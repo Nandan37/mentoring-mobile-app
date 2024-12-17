@@ -40,11 +40,14 @@ export class HttpService {
   }
 
   async setHeaders() {
-    let token = await this.getToken();
+    let token;
+    if(!window['env']['isAuthBypassed']) {
+      token = await this.getToken();
+    }
     const timezone = Intl.DateTimeFormat().resolvedOptions().timeZone;
     const acceptLanguage = await this.localStorage.getLocalData(localKeys.SELECTED_LANGUAGE);
     const headers = {
-      'X-auth-token': token ? token : "",
+      'x-authenticated-user-token': token ? token : "",
       'Content-Type': 'application/json',
       'timeZone': timezone,
       'accept-language':acceptLanguage
@@ -208,6 +211,9 @@ export class HttpService {
   }
 
   public handleError(result) {
+    if(result.data.responseCode == 'UNAUTHORIZED') {
+      this.triggerLogoutConfirmationAlert(result)
+    }
     let msg = result.data.message;
     switch (result.status) {
       case 400:
@@ -217,6 +223,8 @@ export class HttpService {
         this.toastService.showToast(msg ? msg : 'SOMETHING_WENT_WRONG', 'danger')
         break
       case 401:
+      case 419:
+      case 302:
           this.triggerLogoutConfirmationAlert(result)
 
         break
@@ -252,7 +260,7 @@ export class HttpService {
         });
         this.isAlertOpen = true;
       const alert = await this.alert.create({
-        message: msg,
+        message: msg || 'Session expired. Please login again',
         buttons: [
           {
             text: texts['OK'],
