@@ -1,4 +1,4 @@
-import { NgModule } from '@angular/core';
+import { NgModule, CUSTOM_ELEMENTS_SCHEMA } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 
@@ -9,7 +9,6 @@ import { ChatWindowPageRoutingModule } from './chat-window-routing.module';
 import { ChatWindowPage } from './chat-window.page';
 import { CoreModule } from 'src/app/core/core.module';
 import { SharedModule } from 'src/app/shared/shared.module';
-
 @NgModule({
   imports: [
     CommonModule,
@@ -17,8 +16,9 @@ import { SharedModule } from 'src/app/shared/shared.module';
     IonicModule,
     ChatWindowPageRoutingModule,
     CoreModule,
-    SharedModule
+    SharedModule,
   ],
-  declarations: [ChatWindowPage]
+  schemas: [CUSTOM_ELEMENTS_SCHEMA],
+  declarations: [ChatWindowPage],
 })
 export class ChatWindowPageModule {}

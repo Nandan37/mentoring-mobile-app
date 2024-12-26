@@ -71,6 +71,7 @@ export const urlConstants = {
         SEND_REQUEST:"/mentoring/v1/connections/initiate",
         ACCEPT_MSG_REQ:"/mentoring/v1/connections/accept",
         REJECT_MSG_REQ:"/mentoring/v1/connections/reject",
-        GET_PENDING_CONNECTIONS:"/mentoring/v1/connections/pending"
+        GET_PENDING_CONNECTIONS:"/mentoring/v1/connections/pending",
+        GET_CHAT_TOKEN:"/mentoring/v1/profile/getCommunicationToken"
     }
 };

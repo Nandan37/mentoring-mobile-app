@@ -1,10 +1,15 @@
-import { Component, OnInit, ViewChild} from '@angular/core';
+import { Component, OnInit, ViewChild, ViewEncapsulation } from '@angular/core';
 import { MatPaginator } from '@angular/material/paginator';
 import { ActivatedRoute, Router } from '@angular/router';
 import { ModalController } from '@ionic/angular';
+import { FrontendChatLibraryService } from 'frontend-chat-library';
 import { FILTER_ROLES } from 'src/app/core/constants/formConstant';
-import { NO_RESULT_FOUND_FOR_MENTEE, NO_RESULT_FOUND_FOR_MENTOR } from 'src/app/core/constants/genericConstants';
+import {
+  NO_RESULT_FOUND_FOR_MENTEE,
+  NO_RESULT_FOUND_FOR_MENTOR,
+} from 'src/app/core/constants/genericConstants';
 import { paginatorConstants } from 'src/app/core/constants/paginatorConstants';
+import { urlConstants } from 'src/app/core/constants/urlConstants';
 import { HttpService, UtilService } from 'src/app/core/services';
 import { FormService } from 'src/app/core/services/form/form.service';
 import { PermissionService } from 'src/app/core/services/permission/permission.service';
@@ -17,9 +22,10 @@ import { CommonRoutes } from 'src/global.routes';
   selector: 'app-generic-list',
   templateUrl: './generic-list.page.html',
   styleUrls: ['./generic-list.page.scss'],
+  encapsulation: ViewEncapsulation.None,
 })
 export class GenericListPage implements OnInit {
-  @ViewChild('subscribe') searchbarComponent: SearchbarComponent
+  @ViewChild('subscribe') searchbarComponent: SearchbarComponent;
   @ViewChild(MatPaginator) paginator!: MatPaginator;
   pageSize = paginatorConstants.defaultPageSize;
   pageSizeOptions = paginatorConstants.pageSizeOptions;
@@ -54,89 +60,106 @@ export class GenericListPage implements OnInit {
   filterChipsSelected: boolean = false;
   selectedCriteria: any;
 
-  constructor(private route: ActivatedRoute,
+  constructor(
+    private route: ActivatedRoute,
     private httpService: HttpService,
     private modalCtrl: ModalController,
     private utilService: UtilService,
     private formService: FormService,
-    private permissionService:PermissionService,
+    private permissionService: PermissionService,
     private router: Router,
-    private profileService: ProfileService
-  ) { }
+    private profileService: ProfileService,
+    private chatService: FrontendChatLibraryService
+  ) {}
 
-  ngOnInit() { }
+  ngOnInit() {}
 
-  ionViewWillEnter(){
+  ionViewWillEnter() {
     this.isMentor = this.profileService.isMentor;
-    this.route.data.subscribe(data => {
+    this.route.data.subscribe((data) => {
       this.routeData = data;
       this.action(this.routeData);
       this.buttonConfig = this.routeData?.button_config;
     });
     this.filterListData(this.routeData.filterType);
     this.getData(this.routeData);
-    if(!this.searchText &&this.isMentor && !this.totalCount){
-      this.noResult = NO_RESULT_FOUND_FOR_MENTOR
+    if (!this.searchText && this.isMentor && !this.totalCount) {
+      this.noResult = NO_RESULT_FOUND_FOR_MENTOR;
       this.enableExploreButton = true;
-    }else if(!this.searchText &&!this.isMentor && !this.totalCount){
+    } else if (!this.searchText && !this.isMentor && !this.totalCount) {
       this.noResult = NO_RESULT_FOUND_FOR_MENTEE;
       this.enableExploreButton = true;
-    }else{
+    } else {
       this.noResult = this.routeData?.noDataFound;
       this.enableExploreButton = false;
     }
   }
 
-  searchResults(event){
+  searchResults(event) {
     this.searchAndCriterias = {
       headerData: event,
-      routeData: this.routeData
-    }
+      routeData: this.routeData,
+    };
     this.searchAndCriterias = { ...this.searchAndCriterias };
     this.selectedCriteria = event?.criterias?.name;
     this.searchText = event?.searchText;
-    this.getData(this.searchAndCriterias)
+    this.getData(this.searchAndCriterias);
   }
-  async getData(data){
+  async getData(data) {
     let response = await this.httpService.get({
-      url: this.routeData.url + (this.page ? this.page : '')+ 
-      '&limit=' + (this.pageSize ? this.pageSize : '') +  
-      '&search=' + (this.searchText ? btoa(this.searchText) : '') + 
-      '&' + (this.urlQueryData ? this.urlQueryData: '') + 
-      '&search_on=' + (this.selectedCriteria ? this.selectedCriteria : '')
-    })
+      url:
+        this.routeData.url +
+        (this.page ? this.page : '') +
+        '&limit=' +
+        (this.pageSize ? this.pageSize : '') +
+        '&search=' +
+        (this.searchText ? btoa(this.searchText) : '') +
+        '&' +
+        (this.urlQueryData ? this.urlQueryData : '') +
+        '&search_on=' +
+        (this.selectedCriteria ? this.selectedCriteria : ''),
+    });
     this.isLoaded = true;
     this.responseData = response.result.data;
     this.totalCount = response?.result?.count;
-    if(this.searchText && !this.responseData.length){
-    this.noResult = this.routeData?.noDataFound;
-    this.enableExploreButton = false;
+    if (this.searchText && !this.responseData.length) {
+      this.noResult = this.routeData?.noDataFound;
+      this.enableExploreButton = false;
     }
-    if(!this.responseData?.length && this.searchText && !this.filterChipsSelected) { 
+    if (
+      !this.responseData?.length &&
+      this.searchText &&
+      !this.filterChipsSelected
+    ) {
       this.filterIcon = false;
-    } else { 
+    } else {
       this.filterIcon = true;
     }
   }
-
 
   async onClickFilter() {
     let modal = await this.modalCtrl.create({
       component: FilterPopupComponent,
       cssClass: 'filter-modal',
-      componentProps: { filterData: this.filterData }
+      componentProps: { filterData: this.filterData },
     });
 
     modal.onDidDismiss().then(async (dataReturned) => {
-      this.filteredDatas = []
+      this.filteredDatas = [];
       if (dataReturned.data && dataReturned.data.data) {
         if (dataReturned.data.data.selectedFilters) {
           for (let key in dataReturned.data.data.selectedFilters) {
-            this.filteredDatas[key] = dataReturned.data.data.selectedFilters[key].slice(0, dataReturned.data.data.selectedFilters[key].length).map(obj => obj.value).join(',').toString()
+            this.filteredDatas[key] = dataReturned.data.data.selectedFilters[
+              key
+            ]
+              .slice(0, dataReturned.data.data.selectedFilters[key].length)
+              .map((obj) => obj.value)
+              .join(',')
+              .toString();
           }
-          if(dataReturned.data.data.selectedFilters.roles){
+          if (dataReturned.data.data.selectedFilters.roles) {
             this.filterChipsSelected = true;
-          }else{
+          } else {
             this.filterChipsSelected = false;
           }
           this.selectedChips = true;
@@ -145,19 +168,18 @@ export class GenericListPage implements OnInit {
         this.getUrlQueryData();
         this.page = 1;
         this.setPaginatorToFirstpage = true;
-        this.getData(this.urlQueryData)
+        this.getData(this.urlQueryData);
       }
     });
     modal.present();
   }
 
-
-  async filterListData(filterType){
-    const obj = {filterType: filterType, org: true};
+  async filterListData(filterType) {
+    const obj = { filterType: filterType, org: true };
     let data = await this.formService.filterList(obj);
     this.filterData = await this.utilService.transformToFilterData(data, obj);
-    const filterRoles = this.isMentor ? FILTER_ROLES: "";
-    filterRoles ? this.filterData.unshift(filterRoles) : "";
+    const filterRoles = this.isMentor ? FILTER_ROLES : '';
+    filterRoles ? this.filterData.unshift(filterRoles) : '';
   }
   extractLabels(data) {
     this.chips = [];
@@ -170,52 +192,69 @@ export class GenericListPage implements OnInit {
 
   getUrlQueryData() {
     const queryString = Object.keys(this.filteredDatas)
-      .map(key => `${key}=${this.filteredDatas[key]}`)
+      .map((key) => `${key}=${this.filteredDatas[key]}`)
       .join('&');
 
-      this.urlQueryData = queryString;
+    this.urlQueryData = queryString;
   }
 
-  removeChip(event){
+  removeChip(event) {
     this.chips.splice(event.index, 1);
-    this.removeFilteredData(event.chipValue)
+    this.removeFilteredData(event.chipValue);
     this.getUrlQueryData();
-
   }
 
   removeFilteredData(chip: string) {
-    Object.keys(this.filteredDatas).forEach(key => {
-        let values = this.filteredDatas[key].split(',');
-        let chipIndex = values.indexOf(chip);
+    Object.keys(this.filteredDatas).forEach((key) => {
+      let values = this.filteredDatas[key].split(',');
+      let chipIndex = values.indexOf(chip);
 
-        if (chipIndex > -1) {
-            values.splice(chipIndex, 1);
-            this.filteredDatas[key] = values.length ? values.join(',') : delete this.filteredDatas[key];
-        }
+      if (chipIndex > -1) {
+        values.splice(chipIndex, 1);
+        this.filteredDatas[key] = values.length
+          ? values.join(',')
+          : delete this.filteredDatas[key];
+      }
     });
-}
+  }
 
-  onPageChange(event){
-    this.page = event.pageIndex + 1,
-    this.pageSize = this.paginator.pageSize;
-    this.getData(event)
+  onPageChange(event) {
+    (this.page = event.pageIndex + 1),
+      (this.pageSize = this.paginator.pageSize);
+    this.getData(event);
   }
 
   action(event) {
-    if(event && event.filterType){
-      this.permissionService.getPlatformConfig().then((config)=>{
-        this.overlayChips = config?.result?.search_config?.search[event.filterType]?.fields;
-       })
+    if (event && event.filterType) {
+      this.permissionService.getPlatformConfig().then((config) => {
+        this.overlayChips =
+          config?.result?.search_config?.search[event.filterType]?.fields;
+      });
     }
   }
 
-  eventAction(event){
+  eventAction(event) {
     switch (event.type) {
       case 'cardSelect':
         this.router.navigate([CommonRoutes.MENTOR_DETAILS, event?.data?.id]);
         break;
       case 'chat':
-        this.router.navigate([CommonRoutes.CHAT, event.data]);
+        // this.router.navigate([CommonRoutes.CHAT, event.data]);
+        this.httpService
+          .get({ url: urlConstants.API_URLS.GET_CHAT_TOKEN })
+          .then((resp) => {
+            console.log(resp, 'resp');
+            if (resp.result) {
+              const payload = {
+                xAuthToken: resp.result.auth_token,
+                userId: resp.result.user_id,
+              };
+              this.chatService.setConfig(payload);
+              console.log(this.chatService.config, '<========= config');
+              this.router.navigate(['/lib/messages']);
+            }
+          });
+
         break;
     }
   }
@@ -223,5 +262,4 @@ export class GenericListPage implements OnInit {
   eventHandler(event: string) {
     this.valueFromChipAndFilter = event;
   }
-  
 }
