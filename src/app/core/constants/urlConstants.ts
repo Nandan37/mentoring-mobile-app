@@ -22,7 +22,7 @@ export const urlConstants = {
         PROFILE_READ: "/mentoring/v1/profile/read",
         CREATED_SESSIONS: "/mentoring/v1/mentors/createdSessions?page=",
         MENTORS_DIRECTORY_LIST: "/mentoring/v1/mentors/list?page=",
-        MENTORS_PROFILE_DETAILS: "/mentoring/v1/mentors/details/",
+        MENTORS_PROFILE_DETAILS: "/interface/v1/mentors/details/",
         SESSION_DOWNLOAD_CSV: "/mentoring/v1/sessions/getSampleCSV",
         SESSION_BULK_UPLOAD: "/mentoring/v1/sessions/bulkSessionCreate",
         
