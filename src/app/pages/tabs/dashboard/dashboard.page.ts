@@ -151,7 +151,8 @@ export class DashboardPage implements OnInit {
   async handleRoleChange(e) {
     this.selectedRole = e.detail.value;
     this.session_type = 'ALL';
-   this.filteredFormData = this.bigNumberFormData[this.selectedRole] || [];
+    this.categories = '';
+    this.filteredFormData = this.bigNumberFormData[this.selectedRole] || [];
     this.filteredCards = this.filteredFormData|| [];
     if(this.filteredCards){
       this.bigNumberCount();
