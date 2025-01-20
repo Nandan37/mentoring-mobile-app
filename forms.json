@@ -1670,11 +1670,11 @@
             ],
             "chartConfig": [
               {
-                "private_sessions_created": "Number of Sessions Created/Assigned",
+                "private_session_attended": "Number of Sessions Created/Assigned",
                 "backgroundColor": "#832215"
               },
               {
-                "private_sessions_conducted": "Number of Sessions conducted",
+                "private_session_enrolled": "Number of Sessions conducted",
                 "backgroundColor": "#999999"
               }
             ]
@@ -1736,7 +1736,7 @@
                     "value": "com"
                   },
                   {
-                    "label": "School process",
+                    "label": "Rahul process",
                     "value": "sp"
                   }
                 ]
