@@ -19,24 +19,9 @@ const routes: Routes = [
     canActivate: [PublicGuard],
   },
   {
-    path: 'lib',
-    loadChildren: () =>
-      import('frontend-chat-library').then(
-        (m) => m.FrontendChatLibraryModuleRouting
-      ),
-  },
-  {
     path: '**',
     redirectTo: '',
     pathMatch: 'full',
-  },
-
-  {
-    path: 'auth',
-    loadChildren: () =>
-      import('authentication_frontend_library').then(
-        (m) => m.SlRoutingRoutingModule
-      ),
   },
 ];
 @NgModule({

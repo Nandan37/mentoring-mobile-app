@@ -205,6 +205,14 @@ const routes: Routes = [
         },
       },
       {
+        path: 'messages',
+        loadChildren: () =>
+          import('../../pages/messages/messages.module').then(
+            (m) => m.MessagesPageModule
+          ),
+        canActivate: [PrivateGuard],
+      },
+      {
         path: 'chat/:id',
         loadChildren: () =>
           import('../../pages/chat-window/chat-window.module').then(
@@ -212,7 +220,14 @@ const routes: Routes = [
           ),
         canActivate: [PrivateGuard],
       },
-
+      {
+        path: 'chat-request/:id',
+        loadChildren: () =>
+          import('../../pages/chat-request/chat-request.module').then(
+            (m) => m.ChatRequestPageModule
+          ),
+        canActivate: [PrivateGuard],
+      },
       {
         path: '',
         redirectTo: '',

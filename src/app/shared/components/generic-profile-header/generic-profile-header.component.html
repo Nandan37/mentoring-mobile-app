@@ -1,28 +1,80 @@
 <div *ngIf="headerData" class="header-bottom-border">
   <ion-row class="content-wrapper">
     <ion-col size="4">
-      <div class="d-flex flex-justify-center">
-        <img *ngIf="!headerData?.image || headerData?.image==''; else Img; let image" src="../../../../assets/prof-img/user.png" />
+      <div class="d-flex flex-justify-center flex-align-items-center flex-col">
+        <div class="profile-img">
+          <ion-icon
+            name="people-outline"
+            *ngIf="headerData?.is_connected"
+          ></ion-icon>
+          <img
+            *ngIf="
+              !headerData?.image || headerData?.image == '';
+              else Img;
+              let image
+            "
+            src="../../../../assets/prof-img/user.png"
+          />
+        </div>
         <ng-template #Img>
-          <img src="{{headerData?.image}}" />
+          <div class="profile-img">
+            <ion-icon
+              name="people-outline"
+              *ngIf="headerData?.is_connected"
+            ></ion-icon>
+            <img src="{{ headerData?.image }}" />
+          </div>
         </ng-template>
+        <div
+          class="d-inline-flex flex-align-items-center my-4 items-baseline ratings-banner"
+          *ngIf="headerData?.rating?.average"
+        >
+          {{ headerData?.rating?.average }}
+          <ion-icon name="star" style="margin-left: 5px"></ion-icon>
+        </div>
+        <div
+          class="d-inline-flex flex-align-items-center my-4"
+          *ngIf="headerData?.location"
+        >
+          <ion-label class="location">
+            <ion-icon name="location"></ion-icon
+            >{{ headerData?.location?.label }}</ion-label
+          >
+        </div>
       </div>
     </ion-col>
     <ion-col size="8" class="details-wrapper">
       <div>
-        <ion-label *ngIf="headerData?.name" class="name">{{headerData?.name}} </ion-label>
+        <ion-label *ngIf="headerData?.name" class="name"
+          >{{ headerData?.name }}
+        </ion-label>
       </div>
       <div class="roles-div">
-        <ion-label *ngIf="roles">{{ roles[0].title | snakeCaseToUpperCase}}</ion-label>
-        <ion-label class="view-roles" (click)="viewRoles()">{{"VIEW_ROLES" | translate}}</ion-label>
+        <ion-label
+          >{{ headerData?.designation[0]?.label }} ({{
+            headerData?.experience
+          }}
+          years)</ion-label
+        >
       </div>
-      <div class="d-inline-flex flex-align-items-center my-4" *ngIf="headerData?.location">
-        <ion-icon name="location"></ion-icon>
-        <ion-label class="location">{{headerData?.location?.label}}</ion-label>
+      <div class="d-inline-flex flex-align-items-center my-4">
+        <ion-label class="location" *ngIf="headerData?.is_mentor"
+          >{{ "SESSIONS_CONDUCTED" | translate }} :
+          {{ headerData?.sessions_hosted || 0 }}</ion-label
+        >
+        <ion-label class="location" *ngIf="!headerData?.is_mentor"
+          >{{ "SESSIONS_ATTENDED" | translate }} :
+          {{ headerData?.sessions_hosted || 0 }}</ion-label
+        >
       </div>
-      <div *ngIf="buttonConfig">
+      <div *ngIf="buttonConfig" class="flex flex-justify-start mt-4 wrap">
         <div *ngFor="let button of buttonConfig.buttons">
-          <ion-button color="Light" expand="block" fill="outline" shape="round" (click)="action(button?.action)">{{ button?.label | translate }}</ion-button>
+          <ion-button
+            color="light"
+            expand="block"
+            (click)="action(button?.action)"
+            >{{ button?.label | translate }}</ion-button
+          >
         </div>
       </div>
     </ion-col>

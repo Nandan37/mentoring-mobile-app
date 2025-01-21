@@ -154,7 +154,7 @@ export class MentorSearchDirectoryPage implements OnInit {
         this.router.navigate([CommonRoutes.MENTOR_DETAILS, event?.data?.id]);
         break;
         case 'chat':
-          this.router.navigate([CommonRoutes.CHAT, event.data]);
+          this.router.navigate([CommonRoutes.CHAT_REQ, event.data]);
           break;
     }
   }

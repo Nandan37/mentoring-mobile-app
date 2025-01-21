@@ -11,7 +11,6 @@ import { CommonRoutes } from 'src/global.routes';
   styleUrls: ['./requests.page.scss'],
 })
 export class RequestsPage implements OnInit {
-
   public headerConfig: any = {
     menu: true,
     label: 'REQUESTS',
@@ -27,42 +26,41 @@ export class RequestsPage implements OnInit {
   constructor(
     private httpService: HttpService,
     private route: ActivatedRoute,
-    private router : Router
-  ) { }
+    private router: Router
+  ) {}
 
-  ngOnInit() { 
+  ngOnInit() {
     this.pendingRequest();
-    this.route.data.subscribe(data => {
+    this.route.data.subscribe((data) => {
       this.routeData = data;
       this.buttonConfig = this.routeData?.button_config;
-    })
-   }
+    });
+  }
 
-  segmentChanged(event){
+  segmentChanged(event) {
     this.segmentType = event.target.value;
   }
 
-  async pendingRequest(){
+  async pendingRequest() {
     const config = {
-      url: urlConstants.API_URLS.CONNECTION_REQUEST
+      url: urlConstants.API_URLS.CONNECTION_REQUEST,
     };
     try {
       let data: any = await this.httpService.get(config);
       this.data = data ? data.result.data : '';
-      if(!this.data.length){
+      if (!this.data.length) {
         this.noResult = this.routeData?.noDataFound;
       }
       return data;
-    }
-    catch (error) {
-      return error
+    } catch (error) {
+      return error;
     }
   }
 
-  onCardClick(event){
+  onCardClick(event) {
     switch (event.type) {
       case 'viewMessage':
-        this.router.navigate([CommonRoutes.CHAT, event.data]);
+        this.router.navigate([CommonRoutes.CHAT_REQ, event.data]);
         break;
     }
   }

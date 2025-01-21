@@ -13,27 +13,31 @@ export class GenericCardComponent implements OnInit {
   @Input() buttonConfig: any;
   @Input() meta: any;
 
-  constructor(private router: Router) { }
+  constructor(private router: Router) {}
 
-  ngOnInit() { }
+  ngOnInit() {}
 
   onCardClick(data) {
-    this.router.navigate([CommonRoutes.MENTOR_DETAILS, (data?.id || data?.user_id)]);
+    this.router.navigate([
+      CommonRoutes.MENTOR_DETAILS,
+      data?.id || data?.user_id,
+    ]);
   }
-  handleButtonClick(action: string, id) {
+  handleButtonClick(action: string, data) {
     let value = {
-      data: id,
+      data: data.id || data.user_id,
       type: action,
-    }
+      rid: data?.connection_meta?.room_id,
+    };
     this.onClickEvent.emit(value);
   }
-  showButton(event, data){
-    if(!event.hasCondition){
-      return true
-    }else if(event[event.onCheck] == data[event.onCheck]){
-      return true
-    }else{
-      return false
+  showButton(event, data) {
+    if (!event.hasCondition) {
+      return true;
+    } else if (event[event.onCheck] == data[event.onCheck]) {
+      return true;
+    } else {
+      return false;
     }
   }
 }

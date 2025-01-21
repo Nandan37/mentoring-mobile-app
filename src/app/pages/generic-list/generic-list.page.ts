@@ -2,7 +2,7 @@ import { Component, OnInit, ViewChild, ViewEncapsulation } from '@angular/core';
 import { MatPaginator } from '@angular/material/paginator';
 import { ActivatedRoute, Router } from '@angular/router';
 import { ModalController } from '@ionic/angular';
-import { FrontendChatLibraryService } from 'frontend-chat-library';
+import { FrontendChatLibraryService } from 'sl-chat-library';
 import { FILTER_ROLES } from 'src/app/core/constants/formConstant';
 import {
   NO_RESULT_FOUND_FOR_MENTEE,
@@ -239,22 +239,10 @@ export class GenericListPage implements OnInit {
         this.router.navigate([CommonRoutes.MENTOR_DETAILS, event?.data?.id]);
         break;
       case 'chat':
-        // this.router.navigate([CommonRoutes.CHAT, event.data]);
-        this.httpService
-          .get({ url: urlConstants.API_URLS.GET_CHAT_TOKEN })
-          .then((resp) => {
-            console.log(resp, 'resp');
-            if (resp.result) {
-              const payload = {
-                xAuthToken: resp.result.auth_token,
-                userId: resp.result.user_id,
-              };
-              this.chatService.setConfig(payload);
-              console.log(this.chatService.config, '<========= config');
-              this.router.navigate(['/lib/messages']);
-            }
-          });
-
+        if (!event.rid) {
+          return;
+        }
+        this.router.navigate([CommonRoutes.CHAT, event.rid]);
         break;
     }
   }

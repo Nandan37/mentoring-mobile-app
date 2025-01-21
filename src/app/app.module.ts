@@ -23,9 +23,8 @@ import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { MatTableModule } from '@angular/material/table';
 import { MatPaginatorModule } from '@angular/material/paginator';
 import { RecaptchaModule } from 'ng-recaptcha';
-import { FrontendChatLibraryModule } from 'frontend-chat-library';
-import { SlAuthLibModule } from 'authentication_frontend_library';
-
+import { FrontendChatLibraryModule } from 'sl-chat-library';
+import { MatToolbarModule } from '@angular/material/toolbar';
 export const translateHttpLoaderFactory = (httpClient: HttpClient) =>
   new TranslateHttpLoader(httpClient, './assets/i18n/', '.json');
 
@@ -39,7 +38,6 @@ export const translateHttpLoaderFactory = (httpClient: HttpClient) =>
     AppRoutingModule,
     HttpClientModule,
     MatTableModule,
-    SlAuthLibModule,
     MatPaginatorModule,
     IonicStorageModule.forRoot({
       name: 'mentoringApp',
@@ -59,12 +57,11 @@ export const translateHttpLoaderFactory = (httpClient: HttpClient) =>
         typeof environment.production == 'string'
           ? JSON.parse(environment.production)
           : environment.production,
-      // Register the ServiceWorker as soon as the app is stable
-      // or after 30 seconds (whichever comes first).
       registrationStrategy: 'registerWhenStable:30000',
     }),
     BrowserAnimationsModule,
     RecaptchaModule,
+    MatToolbarModule,
     FrontendChatLibraryModule,
   ],
   exports: [],

@@ -1,0 +1,9 @@
+<app-page-header [config]="headerConfig"> </app-page-header>
+<ion-content>
+  <div *ngIf="showChat">
+    <lib-message-listing
+      (onSelect)="onSelect($event)"
+      (newMessageEvent)="messageBadge($event)"
+    ></lib-message-listing>
+  </div>
+</ion-content>
