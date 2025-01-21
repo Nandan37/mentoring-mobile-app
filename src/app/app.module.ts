@@ -1,4 +1,4 @@
-import { NgModule } from '@angular/core';
+import { NgModule, CUSTOM_ELEMENTS_SCHEMA } from '@angular/core';
 import { BrowserModule } from '@angular/platform-browser';
 import { RouteReuseStrategy } from '@angular/router';
 import { IonicModule, IonicRouteStrategy } from '@ionic/angular';
@@ -23,46 +23,53 @@ import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { MatTableModule } from '@angular/material/table';
 import { MatPaginatorModule } from '@angular/material/paginator';
 import { RecaptchaModule } from 'ng-recaptcha';
-
+import { FrontendChatLibraryModule } from 'sl-chat-library';
+import { MatToolbarModule } from '@angular/material/toolbar';
 export const translateHttpLoaderFactory = (httpClient: HttpClient) =>
   new TranslateHttpLoader(httpClient, './assets/i18n/', '.json');
 
 @NgModule({
-    declarations: [AppComponent],
-    imports: [
-        CommonModule,
-        BrowserModule,
-        IonicModule.forRoot(),
-        AppRoutingModule,
-        HttpClientModule,
-        MatTableModule,
-        MatPaginatorModule,
-        IonicStorageModule.forRoot({
-            name: 'mentoringApp',
-            driverOrder: [Drivers.IndexedDB, Drivers.LocalStorage],
-        }),
-        CoreModule,
-        TranslateModule.forRoot({
-            loader: {
-                provide: TranslateLoader,
-                useFactory: translateHttpLoaderFactory,
-                deps: [HttpClient],
-            },
-        }),
-        ReactiveFormsModule,
-        ServiceWorkerModule.register('ngsw-worker.js', {
-            enabled: typeof (environment.production) == 'string' ? JSON.parse(environment.production) : environment.production,
-            // Register the ServiceWorker as soon as the app is stable
-            // or after 30 seconds (whichever comes first).
-            registrationStrategy: 'registerWhenStable:30000'
-        }),
-        BrowserAnimationsModule,
-        RecaptchaModule,
-    ],
-    providers: [{ provide: RouteReuseStrategy, useClass: IonicRouteStrategy },
-        TitleCasePipe,
-        SwUpdate
-    ],
-    bootstrap: [AppComponent]
+  declarations: [AppComponent],
+  schemas: [CUSTOM_ELEMENTS_SCHEMA],
+  imports: [
+    CommonModule,
+    BrowserModule,
+    IonicModule.forRoot(),
+    AppRoutingModule,
+    HttpClientModule,
+    MatTableModule,
+    MatPaginatorModule,
+    IonicStorageModule.forRoot({
+      name: 'mentoringApp',
+      driverOrder: [Drivers.IndexedDB, Drivers.LocalStorage],
+    }),
+    CoreModule,
+    TranslateModule.forRoot({
+      loader: {
+        provide: TranslateLoader,
+        useFactory: translateHttpLoaderFactory,
+        deps: [HttpClient],
+      },
+    }),
+    ReactiveFormsModule,
+    ServiceWorkerModule.register('ngsw-worker.js', {
+      enabled:
+        typeof environment.production == 'string'
+          ? JSON.parse(environment.production)
+          : environment.production,
+      registrationStrategy: 'registerWhenStable:30000',
+    }),
+    BrowserAnimationsModule,
+    RecaptchaModule,
+    MatToolbarModule,
+    FrontendChatLibraryModule,
+  ],
+  exports: [],
+  providers: [
+    { provide: RouteReuseStrategy, useClass: IonicRouteStrategy },
+    TitleCasePipe,
+    SwUpdate,
+  ],
+  bootstrap: [AppComponent],
 })
 export class AppModule {}

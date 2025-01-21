@@ -1,4 +1,11 @@
-import { Component, Input, OnInit, Output, EventEmitter, ViewChild } from '@angular/core';
+import {
+  Component,
+  Input,
+  OnInit,
+  Output,
+  EventEmitter,
+  ViewChild,
+} from '@angular/core';
 import { Router } from '@angular/router';
 import { localKeys } from 'src/app/core/constants/localStorage.keys';
 import { LocalStorageService, ToastService } from 'src/app/core/services';
@@ -15,70 +22,97 @@ import { App, AppState } from '@capacitor/app';
 export class SessionCardComponent implements OnInit {
   @Input() data: any;
   @Input() isEnrolled;
+  @Input() showBanner: boolean = false;
+  @Input() profileImg: any;
   @Output() onClickEvent = new EventEmitter();
   @ViewChild(IonModal) modal: IonModal;
+
   startDate;
   isCreator: boolean;
-  isConductor:boolean;
+  isConductor: boolean;
   buttonConfig;
   userData: any;
   endDate;
   isModalOpen = false;
   meetingPlatform: any;
-  
-  constructor(private router: Router, private sessionService: SessionService, private toast: ToastService, private localStorage: LocalStorageService) { }
-  
+
+  constructor(
+    private router: Router,
+    private sessionService: SessionService,
+    private toast: ToastService,
+    private localStorage: LocalStorageService
+  ) {}
+
   async ngOnInit() {
     App.addListener('appStateChange', (state: AppState) => {
       if (state.isActive == true) {
-        this.setButtonConfig(this.isCreator,this.isConductor);
+        this.setButtonConfig(this.isCreator, this.isConductor);
       }
     });
-    this.meetingPlatform = (this.data?.meeting_info);
+    this.meetingPlatform = this.data?.meeting_info;
     this.isCreator = await this.checkIfCreator();
     this.isConductor = await this.checkIfConductor();
-    this.setButtonConfig(this.isCreator,this.isConductor);
-    this.startDate = (this.data.start_date>0)?new Date(this.data.start_date * 1000):this.startDate;
-    this.endDate = (this.data.end_date>0)?new Date(this.data.start_date * 1000):this.endDate;
+    this.setButtonConfig(this.isCreator, this.isConductor);
+    this.startDate =
+      this.data.start_date > 0
+        ? new Date(this.data.start_date * 1000)
+        : this.startDate;
+    this.endDate =
+      this.data.end_date > 0
+        ? new Date(this.data.start_date * 1000)
+        : this.endDate;
   }
- 
-  setButtonConfig(isCreator: boolean, isConductor:boolean) {
-    let currentTimeInSeconds=Math.floor(Date.now()/1000);
-    if(isConductor){
-      this.buttonConfig={label:"START",type:"startAction"};
+
+  setButtonConfig(isCreator: boolean, isConductor: boolean) {
+    let currentTimeInSeconds = Math.floor(Date.now() / 1000);
+    if (isConductor) {
+      this.buttonConfig = { label: 'START', type: 'startAction' };
     } else {
-      this.buttonConfig=(!isCreator && !isConductor &&this.data.is_enrolled || this.isEnrolled)?{label:"JOIN",type:"joinAction"}:{label:"ENROLL",type:"enrollAction"};
+      this.buttonConfig =
+        (!isCreator && !isConductor && this.data.is_enrolled) || this.isEnrolled
+          ? { label: 'JOIN', type: 'joinAction' }
+          : { label: 'ENROLL', type: 'enrollAction' };
     }
-    this.buttonConfig.isEnabled = ((this.data.start_date - currentTimeInSeconds) < 600 && !(this.data?.meeting_info?.platform == 'OFF')) ? true : false
+    this.buttonConfig.isEnabled =
+      this.data.start_date - currentTimeInSeconds < 600 &&
+      !(this.data?.meeting_info?.platform == 'OFF')
+        ? true
+        : false;
   }
 
   async checkIfCreator() {
-    this.userData = await this.localStorage.getLocalData(localKeys.USER_DETAILS)
-    return (this.data.created_by == this.userData.id) ?true : false;
+    this.userData = await this.localStorage.getLocalData(
+      localKeys.USER_DETAILS
+    );
+    return this.data.created_by == this.userData.id ? true : false;
   }
 
   async checkIfConductor() {
-    this.userData = await this.localStorage.getLocalData(localKeys.USER_DETAILS)
-    return (this.data.mentor_id == this.userData.id) ?true : false;
+    this.userData = await this.localStorage.getLocalData(
+      localKeys.USER_DETAILS
+    );
+    return this.data.mentor_id == this.userData.id ? true : false;
   }
- 
+
   onCardClick(data) {
     let value = {
       data: data,
       type: 'cardSelect',
-    }
-    this.onClickEvent.emit(value)
+    };
+    this.onClickEvent.emit(value);
   }
 
-  onButtonClick(data,type){
+  onButtonClick(data, type) {
     let value = {
       data: data,
-      type:type
+      type: type,
     };
-    this.onClickEvent.emit(value)
+    this.onClickEvent.emit(value);
   }
-  clickOnAddMeetingLink(cardData:any){
+  clickOnAddMeetingLink(cardData: any) {
     let id = cardData.id;
-    this.router.navigate([CommonRoutes.CREATE_SESSION], { queryParams: { id: id , type: 'segment'} });
+    this.router.navigate([CommonRoutes.CREATE_SESSION], {
+      queryParams: { id: id, type: 'segment' },
+    });
   }
 }

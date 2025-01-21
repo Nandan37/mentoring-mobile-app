@@ -7,21 +7,27 @@ import { PrivateGuard } from 'src/app/core/guards/private.guard';
 const routes: Routes = [
   {
     path: '',
-    loadChildren: () => import('./modules/private/private.module').then( m => m.PrivatePageModule)
+    loadChildren: () =>
+      import('./modules/private/private.module').then(
+        (m) => m.PrivatePageModule
+      ),
   },
   {
     path: CommonRoutes.AUTH,
-    loadChildren: () => import('./modules/auth/auth.module').then(m => m.AuthPageModule),
-    canActivate:[PublicGuard]
+    loadChildren: () =>
+      import('./modules/auth/auth.module').then((m) => m.AuthPageModule),
+    canActivate: [PublicGuard],
   },
   {
-    path:'**', redirectTo:'',pathMatch:'full'
-  }
+    path: '**',
+    redirectTo: '',
+    pathMatch: 'full',
+  },
 ];
 @NgModule({
   imports: [
-    RouterModule.forRoot(routes, { preloadingStrategy: PreloadAllModules })
+    RouterModule.forRoot(routes, { preloadingStrategy: PreloadAllModules }),
   ],
-  exports: [RouterModule]
+  exports: [RouterModule],
 })
-export class AppRoutingModule { }
+export class AppRoutingModule {}

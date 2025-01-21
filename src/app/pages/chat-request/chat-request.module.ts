@@ -1,12 +1,12 @@
-import { NgModule, CUSTOM_ELEMENTS_SCHEMA } from '@angular/core';
+import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 
 import { IonicModule } from '@ionic/angular';
 
-import { ChatWindowPageRoutingModule } from './chat-window-routing.module';
+import { ChatRequestPageRoutingModule } from './chat-request-routing.module';
 
-import { ChatWindowPage } from './chat-window.page';
+import { ChatRequestPage } from './chat-request.page';
 import { CoreModule } from 'src/app/core/core.module';
 import { SharedModule } from 'src/app/shared/shared.module';
 import { FrontendChatLibraryModule } from 'sl-chat-library';
@@ -15,12 +15,11 @@ import { FrontendChatLibraryModule } from 'sl-chat-library';
     CommonModule,
     FormsModule,
     IonicModule,
-    ChatWindowPageRoutingModule,
+    ChatRequestPageRoutingModule,
     CoreModule,
     SharedModule,
     FrontendChatLibraryModule,
   ],
-  schemas: [CUSTOM_ELEMENTS_SCHEMA],
-  declarations: [ChatWindowPage],
+  declarations: [ChatRequestPage],
 })
-export class ChatWindowPageModule {}
+export class ChatRequestPageModule {}

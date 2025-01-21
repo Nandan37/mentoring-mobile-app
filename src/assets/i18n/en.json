@@ -311,5 +311,8 @@
     "SEARCH_RESULTS_NOT_FOUND_HEADER": "This space looks empty",
     "NO_RESULT_SUB_HEADER_MENTEE": "Expand your network! Book slots or message experienced professionals to get connected.",
     "NO_RESULT_SUB_HEADER_MENTOR": "Connected mentees will appear here when you accept their request. Keep your calender updated to show your availability.",
-    "SET_CALENDAR": "Set Calendar"
+    "SET_CALENDAR": "Set Calendar",
+    "MESSAGES":"Messages",
+    "USER_GUIDE_VIDEOS":"User Guide Videos",
+    "HELP_SIDEMENU":"Report an Issue"
 }
