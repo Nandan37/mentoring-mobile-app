@@ -10,7 +10,7 @@
     </ion-item>
   </div>
 
-  <div class="graphs-and-charts inner-div-style">
+  <div class="graphs-and-charts inner-div-style"  *ngIf="selectedRole !=='org_admin'">
     <ion-grid>
       <ion-row>
         <ion-col size="3" sizeXs="6" sizeLg="3" class="filter-column" *ngFor="let control of dynamicFormControls">
@@ -46,11 +46,14 @@
     </ion-grid>
   </div>
 
-  <div class="tables inner-div-style">
+  <div class="tables inner-div-style"  *ngIf="selectedRole !=='org_admin'">
     <ion-grid>
       <ion-row *ngIf="chartBody?.tableUrl">
         <lib-table [url]="chartBody?.tableUrl" [headers]="chartBody?.headers" [showDownload]="true" [title]="chartBody?.tableTitle"  style="width: 100%;"></lib-table>
       </ion-row>
     </ion-grid>
+  </div>
+  <div *ngIf="selectedRole ==='org_admin'">
+    org admin not available please select other roles
   </div>
 </ion-content>  

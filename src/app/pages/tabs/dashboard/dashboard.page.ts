@@ -47,8 +47,6 @@ export class DashboardPage implements OnInit {
   labels = [];
   groupBy: any;
   chartBody: any = {};
-  // this should be come from form confg.
-  // chartBodyConfig[this.selectedRole][this.session_type]
   chartBodyConfig :any= {}
   constructor(
     private profile: ProfileService,
@@ -70,8 +68,7 @@ export class DashboardPage implements OnInit {
     this.filteredCards = !this.filteredCards.length ? this.bigNumberFormData[this.user[0]] : [];
     this.selectedRole = this.user[0];
     this.filteredFormData = this.bigNumberFormData[this.selectedRole] || [];
-    const formConfig = this.filteredFormData.form;
-    this.dynamicFormControls = formConfig?.controls || [];
+    this.updateFormData(this.result);
     this.session_type = 'ALL';
     this.chartBodyConfig = this.filteredFormData;
     this.chartBody = this.chartBodyConfig;
@@ -260,28 +257,6 @@ export class DashboardPage implements OnInit {
       roles.unshift("mentee");
     }
     return roles
-  }
-  createChart() {
-    this.chartCreationJson = this.segment === 'mentor' ? JSON.parse(JSON.stringify(this.completeDashboardForms.mentor)) : JSON.parse(JSON.stringify(this.completeDashboardForms.mentee))
-    const maxDataValue = Math.max(
-      ...(
-          this.segment === 'mentor' ?
-          [this.chartData.total_session_created, this.chartData.total_session_assigned, this.chartData.total_session_hosted] :
-          [this.chartData.total_session_enrolled, this.chartData.total_session_attended]
-      )
-  );
-  this.chartCreationJson.forEach(chart => {
-    if (chart.options && chart.options.scales && chart.options.scales.y && chart.options.scales.y.ticks) {
-      chart.options.scales.y.ticks.stepSize = this.calculateStepSize(maxDataValue);
-    }
-    if (chart.data && chart.data.datasets) {
-      chart.data.datasets.forEach(dataset => {
-        dataset.data = dataset.data.map(item => this.chartData[item] || 0);
-      });
-    }
-  });
-    this.chart = new Chart('MyChart', this.chartCreationJson[0]);
-    this.dataAvailable = !!(this.chartData?.total_session_created ||this.chartData?.total_session_enrolled ||this.chartData?.total_session_assigned ||this.chartData?.total_session_hosted);
   }
 
   calculateStepSize(maxDataValue) {
