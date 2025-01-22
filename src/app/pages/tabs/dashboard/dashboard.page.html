@@ -16,7 +16,7 @@
         <ion-col size="3" sizeXs="6" sizeLg="3" class="filter-column" *ngFor="let control of dynamicFormControls">
           <h3>{{ control.label }}</h3>
           <ion-item fill="outline" lines="none" class="no-label-item custom-border-radius custom-height">
-            <ion-select [placeholder]="'Select ' + control.label" [value]="control.defaultValue" (ionChange)="handleFormControlChange(control.value, $event)" style="font-size: 13px;">
+            <ion-select [placeholder]="'Select ' + control.label" [value]="control.defaultValue" (ionChange)="handleFormControlChange(control.value, $event)" [multiple]="control.isMultiple" style="font-size: 13px;">
               <ion-select-option class="custom-font-size" *ngFor="let option of control.entities" [value]="option.value">
                 {{ option.label }}
               </ion-select-option>
@@ -40,7 +40,7 @@
       </ion-row>
       <ion-row>
         <ion-col *ngIf="chartBody?.chartUrl && chartBody?.headers">
-          <lib-bar-chart [url]="chartBody?.chartUrl" [headers]="chartBody?.headers" [legends]="chartBody[session_type]['chartConfig']"></lib-bar-chart>
+          <lib-bar-chart [url]="chartBody?.chartUrl" [headers]="chartBody?.headers" [legends]="chartBody[session_type]['chartConfig']" [chartBody]="chartBodyPayload"></lib-bar-chart>
         </ion-col>
       </ion-row>
     </ion-grid>
