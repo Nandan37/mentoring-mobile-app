@@ -5,7 +5,6 @@ import { FormService } from 'src/app/core/services/form/form.service';
 import * as moment from 'moment';
 import { urlConstants } from 'src/app/core/constants/urlConstants';
 import { Component, OnInit } from '@angular/core';
-import { Chart } from 'chart.js/auto';
 import { ProfileService } from 'src/app/core/services/profile/profile.service';
 import { environment } from 'src/environments/environment';
 
@@ -47,9 +46,8 @@ export class DashboardPage implements OnInit {
   labels = [];
   groupBy: any;
   chartBody: any = {};
-  // this should be come from form confg.
-  // chartBodyConfig[this.selectedRole][this.session_type]
   chartBodyConfig :any= {}
+  chartBodyPayload: any;
   constructor(
     private profile: ProfileService,
     private apiService: HttpService,
@@ -70,8 +68,7 @@ export class DashboardPage implements OnInit {
     this.filteredCards = !this.filteredCards.length ? this.bigNumberFormData[this.user[0]] : [];
     this.selectedRole = this.user[0];
     this.filteredFormData = this.bigNumberFormData[this.selectedRole] || [];
-    const formConfig = this.filteredFormData.form;
-    this.dynamicFormControls = formConfig?.controls || [];
+    this.updateFormData(this.result);
     this.session_type = 'ALL';
     this.chartBodyConfig = this.filteredFormData;
     this.chartBody = this.chartBodyConfig;
@@ -150,7 +147,7 @@ export class DashboardPage implements OnInit {
   async handleRoleChange(e) {
     this.selectedRole = e.detail.value;
     this.session_type = 'ALL';
-    this.categories = '';
+    this.categories = {};
     this.filteredFormData = this.bigNumberFormData[this.selectedRole] || [];
     this.filteredCards = this.filteredFormData|| [];
     if(this.filteredCards){
@@ -191,7 +188,7 @@ export class DashboardPage implements OnInit {
         break;
       
       case 'categories':
-        this.categories = event.detail.value;
+        this.categories = (event.detail.value).length ? {[value]: event.detail.value} : null;
         break;
     }
    
@@ -212,16 +209,18 @@ export class DashboardPage implements OnInit {
   transformData(firstObj: any, secondObj: any): any {
     const updatedFirstObj = JSON.parse(JSON.stringify(firstObj));
     updatedFirstObj.form.controls = updatedFirstObj.form.controls.map((control: any) => {
-      const matchingEntityType = secondObj.entity_types[control.value];
+      const matchingEntityType = secondObj.entityTypes.find(
+        (entityType) => entityType.value === control.value
+    );
       if (matchingEntityType) {
         return {
-          ...control,
-          entities: matchingEntityType[0].entities, 
-          type: 'select',
-          label: matchingEntityType[0].label,
-        };
+            ...control,
+            entities: matchingEntityType.entities || [],
+            type: 'select',
+            label: matchingEntityType.label,
+          };
       }
-      return control;
+      return control
     });
 
     return updatedFirstObj;
@@ -240,10 +239,10 @@ export class DashboardPage implements OnInit {
     }
   }
 
-  async reportData(url){
+  async reportData(url, body?){
     const config = {
       url: url,
-      payload: {},
+      payload: body,
     };
     try {
       let data: any = await this.apiService.post(config);
@@ -261,28 +260,6 @@ export class DashboardPage implements OnInit {
     }
     return roles
   }
-  createChart() {
-    this.chartCreationJson = this.segment === 'mentor' ? JSON.parse(JSON.stringify(this.completeDashboardForms.mentor)) : JSON.parse(JSON.stringify(this.completeDashboardForms.mentee))
-    const maxDataValue = Math.max(
-      ...(
-          this.segment === 'mentor' ?
-          [this.chartData.total_session_created, this.chartData.total_session_assigned, this.chartData.total_session_hosted] :
-          [this.chartData.total_session_enrolled, this.chartData.total_session_attended]
-      )
-  );
-  this.chartCreationJson.forEach(chart => {
-    if (chart.options && chart.options.scales && chart.options.scales.y && chart.options.scales.y.ticks) {
-      chart.options.scales.y.ticks.stepSize = this.calculateStepSize(maxDataValue);
-    }
-    if (chart.data && chart.data.datasets) {
-      chart.data.datasets.forEach(dataset => {
-        dataset.data = dataset.data.map(item => this.chartData[item] || 0);
-      });
-    }
-  });
-    this.chart = new Chart('MyChart', this.chartCreationJson[0]);
-    this.dataAvailable = !!(this.chartData?.total_session_created ||this.chartData?.total_session_enrolled ||this.chartData?.total_session_assigned ||this.chartData?.total_session_hosted);
-  }
 
   calculateStepSize(maxDataValue) {
     return Math.ceil(maxDataValue / 5);
@@ -295,11 +272,11 @@ export class DashboardPage implements OnInit {
       `&session_type=${this.session_type}` +
       `&start_date=${this.startDateEpoch || ''}` +
       `&end_date=${this.endDateEpoch || ''}` +
-      `&entities_value=${this.categories || ''}` +
       `&groupBy=${this.groupBy}`;
     const params = `${urlConstants.API_URLS.DASHBOARD_REPORT_DATA}` +
       `report_code=${this.report_code}${queryParams}`;
-    const resp = await this.reportData(params);
+    this.chartBodyPayload =  this.categories ? { entityTypes: this.categories}: {};
+    const resp = await this.reportData(params, this.chartBodyPayload);
     if (value) {
       return resp.data;
     }
@@ -316,13 +293,14 @@ export class DashboardPage implements OnInit {
   }
   async prepareChartUrl(){
     this.chartBody.chartUrl ="";
+    this.chartBodyPayload = "";
     const queryParams = `&report_role=${this.selectedRole}` +
     `&session_type=${this.session_type}` +
     `&start_date=${this.startDateEpoch || ''}` +
     `&end_date=${this.endDateEpoch || ''}` +
-    `&entities_value=${this.categories || ''}` +
     `&groupBy=${this.groupBy}`;
   this.chartBody.chartUrl = this.chartBodyConfig.chartUrl;
+  this.chartBodyPayload = this.categories ? { entityTypes: this.categories} : {};
   setTimeout(() => {
   this.chartBody.chartUrl = `${environment.baseUrl}${urlConstants.API_URLS.DASHBOARD_REPORT_DATA}` + 'report_code='+ this.chartBody.report_code + queryParams;
   }, 10);
