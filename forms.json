@@ -1726,6 +1726,7 @@
                 "value": "categories",
                 "type": "select",
                 "defaultValue": "",
+                "isMultiple": true,
                 "entities": [
                   {
                     "label": "Education qualification",
@@ -1978,6 +1979,7 @@
                 "value": "categories",
                 "type": "select",
                 "defaultValue": "",
+                "isMultiple": true,
                 "entities": [
                   {
                     "label": "Education qualification",
@@ -2230,6 +2232,7 @@
                 "value": "categories",
                 "type": "select",
                 "defaultValue": "",
+                "isMultiple": true,
                 "entities": [
                   {
                     "label": "Education qualification",
