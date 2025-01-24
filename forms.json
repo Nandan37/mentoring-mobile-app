@@ -2080,11 +2080,11 @@
             ],
             "chartConfig": [
               {
-                "private_sessions_created": "Number Private Sessions created",
+                "private_sessions_created": "Private Sessions created",
                 "backgroundColor": "#832215"
               },
               {
-                "public_sessions_created": "Number Public Sessions created",
+                "public_sessions_created": "Public Sessions created",
                 "backgroundColor": "#b94a3b"
               },
               {
