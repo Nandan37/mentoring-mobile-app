@@ -1574,19 +1574,19 @@
             ],
             "chartConfig": [
               {
-                "private_session_enrolled": "Number of Private Sessions Enrolled",
+                "private_session_enrolled": "Private Sessions Enrolled",
                 "backgroundColor": "#832215"
               },
               {
-                "public_session_enrolled": "Number of Public Sessions Enrolled",
+                "public_session_enrolled": "Public Sessions Enrolled",
                 "backgroundColor": "#b94a3b"
               },
               {
-                "private_session_attended": "Number of Private Sessions Attended",
+                "private_session_attended": "Private Sessions Attended",
                 "backgroundColor": "#999999"
               },
               {
-                "public_session_attended": "Number of Public Sessions Attended",
+                "public_session_attended": "Public Sessions Attended",
                 "backgroundColor": "#858585"
               }
             ]
@@ -1626,11 +1626,11 @@
             ],
             "chartConfig": [
               {
-                "public_session_enrolled": "Number of Sessions Enrolled",
+                "public_session_enrolled": "Sessions Enrolled",
                 "backgroundColor": "#832215"
               },
               {
-                "public_session_attended": "Number of Sessions Attended",
+                "public_session_attended": "Sessions Attended",
                 "backgroundColor": "#999999"
               }
             ]
@@ -1670,11 +1670,11 @@
             ],
             "chartConfig": [
               {
-                "private_session_attended": "Number of Sessions Created/Assigned",
+                "private_session_attended": "Sessions Created/Assigned",
                 "backgroundColor": "#832215"
               },
               {
-                "private_session_enrolled": "Number of Sessions conducted",
+                "private_session_enrolled": "Sessions conducted",
                 "backgroundColor": "#999999"
               }
             ]
@@ -1827,19 +1827,19 @@
             ],
             "chartConfig": [
               {
-                "private_sessions_created": "Number of Private Sessions Created/Assigned",
+                "private_sessions_created": "Private Sessions Created/Assigned",
                 "backgroundColor": "#832215"
               },
               {
-                "public_sessions_created": "Number of Public Sessions Created/Assigned",
+                "public_sessions_created": "Public Sessions Created/Assigned",
                 "backgroundColor": "#b94a3b"
               },
               {
-                "private_sessions_conducted": "Number of Private Sessions conducted",
+                "private_sessions_conducted": "Private Sessions conducted",
                 "backgroundColor": "#999999"
               },
               {
-                "public_sessions_conducted": "Number of Public Sessions conducted",
+                "public_sessions_conducted": "Public Sessions conducted",
                 "backgroundColor": "#858585"
               }
             ]
@@ -1879,11 +1879,11 @@
             ],
             "chartConfig": [
               {
-                "public_sessions_created": "Number of Sessions Created/Assigned",
+                "public_sessions_created": "Sessions Created/Assigned",
                 "backgroundColor": "#832215"
               },
               {
-                "public_sessions_conducted": "Number of Sessions conducted",
+                "public_sessions_conducted": "Sessions conducted",
                 "backgroundColor": "#999999"
               }
             ]
@@ -1923,11 +1923,11 @@
             ],
             "chartConfig": [
               {
-                "private_sessions_created": "Number of Sessions Created/Assigned",
+                "private_sessions_created": "Sessions Created/Assigned",
                 "backgroundColor": "#832215"
               },
               {
-                "private_sessions_conducted": "Number of Sessions conducted",
+                "private_sessions_conducted": "Sessions conducted",
                 "backgroundColor": "#999999"
               }
             ]
@@ -2088,11 +2088,11 @@
                 "backgroundColor": "#b94a3b"
               },
               {
-                "private_sessions_conducted": "Number of Private Sessions conducted",
+                "private_sessions_conducted": "Private Sessions conducted",
                 "backgroundColor": "#999999"
               },
               {
-                "public_sessions_conducted": "Number of Public Sessions conducted",
+                "public_sessions_conducted": "Public Sessions conducted",
                 "backgroundColor": "#858585"
               }
             ]
@@ -2132,11 +2132,11 @@
             ],
             "chartConfig": [
               {
-                "public_sessions_created": "Number of Sessions Created/Assigned",
+                "public_sessions_created": "Sessions Created/Assigned",
                 "backgroundColor": "#832215"
               },
               {
-                "public_sessions_conducted": "Number of Sessions conducted",
+                "public_sessions_conducted": "Sessions conducted",
                 "backgroundColor": "#999999"
               }
             ]
@@ -2176,11 +2176,11 @@
             ],
             "chartConfig": [
               {
-                "private_sessions_created": "Number of Sessions Created/Assigned",
+                "private_sessions_created": "Sessions Created/Assigned",
                 "backgroundColor": "#832215"
               },
               {
-                "private_sessions_conducted": "Number of Sessions conducted",
+                "private_sessions_conducted": "Sessions conducted",
                 "backgroundColor": "#999999"
               }
             ]
