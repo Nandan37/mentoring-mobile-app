@@ -1768,7 +1768,7 @@
                     }
                   },
                   {
-                    "label": "Total hours of Public sessions conducted",
+                    "label": "Total number of Public sessions conducted",
                     "key": "public_count",
                     "value": "0",
                     "Meta": {
@@ -1778,7 +1778,7 @@
                     }
                   },
                   {
-                    "label": "Total hours of sessions conducted",
+                    "label": "Total number of sessions conducted",
                     "key": "total_count",
                     "value": "0",
                     "Meta": {
