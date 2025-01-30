@@ -33,7 +33,7 @@ export class DashboardPage implements OnInit {
   selectedDuration: any = 'month';
   endDateEpoch: number;
   startDateEpoch: number;
-  categories: any;
+  entityTypes: any = null;
   tableDataDownload: boolean = false;
   loading: boolean = false;
   chartData: any;
@@ -147,7 +147,6 @@ export class DashboardPage implements OnInit {
   async handleRoleChange(e) {
     this.selectedRole = e.detail.value;
     this.session_type = 'ALL';
-    this.categories = {};
     this.filteredFormData = this.bigNumberFormData[this.selectedRole] || [];
     this.filteredCards = this.filteredFormData|| [];
     if(this.filteredCards){
@@ -177,19 +176,20 @@ export class DashboardPage implements OnInit {
   
 
   handleFormControlChange(value: any,event: any) {
-    switch(value) {
-      case 'duration':
-        this.selectedDuration = event.detail.value;
-        this.calculateDuration();
-        break;
-      
-      case 'type':
-        this.session_type = event.detail.value;
-        break;
-      
-      case 'categories':
-        this.categories = (event.detail.value).length ? {[value]: event.detail.value} : null;
-        break;
+    if(value === 'duration'){
+      this.selectedDuration = event.detail.value ? event.detail.value : null;
+      this.calculateDuration();
+    }else if(value === 'type'){
+      this.session_type = event.detail.value ? event.detail.value : null;
+    }else{
+      if(!this.entityTypes){
+        this.entityTypes = {};
+      }
+      if(event.detail.value.length){
+        this.entityTypes[value] = event.detail.value;
+      }else{
+        delete this.entityTypes[value];
+      }
     }
    
     this.bigNumberCount();
@@ -199,11 +199,9 @@ export class DashboardPage implements OnInit {
   }
 
   async updateFormData(formData){
-    Object.keys(this.bigNumberFormData).forEach((role) => {
-      const roleData = this.bigNumberFormData[role];
+      const roleData = this.bigNumberFormData[this.selectedRole];
       const firstObject = this.transformData(roleData, formData);
       this.dynamicFormControls = firstObject.form.controls;
-    });
   }
 
   transformData(firstObj: any, secondObj: any): any {
@@ -275,7 +273,7 @@ export class DashboardPage implements OnInit {
       `&groupBy=${this.groupBy}`;
     const params = `${urlConstants.API_URLS.DASHBOARD_REPORT_DATA}` +
       `report_code=${this.report_code}${queryParams}`;
-    this.chartBodyPayload =  this.categories ? { entityTypes: this.categories}: {};
+    this.chartBodyPayload =  this.entityTypes ? { entityTypes: this.entityTypes}: {};
     const resp = await this.reportData(params, this.chartBodyPayload);
     if (value) {
       return resp.data;
@@ -300,7 +298,7 @@ export class DashboardPage implements OnInit {
     `&end_date=${this.endDateEpoch || ''}` +
     `&groupBy=${this.groupBy}`;
   this.chartBody.chartUrl = this.chartBodyConfig.chartUrl;
-  this.chartBodyPayload = this.categories ? { entityTypes: this.categories} : {};
+  this.chartBodyPayload = this.entityTypes ? { entityTypes: this.entityTypes} : {};
   setTimeout(() => {
   this.chartBody.chartUrl = `${environment.baseUrl}${urlConstants.API_URLS.DASHBOARD_REPORT_DATA}` + 'report_code='+ this.chartBody.report_code + queryParams;
   }, 10);
