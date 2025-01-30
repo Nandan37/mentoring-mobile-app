@@ -1706,20 +1706,7 @@
                 "value": "type",
                 "type": "select",
                 "defaultValue": "ALL",
-                "entities": [
-                  {
-                    "label": "All",
-                    "value": "ALL"
-                  },
-                  {
-                    "label": "Public",
-                    "value": "PUBLIC"
-                  },
-                  {
-                    "label": "Private",
-                    "value": "PRIVATE"
-                  }
-                ]
+                "entities": []
               },
               {
                 "label": "Categories",
@@ -1727,20 +1714,15 @@
                 "type": "select",
                 "defaultValue": "",
                 "isMultiple": true,
-                "entities": [
-                  {
-                    "label": "Education qualification",
-                    "value": "edu"
-                  },
-                  {
-                    "label": "Communication",
-                    "value": "com"
-                  },
-                  {
-                    "label": "School process",
-                    "value": "sp"
-                  }
-                ]
+                "entities": []
+              },
+              {
+                "label": "Recommended for",
+                "value": "recommended_for",
+                "type": "select",
+                "defaultValue": "",
+                "isMultiple": true,
+                "entities": []
               }
             ]
           },
@@ -1959,20 +1941,7 @@
                 "value": "type",
                 "type": "select",
                 "defaultValue": "ALL",
-                "entities": [
-                  {
-                    "label": "All",
-                    "value": "ALL"
-                  },
-                  {
-                    "label": "Public",
-                    "value": "PUBLIC"
-                  },
-                  {
-                    "label": "Private",
-                    "value": "PRIVATE"
-                  }
-                ]
+                "entities": []
               },
               {
                 "label": "Categories",
@@ -1980,20 +1949,15 @@
                 "type": "select",
                 "defaultValue": "",
                 "isMultiple": true,
-                "entities": [
-                  {
-                    "label": "Education qualification",
-                    "value": "edu"
-                  },
-                  {
-                    "label": "Communication",
-                    "value": "com"
-                  },
-                  {
-                    "label": "School process",
-                    "value": "sp"
-                  }
-                ]
+                "entities": []
+              },
+              {
+                "label": "Recommended for",
+                "value": "recommended_for",
+                "type": "select",
+                "defaultValue": "",
+                "isMultiple": true,
+                "entities": []
               }
             ]
           },
@@ -2212,20 +2176,7 @@
                 "value": "type",
                 "type": "select",
                 "defaultValue": "ALL",
-                "entities": [
-                  {
-                    "label": "All",
-                    "value": "ALL"
-                  },
-                  {
-                    "label": "Public",
-                    "value": "PUBLIC"
-                  },
-                  {
-                    "label": "Private",
-                    "value": "PRIVATE"
-                  }
-                ]
+                "entities": []
               },
               {
                 "label": "Categories",
@@ -2233,20 +2184,15 @@
                 "type": "select",
                 "defaultValue": "",
                 "isMultiple": true,
-                "entities": [
-                  {
-                    "label": "Education qualification",
-                    "value": "edu"
-                  },
-                  {
-                    "label": "Communication",
-                    "value": "com"
-                  },
-                  {
-                    "label": "School process",
-                    "value": "sp"
-                  }
-                ]
+                "entities": []
+              },
+              {
+                "label": "Recommended for",
+                "value": "recommended_for",
+                "type": "select",
+                "defaultValue": "",
+                "isMultiple": true,
+                "entities": []
               }
             ]
           },
