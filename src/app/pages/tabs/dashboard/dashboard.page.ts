@@ -199,11 +199,9 @@ export class DashboardPage implements OnInit {
   }
 
   async updateFormData(formData){
-    Object.keys(this.bigNumberFormData).forEach((role) => {
-      const roleData = this.bigNumberFormData[role];
+      const roleData = this.bigNumberFormData[this.selectedRole];
       const firstObject = this.transformData(roleData, formData);
       this.dynamicFormControls = firstObject.form.controls;
-    });
   }
 
   transformData(firstObj: any, secondObj: any): any {

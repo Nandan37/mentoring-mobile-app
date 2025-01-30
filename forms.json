@@ -1715,14 +1715,6 @@
                 "defaultValue": "",
                 "isMultiple": true,
                 "entities": []
-              },
-              {
-                "label": "Recommended for",
-                "value": "recommended_for",
-                "type": "select",
-                "defaultValue": "",
-                "isMultiple": true,
-                "entities": []
               }
             ]
           },
