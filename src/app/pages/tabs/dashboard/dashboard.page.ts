@@ -280,6 +280,7 @@ export class DashboardPage implements OnInit {
     }
   }
   async prepareTableUrl(){
+    this.chartBody.tableUrl = "";
     const queryParams = `&report_role=${this.selectedRole}` +
     `&start_date=${this.startDateEpoch || ''}` +
     `&session_type=${this.session_type}` +
