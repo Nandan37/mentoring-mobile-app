@@ -147,6 +147,7 @@ export class DashboardPage implements OnInit {
   async handleRoleChange(e) {
     this.selectedRole = e.detail.value;
     this.session_type = 'ALL';
+    this.selectedDuration = 'month';
     this.filteredFormData = this.bigNumberFormData[this.selectedRole] || [];
     this.filteredCards = this.filteredFormData|| [];
     if(this.filteredCards){
@@ -156,6 +157,7 @@ export class DashboardPage implements OnInit {
     this.updateFormData(this.result);
     this.chartBodyConfig = await this.filteredFormData;
     this.chartBody = this.chartBodyConfig;
+    this.calculateDuration();
     setTimeout(() => { 
       this.prepareChartUrl();
       this.prepareTableUrl();
