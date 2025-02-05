@@ -12,9 +12,10 @@ import { CommonRoutes } from 'src/global.routes';
 export class MessagesPage implements OnInit {
   showChat: boolean = false;
   public headerConfig: any = {
-    menu: false,
+    menu: true,
     headerColor: 'primary',
     notification: false,
+    label:'MESSAGES'
   };
 
   constructor(
