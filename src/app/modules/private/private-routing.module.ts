@@ -229,6 +229,14 @@ const routes: Routes = [
         canActivate: [PrivateGuard],
       },
       {
+        path: CommonRoutes.SESSION_REQUEST,
+        loadChildren: () =>
+          import('../../pages/session-request/session-request.module').then(
+            (m) => m.SessionRequestPageModule
+          ),
+        canActivate: [PrivateGuard],
+      },
+      {
         path: '',
         redirectTo: '',
         pathMatch: 'full',
