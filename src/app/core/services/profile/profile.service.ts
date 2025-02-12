@@ -305,4 +305,28 @@ export class ProfileService {
       throw error;
     }
   }
+
+  async getTheme(data){
+    const config = {
+      url: urlConstants.API_URLS.THEME_READ,
+      payload: {
+        "type": "theme",
+        "sub_type": "themeForm"
+      }
+    };
+    try {
+      let resp: any = await this.httpService.post(config);
+      console.log(resp,"resp");
+      const selectedOrg = resp.result.data.fields.themes.find((org) => org.id === data.organization_id);
+    if (selectedOrg) {
+      const theme = selectedOrg.theme;
+      document.documentElement.style.setProperty('--ion-color-primary', theme.primaryColor);
+      document.documentElement.style.setProperty('--ion-color-secondary', theme.secondaryColor);
+      document.documentElement.style.setProperty('--background-color', theme.backgroundColor);
+      document.documentElement.style.setProperty('--text-color', theme.textColor);
+    }
+    }
+    catch (error) {
+    }
+  }
 }
