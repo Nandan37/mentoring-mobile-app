@@ -22,6 +22,7 @@ export class RequestsPage implements OnInit {
   data: any;
   noResult: any;
   routeData: any;
+  slotBtnConfig: any;
 
   constructor(
     private httpService: HttpService,
@@ -34,6 +35,9 @@ export class RequestsPage implements OnInit {
     this.route.data.subscribe((data) => {
       this.routeData = data;
       this.buttonConfig = this.routeData?.button_config;
+      this.slotBtnConfig = this.routeData.slotButtonConfig;
+
+      console.log(this.routeData)
     });
   }
 
@@ -61,6 +65,9 @@ export class RequestsPage implements OnInit {
     switch (event.type) {
       case 'viewMessage':
         this.router.navigate([CommonRoutes.CHAT_REQ, event.data]);
+        break;
+      case 'viewDetails':
+        this.router.navigate([CommonRoutes.SESSION_REQUEST_DETAILS]);
         break;
     }
   }

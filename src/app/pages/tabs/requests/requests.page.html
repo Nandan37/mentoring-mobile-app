@@ -15,7 +15,17 @@
   </div>
   <div [ngSwitch]="segmentType">
     <div *ngSwitchCase="'slot-requests'">
-      
+      <ion-grid >
+        <ion-row class="d-flex ">
+          <ion-col *ngFor="let value of data" padding size-xs="12" size-sm="12" size-md="6" size-lg="4" align-self-stretch>
+            <app-generic-card 
+              [data]="value?.user_details" 
+              [meta]="{ isSent: value?.created_by === value?.user_id, message: value?.meta?.message, timeStamp: '' }" 
+              [buttonConfig]="slotBtnConfig" (onClickEvent)="onCardClick($event)">
+            </app-generic-card>
+          </ion-col>
+        </ion-row>
+      </ion-grid>
     </div>
     <div *ngSwitchCase="'message-requests'">
       <ion-grid >

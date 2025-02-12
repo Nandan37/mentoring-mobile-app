@@ -1,0 +1,65 @@
+<app-page-header [config]="headerConfig"></app-page-header>
+
+<ion-content class="ion-padding">
+  <div class="profile-container">
+    <ion-avatar class="profile-avatar">
+      <img src="assets/prof-img/user.png" alt="Profile Picture" />
+    </ion-avatar>
+
+    <h2 class="profile-name">John Doe</h2>
+    <p class="profile-description">
+      <ng-container *ngFor="let item of apiDemoResponse?.designation.slice(0,2); let i = index">
+        {{ item.label }}<span *ngIf="i < 1">, </span>
+      </ng-container>
+    </p>
+
+    <ion-button color="primary">View Profile</ion-button>
+    <ion-text class="description">
+      <h2 class="text-left">Agenda</h2>
+      <p style="margin: 0px;" class="text-left">
+        {{ showFullText ? fullContent : fullContent | slice:0:200 }}{{ fullContent.length > 200 && !showFullText ? '...' : '' }}
+      </p>
+    </ion-text>
+    
+    <ion-label 
+      *ngIf="fullContent.length > 200" 
+      class="viewMore" 
+      (click)="toggleText()">
+      {{ showFullText ? 'View Less' : 'View More' }}
+    </ion-label>    
+
+    <p class="request-info text-left">
+      You have requested a slot at <strong>2:00 pm - 3:00 pm</strong> on <strong>Monday (01 May 2023)</strong>
+    </p>
+    <ng-container *ngIf="isAccepted">
+      <div class="text-left">
+        <h2 class="auto-margin">Meeting link</h2>
+        <ion-button color="primary"> Add link </ion-button>
+      </div>
+    </ng-container>
+
+    <ion-chip color="warning" style="color: var(--black); background-color: #fdf6b4;">
+      <ion-icon name="alert-circle"></ion-icon>
+      <ion-label  class="text-left">Please wait for John Doe to respond to your request</ion-label>
+    </ion-chip>
+  </div>
+</ion-content>
+<ion-footer class="ion-no-border footer-button">
+  <ion-toolbar>
+    <ng-container *ngIf="!isAccepted; else templateA">
+      <div class="w-full flex flex-justify-space-around">
+        <ion-button shape="round" color="light" (click)="accept()" class="height-0">
+          <ion-icon style="color: var(--green);" name="checkmark-outline" slot="start"></ion-icon> Accept
+        </ion-button>
+        <ion-button shape="round" color="light" class="height-0">
+          <ion-icon style="color:  var(--red);" name="checkmark-outline" slot="start"></ion-icon> Reject
+        </ion-button>
+      </div>
+    </ng-container> 
+    <ng-template #templateA>
+      <ion-button expand="full" [disabled]="true">Start</ion-button>
+    </ng-template>
+  </ion-toolbar>
+</ion-footer>
+
+

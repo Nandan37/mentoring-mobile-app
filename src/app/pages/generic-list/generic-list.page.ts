@@ -244,6 +244,9 @@ export class GenericListPage implements OnInit {
         }
         this.router.navigate([CommonRoutes.CHAT, event.rid]);
         break;
+      case 'requestSession':
+        this.router.navigate([CommonRoutes.SESSION_REQUEST]);
+        break;
     }
   }
 

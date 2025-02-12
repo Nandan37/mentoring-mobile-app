@@ -55,4 +55,11 @@ export const CHAT_MESSAGES = {
             onCheck: 'is_mentor'
         },
     ],
+    GENERIC_CARD_REQUEST_SLOT_BTN_CONFIG: [
+        {
+            label: 'VIEW_DETAILS',
+            action: 'viewDetails',
+            color: 'primary',
+        },
+    ]
 };

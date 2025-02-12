@@ -1,5 +1,8 @@
 import { Component, OnInit, ViewChild } from '@angular/core';
+import { Router } from '@angular/router';
+import { ToastService } from 'src/app/core/services';
 import { DynamicFormComponent } from 'src/app/shared/components';
+import { CommonRoutes } from 'src/global.routes';
 
 @Component({
   selector: 'app-session-request',
@@ -13,7 +16,7 @@ export class SessionRequestPage implements OnInit {
     controls:[
     {
       "name": "title",
-      "label": "Session title",
+      "label": "Title",
       "value": "",
       "class": "ion-no-margin",
       "type": "text",
@@ -87,7 +90,7 @@ export class SessionRequestPage implements OnInit {
 
   isSubmited: boolean = false;
 
-  constructor() { }
+  constructor(private router: Router, private toast: ToastService) { }
 
   ngOnInit() {
   }
@@ -103,7 +106,9 @@ export class SessionRequestPage implements OnInit {
       this.form1.onSubmit();
     }
     const form = Object.assign({}, {...this.form1.myForm.getRawValue(), ...this.form1.myForm.value});
-    console.log(form)
+    console.log(form);
+    this.router.navigate([`/${CommonRoutes.TABS}/${CommonRoutes.REQUESTS}`]);
+    this.toast.showToast('Your request has been sent successfully', "success")
   }
 
 }

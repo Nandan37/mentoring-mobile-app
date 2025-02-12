@@ -1,0 +1,40 @@
+.profile-container {
+    text-align: center;
+  }
+  
+  .profile-avatar {
+    width: 100px;
+    height: 100px;
+    margin: 16px auto;
+  }
+  
+  .profile-name {
+    font-size: 1.5rem;
+    font-weight: bold;
+  }
+  
+  .profile-description {
+    color: gray;
+    margin-bottom: 15px;
+  }
+  
+  .request-info {
+    margin-top: 20px;
+    font-size: 1rem;
+  }
+  
+  ion-chip {
+    display: flex;
+    justify-content: left;
+    margin-top: 10px;
+  }
+.viewMore{
+    display: flex;
+    justify-content: end;
+    margin: 0px;
+    color: var(--blue);
+    text-decoration: underline;
+    font-style: italic;
+    cursor: pointer;
+}
+  
