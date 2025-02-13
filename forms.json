@@ -1157,5 +1157,696 @@
         ]
       }
     }
+  },
+  {
+    "type": "bignumberDashboard",
+    "sub_type": "bignumberDashboardForm",
+    "action": "skip",
+    "data": {
+      "template_name": "defaultTemplate",
+      "fields": {
+        "mentee": {
+          "ALL": {
+            "bigNumbers": [
+              {
+                "Url": "total_number_of_sessions_attended",
+                "data": [
+                  {
+                    "label": "Total number of Private sessions attended",
+                    "key": "private_count",
+                    "value": "0",
+                    "Meta": {
+                      "color": "#fff",
+                      "background": "#ccc",
+                      "textAlign": ""
+                    }
+                  },
+                  {
+                    "label": "Total number of Public sessions attended",
+                    "key": "public_count",
+                    "value": "0",
+                    "Meta": {
+                      "color": "#fff",
+                      "background": "#ccc",
+                      "textAlign": ""
+                    }
+                  },
+                  {
+                    "label": "Total number of sessions attended",
+                    "key": "total_count",
+                    "value": "0",
+                    "Meta": {
+                      "color": "#fff",
+                      "background": "#ccc",
+                      "textAlign": ""
+                    }
+                  }
+                ]
+              },
+              {
+                "Url": "total_hours_of_learning",
+                "data": [
+                  {
+                    "label": "Total hours of private learning",
+                    "key": "private_hours",
+                    "value": "0",
+                    "Meta": {
+                      "color": "#fff",
+                      "background": "#ccc",
+                      "textAlign": ""
+                    }
+                  },
+                  {
+                    "label": "Total hours of public learning",
+                    "key": "public_hours",
+                    "value": "0",
+                    "Meta": {
+                      "color": "#fff",
+                      "background": "#ccc",
+                      "textAlign": ""
+                    }
+                  },
+                  {
+                    "label": "Total hours of learning",
+                    "key": "total_hours",
+                    "value": "0",
+                    "Meta": {
+                      "color": "#fff",
+                      "background": "#ccc",
+                      "textAlign": ""
+                    }
+                  }
+                ]
+              }
+            ],
+            "chartConfig": [
+              {
+                "private_session_enrolled": "Private Sessions Enrolled",
+                "backgroundColor": "#832215"
+              },
+              {
+                "public_session_enrolled": "Public Sessions Enrolled",
+                "backgroundColor": "#b94a3b"
+              },
+              {
+                "private_session_attended": "Private Sessions Attended",
+                "backgroundColor": "#999999"
+              },
+              {
+                "public_session_attended": "Public Sessions Attended",
+                "backgroundColor": "#858585"
+              }
+            ]
+          },
+          "PUBLIC": {
+            "bigNumbers": [
+              {
+                "Url": "total_number_of_sessions_attended",
+                "data": [
+                  {
+                    "label": "Total number of sessions attended",
+                    "key": "total_count",
+                    "value": "0",
+                    "Meta": {
+                      "color": "#fff",
+                      "background": "#ccc",
+                      "textAlign": ""
+                    }
+                  }
+                ]
+              },
+              {
+                "Url": "total_hours_of_learning",
+                "data": [
+                  {
+                    "label": "Total hours of learning",
+                    "key": "total_hours",
+                    "value": "0",
+                    "Meta": {
+                      "color": "#fff",
+                      "background": "#ccc",
+                      "textAlign": ""
+                    }
+                  }
+                ]
+              }
+            ],
+            "chartConfig": [
+              {
+                "public_session_enrolled": "Sessions Enrolled",
+                "backgroundColor": "#832215"
+              },
+              {
+                "public_session_attended": "Sessions Attended",
+                "backgroundColor": "#999999"
+              }
+            ]
+          },
+          "PRIVATE": {
+            "bigNumbers": [
+              {
+                "Url": "total_number_of_sessions_attended",
+                "data": [
+                  {
+                    "label": "Total number of sessions attended",
+                    "key": "total_count",
+                    "value": "0",
+                    "Meta": {
+                      "color": "#fff",
+                      "background": "#ccc",
+                      "textAlign": ""
+                    }
+                  }
+                ]
+              },
+              {
+                "Url": "total_hours_of_learning",
+                "data": [
+                  {
+                    "label": "Total hours of learning",
+                    "key": "total_hours",
+                    "value": "0",
+                    "Meta": {
+                      "color": "#fff",
+                      "background": "#ccc",
+                      "textAlign": ""
+                    }
+                  }
+                ]
+              }
+            ],
+            "chartConfig": [
+              {
+                "private_session_attended": "Sessions Created/Assigned",
+                "backgroundColor": "#832215"
+              },
+              {
+                "private_session_enrolled": "Sessions conducted",
+                "backgroundColor": "#999999"
+              }
+            ]
+          },
+          "form": {
+            "controls": [
+              {
+                "label": "Duration",
+                "value": "duration",
+                "type": "select",
+                "defaultValue": "month",
+                "entities": [
+                  {
+                    "label": "This week",
+                    "value": "week"
+                  },
+                  {
+                    "label": "This month",
+                    "value": "month"
+                  },
+                  {
+                    "label": "This quarter",
+                    "value": "quarter"
+                  }
+                ]
+              },
+              {
+                "label": "Session type",
+                "value": "type",
+                "type": "select",
+                "defaultValue": "ALL",
+                "entities": []
+              },
+              {
+                "label": "Categories",
+                "value": "categories",
+                "type": "select",
+                "defaultValue": "",
+                "isMultiple": true,
+                "entities": []
+              }
+            ]
+          },
+          "chartUrl": "",
+          "report_code": "split_of_sessions_enrolled_and_attended_by_user",
+          "table_report_code": "mentee_session_details",
+          "tableUrl": "",
+          "tableTitle": "Session Details",
+          "headers": ""
+        },
+        "mentor": {
+          "ALL": {
+            "bigNumbers": [
+              {
+                "Url": "total_number_of_sessions_conducted",
+                "data": [
+                  {
+                    "label": "Total number of Private sessions conducted",
+                    "key": "private_count",
+                    "value": "0",
+                    "Meta": {
+                      "color": "#fff",
+                      "background": "#ccc",
+                      "textAlign": ""
+                    }
+                  },
+                  {
+                    "label": "Total number of Public sessions conducted",
+                    "key": "public_count",
+                    "value": "0",
+                    "Meta": {
+                      "color": "#fff",
+                      "background": "#ccc",
+                      "textAlign": ""
+                    }
+                  },
+                  {
+                    "label": "Total number of sessions conducted",
+                    "key": "total_count",
+                    "value": "0",
+                    "Meta": {
+                      "color": "#fff",
+                      "background": "#ccc",
+                      "textAlign": ""
+                    }
+                  }
+                ]
+              },
+              {
+                "Url": "total_hours_of_mentoring_conducted",
+                "data": [
+                  {
+                    "label": "Total hours of Private mentoring conducted",
+                    "key": "private_hours",
+                    "value": "0",
+                    "Meta": {
+                      "color": "#fff",
+                      "background": "#ccc",
+                      "textAlign": ""
+                    }
+                  },
+                  {
+                    "label": "Total hours of Public mentoring conducted",
+                    "key": "public_hours",
+                    "value": "0",
+                    "Meta": {
+                      "color": "#fff",
+                      "background": "#ccc",
+                      "textAlign": ""
+                    }
+                  },
+                  {
+                    "label": "Total hours of mentoring conducted",
+                    "key": "total_hours",
+                    "value": "0",
+                    "Meta": {
+                      "color": "#fff",
+                      "background": "#ccc",
+                      "textAlign": ""
+                    }
+                  }
+                ]
+              }
+            ],
+            "chartConfig": [
+              {
+                "private_sessions_created": "Private Sessions Created/Assigned",
+                "backgroundColor": "#832215"
+              },
+              {
+                "public_sessions_created": "Public Sessions Created/Assigned",
+                "backgroundColor": "#b94a3b"
+              },
+              {
+                "private_sessions_conducted": "Private Sessions conducted",
+                "backgroundColor": "#999999"
+              },
+              {
+                "public_sessions_conducted": "Public Sessions conducted",
+                "backgroundColor": "#858585"
+              }
+            ]
+          },
+          "PUBLIC": {
+            "bigNumbers": [
+              {
+                "Url": "total_hours_of_mentoring_conducted",
+                "data": [
+                  {
+                    "label": "Total hours of Mentoring conducted",
+                    "key": "public_hours",
+                    "value": "0",
+                    "Meta": {
+                      "color": "#fff",
+                      "background": "#ccc",
+                      "textAlign": ""
+                    }
+                  }
+                ]
+              },
+              {
+                "Url": "total_number_of_sessions_conducted",
+                "data": [
+                  {
+                    "label": "Total number of sessions conducted",
+                    "key": "public_count",
+                    "value": "0",
+                    "Meta": {
+                      "color": "#fff",
+                      "background": "#ccc",
+                      "textAlign": ""
+                    }
+                  }
+                ]
+              }
+            ],
+            "chartConfig": [
+              {
+                "public_sessions_created": "Sessions Created/Assigned",
+                "backgroundColor": "#832215"
+              },
+              {
+                "public_sessions_conducted": "Sessions conducted",
+                "backgroundColor": "#999999"
+              }
+            ]
+          },
+          "PRIVATE": {
+            "bigNumbers": [
+              {
+                "Url": "total_hours_of_mentoring_conducted",
+                "data": [
+                  {
+                    "label": "Total hours of Mentoring conducted",
+                    "key": "private_hours",
+                    "value": "0",
+                    "Meta": {
+                      "color": "#fff",
+                      "background": "#ccc",
+                      "textAlign": ""
+                    }
+                  }
+                ]
+              },
+              {
+                "Url": "total_number_of_sessions_conducted",
+                "data": [
+                  {
+                    "label": "Total number of sessions conducted",
+                    "key": "private_count",
+                    "value": "0",
+                    "Meta": {
+                      "color": "#fff",
+                      "background": "#ccc",
+                      "textAlign": ""
+                    }
+                  }
+                ]
+              }
+            ],
+            "chartConfig": [
+              {
+                "private_sessions_created": "Sessions Created/Assigned",
+                "backgroundColor": "#832215"
+              },
+              {
+                "private_sessions_conducted": "Sessions conducted",
+                "backgroundColor": "#999999"
+              }
+            ]
+          },
+          "form": {
+            "controls": [
+              {
+                "label": "Duration",
+                "value": "duration",
+                "type": "select",
+                "defaultValue": "month",
+                "entities": [
+                  {
+                    "label": "This week",
+                    "value": "week"
+                  },
+                  {
+                    "label": "This month",
+                    "value": "month"
+                  },
+                  {
+                    "label": "This quarter",
+                    "value": "quarter"
+                  }
+                ]
+              },
+              {
+                "label": "Session type",
+                "value": "type",
+                "type": "select",
+                "defaultValue": "ALL",
+                "entities": []
+              },
+              {
+                "label": "Categories",
+                "value": "categories",
+                "type": "select",
+                "defaultValue": "",
+                "isMultiple": true,
+                "entities": []
+              }
+            ]
+          },
+          "chartUrl": "",
+          "report_code": "split_of_sessions_conducted",
+          "table_report_code": "mentoring_session_details",
+          "tableUrl": "",
+          "tableTitle": "Mentoring Session Details",
+          "headers": ""
+        },
+        "session_manager": {
+          "ALL": {
+            "bigNumbers": [
+              {
+                "Url": "total_number_of_hours_of_mentoring_conducted",
+                "data": [
+                  {
+                    "label": "Total hours of private mentoring conducted",
+                    "key": "private_hours",
+                    "value": "0",
+                    "Meta": {
+                      "color": "#fff",
+                      "background": "#ccc",
+                      "textAlign": ""
+                    }
+                  },
+                  {
+                    "label": "Total hours of public mentoring conducted",
+                    "key": "public_hours",
+                    "value": "0",
+                    "Meta": {
+                      "color": "#fff",
+                      "background": "#ccc",
+                      "textAlign": ""
+                    }
+                  },
+                  {
+                    "label": "Total hours of mentoring conducted",
+                    "key": "total_hours",
+                    "value": "0",
+                    "Meta": {
+                      "color": "#fff",
+                      "background": "#ccc",
+                      "textAlign": ""
+                    }
+                  }
+                ]
+              },
+              {
+                "Url": "total_hours_of_sessions_created_by_session_manager",
+                "data": [
+                  {
+                    "label": "Total hours of private sessions created by SM",
+                    "key": "total_private_hours",
+                    "value": "0",
+                    "Meta": {
+                      "color": "#fff",
+                      "background": "#ccc",
+                      "textAlign": ""
+                    }
+                  },
+                  {
+                    "label": "Total hours of public sessions created by SM",
+                    "key": "total_public_hours",
+                    "value": "0",
+                    "Meta": {
+                      "color": "#fff",
+                      "background": "#ccc",
+                      "textAlign": ""
+                    }
+                  },
+                  {
+                    "label": "Total hours of sessions created by SM",
+                    "key": "total_hours",
+                    "value": "0",
+                    "Meta": {
+                      "color": "#fff",
+                      "background": "#ccc",
+                      "textAlign": ""
+                    }
+                  }
+                ]
+              }
+            ],
+            "chartConfig": [
+              {
+                "private_sessions_created": "Private Sessions created",
+                "backgroundColor": "#832215"
+              },
+              {
+                "public_sessions_created": "Public Sessions created",
+                "backgroundColor": "#b94a3b"
+              },
+              {
+                "private_sessions_conducted": "Private Sessions conducted",
+                "backgroundColor": "#999999"
+              },
+              {
+                "public_sessions_conducted": "Public Sessions conducted",
+                "backgroundColor": "#858585"
+              }
+            ]
+          },
+          "PUBLIC": {
+            "bigNumbers": [
+              {
+                "Url": "total_number_of_hours_of_mentoring_conducted",
+                "data": [
+                  {
+                    "label": "Total hours of public mentoring conducted",
+                    "key": "public_hours",
+                    "value": "0",
+                    "Meta": {
+                      "color": "#fff",
+                      "background": "#ccc",
+                      "textAlign": ""
+                    }
+                  }
+                ]
+              },
+              {
+                "Url": "total_hours_of_sessions_created_by_session_manager",
+                "data": [
+                  {
+                    "label": "Total hours of public sessions created by SM",
+                    "key": "total_public_hours",
+                    "value": "0",
+                    "Meta": {
+                      "color": "#fff",
+                      "background": "#ccc",
+                      "textAlign": ""
+                    }
+                  }
+                ]
+              }
+            ],
+            "chartConfig": [
+              {
+                "public_sessions_created": "Sessions Created/Assigned",
+                "backgroundColor": "#832215"
+              },
+              {
+                "public_sessions_conducted": "Sessions conducted",
+                "backgroundColor": "#999999"
+              }
+            ]
+          },
+          "PRIVATE": {
+            "bigNumbers": [
+              {
+                "Url": "total_number_of_hours_of_mentoring_conducted",
+                "data": [
+                  {
+                    "label": "Total hours of private mentoring conducted",
+                    "key": "private_hours",
+                    "value": "0",
+                    "Meta": {
+                      "color": "#fff",
+                      "background": "#ccc",
+                      "textAlign": ""
+                    }
+                  }
+                ]
+              },
+              {
+                "Url": "total_hours_of_sessions_created_by_session_manager",
+                "data": [
+                  {
+                    "label": "Total hours of private sessions created by SM",
+                    "key": "total_private_hours",
+                    "value": "0",
+                    "Meta": {
+                      "color": "#fff",
+                      "background": "#ccc",
+                      "textAlign": ""
+                    }
+                  }
+                ]
+              }
+            ],
+            "chartConfig": [
+              {
+                "private_sessions_created": "Sessions Created/Assigned",
+                "backgroundColor": "#832215"
+              },
+              {
+                "private_sessions_conducted": "Sessions conducted",
+                "backgroundColor": "#999999"
+              }
+            ]
+          },
+          "form": {
+            "controls": [
+              {
+                "label": "Duration",
+                "value": "duration",
+                "type": "select",
+                "defaultValue": "month",
+                "entities": [
+                  {
+                    "label": "This week",
+                    "value": "week"
+                  },
+                  {
+                    "label": "This month",
+                    "value": "month"
+                  },
+                  {
+                    "label": "This quarter",
+                    "value": "quarter"
+                  }
+                ]
+              },
+              {
+                "label": "Session type",
+                "value": "type",
+                "type": "select",
+                "defaultValue": "ALL",
+                "entities": []
+              },
+              {
+                "label": "Categories",
+                "value": "categories",
+                "type": "select",
+                "defaultValue": "",
+                "isMultiple": true,
+                "entities": []
+              }
+            ]
+          },
+          "chartUrl": "",
+          "report_code": "split_of_sessions_created_and_conducted",
+          "table_report_code": "session_manger_session_details",
+          "tableUrl": "",
+          "tableTitle": "Session details",
+          "headers": ""
+        }
+      }
+    }
   }
 ]
