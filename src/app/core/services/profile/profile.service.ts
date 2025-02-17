@@ -180,6 +180,9 @@ export class ProfileService {
       return item['title'];
     });
     this.isMentor = roles.includes('mentor') ? true : false;
+    if (!roles.includes("mentee")) {
+      roles.unshift("mentee");
+    }
     return roles;
   }
 
