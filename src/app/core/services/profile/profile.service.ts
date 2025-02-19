@@ -19,7 +19,7 @@ import { TranslateService } from '@ngx-translate/core';
 import { UserListModalComponent } from 'src/app/shared/components/user-list-modal/user-list-modal.component';
 import { ModalController } from '@ionic/angular';
 import { environment } from 'src/environments/environment';
-import { FrontendChatLibraryService } from 'sl-chat-library';
+import { FrontendChatLibraryService } from 'frontend-chat-library-kiran';
 
 @Injectable({
   providedIn: 'root',
@@ -180,6 +180,9 @@ export class ProfileService {
       return item['title'];
     });
     this.isMentor = roles.includes('mentor') ? true : false;
+    if (!roles.includes("mentee")) {
+      roles.unshift("mentee");
+    }
     return roles;
   }
 
