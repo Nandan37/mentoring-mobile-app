@@ -2,7 +2,7 @@ import { Component, OnInit, ViewChild, ViewEncapsulation } from '@angular/core';
 import { MatPaginator } from '@angular/material/paginator';
 import { ActivatedRoute, Router } from '@angular/router';
 import { ModalController } from '@ionic/angular';
-import { FrontendChatLibraryService } from 'sl-chat-library';
+import { FrontendChatLibraryService } from 'frontend-chat-library-kiran';
 import { FILTER_ROLES } from 'src/app/core/constants/formConstant';
 import {
   NO_RESULT_FOUND_FOR_MENTEE,

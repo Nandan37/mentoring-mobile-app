@@ -1,6 +1,6 @@
 {
   "name": "MentorED",
-  "version": "0.0.1",
+  "version": "3.1.0",
   "author": "Ionic Framework",
   "homepage": "https://ionicframework.com/",
   "scripts": {
@@ -10,7 +10,8 @@
     "test": "ng test",
     "lint": "ng lint",
     "e2e": "ng e2e",
-    "manage-forms": "node formsManager"
+    "manage-forms": "node formsManager",
+    "create-forms": "node formsManager --create"
   },
   "private": true,
   "dependencies": {
@@ -57,6 +58,8 @@
     "cordova-plugin-screen-orientation": "^3.0.3",
     "cordova-sqlite-storage": "^6.1.0",
     "es6-promise-plugin": "^4.2.2",
+    "frontend-chat-library-kiran": "^1.0.1",
+    "generic-chart": "^1.0.3",
     "ionic-plugin-deeplinks": "^1.0.24",
     "jwt-decode": "^3.1.2",
     "lodash-es": "^4.17.21",
@@ -65,7 +68,8 @@
     "papaparse": "^5.4.1",
     "rxjs": "^7.5.0",
     "rxjs-compat": "^6.6.7",
-    "sl-chat-library": "^1.0.0",
+    "sl-generic-table": "^1.1.6",
+    "tslib": "^2.2.0",
     "yargs": "^17.7.2",
     "zone.js": "^0.14.0"
   },
