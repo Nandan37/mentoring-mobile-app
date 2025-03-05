@@ -1,5 +1,7 @@
 import { Component, OnInit, ViewChild } from '@angular/core';
+import { IonModal } from '@ionic/angular';
 import { PLATFORMS } from 'src/app/core/constants/formConstant';
+import { ToastService, UtilService } from 'src/app/core/services';
 import { FormService } from 'src/app/core/services/form/form.service';
 import { SessionService } from 'src/app/core/services/session/session.service';
 import { DynamicFormComponent } from 'src/app/shared/components';
@@ -11,14 +13,18 @@ import { DynamicFormComponent } from 'src/app/shared/components';
 })
 export class SessionRequestDetailsPage implements OnInit {
   @ViewChild('platformForm') platformForm: DynamicFormComponent;
+  @ViewChild(IonModal) modal!: IonModal;
   showFullText: boolean;
   isAccepted: boolean = false;
   meetingPlatforms: any;
   selectedLink: any;
   selectedHint: any;
   editSessionBtn: boolean;
+  isMeetingLinkAdded: boolean =false;
+  isModalOpen: boolean = false;
+  isRejected: boolean = false;
 
-  constructor(private form: FormService,private sessionService: SessionService,) { }
+  constructor(private form: FormService,private sessionService: SessionService,private toast: ToastService,private utilService: UtilService) { }
   public headerConfig: any = {
     backButton: true,
     headerColor: 'primary'
@@ -51,21 +57,46 @@ export class SessionRequestDetailsPage implements OnInit {
       {
           "value": "te",
           "label": "Teacher"
-      }
+      },
   ],
     image: '',
-    agenda: '',
+    agenda: 'Contrary to popular belief, Lorem Ipsum is not simply random text. It has roots in a piece of classical Latin literature from 45 BC, making it over 2000 years old. Richard McClintock, a Latin professor at Hampden-Sydney College in Virginia, looked up one of the more obscure Latin words, consectetur, from a Lorem Ipsum passage, and going through the cites of the word in classical literature, discovered the undoubtable source.',
     slot_request_date: '',
     request: 'PENDING'
   }
 
   accept(){
-    console.log('accept :')
     this.isAccepted = true;
+    this.toast.showToast("You have accepted this session. [Mentee’s Name] has been added to your connections.", 'success');
   }
 
-  addLink(){
-    if (this.platformForm.myForm.valid){
+  async reject(){
+    let msg = {
+      header: 'Reject ?',
+      message: 'Are you sure you want to reject the slot request ?',
+      cancel: 'CANCEL',
+      submit: 'Reject',
+      inputs: [
+        {
+          name: 'reason',  
+          type: 'textarea',
+          placeholder: 'Let NAME know why you are rejecting there slot...',
+        }
+      ]
+    };
+    const response = await this.utilService.alertPopup(msg);
+    if (response) {
+      this.isRejected = true;
+      this.toast.showToast("You have rejected the message slot request", 'danger');
+      console.log('Rejection Reason:', response); // Access input value
+    } else {
+      console.log('User canceled the rejection');
+    }
+  }
+
+  addLink(isOpen: boolean){
+    this.isModalOpen = isOpen;
+    if (this.platformForm?.myForm?.valid){
       let meetingInfo = {
         'meeting_info':{
           'platform': this.selectedLink.name,
@@ -94,5 +125,113 @@ export class SessionRequestDetailsPage implements OnInit {
   compareWithFn(o1, o2) {
     return o1 === o2;
   };
+
+  addNow(){
+    this.isMeetingLinkAdded = true;
+    this.modal.dismiss();
+    this.isModalOpen =false;
+  }
+
+  editLink(isOpen: boolean){
+    this.isModalOpen = isOpen;
+    console.log('meet platform', this.meetingPlatforms)
+  }
+
+  addLater(){
+    this.modal.dismiss();
+    this.isModalOpen = false;
+    
+  }
+
+  yourScheduledData = [
+    { 
+      date:"2025-01-13",
+      bookedSlots: [
+        { startTime:"12:01:01", 
+          endTime:"13:00:01",
+          title: "Session 1"
+        },
+        { startTime:"01:01:01", 
+          endTime:"14:00:01",
+          title: 'session 2'
+        },
+        { startTime:"12:01:01", 
+          endTime:"13:00:01",
+          title: "Session 1"
+        },
+        { startTime:"01:01:01", 
+          endTime:"14:00:01",
+          title: 'session 2'
+        }
+      ]  
+    },
+    { 
+      date:"2025-02-13",
+      bookedSlots: [
+        { startTime:"12:01:01", 
+          endTime:"13:00:01",
+          title: "Session 1"
+        },
+        { startTime:"01:01:01", 
+          endTime:"14:00:01",
+          title: 'session 2'
+        }
+      ]   
+    },
+    { 
+      date:"2025-01-13",
+      bookedSlots: [
+        { startTime:"12:01:01", 
+          endTime:"13:00:01",
+          title: "Session 1"
+        },
+        { startTime:"01:01:01", 
+          endTime:"14:00:01",
+          title: 'session 2'
+        }
+      ]  
+    },
+    { 
+      date:"2025-02-13",
+      bookedSlots: [
+        { startTime:"12:01:01", 
+          endTime:"13:00:01",
+          title: "Session 1"
+        },
+        { startTime:"01:01:01", 
+          endTime:"14:00:01",
+          title: 'session 2'
+        }
+      ]   
+    },
+    { 
+      date:"2025-01-13",
+      bookedSlots: [
+        { startTime:"12:01:01", 
+          endTime:"13:00:01",
+          title: "Session 1"
+        },
+        { startTime:"01:01:01", 
+          endTime:"14:00:01",
+          title: 'session 2'
+        }
+      ]  
+    },
+    { 
+      date:"2025-02-13",
+      bookedSlots: [
+        { startTime:"12:01:01", 
+          endTime:"13:00:01",
+          title: "Session 1"
+        },
+        { startTime:"01:01:01", 
+          endTime:"14:00:01",
+          title: 'session 2'
+        }
+      ]   
+    }
+  ];
+
+  
 
 }

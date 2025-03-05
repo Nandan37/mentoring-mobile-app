@@ -8,6 +8,10 @@ import { SessionRequestDetailsPageRoutingModule } from './session-request-detail
 
 import { SessionRequestDetailsPage } from './session-request-details.page';
 import { SharedModule } from 'src/app/shared/shared.module';
+import { MatExpansionModule } from '@angular/material/expansion';
+import { MatFormFieldModule } from '@angular/material/form-field';
+import { MatInputModule } from '@angular/material/input';
+
 
 @NgModule({
   imports: [
@@ -15,7 +19,10 @@ import { SharedModule } from 'src/app/shared/shared.module';
     FormsModule,
     IonicModule,
     SessionRequestDetailsPageRoutingModule,
-    SharedModule
+    SharedModule,
+    MatExpansionModule,
+    MatFormFieldModule,
+    MatInputModule
   ],
   declarations: [SessionRequestDetailsPage]
 })

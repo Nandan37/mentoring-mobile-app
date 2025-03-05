@@ -57,12 +57,6 @@ ion-modal ion-toolbar {
 }
 
 
-// .form-content{
-  // max-height: auto !important;    
-  // overflow-y: scroll !important;
-  // width: 95%;
-// }
-
 .card-title{
   font-weight: 800;
 }
@@ -76,4 +70,73 @@ ion-modal ion-toolbar {
   font-size: 12px;
   padding-left: 5px;
   margin: 0%;
+}
+
+
+
+
+
+
+
+
+
+
+
+.timeline-container {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  align-items: center;
+}
+
+.timeline-item {
+  display: flex;
+  align-items: center;
+  width: 80%;
+}
+
+.date {
+  width: 120px;
+  font-weight: bold;
+  text-align: right;
+  padding-right: 15px;
+}
+
+.line-container {
+    position: relative; /* To position the circle and line relative to this container */
+    display: flex;
+    justify-content: center; /* Center the line horizontally */
+}
+
+.circle {
+    width: 10px; /* Diameter of the circle */
+    height: 10px; /* Diameter of the circle */
+    background-color: #000; /* Color of the circle */
+    border-radius: 50%; /* Makes it a circle */
+    position: absolute; /* Position the circle absolutely within the container */
+    top: 50%; /* Move the circle down by 50% of the container's height */
+    transform: translateY(-50%); /* Adjust to center the circle vertically */
+    left: 50%; /* Center the circle horizontally */
+    transform: translateX(-50%); /* Adjust to center the circle horizontally */
+}
+
+.line {
+    width: 2px; /* Thickness of the line */
+    height: 200px; /* Length of the line */
+    background-color: #000; /* Color of the line */
+}
+
+.slots {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  padding-left: 15px;
+  width: 100%;
+}
+
+.slot {
+  background: #e3f2fd;
+  padding: 8px 12px;
+  border-radius: 4px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 }

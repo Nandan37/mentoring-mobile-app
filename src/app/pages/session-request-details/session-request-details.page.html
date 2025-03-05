@@ -6,7 +6,7 @@
       <img src="assets/prof-img/user.png" alt="Profile Picture" />
     </ion-avatar>
 
-    <h2 class="profile-name">John Doe</h2>
+    <h2 class="profile-name">{{apiDemoResponse.name}}</h2>
     <p class="profile-description">
       <ng-container *ngFor="let item of apiDemoResponse?.designation.slice(0,2); let i = index">
         {{ item.label }}<span *ngIf="i < 1">, </span>
@@ -17,12 +17,12 @@
     <ion-text class="description">
       <h2 class="text-left">Agenda</h2>
       <p style="margin: 0px;" class="text-left">
-        {{ showFullText ? fullContent : fullContent | slice:0:200 }}{{ fullContent.length > 200 && !showFullText ? '...' : '' }}
+        {{ showFullText ? apiDemoResponse.agenda : apiDemoResponse.agenda | slice:0:200 }}{{ apiDemoResponse.agenda.length > 200 && !showFullText ? '...' : '' }}
       </p>
     </ion-text>
     
     <ion-label 
-      *ngIf="fullContent.length > 200" 
+      *ngIf="apiDemoResponse.agenda.length > 200" 
       class="viewMore" 
       (click)="toggleText()">
       {{ showFullText ? 'View Less' : 'View More' }}
@@ -31,12 +31,30 @@
     <p class="request-info text-left">
       You have requested a slot at <strong>2:00 pm - 3:00 pm</strong> on <strong>Monday (01 May 2023)</strong>
     </p>
-    <ng-container *ngIf="isAccepted">
-      <div class="text-left">
+    <ng-container>
+      <div class="text-left" *ngIf="isAccepted">
         <h2 class="auto-margin">Meeting link</h2>
-        <ion-button id="open-modal" color="primary" (click)="addLink()"> Add link </ion-button>
+        <ng-template>
+          <div>
+            
+          </div>
+        </ng-template>
+        <ion-button color="primary" *ngIf="!isMeetingLinkAdded" (click)="addLink(true)"> Add link </ion-button>
+        <ion-button color="primary" *ngIf="isMeetingLinkAdded" (click)="editLink(true)"> Edit link </ion-button>
       </div>
-      <ion-modal #modal trigger="open-modal">
+
+      <ion-chip color="warning" style="color: var(--black); background-color: #fdf6b4; margin-bottom: 2%;">
+        <ion-icon name="alert-circle"></ion-icon>
+        @if (isRejected) {
+          <ion-label class="text-left">You have rejected the slot request</ion-label>
+        } @else if (isAccepted) {
+          <ion-label class="text-left">Start button will get enabled 10 min before schedule time</ion-label>
+        } @else {
+          <ion-label class="text-left">Please wait for John Doe to respond to your request</ion-label>
+        }
+      </ion-chip>
+      
+      <ion-modal #modal [isOpen]="isModalOpen" [backdropDismiss]="false">
         <ng-template>
           <ion-content>
             <ion-list>
@@ -57,7 +75,7 @@
                     </ion-item>
                   </ion-list>
                   <div *ngFor="let option of meetingPlatforms">
-                    <app-dynamic-form *ngIf="selectedLink==option" [jsonFormData]=option.form #platformForm></app-dynamic-form>
+                    <app-dynamic-form *ngIf="selectedLink==option" [jsonFormData]="option.form" #platformForm></app-dynamic-form>
                 </div>
                 </ion-card-content>
               </ion-card>
@@ -66,30 +84,61 @@
           <ion-footer>
             <ion-toolbar>
               <div class="w-full flex flex-justify-flex-end">
-                <ion-button color="primary" (click)="modal.dismiss()">Add now</ion-button>
-                <ion-button color="primary" (click)="modal.dismiss()">Add later</ion-button>
+                <ion-button color="primary" (click)="addNow()">Add now</ion-button>
+                <ion-button color="primary" (click)="addLater()">Add later</ion-button>
               </div>
             </ion-toolbar>
           </ion-footer>
         </ng-template>
       </ion-modal>
-    
+      <mat-accordion>
+        <mat-expansion-panel>
+          <mat-expansion-panel-header>
+            <mat-panel-title>
+              <ion-icon size="large" name="calendar-outline"></ion-icon>
+            </mat-panel-title>
+            <mat-panel-description style="font-size: large;">
+              Your schedule
+            </mat-panel-description>
+          </mat-expansion-panel-header>
+      
+          <div class="timeline-container">
+            <div *ngFor="let event of yourScheduledData" class="timeline-item">
+              <!-- Date Section -->
+              <div class="date">
+                <p>{{ event.date }}</p>
+              </div>
+          
+              <!-- Vertical Line -->
+              <div class="line-container">
+                <div class="circle"></div> <!-- Small circle for design -->
+                <div class="line"></div>
+              </div>
+          
+          
+              <!-- Booked Slots -->
+              <div class="slots">
+                <div *ngFor="let slot of event.bookedSlots" class="slot">
+                  <p>{{ slot.startTime }} - {{ slot.endTime }}</p>
+                  <p>{{slot.title}}</p>
+                </div>
+              </div>
+            </div>
+          </div>
+          
+        </mat-expansion-panel>
+      </mat-accordion>
     </ng-container>
-
-    <ion-chip color="warning" style="color: var(--black); background-color: #fdf6b4;">
-      <ion-icon name="alert-circle"></ion-icon>
-      <ion-label  class="text-left">Please wait for John Doe to respond to your request</ion-label>
-    </ion-chip>
   </div>
 </ion-content>
-<ion-footer class="ion-no-border footer-button">
+<ion-footer class="ion-no-border footer-button" *ngIf="!isRejected">
   <ion-toolbar>
     <ng-container *ngIf="!isAccepted; else templateA">
       <div class="w-full flex flex-justify-space-around">
         <ion-button shape="round" color="light" (click)="accept()" class="height-0">
           <ion-icon style="color: var(--green);" name="checkmark-outline" slot="start"></ion-icon> Accept
         </ion-button>
-        <ion-button shape="round" color="light" class="height-0">
+        <ion-button shape="round" color="light" (click)="reject()" class="height-0">
           <ion-icon style="color:  var(--red);" name="checkmark-outline" slot="start"></ion-icon> Reject
         </ion-button>
       </div>
