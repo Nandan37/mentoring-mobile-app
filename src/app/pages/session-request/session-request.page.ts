@@ -106,7 +106,6 @@ export class SessionRequestPage implements OnInit {
       this.form1.onSubmit();
     }
     const form = Object.assign({}, {...this.form1.myForm.getRawValue(), ...this.form1.myForm.value});
-    console.log(form);
     this.router.navigate([`/${CommonRoutes.TABS}/${CommonRoutes.REQUESTS}`]);
     this.toast.showToast('Your request has been sent successfully', "success")
   }
