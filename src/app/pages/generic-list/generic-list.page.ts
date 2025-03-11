@@ -242,7 +242,7 @@ export class GenericListPage implements OnInit {
         if (!event.rid) {
           return;
         }
-        this.router.navigate([CommonRoutes.CHAT, event.rid]);
+        this.router.navigate([CommonRoutes.CHAT, event.rid],{queryParams:{id:event.data.id}});
         break;
     }
   }
