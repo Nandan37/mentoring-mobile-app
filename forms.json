@@ -1161,7 +1161,7 @@
   {
     "type": "bignumberDashboard",
     "sub_type": "bignumberDashboardForm",
-    "action": "skip",
+    "action": "create",
     "data": {
       "template_name": "defaultTemplate",
       "fields": {
