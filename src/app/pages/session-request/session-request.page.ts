@@ -95,6 +95,11 @@ export class SessionRequestPage implements OnInit {
   ngOnInit() {
   }
 
+  private ids: any = {
+    user_id : "11",
+    friend_id : "09"
+  }
+
   public headerConfig: any = {
     backButton: true,
     label: "Set agenda",
@@ -105,7 +110,8 @@ export class SessionRequestPage implements OnInit {
     if(!this.isSubmited){
       this.form1.onSubmit();
     }
-    const form = Object.assign({}, {...this.form1.myForm.getRawValue(), ...this.form1.myForm.value});
+    const form = Object.assign({}, {...this.form1.myForm.getRawValue(), ...this.form1.myForm.value}, { ...this.ids});
+    console.log('form',form.start_date)
     this.router.navigate([`/${CommonRoutes.TABS}/${CommonRoutes.REQUESTS}`]);
     this.toast.showToast('Your request has been sent successfully', "success")
   }

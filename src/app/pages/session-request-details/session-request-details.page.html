@@ -13,7 +13,7 @@
       </ng-container>
     </p>
 
-    <ion-button color="primary">View Profile</ion-button>
+    <ion-button color="primary" (click)="viewProfile(apiDemoResponse?.id)">View Profile</ion-button>
     <ion-text class="description">
       <h2 class="text-left">Agenda</h2>
       <p style="margin: 0px;" class="text-left">
@@ -34,11 +34,23 @@
     <ng-container>
       <div class="text-left" *ngIf="isAccepted">
         <h2 class="auto-margin">Meeting link</h2>
-        <ng-template>
-          <div>
-            
-          </div>
-        </ng-template>
+          @if (this.existingData?.meeting_info?.meta?.meetingId) {
+            <div>
+              <ion-label>Meeting will take place on <b>Zoom</b></ion-label><br>
+              <ion-label>Meeting ID : 12345</ion-label><br>
+              <ion-label>Passcode : 1234</ion-label>
+            </div>
+          } @else if (this.existingData?.meeting_info?.link) {
+            <div>
+              <ion-label>
+                Google meet : link
+              </ion-label>
+            </div>
+          } @else {
+            <div>
+              <ion-label>BBB</ion-label>
+            </div>
+          }
         <ion-button color="primary" *ngIf="!isMeetingLinkAdded" (click)="addLink(true)"> Add link </ion-button>
         <ion-button color="primary" *ngIf="isMeetingLinkAdded" (click)="editLink(true)"> Edit link </ion-button>
       </div>
@@ -75,7 +87,7 @@
                     </ion-item>
                   </ion-list>
                   <div *ngFor="let option of meetingPlatforms">
-                    <app-dynamic-form *ngIf="selectedLink==option" [jsonFormData]="option.form" #platformForm></app-dynamic-form>
+                    <app-dynamic-form *ngIf="selectedLink==option" [jsonFormData]="option?.form" #platformForm></app-dynamic-form>
                 </div>
                 </ion-card-content>
               </ion-card>
@@ -84,7 +96,7 @@
           <ion-footer>
             <ion-toolbar>
               <div class="w-full flex flex-justify-flex-end">
-                <ion-button color="primary" (click)="addNow()">Add now</ion-button>
+                <ion-button color="primary"[disabled]="platformForm && !platformForm.myForm.valid" (click)="addNow()">Add now</ion-button>
                 <ion-button color="primary" (click)="addLater()">Add later</ion-button>
               </div>
             </ion-toolbar>
@@ -92,7 +104,7 @@
         </ng-template>
       </ion-modal>
       <mat-accordion>
-        <mat-expansion-panel>
+        <mat-expansion-panel style="background: #f3f3f3;;">
           <mat-expansion-panel-header>
             <mat-panel-title>
               <ion-icon size="large" name="calendar-outline"></ion-icon>
@@ -101,28 +113,24 @@
               Your schedule
             </mat-panel-description>
           </mat-expansion-panel-header>
-      
-          <div class="timeline-container">
-            <div *ngFor="let event of yourScheduledData" class="timeline-item">
-              <!-- Date Section -->
-              <div class="date">
-                <p>{{ event.date }}</p>
+          <div class="timeline">
+            <div class="timeline-item" *ngFor="let event of yourScheduledData">
+              <div class="timeline-dot"></div>
+              <div class="timeline-date">
+                {{event.date}}
               </div>
-          
-              <!-- Vertical Line -->
-              <div class="line-container">
-                <div class="circle"></div> <!-- Small circle for design -->
-                <div class="line"></div>
+              <div class="timeline-card" *ngFor="let event of event.bookedSlots">
+                <ion-grid>
+                  <ion-row class="ion-align-items-center">
+                    <ion-col size-lg="3">
+                      <p class="margin-none text-left px-4">{{ event?.startTime }}</p> <br />
+                      <p class="margin-none text-left px-4">{{ event?.endTime }}</p>
+                    </ion-col>
+                    <ion-col size-lg="3"> <h3 class="margin-none">{{event?.title}}</h3> </ion-col>
+                  </ion-row>
+                </ion-grid>
               </div>
-          
-          
-              <!-- Booked Slots -->
-              <div class="slots">
-                <div *ngFor="let slot of event.bookedSlots" class="slot">
-                  <p>{{ slot.startTime }} - {{ slot.endTime }}</p>
-                  <p>{{slot.title}}</p>
-                </div>
-              </div>
+              <div class="timeline-line"></div>
             </div>
           </div>
           
