@@ -11,7 +11,7 @@ import {
 import { CommonRoutes } from 'src/global.routes';
 import * as _ from 'lodash-es';
 import { Location } from '@angular/common';
-import { AlertController, ModalController, Platform } from '@ionic/angular';
+import { ActionSheetController, AlertController, ModalController, Platform } from '@ionic/angular';
 import { urlConstants } from 'src/app/core/constants/urlConstants';
 import { TranslateService } from '@ngx-translate/core';
 import { CREATE_SESSION_FORM, MANAGERS_CREATE_SESSION_FORM, PLATFORMS } from 'src/app/core/constants/formConstant';
@@ -80,14 +80,433 @@ export class CreateSessionPage implements OnInit {
     private router: Router,
     private route:ActivatedRoute,
     private modalCtrl:ModalController,
-    private permissionService:PermissionService
+    private permissionService:PermissionService,
+    private actionSheetController: ActionSheetController
   ) {
   }
   async ngOnInit() {
     let formConfig =(await this.permissionService.hasPermission({ module: permissions.MANAGE_SESSION, action: manageSessionAction.SESSION_ACTIONS })) ? MANAGERS_CREATE_SESSION_FORM : CREATE_SESSION_FORM
     const platformForm = await this.getPlatformFormDetails();
     const result = await this.form.getForm(formConfig);
-    this.formData = _.get(result, 'data.fields');
+    this.formData ={
+      "controls": [
+        {
+          "name": "title",
+          "label": "Session title",
+          "value": "",
+          "class": "ion-no-margin",
+          "type": "text",
+          "placeHolder": "Ex. Name of your session",
+          "position": "floating",
+          "errorMessage": {
+            "required": "Enter session title",
+            "pattern": "This field can only contain alphanumeric characters"
+          },
+          "validators": {
+            "required": true,
+            "maxLength": 255,
+            "pattern": "^[a-zA-Z0-9-.,s ]+$"
+          }
+        },
+        {
+          "name": "description",
+          "label": "Description",
+          "value": "",
+          "class": "ion-no-margin",
+          "type": "textarea",
+          "placeHolder": "Tell the community something about your session",
+          "position": "floating",
+          "errorMessage": {
+            "required": "Enter description",
+            "pattern": "This field can only contain alphanumeric characters"
+          },
+          "validators": {
+            "required": true,
+            "maxLength": 255,
+            "pattern": "^[a-zA-Z0-9-.,s ]+$"
+          }
+        },
+        {
+          "name": "type",
+          "label": "Session type",
+          "class": "ion-no-margin",
+          "type": "select",
+          "dependedChild": "mentees",
+          "value": "",
+          "position": "floating",
+          "info": [
+            {
+              "header": "Public session",
+              "message": "Discoverable. Mentees can enroll and attend"
+            },
+            {
+              "header": "Private session",
+              "message": "Non-discoverable. Invited mentee can attend"
+            }
+          ],
+          "errorMessage": {
+            "required": "Please select your session type"
+          },
+          "validators": {
+            "required": true
+          },
+          "meta": {
+            "errorLabel": "Location",
+            "disabledChildren": [
+              "mentees",
+              "mentor_id"
+            ]
+          },
+          "multiple": false,
+          "options": [
+            {
+              "label": "Private",
+              "value": "PRIVATE"
+            },
+            {
+              "label": "Public",
+              "value": "PUBLIC"
+            }
+          ]
+        },
+        {
+          "name": "mentor_id",
+          "label": "Add mentor",
+          "value": "",
+          "class": "ion-no-margin",
+          "type": "search",
+          "position": "floating",
+          "disabled": true,
+          "meta": {
+            "multiSelect": false,
+            "disableIfSelected": true,
+            "searchLabel": "Search for mentor",
+            "searchData": [],
+            "url": "MENTORS_LIST",
+            "labelArrayForSingleSelect": [
+              "mentor_name",
+              "organization.name"
+            ],
+            "filters": {
+              "entity_types": [
+                {
+                  "key": "designation",
+                  "label": "Designation",
+                  "type": "checkbox"
+                }
+              ],
+              "organizations": [
+                {
+                  "isEnabled": true,
+                  "key": "organizations",
+                  "type": "checkbox"
+                }
+              ]
+            },
+            "filterType": "mentor",
+            "addPopupType": "addUser"
+          },
+          "info": [
+            {
+              "message": "Click to select Mentor for this session"
+            }
+          ],
+          "errorMessage": {
+            "required": "Please add a mentor for the session"
+          },
+          "validators": {
+            "required": true
+          }
+        },
+        {
+          "name": "mentees",
+          "label": "Add mentee",
+          "value": [],
+          "class": "ion-no-margin",
+          "disabled": true,
+          "type": "search",
+          "meta": {
+            "multiSelect": true,
+            "url": "MENTEES_LIST",
+            "searchLabel": "Search for mentee",
+            "searchData": [],
+            "maxCount": "MAX_MENTEE_ENROLLMENT_COUNT",
+            "labelForListButton": "View Mentee List",
+            "labelForAddButton": "Add Mentee",
+            "filters": {
+              "entity_types": [
+                {
+                  "key": "designation",
+                  "label": "Designation",
+                  "type": "checkbox"
+                }
+              ],
+              "organizations": [
+                {
+                  "isEnabled": true,
+                  "key": "organizations",
+                  "type": "checkbox"
+                }
+              ]
+            },
+            "filterType": "mentee",
+            "addPopupType": "addUser"
+          },
+          "position": "floating",
+          "info": [
+            {
+              "message": "Click to select Mentee(s) for this session"
+            }
+          ],
+          "errorMessage": {
+            "required": "Please add mentee for the session"
+          },
+          "validators": {
+            "required": true
+          }
+        },
+        {
+          "name": "start_date",
+          "label": "Start date",
+          "class": "ion-no-margin",
+          "value": "",
+          "displayFormat": "DD/MMM/YYYY HH:mm",
+          "dependedChild": "end_date",
+          "type": "date",
+          "placeHolder": "YYYY-MM-DD hh:mm",
+          "errorMessage": {
+            "required": "Enter start date"
+          },
+          "position": "floating",
+          "validators": {
+            "required": true
+          }
+        },
+        {
+          "name": "end_date",
+          "label": "End date",
+          "class": "ion-no-margin",
+          "position": "floating",
+          "value": "",
+          "displayFormat": "DD/MMM/YYYY HH:mm",
+          "dependedParent": "start_date",
+          "type": "date",
+          "placeHolder": "YYYY-MM-DD hh:mm",
+          "errorMessage": {
+            "required": "Enter end date"
+          },
+          "validators": {
+            "required": true
+          }
+        },
+        {
+          "name": "recommended_for",
+          "label": "Recommended for",
+          "class": "ion-no-margin",
+          "value": [],
+          "type": "search",
+          "position": "",
+          "disabled": false,
+          "errorMessage": {
+            "required": "Enter recommended for"
+          },
+          "validators": {
+            "required": true
+          },
+          "options": [
+            {
+              "label": "Block education officer",
+              "value": "beo"
+            },
+            {
+              "label": "Cluster officials",
+              "value": "co"
+            },
+            {
+              "label": "District education officer",
+              "value": "deo"
+            },
+            {
+              "label": "Head master",
+              "value": "hm"
+            },
+            {
+              "label": "Teacher",
+              "value": "te"
+            }
+          ],
+          "meta": {
+            "entityType": "recommended_for",
+            "addNewPopupHeader": "Recommended for",
+            "addNewPopupSubHeader": "Who is this session for?",
+            "showSelectAll": true,
+            "multiSelect": true,
+            "showAddOption": {
+              "showAddButton": true,
+              "addChipLabel": ""
+            },
+            "allow_custom_entities": true,
+            "allow_filtering": true,
+            "addPopupType": "addCompetency",
+            "labelForAddButton": "Select Recommended for"
+          },
+          "multiple": true
+        },
+        {
+          "name": "categories",
+          "label": "Categories",
+          "class": "ion-no-margin",
+          "value": [],
+          "type": "search",
+          "position": "",
+          "disabled": false,
+          "errorMessage": {
+            "required": "Enter categories"
+          },
+          "validators": {
+            "required": true
+          },
+          "options": [
+            {
+              "label": "Communication",
+              "value": "communication"
+            },
+            {
+              "label": "Educational leadership",
+              "value": "educational_leadership"
+            },
+            {
+              "label": "Professional development",
+              "value": "professional_development"
+            },
+            {
+              "label": "School process",
+              "value": "school_process"
+            },
+            {
+              "label": "SQAA",
+              "value": "sqaa"
+            }
+          ],
+          "meta": {
+            "entityType": "categories",
+            "addNewPopupHeader": "Add new category",
+            "addNewPopupSubHeader": "Categories for the session",
+            "showSelectAll": true,
+            "multiSelect": true,
+            "showAddOption": {
+              "showAddButton": true,
+              "addChipLabel": ""
+            },
+            "allow_custom_entities": true,
+            "allow_filtering": true,
+            "addPopupType": "addCompetency",
+            "labelForAddButton": "Select Categories"
+          },
+          "multiple": true
+        },
+        {
+          "name": "medium",
+          "label": "Medium",
+          "alertLabel": "medium",
+          "class": "ion-no-margin",
+          "value": [],
+          "type": "search",
+          "position": "",
+          "disabled": false,
+          "errorMessage": {
+            "required": "Enter select medium"
+          },
+          "validators": {
+            "required": true
+          },
+          "options": [
+            {
+              "label": "English",
+              "value": "en_in"
+            },
+            {
+              "label": "Hindi",
+              "value": "hi"
+            }
+          ],
+          "meta": {
+            "entityType": "medium",
+            "addNewPopupHeader": "Add new medium",
+            "addNewPopupSubHeader": "Medium for the session",
+            "showSelectAll": true,
+            "multiSelect": true,
+            "showAddOption": {
+              "showAddButton": true,
+              "addChipLabel": ""
+            },
+            "allow_custom_entities": true,
+            "allow_filtering": true,
+            "addPopupType": "addCompetency",
+            "labelForAddButton": "Select Medium"
+          },
+          "multiple": true
+        },
+        {
+          "name": "pre_resources",
+          "label": "Pre  session resources",
+          "class": "ion-no-margin",
+          "value": [],
+          "type": "search",
+          "position": "",
+          "disabled": false,
+          "validators": {
+            "required": false
+          },
+          "meta": {
+            "showSelectAll": true,
+            "multiSelect": true,
+            "showAddOption": {
+              "showAddButton": true,
+              "addChipLabel": ""
+            },
+            "allow_custom_entities": false,
+            "allow_filtering": false,
+            "addPopupType": "file",
+            "labelForAddButton": "Add resource"
+          },
+          "info": [
+            {
+              "message": "Add pre session resources"
+            }
+          ],
+        },
+        {
+          "name": "post_resources",
+          "label": "Post  session resources",
+          "class": "ion-no-margin",
+          "value": [],
+          "type": "search",
+          "position": "",
+          "disabled": false,
+          "validators": {
+            "required": false
+          },
+          "meta": {
+            "showSelectAll": true,
+            "multiSelect": true,
+            "showAddOption": {
+              "showAddButton": true,
+              "addChipLabel": ""
+            },
+            "allow_custom_entities": false,
+            "allow_filtering": false,
+            "addPopupType": "file",
+            "labelForAddButton": "Add resource"
+          },
+          "info": [
+            {
+              "message": "Add post session resources"
+            }
+          ],
+        },
+      ]
+    }
     this.entityNames = await this.form.getEntityNames(this.formData)
     this.entityList = await this.form.getEntities(this.entityNames, 'SESSION')
     this.formData = await this.form.populateEntity(this.formData,this.entityList)
@@ -165,68 +584,95 @@ export class CreateSessionPage implements OnInit {
     return true
   }
 
+  async handleFileUploads() {
+    for (const control of this.formData.controls) {
+      if (control.type === 'search' && control.meta?.addPopupType === 'file' && control.value?.length) {
+        const updatedFiles = [];
+        for (const file of control.value) {
+          if (file instanceof File) {
+            const signedUrl = await this.getSignedUrl(file.name);
+            const uploadedFileUrl = await this.uploadFile(file, signedUrl);
+            updatedFiles.push(uploadedFileUrl);
+          } else {
+            updatedFiles.push(file);
+          }
+        }
+        control.value = updatedFiles;
+      }
+    }
+  }
+
+  async getSignedUrl(fileName: string) {
+    const config = {
+      url: urlConstants.API_URLS.GET_SESSION_IMAGE_UPLOAD_URL + fileName.replace(/[^A-Z0-9]+/ig, "_").toLowerCase()
+    };
+    const data: any = await this.api.get(config);
+    return data.result;
+  }
+
+  async uploadFile(file: File, signedUrl: any) {
+    return new Promise((resolve, reject) => {
+      this.attachment.cloudImageUpload(file, signedUrl).subscribe({
+        next: () => resolve(signedUrl.destFilePath),
+        error: (err) => reject(err)
+      });
+    });
+  }
 
   async onSubmit() {
-    if(!this.isSubmited){
+    if (!this.isSubmited) {
       this.form1.onSubmit();
     }
     if (this.form1.myForm.valid) {
-      if (this.profileImageData.image && !this.profileImageData.isUploaded) {
-        this.getImageUploadUrl(this.localImage);
-      } else {
-        const form = Object.assign({}, {...this.form1.myForm.getRawValue(), ...this.form1.myForm.value});
-        console.log(form)
-        form.start_date = (Math.floor((new Date(form.start_date).getTime() / 1000) / 60) * 60).toString();
-        form.end_date = (Math.floor((new Date(form.end_date).getTime() / 1000) / 60) * 60).toString();
-        const timezone = Intl.DateTimeFormat().resolvedOptions().timeZone;
-        form.time_zone = timezone;
-        _.forEach(this.entityNames, (entityKey) => {
-          let control = this.formData.controls.find(obj => obj.name === entityKey);
-          form[entityKey] = control.multiple && control.type == 'chip' ? _.map(form[entityKey], 'value') : form[entityKey]
-        });
-        if(!this.profileImageData.image){
-          form.image=[]
+      await this.handleFileUploads(); // Handle file uploads dynamically
+
+      const form = Object.assign({}, { ...this.form1.myForm.getRawValue(), ...this.form1.myForm.value });
+
+      // Ensure correct formatting for specific fields
+      form.start_date = (Math.floor((new Date(form.start_date).getTime() / 1000) / 60) * 60).toString();
+      form.end_date = (Math.floor((new Date(form.end_date).getTime() / 1000) / 60) * 60).toString();
+      const timezone = Intl.DateTimeFormat().resolvedOptions().timeZone;
+      form.time_zone = timezone;
+
+      _.forEach(this.entityNames, (entityKey) => {
+        const control = this.formData.controls.find(obj => obj.name === entityKey);
+        if (control) {
+          form[entityKey] = control.multiple && control.type === 'chip'
+            ? _.map(form[entityKey], 'value')
+            : form[entityKey];
         }
-        this.form1.myForm.markAsPristine();
-        let result = await this.sessionService.createSession(form, this.id);
-        if (result) {
-          this.sessionDetails = _.isEmpty(result) ? this.sessionDetails : result;
-          this.isSubmited = true;
-          this.firstStepperTitle = (this.id) ? "EDIT_SESSION_LABEL":"CREATE_NEW_SESSION";
-          this.headerConfig.label = this.id ? "EDIT_SESSION":"CREATE_NEW_SESSION";
-          if(!this.id && result.id){
-            this.router.navigate([CommonRoutes.CREATE_SESSION], { queryParams: { id: result.id , type: 'segment'}, replaceUrl: true });
-          }else {
-            this.type = 'segment';
-          }
+      });
+
+      // Ensure file fields are included in the form data
+      this.formData.controls.forEach(control => {
+        if (control.type === 'search' && control.meta?.addPopupType === 'file') {
+          form[control.name] = control.value || [];
+        }
+      });
+
+      if (!this.profileImageData.image) {
+        form.image = [];
+      }
+
+      this.form1.myForm.markAsPristine();
+      const result = await this.sessionService.createSession(form, this.id);
+      if (result) {
+        this.sessionDetails = _.isEmpty(result) ? this.sessionDetails : result;
+        this.isSubmited = true;
+        this.firstStepperTitle = this.id ? "EDIT_SESSION_LABEL" : "CREATE_NEW_SESSION";
+        this.headerConfig.label = this.id ? "EDIT_SESSION" : "CREATE_NEW_SESSION";
+        if (!this.id && result.id) {
+          this.router.navigate([CommonRoutes.CREATE_SESSION], { queryParams: { id: result.id, type: 'segment' }, replaceUrl: true });
         } else {
-          this.profileImageData.image = this.lastUploadedImage;
-          this.profileImageData.isUploaded = false;
+          this.type = 'segment';
         }
+      } else {
+        this.profileImageData.image = this.lastUploadedImage;
+        this.profileImageData.isUploaded = false;
       }
     } else {
       this.toast.showToast("Please fill all the mandatory fields", "danger");
     }
-  }
-
-  async getImageUploadUrl(file) {
-    this.loaderService.startLoader();
-    let config = {
-      url: urlConstants.API_URLS.GET_SESSION_IMAGE_UPLOAD_URL + file.name.replace(/[^A-Z0-9]+/ig, "_").toLowerCase()
-    }
-    let data: any = await this.api.get(config);
-    return this.upload(file, data.result).subscribe()
-  }
-
-  upload(data, uploadUrl) {
-    return this.attachment.cloudImageUpload(data,uploadUrl).pipe(
-      map((resp=>{
-      this.profileImageData.image = uploadUrl.destFilePath;
-      this.form1.myForm.value.image = [uploadUrl.destFilePath];
-      this.profileImageData.isUploaded = true;
-      this.profileImageData.haveValidationError = false;
-      this.onSubmit();
-    })))
   }
 
   resetForm() {
@@ -370,6 +816,7 @@ export class CreateSessionPage implements OnInit {
   }
 
   eventHandler(event) {
+    console.log(event.type);
     switch(event.type) {
       case 'addUser':
         this.showAddUserPopup(event)
@@ -386,8 +833,71 @@ export class CreateSessionPage implements OnInit {
       case 'addCompetency view':
         this.viewSelectedCompetencies(event)
         break;
+      case 'file':
+        this.showResourcesPopup(event)
+        break;
     }
   }
+handleSelectedFile(file) {
+    // Handle file upload logic here
+}
+  async showResourcesPopup(event) {
+    const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
+
+    if (isMobile) {
+        // Show options for Camera or File
+        const actionSheet = await this.actionSheetController.create({
+            header: 'Select Resource',
+            buttons: [
+                {
+                    text: 'Camera',
+                    icon: 'camera',
+                    handler: () => {
+                        this.openCamera();
+                    }
+                },
+                {
+                    text: 'File',
+                    icon: 'folder',
+                    handler: () => {
+                        this.openFilePicker(event);
+                    }
+                },
+                {
+                    text: 'Cancel',
+                    icon: 'close',
+                    role: 'cancel'
+                }
+            ]
+        });
+        await actionSheet.present();
+    } else {
+        this.openFilePicker(event);
+    }
+}
+
+openCamera() {
+    console.log('Camera option selected');
+}
+
+openFilePicker(event) {
+  console.log('File picker option selected');
+  const input = document.createElement('input');
+  input.type = 'file';
+  input.accept = '*/*';
+  input.onchange = (fileEvent: any) => {
+    const file = fileEvent.target.files[0];
+    console.log('Selected file:', file);
+    if (event?.formControl?.control?.value) {
+      event.formControl.control.value.push(file);
+    console.log('event.formControl.control.value -', event.formControl.control.value);
+
+    } else {
+      console.warn('formControl or control is undefined');
+    }
+  };
+  input.click();
+}
 
   async showCompetencyPopup(event) {
     const popover = await this.modalCtrl.create({

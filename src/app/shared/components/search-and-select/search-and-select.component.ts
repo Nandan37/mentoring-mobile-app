@@ -80,6 +80,20 @@ export class SearchAndSelectComponent implements OnInit, ControlValueAccessor {
     }
   }
 
+  removeFile(index: number) {
+    if (this.control?.value) {
+      const updatedFiles = [...this.control.value];
+      updatedFiles.splice(index, 1);
+  
+      if (this.control.setValue) {
+        this.control.setValue(updatedFiles);
+      } else {
+        this.control.value = updatedFiles;
+      }
+    }
+  }
+  
+
   async showPopover() {
     this.markAsTouched();
     this.showSelectionPopover.emit({type: this.control.meta.addPopupType, id: this.uniqueId})
