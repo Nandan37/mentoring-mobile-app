@@ -1,21 +1,8 @@
 <div *ngIf="headerData" class="header-bottom-border">
   <ion-row class="content-wrapper">
     <ion-col size="4">
-      <div class="d-flex flex-justify-center flex-align-items-center flex-col">
-        <div class="profile-img">
-          <ion-icon
-            name="people-outline"
-            *ngIf="headerData?.is_connected"
-          ></ion-icon>
-          <img
-            *ngIf="
-              !headerData?.image || headerData?.image == '';
-              else Img;
-              let image
-            "
-            src="../../../../assets/prof-img/user.png"
-          />
-        </div>
+      <div class="d-flex flex-justify-center">
+        <img *ngIf="!headerData?.image || headerData?.image==''; else Img; let image" src="assets/prof-img/user.png" />
         <ng-template #Img>
           <div class="profile-img">
             <ion-icon

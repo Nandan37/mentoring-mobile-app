@@ -179,8 +179,12 @@ export class ProfileService {
     var roles = userDetails.user_roles.map(function (item) {
       return item['title'];
     });
-    this.isMentor = roles.includes('mentor') ? true : false;
-    return roles;
+    this.isMentor = roles.includes('mentor')?true:false;
+    if (!roles.includes("mentee")) {
+      roles.unshift("mentee");
+    }
+    this.isMentor = roles.map(s => s.toLowerCase()).includes('mentor')?true:false;
+    return roles
   }
 
   async upDateProfilePopup(

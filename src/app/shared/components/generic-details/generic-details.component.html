@@ -20,7 +20,7 @@
     </ng-template>
     <ng-template #elseBlock4>
       <div *ngIf="item?.key=='mentor_name';else elseBlock5">
-        <p>{{sessionData.data[item.key] }}</p>
+        <p class="break-word">{{sessionData.data[item.key] }}</p>
         <div>
           {{sessionData.data.mentor_designation}}
         </div>
