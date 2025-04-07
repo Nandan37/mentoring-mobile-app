@@ -4,7 +4,7 @@
       <ion-back-button defaultHref="/home"></ion-back-button>
     </ion-buttons>
     <ion-buttons slot="start">
-      <div class="flex-box">
+      <div class="flex-box" (click)="goToProfile()">
         <img
           [src]="info?.user_details?.image || '../../../../assets/prof-img/user.png'"
           alt="Profile Picture"

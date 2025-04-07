@@ -18,129 +18,35 @@
               </ion-label>
               <ion-label class="view-roles" (click)="viewRoles()">{{"VIEW_ROLES" | translate}}</ion-label>
             </div>
-            <ng-template #elseBlock>
-              <ion-icon
-                slot="icon-only"
-                name="person-circle"
-                class="no-image-icon"
-              ></ion-icon>
-            </ng-template>
-          </div>
-          <div class="usr-div">
-            <ion-label class="username"
-              ><strong>{{user?.name}}</strong></ion-label
-            >
-            <div class="user-role-labels">
-              <ion-label *ngIf="userRoles"
-                >{{ userRoles[0] | snakeCaseToUpperCase}}
-              </ion-label>
-              <ion-label class="view-roles" (click)="viewRoles()"
-                >{{"VIEW_ROLES" | translate}}</ion-label
-              >
-            </div>
-            <a
-              (click)="goToProfilePage()"
-              class="cursor"
-              *allowTemplateView="PAGE_IDS.profile"
-              >{{"PROFILE" | translate}}</a
-            >
+            <a (click)="goToProfilePage()" class="cursor" *allowTemplateView="PAGE_IDS.profile">{{"PROFILE" | translate}}</a>
           </div>
         </div>
       </div>
     </ion-header>
-    <ion-content
-      *ngIf="user"
-      fullscreen
-      [ngClass]="{'disable-div': user?.profile_mandatory_fields.length && !isAuthBypassed || !user?.about && !isAuthBypassed}"
-    >
+    <ion-content *ngIf="user" fullscreen [ngClass]="{'disable-div': user?.profile_mandatory_fields.length && !isAuthBypassed || !user?.about && !isAuthBypassed}">
       <div class="menu-css">
         <ion-list lines="none" class="sub-menu-list">
-          <ion-menu-toggle
-            auto-hide="false"
-            [class]="adminPage?.class"
-            *ngIf="adminAccess"
-          >
-            <ion-item
-              [routerLink]="adminPage?.url"
-              lines="none"
-              detail="false"
-              (click)="menuItemAction(adminPage)"
-              *allowTemplateView="adminPage?.pageId"
-            >
-              <ng-container
-                *ngIf="isCustomIcon(adminPage?.icon); else defaultAdminIcon"
-              >
-                <img
-                  [src]="adminPage.icon"
-                  class="side-menu-icon custom-icon"
-                  slot="start"
-                  alt="{{ adminPage.title }} icon"
-                />
-              </ng-container>
-              <ng-template #defaultAdminIcon>
-                <ion-icon
-                  class="side-menu-icon"
-                  slot="start"
-                  [ios]="adminPage.icon + '-outline'"
-                  [md]="adminPage.icon + '-outline'"
-                ></ion-icon>
-              </ng-template>
-              <ion-label class="sub-menu-list-label"
-                ><strong>{{ adminPage.title | translate}} </strong></ion-label
-              >
+          <ion-menu-toggle auto-hide="false" [class]="adminPage?.class" *ngIf="adminAccess">
+            <ion-item [routerLink]="adminPage?.url" lines="none" detail="false" (click)="menuItemAction(adminPage)" *allowTemplateView="adminPage?.pageId">
+              <ion-icon class="side-menu-icon" slot="start" [ios]="adminPage.icon + '-outline'" [md]="adminPage.icon + '-outline'"></ion-icon>
+              <ion-label class="sub-menu-list-label"><strong>{{ adminPage.title | translate}}</strong></ion-label>
             </ion-item>
           </ion-menu-toggle>
-          <ion-menu-toggle
-            auto-hide="false"
-            *ngFor="let p of appPages; let i = index"
-            [class]="p?.class"
-          >
-            <ng-container>
-              <span class="badge" *ngIf="p.badge"></span>
-              <ion-item
-                [routerLink]="p?.url"
-                lines="none"
-                detail="false"
-                (click)="menuItemAction(p)"
-                *allowTemplateView="p?.pageId"
-              >
-                <ng-container *ngIf="isCustomIcon(p.icon); else defaultIcon">
-                  <img
-                    [src]="p.icon"
-                    class="side-menu-icon custom-icon"
-                    slot="start"
-                    alt="{{ p.title }} icon"
-                  />
-                </ng-container>
-                <ng-template #defaultIcon>
-                  <ion-icon
-                    class="side-menu-icon"
-                    slot="start"
-                    [ios]="p.icon + '-outline'"
-                    [md]="p.icon + '-outline'"
-                  >
-                  </ion-icon>
-                </ng-template>
-                <ion-label class="sub-menu-list-label"
-                  ><strong>{{ p.title | translate}}</strong>
-                </ion-label>
-              </ion-item>
-            </ng-container>
+          <ion-menu-toggle auto-hide="false" *ngFor="let p of appPages; let i = index" [class]="p?.class">
+            <ion-item [routerLink]="p?.url" lines="none" detail="false" (click)="menuItemAction(p)" *allowTemplateView="p?.pageId">
+              <ion-icon class="side-menu-icon" slot="start" [ios]="p.icon + '-outline'" [md]="p.icon + '-outline'"></ion-icon>
+              <ion-label class="sub-menu-list-label"><strong>{{ p.title | translate}}</strong></ion-label>
+            </ion-item>
           </ion-menu-toggle>
-        </ion-list>
+        </ion-list> 
       </div>
     </ion-content>
     <ion-footer class="side-menu-footer" *ngIf="user">
-      <ion-row
-        (click)="logout()"
-        class="cursor"
-        *allowTemplateView="'PROFILE_PAGE'"
-      >
+      <ion-row (click)="logout()" class="cursor" *allowTemplateView="'PROFILE_PAGE'">
         <ion-col size="12">
           <div class="d-flex flex-justify-center">
-            <ion-icon name="power" size="large" class="ion-margin-end">
-            </ion-icon>
-            <strong class="space-bottom"> {{"LOGOUT" | translate}}</strong>
+            <ion-icon name="power" size="large" class="ion-margin-end"> </ion-icon> <strong class="space-bottom">
+              {{"LOGOUT" | translate}}</strong>
           </div>
         </ion-col>
       </ion-row>

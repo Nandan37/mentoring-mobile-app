@@ -81,7 +81,7 @@ export class GenericProfileHeaderComponent implements OnInit {
           ? this.router.navigate([
               `/${CommonRoutes.CHAT}`,
               this.headerData.connection_details?.room_id,
-            ])
+            ],{queryParams: {id: this.headerData.id}})
           : this.router.navigate([
               `/${CommonRoutes.CHAT_REQ}`,
               this.headerData.id,

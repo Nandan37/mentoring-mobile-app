@@ -2,7 +2,6 @@ import { Component, OnInit, ViewChild, ViewEncapsulation } from '@angular/core';
 import { MatPaginator } from '@angular/material/paginator';
 import { ActivatedRoute, Router } from '@angular/router';
 import { ModalController } from '@ionic/angular';
-import { FrontendChatLibraryService } from 'sl-chat-library';
 import { FILTER_ROLES } from 'src/app/core/constants/formConstant';
 import {
   NO_RESULT_FOUND_FOR_MENTEE,
@@ -69,7 +68,6 @@ export class GenericListPage implements OnInit {
     private permissionService: PermissionService,
     private router: Router,
     private profileService: ProfileService,
-    private chatService: FrontendChatLibraryService
   ) {}
 
   ngOnInit() {}
@@ -242,7 +240,7 @@ export class GenericListPage implements OnInit {
         if (!event.rid) {
           return;
         }
-        this.router.navigate([CommonRoutes.CHAT, event.rid],{queryParams:{id:event.data.id}});
+        this.router.navigate([CommonRoutes.CHAT, event.rid],{queryParams:{id:event.data}});
         break;
     }
   }

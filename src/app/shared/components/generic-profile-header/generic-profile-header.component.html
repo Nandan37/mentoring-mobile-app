@@ -1,35 +1,40 @@
 <div *ngIf="headerData" class="header-bottom-border">
   <ion-row class="content-wrapper">
     <ion-col size="4">
-      <div class="d-flex flex-justify-center">
-        <img *ngIf="!headerData?.image || headerData?.image==''; else Img; let image" src="assets/prof-img/user.png" />
-        <ng-template #Img>
+      <div class="profile-container">
+        <!-- Profile Image -->
+        <ng-container *ngIf="headerData?.image && headerData?.image !== ''; else DefaultImg">
           <div class="profile-img">
             <ion-icon
               name="people-outline"
               *ngIf="headerData?.is_connected"
             ></ion-icon>
-            <img src="{{ headerData?.image }}" />
+            <img [src]="headerData?.image" />
           </div>
+        </ng-container>
+        <ng-template #DefaultImg>
+          <img src="assets/prof-img/user.png" class="default-img" />
         </ng-template>
+    
+        <!-- Rating -->
         <div
-          class="d-inline-flex flex-align-items-center my-4 items-baseline ratings-banner"
+          class="ratings-banner"
           *ngIf="headerData?.rating?.average"
         >
-          {{ headerData?.rating?.average }}
+          {{ headerData?.rating?.average }} 
           <ion-icon name="star" style="margin-left: 5px"></ion-icon>
         </div>
-        <div
-          class="d-inline-flex flex-align-items-center my-4"
-          *ngIf="headerData?.location"
-        >
+    
+        <!-- Location -->
+        <div *ngIf="headerData?.location" class="location-info">
           <ion-label class="location">
-            <ion-icon name="location"></ion-icon
-            >{{ headerData?.location?.label }}</ion-label
-          >
+            <ion-icon name="location"></ion-icon>
+            {{ headerData?.location?.label }}
+          </ion-label>
         </div>
       </div>
     </ion-col>
+    
     <ion-col size="8" class="details-wrapper">
       <div>
         <ion-label *ngIf="headerData?.name" class="name"

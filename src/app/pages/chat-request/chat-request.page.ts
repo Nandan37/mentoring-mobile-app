@@ -5,6 +5,7 @@ import { TranslateService } from '@ngx-translate/core';
 import { CHAT_MESSAGES } from 'src/app/core/constants/chatConstants';
 import { urlConstants } from 'src/app/core/constants/urlConstants';
 import { HttpService, ToastService } from 'src/app/core/services';
+import { CommonRoutes } from 'src/global.routes';
 @Component({
   selector: 'app-chat-request',
   templateUrl: './chat-request.page.html',
@@ -129,5 +130,8 @@ export class ChatRequestPage implements OnInit {
       this.messages = CHAT_MESSAGES.RECEIVER;
       this.toast.showToast('REJECTED_MESSAGE_REQ', 'danger');
     });
+  }
+  goToProfile(){
+        this.router.navigate([CommonRoutes.MENTOR_DETAILS, this.id]);
   }
 }
