@@ -11,6 +11,7 @@ export class FilterTreeComponent implements OnInit {
   @Input() enableFilterLabel: any;
   @Input() filterData: any;
   @Output() filtersChanged = new EventEmitter<any>();
+  @Input() eventData: any;
 
 
   constructor() { }
@@ -39,6 +40,19 @@ export class FilterTreeComponent implements OnInit {
     });
     this.filtersChanged.emit(selectedOptionsByCategory);
   }
-
+  isCheckboxDisabled(filter: any, sessionType: string): boolean {
+    
+    if (filter.name === 'type') {
+      if (sessionType === 'PUBLIC') {
+        return true; 
+      } else if (sessionType === 'PRIVATE') {
+        return !filter.isConnectionEnabled; 
+      }
+      
+      return !filter.isConnectionEnabled; 
+    }
+    
+    return false;
+  }
 }
 

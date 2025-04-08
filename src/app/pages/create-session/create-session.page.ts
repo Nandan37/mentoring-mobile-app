@@ -1,7 +1,6 @@
-import { HttpClient } from '@angular/common/http';
-import { ChangeDetectorRef, Component, Input, OnInit, ViewChild } from '@angular/core';
+import { ChangeDetectorRef, Component, OnInit, ViewChild } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
-import { AttachmentService, LoaderService, ToastService, UtilService } from 'src/app/core/services';
+import { AttachmentService, LoaderService, ToastService } from 'src/app/core/services';
 import { HttpService } from 'src/app/core/services/http/http.service';
 import { SessionService } from 'src/app/core/services/session/session.service';
 import {
@@ -11,7 +10,7 @@ import {
 import { CommonRoutes } from 'src/global.routes';
 import * as _ from 'lodash-es';
 import { Location } from '@angular/common';
-import { AlertController, ModalController, Platform } from '@ionic/angular';
+import { AlertController, ModalController } from '@ionic/angular';
 import { urlConstants } from 'src/app/core/constants/urlConstants';
 import { TranslateService } from '@ngx-translate/core';
 import { CREATE_SESSION_FORM, MANAGERS_CREATE_SESSION_FORM, PLATFORMS } from 'src/app/core/constants/formConstant';
@@ -62,15 +61,16 @@ export class CreateSessionPage implements OnInit {
   params: any;
   editSessionDisable: boolean;
   isMobile = window.innerWidth <= 950;
+  sessionType: any;
+  queryParams: any;
+  formConfig: any;
 
   constructor(
-    private http: HttpClient,
     private sessionService: SessionService,
     private toast: ToastService,
     private activatedRoute: ActivatedRoute,
     private location: Location,
     private attachment: AttachmentService,
-    private platform: Platform,
     private api: HttpService,
     private loaderService: LoaderService,
     private translate: TranslateService,
@@ -83,14 +83,19 @@ export class CreateSessionPage implements OnInit {
     private permissionService:PermissionService
   ) {
   }
-  async ngOnInit() {
-    let formConfig =(await this.permissionService.hasPermission({ module: permissions.MANAGE_SESSION, action: manageSessionAction.SESSION_ACTIONS })) ? MANAGERS_CREATE_SESSION_FORM : CREATE_SESSION_FORM
+  ngOnInit() {
+      
+  }
+  async ionViewWillEnter() {
+    await this.updateFormConfig();
+    this.route.queryParams.subscribe(() => this.updateFormConfig());
+    
     const platformForm = await this.getPlatformFormDetails();
-    const result = await this.form.getForm(formConfig);
+    const result = await this.form.getForm(this.formConfig);
     this.formData = _.get(result, 'data.fields');
-    this.entityNames = await this.form.getEntityNames(this.formData)
-    this.entityList = await this.form.getEntities(this.entityNames, 'SESSION')
-    this.formData = await this.form.populateEntity(this.formData,this.entityList)
+    this.entityNames = await this.form.getEntityNames(this.formData);
+    this.entityList = await this.form.getEntities(this.entityNames, 'SESSION');
+    this.formData = await this.form.populateEntity(this.formData,this.entityList);
     this.changeDetRef.detectChanges();
     this.permissionService.getPlatformConfig();
     this.activatedRoute.queryParamMap.subscribe(async (params) => {
@@ -351,8 +356,10 @@ export class CreateSessionPage implements OnInit {
     let dependedControlIndex = this.formData.controls.findIndex(formControl => formControl.name === event.dependedChild)
     let dependedControl = this.form1.myForm.get(event.dependedChild)
     if(event.value === "PUBLIC") {
+      this.sessionType = event?.value;
       this.setControlValidity(dependedControlIndex, dependedControl, false);
     } else {
+      this.sessionType = event?.value;
       this.setControlValidity(dependedControlIndex, dependedControl, true);
     }
     this.formData.controls.forEach(control => {
@@ -429,7 +436,8 @@ export class CreateSessionPage implements OnInit {
           showFilter: true,
           showSearch: true,
           viewListMode: false,
-          isMobile: this.isMobile
+          isMobile: this.isMobile,
+          sessionType: this.sessionType
         }
       }
     });
@@ -503,5 +511,22 @@ export class CreateSessionPage implements OnInit {
       }
     });
     await popover.present();
+  }
+
+  async updateFormConfig() {
+    const queryParams = this.route.snapshot.queryParams;
+    const isManagePage = queryParams['source'] === 'manage';
+
+    if (isManagePage) {
+      const hasPermission = await this.permissionService.hasPermission({
+        module: permissions.MANAGE_SESSION,
+        action: manageSessionAction.SESSION_ACTIONS,
+      });
+
+      this.formConfig = hasPermission ? MANAGERS_CREATE_SESSION_FORM : CREATE_SESSION_FORM;
+    } else {
+      this.formConfig = CREATE_SESSION_FORM;
+    }
+    
   }
 }

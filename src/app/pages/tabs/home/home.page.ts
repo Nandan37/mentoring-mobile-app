@@ -184,7 +184,7 @@ export class HomePage implements OnInit {
   }
   async createSession() {
     if (this.user?.about != null || environment['isAuthBypassed']) {
-      this.router.navigate([`${CommonRoutes.CREATE_SESSION}`]); 
+      this.router.navigate([`${CommonRoutes.CREATE_SESSION}`], { queryParams: { source: 'home' } }); 
     } else {
       this.profileService.upDateProfilePopup()
     }

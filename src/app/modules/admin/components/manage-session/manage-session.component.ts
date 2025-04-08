@@ -210,7 +210,7 @@ export class ManageSessionComponent implements OnInit {
   }
 
   createSession(){
-      this.router.navigate([`${CommonRoutes.CREATE_SESSION}`]); 
+      this.router.navigate([`${CommonRoutes.CREATE_SESSION}`], { queryParams: { source: 'manage' } }); 
   } 
   segmentChanged(event){
     this.segmentType = event.target.value;
