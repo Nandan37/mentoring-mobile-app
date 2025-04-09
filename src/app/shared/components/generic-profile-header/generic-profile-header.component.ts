@@ -45,7 +45,9 @@ export class GenericProfileHeaderComponent implements OnInit {
   async action(event) {
     switch (event) {
       case 'edit':
-        this.router.navigate([`/${CommonRoutes.EDIT_PROFILE}`]);
+        this.router.navigate([`/${CommonRoutes.EDIT_PROFILE}`],{
+          replaceUrl: true,
+          queryParams: { redirectUrl: `${CommonRoutes.TABS}/${CommonRoutes.PROFILE}` }});
         break;
 
       case 'role':
