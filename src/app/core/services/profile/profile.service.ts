@@ -287,7 +287,7 @@ export class ProfileService {
     }
   }
 
-  async getChatToken() {
+  async getChatToken(): Promise<boolean> {
     const config = {
       url: urlConstants.API_URLS.GET_CHAT_TOKEN,
     };
@@ -303,10 +303,12 @@ export class ProfileService {
             .trim(),
         };
         await this.chatService.setConfig(payload);
+        return true;
       }
+      return false;
     } catch (error) {
       this.loaderService.stopLoader();
-      throw error;
+     return false
     }
   }
 }
