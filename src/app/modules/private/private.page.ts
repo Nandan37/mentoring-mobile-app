@@ -212,24 +212,46 @@ export class PrivatePage implements OnInit {
   initializeApp() {
     this.platform.ready().then(() => {
       this.network.netWorkCheck();
-      setTimeout(async ()=>{
+      this.profile.getChatToken();
+      setTimeout(async () => {
         this.languageSetting();
         this.setHeader();
-        this.localStorage.getLocalData(localKeys.USER_DETAILS).then((userDetails)=>{
-          if(userDetails) {
-            this.profile.getUserRole(userDetails)
-            this.adminAccess = userDetails.permissions ? this.permissionService.hasAdminAcess(this.actionsArrays,userDetails?.permissions) : false;
-          }
-          this.getUser();
-        })
-      },0)
+        this.localStorage
+          .getLocalData(localKeys.USER_DETAILS)
+          .then((userDetails) => {
+            if (userDetails) {
+              this.profile.getUserRole(userDetails);
+              this.adminAccess = userDetails.permissions
+                ? this.permissionService.hasAdminAcess(
+                    this.actionsArrays,
+                    userDetails?.permissions
+                  )
+                : false;
+              if (this.profile?.isMentor) {
+                this.appPages.splice(2, 0, {
+                  title: 'REQUESTS',
+                  action: 'requests',
+                  icon: '/assets/images/request_icon_outline.svg',
+                  class: 'hide-on-small-screen',
+                  url: CommonRoutes.TABS + '/' + CommonRoutes.REQUESTS,
+                  pageId: PAGE_IDS.requests,
+                });
+              }
+            }
+            this.getUser();
+          });
+      }, 0);
       this.db.init();
-      setTimeout(async ()=>{
-        this.userRoles = await this.localStorage.getLocalData(localKeys.USER_ROLES);
-        this.isMentor = this.userRoles.includes('mentor')?true:false;
-      },1000);
+      setTimeout(async () => {
+        this.userRoles = await this.localStorage.getLocalData(
+          localKeys.USER_ROLES
+        );
+      }, 1000);
       setTimeout(() => {
-        document.querySelector('ion-menu')?.shadowRoot?.querySelector('.menu-inner')?.setAttribute('style', 'border-radius:8px 8px 0px 0px');
+        document
+          .querySelector('ion-menu')
+          ?.shadowRoot?.querySelector('.menu-inner')
+          ?.setAttribute('style', 'border-radius:8px 8px 0px 0px');
       }, 2000);
       this.userEventSubscription = this.userService.userEventEmitted$.subscribe(
         (data) => {
