@@ -7,6 +7,7 @@ import { urlConstants } from 'src/app/core/constants/urlConstants';
 import { Component, OnInit } from '@angular/core';
 import { ProfileService } from 'src/app/core/services/profile/profile.service';
 import { environment } from 'src/environments/environment';
+import { TranslateService } from '@ngx-translate/core';
 
 @Component({
   selector: 'app-dashboard',
@@ -48,11 +49,13 @@ export class DashboardPage implements OnInit {
   chartBody: any = {};
   chartBodyConfig :any= {}
   chartBodyPayload: any;
-  metaKeys =DASHBOARD_TABLE_META_KEYS
+  metaKeys =DASHBOARD_TABLE_META_KEYS;
+  translatedChartConfig:any;
   constructor(
     private profile: ProfileService,
     private apiService: HttpService,
-    private form: FormService) { }
+    private form: FormService,
+  private translate : TranslateService) { }
 
   
   ionViewWillEnter() {
