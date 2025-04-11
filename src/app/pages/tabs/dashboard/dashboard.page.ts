@@ -1,5 +1,5 @@
 import * as _ from 'lodash';
-import { BIG_NUMBER_DASHBOARD_FORM } from 'src/app/core/constants/formConstant';
+import { BIG_NUMBER_DASHBOARD_FORM, DASHBOARD_TABLE_META_KEYS } from 'src/app/core/constants/formConstant';
 import { HttpService } from 'src/app/core/services';
 import { FormService } from 'src/app/core/services/form/form.service';
 import * as moment from 'moment';
@@ -7,6 +7,7 @@ import { urlConstants } from 'src/app/core/constants/urlConstants';
 import { Component, OnInit } from '@angular/core';
 import { ProfileService } from 'src/app/core/services/profile/profile.service';
 import { environment } from 'src/environments/environment';
+import { TranslateService } from '@ngx-translate/core';
 
 @Component({
   selector: 'app-dashboard',
@@ -48,10 +49,15 @@ export class DashboardPage implements OnInit {
   chartBody: any = {};
   chartBodyConfig :any= {}
   chartBodyPayload: any;
+  translatedChartConfig : any;
+
+  metaKeys =DASHBOARD_TABLE_META_KEYS
+
   constructor(
     private profile: ProfileService,
     private apiService: HttpService,
-    private form: FormService) { }
+    private form: FormService,
+    public translate: TranslateService) { }
 
   
   ionViewWillEnter() {
@@ -72,10 +78,11 @@ export class DashboardPage implements OnInit {
     this.session_type = 'ALL';
     this.chartBodyConfig = this.filteredFormData;
     this.chartBody = this.chartBodyConfig;
+  await this.getTranslatedLabel();
     if(this.user){
       this.initialDuration();
     }
-  }
+}
 
   public headerConfig: any = {
     menu: true,
@@ -150,6 +157,9 @@ export class DashboardPage implements OnInit {
     this.selectedDuration = 'month';
     this.filteredFormData = this.bigNumberFormData[this.selectedRole] || [];
     this.filteredCards = this.filteredFormData|| [];
+    this.chartBodyConfig = this.filteredCards;
+    this.chartBody  = this.chartBodyConfig;
+    await this.getTranslatedLabel();
     if(this.filteredCards){
       this.bigNumberCount();
     }
@@ -204,6 +214,24 @@ export class DashboardPage implements OnInit {
       const roleData = this.bigNumberFormData[this.selectedRole];
       const firstObject = this.transformData(roleData, formData);
       this.dynamicFormControls = firstObject.form.controls;
+  }
+  getTranslatedLabel() {
+    const rawConfig = this.chartBody?.[this.session_type]?.chartConfig;
+    if (rawConfig) {
+      this.translatedChartConfig = rawConfig.map(item => {
+        const key = Object.keys(item).find(k => k !== 'backgroundColor')!; // get the dynamic key
+        const translationKey = item[key];
+        return {
+          [key]: this.translate.instant(translationKey),
+          backgroundColor: item.backgroundColor
+        };
+      });
+    }
+    for (const key in DASHBOARD_TABLE_META_KEYS) {
+      if (DASHBOARD_TABLE_META_KEYS.hasOwnProperty(key)) {
+        this.metaKeys[key] = this.translate.instant(DASHBOARD_TABLE_META_KEYS[key]);
+      }
+    }
   }
 
   transformData(firstObj: any, secondObj: any): any {

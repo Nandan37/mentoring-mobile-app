@@ -74,3 +74,23 @@ export const FILTER_ROLES = {
 	],
 	"type": "checkbox"
 }
+
+
+export const DASHBOARD_TABLE_META_KEYS ={
+	"reportDateError":"END_DATE_LESS_THAN_STARTDATE",
+	  "reportTableNoSessions" : "NO_SESSIONS_FOUND_TIME_PERIOD",
+	  "submit":"SUBMIT",
+	  "endDate":"END_DATE",
+	  "startDate":"START_DATE",
+	  "selectDateRange":"SELECT_DATE_RANGE",
+	  "selectDate":"SELECT_DATE",
+	  "noData":"NO_SESSIONS_FOUND",
+	  "clearFilters":"CLEAR_FILTERS",
+	  "downloadTable":"DOWNLOAD_TABLE",
+	  "search":"SEARCH",
+	  "select":"SELECT",
+	  "invalidSearch":"INVALID_SEARCH",
+	  "chooseADate":"CHOOSE_A_DATE",
+	  "noSessions":"NO_SESSIONS",
+	  "noDataFound":"NO_SESSIONS_FOUND",
+	"cancel":"CANCEL"}
