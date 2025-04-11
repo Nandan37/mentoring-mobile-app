@@ -1,4 +1,4 @@
-import { NgModule } from '@angular/core';
+import { NgModule, CUSTOM_ELEMENTS_SCHEMA } from '@angular/core';
 import { BrowserModule } from '@angular/platform-browser';
 import { RouteReuseStrategy } from '@angular/router';
 import { IonicModule, IonicRouteStrategy } from '@ionic/angular';
@@ -15,23 +15,22 @@ import { TranslateHttpLoader } from '@ngx-translate/http-loader';
 import { CoreModule } from './core/core.module';
 import { Drivers, Storage } from '@ionic/storage';
 import { IonicStorageModule } from '@ionic/storage-angular';
-import { SQLite } from '@ionic-native/sqlite/ngx';
 import { TitleCasePipe } from '@angular/common';
 import { ReactiveFormsModule } from '@angular/forms';
-import { ScreenOrientation } from '@ionic-native/screen-orientation/ngx';
 import { ServiceWorkerModule, SwUpdate } from '@angular/service-worker';
 import { environment } from '../environments/environment';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { MatTableModule } from '@angular/material/table';
 import { MatPaginatorModule } from '@angular/material/paginator';
 import { RecaptchaModule } from 'ng-recaptcha';
-
+import { FrontendChatLibraryModule } from 'sl-chat-library';
+import { MatToolbarModule } from '@angular/material/toolbar';
 export const translateHttpLoaderFactory = (httpClient: HttpClient) =>
   new TranslateHttpLoader(httpClient, './assets/i18n/', '.json');
 
 @NgModule({
   declarations: [AppComponent],
-  entryComponents: [],
+  schemas: [CUSTOM_ELEMENTS_SCHEMA],
   imports: [
     CommonModule,
     BrowserModule,
@@ -54,20 +53,22 @@ export const translateHttpLoaderFactory = (httpClient: HttpClient) =>
     }),
     ReactiveFormsModule,
     ServiceWorkerModule.register('ngsw-worker.js', {
-      enabled: typeof(environment.production)=='string' ? JSON.parse(environment.production) : environment.production,
-      // Register the ServiceWorker as soon as the app is stable
-      // or after 30 seconds (whichever comes first).
-      registrationStrategy: 'registerWhenStable:30000'
+      enabled:
+        typeof environment.production == 'string'
+          ? JSON.parse(environment.production)
+          : environment.production,
+      registrationStrategy: 'registerWhenStable:30000',
     }),
     BrowserAnimationsModule,
     RecaptchaModule,
+    MatToolbarModule,
+    FrontendChatLibraryModule,
   ],
-
-  providers: [{ provide: RouteReuseStrategy, useClass: IonicRouteStrategy },
-    SQLite,
+  exports: [],
+  providers: [
+    { provide: RouteReuseStrategy, useClass: IonicRouteStrategy },
     TitleCasePipe,
-    ScreenOrientation,
-    SwUpdate
+    SwUpdate,
   ],
   bootstrap: [AppComponent],
 })

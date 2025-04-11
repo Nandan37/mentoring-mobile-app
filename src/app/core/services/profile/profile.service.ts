@@ -19,6 +19,7 @@ import { TranslateService } from '@ngx-translate/core';
 import { UserListModalComponent } from 'src/app/shared/components/user-list-modal/user-list-modal.component';
 import { ModalController } from '@ionic/angular';
 import { environment } from 'src/environments/environment';
+import { FrontendChatLibraryService } from 'sl-chat-library';
 
 @Injectable({
   providedIn: 'root',
@@ -33,15 +34,15 @@ export class ProfileService {
     private toast: ToastService,
     private localStorage: LocalStorageService,
     private _location: Location,
-    private utilService:UtilService,
+    private utilService: UtilService,
     private userService: UserService,
     private injector: Injector,
     private form: FormService,
     private util: UtilService,
-    private modal: ModalController
-  ) {
-   }
-  async profileUpdate(formData, showToast=true) {
+    private modal: ModalController,
+    private chatService: FrontendChatLibraryService
+  ) {}
+  async profileUpdate(formData, showToast = true) {
     await this.loaderService.startLoader();
     const config = {
       url: urlConstants.API_URLS.PROFILE_UPDATE,
@@ -49,17 +50,21 @@ export class ProfileService {
     };
     try {
       let data: any = await this.httpService.patch(config);
-      let userDetails = await this.localStorage.getLocalData(localKeys.USER_DETAILS);
+      let userDetails = await this.localStorage.getLocalData(
+        localKeys.USER_DETAILS
+      );
       let profileData = await this.getProfileDetailsFromAPI();
       userDetails.user = null;
-      let profileDatas = await {...userDetails, ...profileData};
-      await this.localStorage.setLocalData(localKeys.USER_DETAILS, profileDatas);
+      let profileDatas = await { ...userDetails, ...profileData };
+      await this.localStorage.setLocalData(
+        localKeys.USER_DETAILS,
+        profileDatas
+      );
       this.userService.userEvent.next(profileDatas);
       this.loaderService.stopLoader();
-      (showToast)?this.toast.showToast(data.message, "success"):null;
+      showToast ? this.toast.showToast(data.message, 'success') : null;
       return true;
-      }
-    catch (error) {
+    } catch (error) {
       this.loaderService.stopLoader();
     }
   }
@@ -68,44 +73,44 @@ export class ProfileService {
     //showLoader ? await this.loaderService.startLoader() : null;
     return new Promise((resolve) => {
       try {
-        this.localStorage.getLocalData(localKeys.USER_DETAILS)
+        this.localStorage
+          .getLocalData(localKeys.USER_DETAILS)
           .then(async (data) => {
-            if(data) {
-              await this.getUserRole(data)
+            if (data) {
+              await this.getUserRole(data);
               resolve(data);
             }
             //showLoader ? this.loaderService.stopLoader() : null;
-          })
+          });
       } catch (error) {
-       // showLoader ? this.loaderService.stopLoader() : showLoader;
+        // showLoader ? this.loaderService.stopLoader() : showLoader;
       }
     });
   }
 
-  async generateOtp(formData,captchaToken) {
+  async generateOtp(formData, captchaToken) {
     await this.loaderService.startLoader();
     const config = {
       url: urlConstants.API_URLS.GENERATE_OTP,
       payload: formData,
-      headers: captchaToken ?  {'captcha-token': captchaToken}:{}
+      headers: captchaToken ? { 'captcha-token': captchaToken } : {},
     };
     try {
       let data: any = await this.httpService.post(config);
       this.loaderService.stopLoader();
-      this.toast.showToast(data.message, "success");
+      this.toast.showToast(data.message, 'success');
       return data;
-    }
-    catch (error) {
+    } catch (error) {
       this.loaderService.stopLoader();
     }
   }
   async updatePassword(formData) {
-    this.deviceInfo = await this.util?.deviceDetails()
+    this.deviceInfo = await this.util?.deviceDetails();
     await this.loaderService.startLoader();
     const config = {
       url: urlConstants.API_URLS.RESET_PASSWORD,
       payload: formData,
-      headers: { 'device-info': this.deviceInfo}
+      headers: { 'device-info': this.deviceInfo },
     };
     try {
       let data: any = await this.httpService.post(config);
@@ -114,66 +119,64 @@ export class ProfileService {
       let user = await this.getProfileDetailsFromAPI();
       this.userService.userEvent.next(user);
       this.loaderService.stopLoader();
-      this.toast.showToast(data.message, "success");
+      this.toast.showToast(data.message, 'success');
       return userData;
-    }
-    catch (error) {
+    } catch (error) {
       this.loaderService.stopLoader();
       return null;
     }
   }
-  async registrationOtp(formData,captchaToken) {
+  async registrationOtp(formData, captchaToken) {
     await this.loaderService.startLoader();
     const config = {
       url: urlConstants.API_URLS.REGISTRATION_OTP,
       payload: formData,
-      headers: captchaToken ?  {'captcha-token': captchaToken}:{}
+      headers: captchaToken ? { 'captcha-token': captchaToken } : {},
     };
     try {
       let data: any = await this.httpService.post(config);
       this.loaderService.stopLoader();
       return data;
-    }
-    catch (error) {
+    } catch (error) {
       this.loaderService.stopLoader();
     }
   }
   async shareProfile(id) {
     await this.loaderService.startLoader();
     const config = {
-      url: urlConstants.API_URLS.SHARE_MENTOR_PROFILE+id,
-      payload: {}
+      url: urlConstants.API_URLS.SHARE_MENTOR_PROFILE + id,
+      payload: {},
     };
     try {
       let data = await this.httpService.get(config);
       let result = _.get(data, 'result');
       this.loaderService.stopLoader();
       return result;
-    }
-    catch (error) {
+    } catch (error) {
       this.loaderService.stopLoader();
     }
   }
 
-  async getProfileDetailsFromAPI(){
+  async getProfileDetailsFromAPI() {
     const config = {
       url: urlConstants.API_URLS.PROFILE_READ,
-      payload: {}
+      payload: {},
     };
     try {
       let data: any = await this.httpService.get(config);
       data = _.get(data, 'result');
-      this.getUserRole(data)
+      this.getUserRole(data);
       await this.localStorage.setLocalData(localKeys.USER_DETAILS, data);
-      await this.localStorage.setLocalData(localKeys.USER_ROLES, this.getUserRole(data))
+      await this.localStorage.setLocalData(
+        localKeys.USER_ROLES,
+        this.getUserRole(data)
+      );
       return data;
-    }
-    catch (error) {
-    }
+    } catch (error) {}
   }
 
   getUserRole(userDetails) {
-    var roles = userDetails.user_roles.map(function(item) {
+    var roles = userDetails.user_roles.map(function (item) {
       return item['title'];
     });
     this.isMentor = roles.includes('mentor')?true:false;
@@ -184,24 +187,44 @@ export class ProfileService {
     return roles
   }
 
-  async upDateProfilePopup(msg:any = {header: 'UPDATE_PROFILE',message: 'PLEASE_UPDATE_YOUR_PROFILE_IN_ORDER_TO_PROCEED',cancel:'UPDATE',submit:'CANCEL'}){
-    this.utilService.alertPopup(msg).then(async (data) => {
-      if(!data){
-        this.router.navigate([`/${CommonRoutes.EDIT_PROFILE}`]);
-      }
-    }).catch(error => {})
+  async upDateProfilePopup(
+    msg: any = {
+      header: 'UPDATE_PROFILE',
+      message: 'PLEASE_UPDATE_YOUR_PROFILE_IN_ORDER_TO_PROCEED',
+      cancel: 'UPDATE',
+      submit: 'CANCEL',
+    }
+  ) {
+    this.utilService
+      .alertPopup(msg)
+      .then(async (data) => {
+        if (!data) {
+          this.router.navigate([`/${CommonRoutes.EDIT_PROFILE}`]);
+        }
+      })
+      .catch((error) => {});
   }
 
-  async prefillData(requestDetails: any,entityNames:any,formData:any,showAddOption:any=true) {
+  async prefillData(
+    requestDetails: any,
+    entityNames: any,
+    formData: any,
+    showAddOption: any = true
+  ) {
     let existingData = requestDetails;
-    if(requestDetails?.about || environment.isAuthBypassed){
-       existingData = await this.form.formatEntityOptions(requestDetails,entityNames)
+    if (requestDetails?.about || environment.isAuthBypassed) {
+      existingData = await this.form.formatEntityOptions(
+        requestDetails,
+        entityNames
+      );
     }
     for (let i = 0; i < formData.controls.length; i++) {
-      if(formData.controls[i].type == 'chip'){
+      if (formData.controls[i].type == 'chip') {
         formData.controls[i].meta.showAddOption.showAddButton = showAddOption;
       }
-      formData.controls[i].value = existingData[formData.controls[i].name] ? existingData[formData.controls[i].name] : '';
+      formData.controls[i].value = existingData[formData.controls[i].name]
+        ? existingData[formData.controls[i].name]
+        : '';
       formData.controls[i].options = _.unionBy(
         formData.controls[i].options,
         formData.controls[i].value,
@@ -210,49 +233,82 @@ export class ProfileService {
     }
   }
 
-  async viewRolesModal(userRoles){
-    if (!userRoles.includes("mentee")) {
-      userRoles.push("mentee");
+  async viewRolesModal(userRoles) {
+    if (!userRoles.includes('mentee')) {
+      userRoles.push('mentee');
     }
     userRoles = userRoles.sort();
     let modal = await this.modal.create({
       component: UserListModalComponent,
       cssClass: 'user-role-modal',
-      componentProps: { data: userRoles }
+      componentProps: { data: userRoles },
     });
     modal.present();
   }
 
-  async getMentors(showLoader = true, obj){
+  async getMentors(showLoader = true, obj) {
     showLoader ? await this.loaderService.startLoader() : '';
     const config = {
-      url: urlConstants.API_URLS.MENTORS_DIRECTORY_LIST  + obj?.page + '&limit=' + obj.pageSize + '&search=' + btoa(obj.searchText) + '&directory=false'+ '&search_on=' + (obj?.selectedChip? obj?.selectedChip : '') + '&' + (obj?.urlQueryData ? obj?.urlQueryData: ''),
-      payload: {}
+      url:
+        urlConstants.API_URLS.MENTORS_DIRECTORY_LIST +
+        obj?.page +
+        '&limit=' +
+        obj.pageSize +
+        '&search=' +
+        btoa(obj.searchText) +
+        '&directory=false' +
+        '&search_on=' +
+        (obj?.selectedChip ? obj?.selectedChip : '') +
+        '&' +
+        (obj?.urlQueryData ? obj?.urlQueryData : ''),
+      payload: {},
     };
     try {
       let data: any = await this.httpService.get(config);
       showLoader ? await this.loaderService.stopLoader() : '';
       return data;
-    }
-    catch (error) {
+    } catch (error) {
       showLoader ? await this.loaderService.stopLoader() : '';
-      return error
+      return error;
     }
   }
 
-  async updateLanguage(formData, showToast=true){
+  async updateLanguage(formData, showToast = true) {
     const config = {
       url: urlConstants.API_URLS.UPDATE_LANGUAGE,
       payload: formData,
     };
     try {
       let data: any = await this.httpService.patch(config);
-      (showToast)?this.toast.showToast(data.message, "success"):null;
+      showToast ? this.toast.showToast(data.message, 'success') : null;
       return data;
-      }
-    catch (error) {
+    } catch (error) {
       this.loaderService.stopLoader();
     }
   }
 
+  async getChatToken(): Promise<boolean> {
+    const config = {
+      url: urlConstants.API_URLS.GET_CHAT_TOKEN,
+    };
+    try {
+      const resp = await this.httpService.get(config);
+      if (resp.result) {
+        const payload = {
+          xAuthToken: resp.result.auth_token,
+          userId: resp.result.user_id,
+          textColor: '#fff',
+          bgColor: getComputedStyle(document.documentElement)
+            .getPropertyValue('--ion-color-primary')
+            .trim(),
+        };
+        await this.chatService.setConfig(payload);
+        return true;
+      }
+      return false;
+    } catch (error) {
+      this.loaderService.stopLoader();
+     return false
+    }
+  }
 }
