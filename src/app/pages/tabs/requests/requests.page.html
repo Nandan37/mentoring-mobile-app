@@ -17,7 +17,7 @@
     <div *ngSwitchCase="'slot-requests'">
       <ion-grid >
         <ion-row class="d-flex ">
-          <ion-col *ngFor="let value of data" padding size-xs="12" size-sm="12" size-md="6" size-lg="4" align-self-stretch>
+          <ion-col *ngFor="let value of data" padding size-xs="12" size-sm="12" size-md="6" size-lg="6" size-xl="4" align-self-stretch>
             <app-generic-card 
               [data]="value?.user_details" 
               [meta]="{ isSent: value?.created_by === value?.user_id, message: value?.meta?.message, timeStamp: '' }" 
@@ -30,7 +30,7 @@
     <div *ngSwitchCase="'message-requests'">
       <ion-grid >
         <ion-row class="d-flex ">
-          <ion-col *ngFor="let value of data" padding size-xs="12" size-sm="12" size-md="6" size-lg="4" align-self-stretch>
+          <ion-col *ngFor="let value of data" padding size-xs="12" size-sm="12" size-md="6" size-lg="6" size-xl="4" align-self-stretch>
             <app-generic-card 
               [data]="value?.user_details" 
               [meta]="{ isSent: value?.created_by === value?.user_id, message: value?.meta?.message, timeStamp: '' }" 
