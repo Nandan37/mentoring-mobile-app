@@ -80,6 +80,7 @@ export const urlConstants = {
     GET_CHAT_TOKEN: '/mentoring/v1/profile/getCommunicationToken',
     GET_PROFILE_DATA: '/interface/v1/profile/get/',
     DASHBOARD_REPORT_FILTER: "/mentoring/v1/reports/filterList?",
-    DASHBOARD_REPORT_DATA: "/mentoring/v1/reports/reportData?"
+    DASHBOARD_REPORT_DATA: "/mentoring/v1/reports/reportData?",
+    GETUSERIDBYRID:"/mentoring/v1/profile/externalIdMapping"
   }
 };

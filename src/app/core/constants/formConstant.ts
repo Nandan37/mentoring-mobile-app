@@ -58,7 +58,6 @@ export const DASHBOARD: IFORM = {
 	"type": "dashboard",
 	"sub_type": "dashboardForm",
 }
-
 export const FILTER_ROLES = {
 	"title": "Roles",
 	"name": "roles",
@@ -74,7 +73,6 @@ export const FILTER_ROLES = {
 	],
 	"type": "checkbox"
 }
-
 
 export const DASHBOARD_TABLE_META_KEYS ={
 	"reportDateError":"END_DATE_LESS_THAN_STARTDATE",

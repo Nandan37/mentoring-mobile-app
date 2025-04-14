@@ -50,7 +50,6 @@ export class DashboardPage implements OnInit {
   chartBodyConfig :any= {}
   chartBodyPayload: any;
   translatedChartConfig : any;
-
   metaKeys =DASHBOARD_TABLE_META_KEYS
 
   constructor(
@@ -78,7 +77,7 @@ export class DashboardPage implements OnInit {
     this.session_type = 'ALL';
     this.chartBodyConfig = this.filteredFormData;
     this.chartBody = this.chartBodyConfig;
-  await this.getTranslatedLabel();
+    await this.getTranslatedLabel();
     if(this.user){
       this.initialDuration();
     }
@@ -215,6 +214,7 @@ export class DashboardPage implements OnInit {
       const firstObject = this.transformData(roleData, formData);
       this.dynamicFormControls = firstObject.form.controls;
   }
+  
   getTranslatedLabel() {
     const rawConfig = this.chartBody?.[this.session_type]?.chartConfig;
     if (rawConfig) {
@@ -233,7 +233,7 @@ export class DashboardPage implements OnInit {
       }
     }
   }
-
+  
   transformData(firstObj: any, secondObj: any): any {
     const updatedFirstObj = JSON.parse(JSON.stringify(firstObj));
     updatedFirstObj.form.controls = updatedFirstObj.form.controls.map((control: any) => {

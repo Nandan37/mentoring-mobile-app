@@ -51,6 +51,8 @@ export class ChatRequestPage implements OnInit {
       this.info = resp?.result;
       if (resp?.result?.status == 'REQUESTED') {
         this.message = '';
+      }else if(resp?.result?.status == 'ACCEPTED') {
+        this.router.navigate([CommonRoutes.CHAT, resp?.result?.meta.room_id],{queryParams:{id:resp?.result?.id}});
       }
       this.info.status = !resp?.result?.status
         ? 'PENDING'
@@ -88,6 +90,7 @@ export class ChatRequestPage implements OnInit {
     };
     this.httpService.post(payload).then((resp) => {
       this.info.status = 'ACCEPTED';
+        this.router.navigate([CommonRoutes.CHAT, resp?.result?.meta.room_id],{queryParams:{id:resp?.result?.id}});
     });
   }
 

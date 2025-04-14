@@ -48,6 +48,14 @@ export class PrivatePage implements OnInit {
       pageId: PAGE_IDS.mentorDirectory,
     },
     {
+      title: 'REQUESTS',
+      action: 'requests',
+      icon: '/assets/images/request_icon_outline.svg',
+      class: 'hide-on-small-screen',
+      url: CommonRoutes.TABS + '/' + CommonRoutes.REQUESTS,
+      pageId: PAGE_IDS.requests,
+    },
+    {
       title: 'MY_CONNECTIONS',
       action: 'my-connections',
       icon: 'people',
@@ -227,16 +235,6 @@ export class PrivatePage implements OnInit {
                     userDetails?.permissions
                   )
                 : false;
-              if (this.profile?.isMentor) {
-                this.appPages.splice(2, 0, {
-                  title: 'REQUESTS',
-                  action: 'requests',
-                  icon: '/assets/images/request_icon_outline.svg',
-                  class: 'hide-on-small-screen',
-                  url: CommonRoutes.TABS + '/' + CommonRoutes.REQUESTS,
-                  pageId: PAGE_IDS.requests,
-                });
-              }
             }
             this.getUser();
           });
