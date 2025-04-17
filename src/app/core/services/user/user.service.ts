@@ -3,6 +3,7 @@ import { localKeys } from '../../constants/localStorage.keys';
 import { LocalStorageService } from '../localstorage.service';
 import * as _ from 'lodash-es';
 import jwt_decode from "jwt-decode";
+import * as moment from 'moment';
 import { Subject } from 'rxjs';
 
 @Injectable({
@@ -29,9 +30,9 @@ export class UserService {
 
   validateToken(token){
     const tokenDecoded: any = jwt_decode(token);
-    const tokenExpiryTime = new Date(tokenDecoded.exp * 1000); 
-    const currentTime = new Date(); 
-    return currentTime < tokenExpiryTime;
+    const tokenExpiryTime = moment(tokenDecoded.exp * 1000);
+    const currentTime = moment(Date.now());
+    return currentTime.isBefore(tokenExpiryTime);
   }
   
 }
