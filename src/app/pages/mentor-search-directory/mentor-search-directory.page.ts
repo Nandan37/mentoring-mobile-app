@@ -1,8 +1,7 @@
 import { Component, OnInit, ViewChild } from '@angular/core';
 import { MatPaginator } from '@angular/material/paginator';
-import { ActivatedRoute, Router } from '@angular/router';
+import { Router } from '@angular/router';
 import { ModalController } from '@ionic/angular';
-import { CHAT_MESSAGES } from 'src/app/core/constants/chatConstants';
 import { paginatorConstants } from 'src/app/core/constants/paginatorConstants';
 import { ToastService, UtilService } from 'src/app/core/services';
 import { FormService } from 'src/app/core/services/form/form.service';
@@ -44,7 +43,6 @@ export class MentorSearchDirectoryPage implements OnInit {
   limit: any;
   chips = [];
   showSelectedCriteria: any;
-  buttonConfig: any;;
 
   constructor(
     private router: Router,
@@ -53,15 +51,10 @@ export class MentorSearchDirectoryPage implements OnInit {
     private permissionService: PermissionService,
     private formService: FormService,
     private utilService: UtilService,
-    private toast: ToastService,
-    private route: ActivatedRoute
+    private toast: ToastService
   ) { }
 
-  ngOnInit() {
-    this.route.data.subscribe(data => {
-      this.buttonConfig = data.button_config;
-    })
-   }
+  ngOnInit() { }
 
   async ionViewWillEnter() {
     this.getMentors();
@@ -154,9 +147,6 @@ export class MentorSearchDirectoryPage implements OnInit {
       case 'cardSelect':
         this.router.navigate([CommonRoutes.MENTOR_DETAILS, event?.data?.id]);
         break;
-        case 'chat':
-          this.router.navigate([CommonRoutes.CHAT_REQ, event.data]);
-          break;
     }
   }
 

@@ -5,8 +5,6 @@ import { CommonRoutes } from 'src/global.routes';
 import { TabsPage } from './tabs.page';
 import { AllowPageAccess } from 'src/app/core/guards/allowPageAccess/allowPageAccess.guard';
 import { PAGE_IDS } from 'src/app/core/constants/page.ids';
-import { CHAT_MESSAGES } from 'src/app/core/constants/chatConstants';
-import { MY_CONNECTIONS_NO_RESULT_FOUND } from 'src/app/core/constants/genericConstants';
 
 const routes: Routes = [
   {
@@ -17,29 +15,13 @@ const routes: Routes = [
       {
         path: CommonRoutes.HOME,
         loadChildren: () => import('./home/home.module').then(m => m.Tab1PageModule),
-        canActivate:[PrivateGuard, AllowPageAccess],
-        data: {
-          pageId: PAGE_IDS.home,
-          placeholder: 'home page'
-        }
+        canActivate:[PrivateGuard]
       },
       {
         path: CommonRoutes.MENTOR_DIRECTORY,
         loadChildren: () => import('./mentor-directory/mentor-directory.module').then(m => m.MentorDirectoryPageModule),
-        canActivate:[PrivateGuard],
-        data: {
-          button_config: CHAT_MESSAGES.GENERIC_CARD_MENTOR_DIRECTORY_BTN_CONFIG
-        }
+        canActivate:[PrivateGuard]
       },
-      {
-        path: CommonRoutes.REQUESTS,
-        loadChildren: () => import('./requests/requests.module').then( m => m.RequestsPageModule),
-        canActivate:[PrivateGuard],
-        data: {
-          button_config: CHAT_MESSAGES.GENERIC_CARD_REQUEST_BTN_CONFIG,
-          noDataFound: MY_CONNECTIONS_NO_RESULT_FOUND
-        }
-      },    
       {
         path: CommonRoutes.DASHBOARD,
         loadChildren: () => import('./dashboard/dashboard.module').then(m => m.DashboardPageModule),
