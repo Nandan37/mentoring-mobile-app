@@ -1,114 +1,47 @@
-img {
-  border-radius: 50%;
-  width: 95px;
-  height: 95px;
+img{    
+    border-radius:50%;
+    width: 95px;
+    height: 95px;
 }
 ion-icon {
-  color: white;
+    color: white;
 }
-ion-col {
-  display: block;
+ion-col{
+    display: block;
 }
-.name {
-  font-weight: bold;
-  font-size: 20px;
-  letter-spacing: 0.5px;
-  margin-left: 2px;
+.name{
+    font-weight: bold;
+    font-size:20px;
+    letter-spacing: .5px;
+    margin-left: 2px;
 }
-.details-wrapper {
-  margin: 10px 0px 0px 0px;
-  padding-left: 8px;
+.details-wrapper{
+    margin: 22px 0px 0px 0px;
+    padding-left: 8px;
 }
-.location {
-  color: #fff;
-  font-size: 14px;
-  margin-left: 2px;
-  text-align: center;
+.location{
+    color: rgb(172, 175, 175);
+    font-size: 14px;
+    margin-left: 2px;
 }
-ion-button {
-  color: white;
-  max-width: fit-content;
+ion-button{
+    border-width: thick !important;
+    color: white;
+    margin: 30px 20px 0px 0px;
+    max-width: 250px;
+    
 }
-.content-wrapper {
-  padding: 16px 16px 16px 0px;
+.content-wrapper{
+    padding: 16px 16px 16px 0px;
 }
-.view-roles {
-  color: var(--ion-color-secondary);
-  text-decoration: underline;
-  cursor: pointer;
-  margin-left: 2%;
-  font-size: small;
+.view-roles{
+    color: blue;
+    text-decoration: underline;
+    cursor: pointer;
+    margin-left: 2%;
+    font-size: small;
 }
-.roles-div {
-  padding-left: 2px;
-  padding-top: 1%;
-}
-
-.items-baseline {
-  align-items: baseline;
-}
-
-.ratings-banner {
-  background: green;
-  padding: 0px 10px;
-  font-size: 12px;
-  margin-top: -7px !important;
-  width: 50px;
-  text-align: center;
-  justify-content: center;
-  z-index: 1;
-}
-
-.profile-img {
-  position: relative;
-  ion-icon {
-    position: absolute;
-    right: 0px;
-    top: -5px;
-    width: 25px;
-    height: 25px;
-    background: #fff;
-    color: #000;
-    border-radius: 50%;
-    padding: 4px;
-  }
-}
-
-.wrap {
-  flex-wrap: wrap;
-  gap: 10px;
-}
-
-
-.profile-container {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  text-align: center;
-}
-
-.profile-img img,
-.default-img {
-  width: 100px;
-  height: 100px;
-  border-radius: 50%;
-  object-fit: cover;
-}
-
-.ratings-banner {
-  margin: 10px 0;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-
-.location-info {
-  margin-top: 0px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-
-.location ion-icon {
-  margin-right: 5px;
+.roles-div{
+    padding-left: 2px;
+    padding-top: 1%
 }

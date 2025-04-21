@@ -29,6 +29,8 @@ import { ModelComponent } from './components/model/model.component';
 import { MatInputModule } from '@angular/material/input';
 import { MatButtonModule } from '@angular/material/button';
 import { MatDatepickerModule } from '@angular/material/datepicker';                                              
+import { NgxMatDatetimePickerModule, NgxMatTimepickerModule } from '@angular-material-components/datetime-picker';
+import { NgxMatMomentModule } from '@angular-material-components/moment-adapter';
 import { GenericTableComponent } from './components/generic-table/generic-table.component';
 import { MatTableModule } from '@angular/material/table';
 import { MatPaginatorModule } from '@angular/material/paginator';
@@ -44,11 +46,6 @@ import { snakeCaseToUpperCasePipe } from '../core/pipes/snake-case-to-normal-cas
 import { AllowTemplateViewDirective } from './directive/allowTemplate.directive';
 import { GenericSearchComponent } from './components/generic-search/generic-search.component';
 import { SearchCompetencyComponent } from './components/search-competency/search-competency.component';
-import { SearchbarComponent } from './components/searchbar/searchbar.component';
-import { OverlayModule } from '@angular/cdk/overlay';
-import { ChipsAndFilterComponent } from './components/chips-and-filter/chips-and-filter.component';
-import { GenericCardComponent } from './components/generic-card/generic-card.component';
-import { OwlDateTimeModule, OwlNativeDateTimeModule } from '@danielmoncada/angular-datetime-picker';
 
 @NgModule({
   declarations: [
@@ -85,10 +82,7 @@ import { OwlDateTimeModule, OwlNativeDateTimeModule } from '@danielmoncada/angul
     snakeCaseToUpperCasePipe,
     AllowTemplateViewDirective,
     GenericSearchComponent,
-    SearchCompetencyComponent,
-    SearchbarComponent,
-    ChipsAndFilterComponent,
-    GenericCardComponent
+    SearchCompetencyComponent
   ],
   imports: [
     CommonModule,
@@ -98,14 +92,14 @@ import { OwlDateTimeModule, OwlNativeDateTimeModule } from '@danielmoncada/angul
     FormsModule,
     MatDatepickerModule,
     MatInputModule,
+    NgxMatDatetimePickerModule,
+    NgxMatTimepickerModule,
     FormsModule,
     ReactiveFormsModule,
     MatButtonModule,
+    NgxMatMomentModule,
     MatTableModule,
-    MatPaginatorModule,
-    OverlayModule,
-    OwlDateTimeModule,
-    OwlNativeDateTimeModule,
+    MatPaginatorModule
   ],
   exports: [
     DynamicFormComponent,
@@ -139,10 +133,7 @@ import { OwlDateTimeModule, OwlNativeDateTimeModule } from '@danielmoncada/angul
     snakeCaseToUpperCasePipe,
     AllowTemplateViewDirective,
     GenericSearchComponent,
-    SearchCompetencyComponent,
-    SearchbarComponent,
-    ChipsAndFilterComponent,
-    GenericCardComponent
+    SearchCompetencyComponent
   ],
 })
 export class SharedModule {}

@@ -22,10 +22,7 @@ ion-chip{
       color: var(--dark-grey);
       margin-bottom: 5px;
   }
-.break-word{
-    word-break: break-word;
-    overflow-wrap: break-word;
-}
+
 .view-mentee-list{
     color: var(--ion-color-primary);
     border: 1px solid var(--ion-color-primary);
@@ -36,4 +33,8 @@ ion-chip{
     justify-content: center;
     align-items: center;
     padding-right: 10px;
+}
+.break-word{
+    word-break: break-word;
+    overflow-wrap: break-word;
 }

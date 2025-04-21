@@ -1494,7 +1494,7 @@
   {
     "type": "bignumberDashboard",
     "sub_type": "bignumberDashboardForm",
-    "action": "create",
+    "action": "skip",
     "data": {
       "template_name": "defaultTemplate",
       "fields": {
@@ -2176,7 +2176,7 @@
           "report_code": "split_of_sessions_created_and_conducted",
           "table_report_code": "session_manger_session_details",
           "tableUrl": "",
-          "tableTitle": "SESSION_DETAILS",
+          "tableTitle": "MENTORING_SESSION_DETAILS",
           "headers": ""
         }
       }

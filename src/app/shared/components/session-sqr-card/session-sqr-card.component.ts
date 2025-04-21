@@ -1,5 +1,6 @@
 import { Component, OnInit,Input, Output, EventEmitter } from '@angular/core';
 import { Router } from '@angular/router';
+import * as moment from 'moment';
 import { CommonRoutes } from 'src/global.routes';
 
 @Component({

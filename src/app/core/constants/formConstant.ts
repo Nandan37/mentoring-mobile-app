@@ -76,19 +76,3 @@ export const DASHBOARD_TABLE_META_KEYS ={
 	  "noSessions":"NO_SESSIONS",
 	  "noDataFound":"NO_SESSIONS_FOUND",
 	"cancel":"CANCEL"}
-
-export const FILTER_ROLES = {
-	"title": "Roles",
-	"name": "roles",
-	"options": [
-		{
-			"label": "Mentor",
-			"value": "mentor"
-		},
-		{
-			"label": "Mentee",
-			"value": "Mentee"
-		}
-	],
-	"type": "checkbox"
-}
