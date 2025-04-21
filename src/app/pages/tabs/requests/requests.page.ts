@@ -36,8 +36,6 @@ export class RequestsPage implements OnInit {
       this.routeData = data;
       this.buttonConfig = this.routeData?.button_config;
       this.slotBtnConfig = this.routeData.slotButtonConfig;
-
-      console.log(this.routeData)
     });
   }
 
@@ -67,7 +65,7 @@ export class RequestsPage implements OnInit {
         this.router.navigate([CommonRoutes.CHAT_REQ, event.data]);
         break;
       case 'viewDetails':
-        this.router.navigate([CommonRoutes.SESSION_REQUEST_DETAILS]);
+        this.router.navigate([CommonRoutes.SESSION_REQUEST_DETAILS], {queryParams: {data: event.data}});
         break;
     }
   }

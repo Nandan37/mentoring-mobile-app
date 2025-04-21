@@ -227,7 +227,7 @@ export class PrivatePage implements OnInit {
                     userDetails?.permissions
                   )
                 : false;
-              if (this.profile?.isMentor) {
+              // if (this.profile?.isMentor) {
                 this.appPages.splice(2, 0, {
                   title: 'REQUESTS',
                   action: 'requests',
@@ -236,7 +236,7 @@ export class PrivatePage implements OnInit {
                   url: CommonRoutes.TABS + '/' + CommonRoutes.REQUESTS,
                   pageId: PAGE_IDS.requests,
                 });
-              }
+              // }
             }
             this.getUser();
           });

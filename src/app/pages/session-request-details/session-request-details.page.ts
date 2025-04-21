@@ -1,4 +1,5 @@
 import { Component, OnInit, ViewChild } from '@angular/core';
+import { ActivatedRoute } from '@angular/router';
 import { IonModal } from '@ionic/angular';
 import { PLATFORMS } from 'src/app/core/constants/formConstant';
 import { ToastService, UtilService } from 'src/app/core/services';
@@ -24,46 +25,27 @@ export class SessionRequestDetailsPage implements OnInit {
   isModalOpen: boolean = false;
   isRejected: boolean = false;
 
-  constructor(private form: FormService,private sessionService: SessionService,private toast: ToastService,private utilService: UtilService) { }
+  constructor(
+    private form: FormService,
+    private sessionService: SessionService,
+    private toast: ToastService,
+    private utilService: UtilService,
+    private activateRoute: ActivatedRoute,
+  ) { }
   public headerConfig: any = {
     backButton: true,
     headerColor: 'primary'
   };
 
-  ngOnInit() {
-    this.getPlatformFormDetails()
+  ngOnInit() { }
+
+  ionViewWillEnter() {
+    this.getPlatformFormDetails();
+    this.activateRoute.queryParams.subscribe((params) => {console.log(params);});
   }
-  fullContent: string = "Lorem Ipsum is simply dummy text of the printing and typesetting industry. It has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book. It has survived not only five centuries, but also the leap into electronic typesetting, remaining essentially unchanged.";
 
   toggleText() {
     this.showFullText = !this.showFullText;
-  }
-
-  apiDemoResponse:any = {
-    name: "John don",
-    designation: [
-      {
-          "value": "beo",
-          "label": "Block education officer"
-      },
-      {
-          "value": "co",
-          "label": "Cluster officials"
-      },
-      {
-          "value": "deo",
-          "label": "District education officer"
-      },
-      {
-          "value": "te",
-          "label": "Teacher"
-      },
-  ],
-    image: '',
-    agenda: 'Contrary to popular belief, Lorem Ipsum is not simply random text. It has roots in a piece of classical Latin literature from 45 BC, making it over 2000 years old. Richard McClintock, a Latin professor at Hampden-Sydney College in Virginia, looked up one of the more obscure Latin words, consectetur, from a Lorem Ipsum passage, and going through the cites of the word in classical literature, discovered the undoubtable source.',
-    slot_request_date: '',
-    request: 'PENDING',
-    id: "11"
   }
 
   accept(){
@@ -244,10 +226,6 @@ export class SessionRequestDetailsPage implements OnInit {
         { startTime:"12:01:01", 
           endTime:"13:00:01",
           title: "Session 1"
-        },
-        { startTime:"01:01:01", 
-          endTime:"14:00:01",
-          title: 'session 2'
         }
       ]   
     }
@@ -364,6 +342,32 @@ export class SessionRequestDetailsPage implements OnInit {
             "label": "other"
         }
     ]
+}
+apiDemoResponse:any = {
+  name: "John don",
+  designation: [
+    {
+        "value": "beo",
+        "label": "Block education officer"
+    },
+    {
+        "value": "co",
+        "label": "Cluster officials"
+    },
+    {
+        "value": "deo",
+        "label": "District education officer"
+    },
+    {
+        "value": "te",
+        "label": "Teacher"
+    },
+],
+  image: '',
+  agenda: 'Contrary to popular belief, Lorem Ipsum is not simply random text. It has roots in a piece of classical Latin literature from 45 BC, making it over 2000 years old. Richard McClintock, a Latin professor at Hampden-Sydney College in Virginia, looked up one of the more obscure Latin words, consectetur, from a Lorem Ipsum passage, and going through the cites of the word in classical literature, discovered the undoubtable source.',
+  slot_request_date: '',
+  request: 'PENDING',
+  id: "11"
 }
 
 }

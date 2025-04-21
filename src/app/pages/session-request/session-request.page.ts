@@ -1,6 +1,7 @@
 import { Component, OnInit, ViewChild } from '@angular/core';
-import { Router } from '@angular/router';
-import { ToastService } from 'src/app/core/services';
+import { ActivatedRoute, Router } from '@angular/router';
+import { localKeys } from 'src/app/core/constants/localStorage.keys';
+import { LocalStorageService, ToastService } from 'src/app/core/services';
 import { DynamicFormComponent } from 'src/app/shared/components';
 import { CommonRoutes } from 'src/global.routes';
 
@@ -40,6 +41,7 @@ export class SessionRequestPage implements OnInit {
       "displayFormat": "DD/MMM/YYYY HH:mm",
       "dependedChild": "end_date",
       "type": "date",
+      "time_zone": "IST",
       "placeHolder": "YYYY-MM-DD hh:mm",
       "errorMessage": {
         "required": "Enter start date"
@@ -58,6 +60,7 @@ export class SessionRequestPage implements OnInit {
       "displayFormat": "DD/MMM/YYYY HH:mm",
       "dependedParent": "start_date",
       "type": "date",
+      "time_zone": "IST",
       "placeHolder": "YYYY-MM-DD hh:mm",
       "errorMessage": {
         "required": "Enter end date"
@@ -89,15 +92,16 @@ export class SessionRequestPage implements OnInit {
 }
 
   isSubmited: boolean = false;
+  ids: any = {};
 
-  constructor(private router: Router, private toast: ToastService) { }
+  constructor(private router: Router, private toast: ToastService, private activatedRoute: ActivatedRoute,private localStorage: LocalStorageService,) { }
 
   ngOnInit() {
   }
 
-  private ids: any = {
-    user_id : "11",
-    friend_id : "09"
+  async ionViewWillEnter() {
+    this.activatedRoute.queryParams.subscribe(({ data }) => this.ids.friend_id = data);
+    this.ids.user_id = (await this.localStorage.getLocalData(localKeys.USER_DETAILS))?.id;
   }
 
   public headerConfig: any = {
@@ -110,10 +114,17 @@ export class SessionRequestPage implements OnInit {
     if(!this.isSubmited){
       this.form1.onSubmit();
     }
-    const form = Object.assign({}, {...this.form1.myForm.getRawValue(), ...this.form1.myForm.value}, { ...this.ids});
-    console.log('form',form.start_date)
-    this.router.navigate([`/${CommonRoutes.TABS}/${CommonRoutes.REQUESTS}`]);
-    this.toast.showToast('Your request has been sent successfully', "success")
+    if(this.form1.myForm.valid){
+      const form = Object.assign({}, {...this.form1.myForm.getRawValue(), ...this.form1.myForm.value}, { ...this.ids});
+      form.start_date = (Math.floor((new Date(form.start_date).getTime() / 1000) / 60) * 60).toString();
+      form.end_date = (Math.floor((new Date(form.end_date).getTime() / 1000) / 60) * 60).toString();
+      const timezone = Intl.DateTimeFormat().resolvedOptions().timeZone;
+      form.time_zone = timezone;
+      console.log('form', form);
+      this.form1.myForm.markAsPristine();
+      this.router.navigate([`/${CommonRoutes.TABS}/${CommonRoutes.REQUESTS}`]);
+      this.toast.showToast('Your request has been sent successfully', "success")
+    }
   }
 
 }

@@ -13,7 +13,7 @@
       </ng-container>
     </p>
 
-    <ion-button color="primary" (click)="viewProfile(apiDemoResponse?.id)">View Profile</ion-button>
+    <ion-button color="primary" (click)="viewProfile(apiDemoResponse?.id)">{{"VIEW_PROFILE" | translate}}</ion-button>
     <ion-text class="description">
       <h2 class="text-left">Agenda</h2>
       <p style="margin: 0px;" class="text-left">
@@ -32,7 +32,7 @@
       You have requested a slot at <strong>2:00 pm - 3:00 pm</strong> on <strong>Monday (01 May 2023)</strong>
     </p>
     <ng-container>
-      <div class="text-left" *ngIf="isAccepted">
+      <div class="text-left" *ngIf="isAccepted && existingData && yourScheduledData.length > 0">
         <h2 class="auto-margin">Meeting link</h2>
           @if (this.existingData?.meeting_info?.meta?.meetingId) {
             <div>
@@ -66,7 +66,7 @@
         }
       </ion-chip>
       
-      <ion-modal #modal [isOpen]="isModalOpen" [backdropDismiss]="false">
+      <ion-modal #modal [isOpen]="isModalOpen" [backdropDismiss]="false" *ngIf="existingData && yourScheduledData.length > 0">
         <ng-template>
           <ion-content>
             <ion-list>
@@ -103,7 +103,7 @@
           </ion-footer>
         </ng-template>
       </ion-modal>
-      <mat-accordion>
+      <mat-accordion *ngIf="isAccepted && existingData && yourScheduledData.length > 0">
         <mat-expansion-panel style="background: #f3f3f3;;">
           <mat-expansion-panel-header>
             <mat-panel-title>
@@ -139,7 +139,7 @@
     </ng-container>
   </div>
 </ion-content>
-<ion-footer class="ion-no-border footer-button" *ngIf="!isRejected">
+<ion-footer class="ion-no-border footer-button" *ngIf="!isRejected && existingData && yourScheduledData.length > 0">
   <ion-toolbar>
     <ng-container *ngIf="!isAccepted; else templateA">
       <div class="w-full flex flex-justify-space-around">
