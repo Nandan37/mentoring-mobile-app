@@ -10,8 +10,30 @@
       </p>
     </div>
     <div class="d-flex flex-align-items-center mx-10">
-      <ion-icon name="chatbox"></ion-icon>
-      <p class="max-width-70" style="margin: 2px 5px">{{ meta.message }}</p>
+      <ng-container *ngIf="meta.message; else timeIcon">
+        <ion-icon name="chatbox"></ion-icon>
+      </ng-container>
+      <ng-template #timeIcon>
+        <ion-icon name="time"></ion-icon>
+      </ng-template>
+    
+      <ng-container *ngIf="meta.message; else timeBlock">
+        <p class="max-width-70" style="margin: 2px 5px">{{ meta.message }}</p>
+      </ng-container>
+    
+      <ng-template #timeBlock>
+        <small>
+          {{
+            meta.startTime * 1000 | date: 'dd MMM, yyyy'
+          }},
+          {{
+            meta.startTime * 1000 | date: 'h:mm a'
+          }} -
+          {{
+            meta.endTime * 1000 | date: 'h:mm a'
+          }}
+        </small>
+      </ng-template>
     </div>
   </div>
   <ion-grid>
