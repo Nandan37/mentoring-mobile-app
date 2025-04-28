@@ -2,6 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { AlertController } from '@ionic/angular';
 import { TranslateService } from '@ngx-translate/core';
+import { replace } from 'lodash';
 import { CHAT_MESSAGES } from 'src/app/core/constants/chatConstants';
 import { urlConstants } from 'src/app/core/constants/urlConstants';
 import { HttpService, ToastService } from 'src/app/core/services';
@@ -52,7 +53,7 @@ export class ChatRequestPage implements OnInit {
       if (resp?.result?.status == 'REQUESTED') {
         this.message = '';
       }else if(resp?.result?.status == 'ACCEPTED') {
-        this.router.navigate([CommonRoutes.CHAT, resp?.result?.meta.room_id],{queryParams:{id:resp?.result?.id}});
+        this.router.navigate([CommonRoutes.CHAT, resp?.result?.meta.room_id],{queryParams:{id:resp?.result?.id}, replaceUrl: true });
       }
       this.info.status = !resp?.result?.status
         ? 'PENDING'
