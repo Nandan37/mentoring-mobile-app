@@ -66,10 +66,6 @@ export class ChatRequestPage implements OnInit {
     });
   }
   sendRequest() {
-    if (this.info.status == 'REQUESTED') {
-      this.toast.showToast('MULTIPLE_MESSAGE_REQ', 'danger');
-      return;
-    }
     const payload = {
       url: urlConstants.API_URLS.SEND_REQUEST,
       payload: {
