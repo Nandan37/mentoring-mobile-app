@@ -1,4 +1,4 @@
-<ion-card class="shadow-with-radious generic-card" (click)="onCardClick(data)">
+<ion-card class="shadow-with-radious generic-card" (click)="handleButtonClick(button?.action, data)">
   <div class="generic-card-header d-grid" *ngIf="meta">
     <div class="d-flex flex-align-items-center mx-10">
       <ion-icon
@@ -18,7 +18,7 @@
     <ion-row>
       <ion-col class="columns" size="4" no-padding>
         <div class="d-flex flex-justify-center">
-          <img
+          <img (click)="onCardClick(data);   $event.stopPropagation()"
             class="profile-img"
             [src]="data?.image ? data.image : 'assets/prof-img/user.png'"
           />
@@ -26,7 +26,7 @@
       </ion-col>
       <ion-col class="columns" size="8" no-padding>
         <ion-item lines="none" class="ion-item-padding-none">
-          <ion-label class="auto-margin">
+          <ion-label class="auto-margin" (click)="onCardClick(data);   $event.stopPropagation()">
             <h4 class="margin-none">{{ data?.name || data?.title }}</h4>
             <div class="d-flex" *ngIf="data?.designation?.length">
               <p class="max-width-50">{{ data?.designation[0]?.label }}</p>
