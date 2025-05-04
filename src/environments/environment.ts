@@ -8,6 +8,8 @@ export const environment = {
   deepLinkUrl: 'https://mentored.shikshalokam.org',
   privacyPolicyUrl:'https://shikshalokam.org/mentoring/privacy-policy',
   termsOfServiceUrl:'https://shikshalokam.org/mentoring/term-of-use',
+  chatBaseUrl:'https://chat-dev.elevate-apis.shikshalokam.org',
+  chatWebSocketUrl :'wss://chat-dev.elevate-apis.shikshalokam.org/websocket',
   supportEmail: "mentoredtest1@yopmail.com",
   // recaptchaSiteKey:"6LfWEKYpAAAAACxKbR7H42o3BwbJkJA06vIM_6Ea",
   recaptchaSiteKey:"",
