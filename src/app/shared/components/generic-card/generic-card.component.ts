@@ -26,7 +26,7 @@ export class GenericCardComponent implements OnInit {
   handleButtonClick(action: string, data) {
     let value = {
       data: data.id || data.user_id,
-      type: action || 'viewMessage',
+      type: action,
       rid: data?.connection_meta?.room_id,
     };
     this.onClickEvent.emit(value);
