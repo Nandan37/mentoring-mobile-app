@@ -47,7 +47,7 @@ export class CreateSessionPage implements OnInit {
     type: 'session',
     haveValidationError: false
   }
-
+  updatedFiles : any= [];
   public formData: JsonFormData;
   showForm: boolean = false;
   isSubmited: boolean;
@@ -448,7 +448,7 @@ export class CreateSessionPage implements OnInit {
           "multiple": true
         },
         {
-          "name": "pre_resources",
+          "name": "pre",
           "label": "Pre  session resources",
           "class": "ion-no-margin",
           "value": [],
@@ -477,7 +477,7 @@ export class CreateSessionPage implements OnInit {
           ],
         },
         {
-          "name": "post_resources",
+          "name": "post",
           "label": "Post  session resources",
           "class": "ion-no-margin",
           "value": [],
@@ -587,17 +587,21 @@ export class CreateSessionPage implements OnInit {
   async handleFileUploads() {
     for (const control of this.formData.controls) {
       if (control.type === 'search' && control.meta?.addPopupType === 'file' && control.value?.length) {
-        const updatedFiles = [];
+        console.log(control);
         for (const file of control.value) {
           if (file instanceof File) {
             const signedUrl = await this.getSignedUrl(file.name);
             const uploadedFileUrl = await this.uploadFile(file, signedUrl);
-            updatedFiles.push(uploadedFileUrl);
+            console.log(uploadedFileUrl);
+            this.updatedFiles.push({
+              "name":file.name,
+              "link":uploadedFileUrl,
+              "type":control.name
+          });
           } else {
-            updatedFiles.push(file);
+            this.updatedFiles.push(file);
           }
         }
-        control.value = updatedFiles;
       }
     }
   }
@@ -624,11 +628,9 @@ export class CreateSessionPage implements OnInit {
       this.form1.onSubmit();
     }
     if (this.form1.myForm.valid) {
-      await this.handleFileUploads(); // Handle file uploads dynamically
+      await this.handleFileUploads();
 
       const form = Object.assign({}, { ...this.form1.myForm.getRawValue(), ...this.form1.myForm.value });
-
-      // Ensure correct formatting for specific fields
       form.start_date = (Math.floor((new Date(form.start_date).getTime() / 1000) / 60) * 60).toString();
       form.end_date = (Math.floor((new Date(form.end_date).getTime() / 1000) / 60) * 60).toString();
       const timezone = Intl.DateTimeFormat().resolvedOptions().timeZone;
@@ -642,18 +644,11 @@ export class CreateSessionPage implements OnInit {
             : form[entityKey];
         }
       });
-
-      // Ensure file fields are included in the form data
-      this.formData.controls.forEach(control => {
-        if (control.type === 'search' && control.meta?.addPopupType === 'file') {
-          form[control.name] = control.value || [];
-        }
-      });
-
       if (!this.profileImageData.image) {
         form.image = [];
       }
-
+      form.resources= this.updatedFiles;
+      console.log(form,"form.resources 651");
       this.form1.myForm.markAsPristine();
       const result = await this.sessionService.createSession(form, this.id);
       if (result) {
