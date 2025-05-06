@@ -127,6 +127,7 @@ export class DynamicFormComponent implements OnInit {
   dependedChildDate="";
   dependedParent: any;
   dependedParentDate: any;
+  isMobile = window.innerWidth <= 950;
 
   constructor(private fb: UntypedFormBuilder, private toast: ToastService) {}
   ngOnInit() {
@@ -242,7 +243,9 @@ export class DynamicFormComponent implements OnInit {
     this.currentDate = new Date();
     if (this.myForm.get(control.name).value)
       datetimePicker._selected = this.myForm.get(control.name).value;
-    datetimePicker.open();
+    setTimeout(()=>{
+      datetimePicker.open();
+    },500)
   }
 
   selectionChanged(control, event){

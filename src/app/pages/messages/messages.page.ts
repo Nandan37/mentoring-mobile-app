@@ -10,23 +10,27 @@ import { CommonRoutes } from 'src/global.routes';
   styleUrls: ['./messages.page.scss'],
 })
 export class MessagesPage implements OnInit {
-  showChat: boolean = false;
+  showChat: any;
   public headerConfig: any = {
     menu: true,
     headerColor: 'primary',
     notification: false,
     label:'MESSAGES'
   };
+  isLoaded: boolean = false;
 
   constructor(
     private route: Router,
     private profileService: ProfileService,
     private utilsService: UtilService
   ) {}
+  ngOnInit(): void {
+      
+  }
 
-  async ngOnInit() {
-    await this.profileService.getChatToken();
-    this.showChat = true;
+  async ionViewWillEnter() {
+    this.showChat = await this.profileService.getChatToken();
+    this.isLoaded = true;
   }
 
   onSelect(data: any) {

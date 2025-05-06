@@ -29,12 +29,14 @@ export class RequestsPage implements OnInit {
     private router: Router
   ) {}
 
-  ngOnInit() {
+  ionViewWillEnter(){
     this.pendingRequest();
     this.route.data.subscribe((data) => {
       this.routeData = data;
       this.buttonConfig = this.routeData?.button_config;
     });
+  }
+  ngOnInit() {
   }
 
   segmentChanged(event) {

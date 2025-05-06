@@ -48,6 +48,14 @@ export class PrivatePage implements OnInit {
       pageId: PAGE_IDS.mentorDirectory,
     },
     {
+      title: 'REQUESTS',
+      action: 'requests',
+      icon: '/assets/images/request_icon_outline.svg',
+      class: 'hide-on-small-screen',
+      url: CommonRoutes.TABS + '/' + CommonRoutes.REQUESTS,
+      pageId: PAGE_IDS.requests,
+    },
+    {
       title: 'MY_CONNECTIONS',
       action: 'my-connections',
       icon: 'people',
@@ -228,16 +236,6 @@ export class PrivatePage implements OnInit {
                     userDetails?.permissions
                   )
                 : false;
-              if (this.profile?.isMentor) {
-                this.appPages.splice(2, 0, {
-                  title: 'REQUESTS',
-                  action: 'requests',
-                  icon: '/assets/images/request_icon_outline.svg',
-                  class: 'hide-on-small-screen',
-                  url: CommonRoutes.TABS + '/' + CommonRoutes.REQUESTS,
-                  pageId: PAGE_IDS.requests,
-                });
-              }
             }
             this.getUser();
           });
@@ -254,7 +252,6 @@ export class PrivatePage implements OnInit {
           ?.shadowRoot?.querySelector('.menu-inner')
           ?.setAttribute('style', 'border-radius:8px 8px 0px 0px');
       }, 2000);
-
       this.userEventSubscription = this.userService.userEventEmitted$.subscribe(
         (data) => {
           if (data) {
@@ -281,7 +278,6 @@ export class PrivatePage implements OnInit {
     });
     this.subscribeBackButton();
   }
-
   setHeader() {
     this.userService.getUserValue();
   }

@@ -8,6 +8,8 @@ export const environment = {
   deepLinkUrl: 'https://mentored.shikshalokam.org',
   privacyPolicyUrl:'https://shikshalokam.org/mentoring/privacy-policy',
   termsOfServiceUrl:'https://shikshalokam.org/mentoring/term-of-use',
+  chatBaseUrl:'https://chat-dev.elevate-apis.shikshalokam.org',
+  chatWebSocketUrl :'wss://chat-dev.elevate-apis.shikshalokam.org/websocket',
   supportEmail: "mentoredtest1@yopmail.com",
   // recaptchaSiteKey:"6LfWEKYpAAAAACxKbR7H42o3BwbJkJA06vIM_6Ea",
   recaptchaSiteKey:"",
@@ -20,3 +22,18 @@ export const environment = {
     errorMessage:"Password should contain at least one uppercase letter, one number and one special character."
   },
 };
+	// production: false ,
+	// name: window['env' as any]['name' as any] ,
+	// baseUrl: window['env' as any]['baseUrl'] ,
+	// sqliteDBName: window['env' as any]['sqliteDBName' as any] ,
+	// deepLinkUrl: window['env' as any]['deepLinkUrl'],
+	// privacyPolicyUrl: window['env' as any]['privacyPolicyUrl' as any] ,
+	// termsOfServiceUrl: window['env' as any]['termsOfServiceUrl' as any] ,
+	// recaptchaSiteKey: window['env' as any]['recaptchaSiteKey'] ,
+	// recaptchaSiteKeyOld: window['env' as any]['recaptchaSiteKeyOld' as any] ,
+	// restictedPages: window['env' as any]['restictedPages'],
+	// unauthorizedRedirectUrl: window['env' as any]['unauthorizedRedirectUrl' as string] ,
+	// supportEmail: window['env' as any]['supportEmail' as any] ,
+	// isAuthBypassed: window['env' as any]['isAuthBypassed'] ,
+	// password: window['env' as any]['password'] 
+
