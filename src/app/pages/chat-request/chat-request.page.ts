@@ -66,6 +66,10 @@ export class ChatRequestPage implements OnInit {
     });
   }
   sendRequest() {
+    if(this.message.length >this.messageLimit){
+      this.toast.showToast('MESSAGE_TEXT_LIMIT', 'danger');
+      return;
+    }
     const payload = {
       url: urlConstants.API_URLS.SEND_REQUEST,
       payload: {
