@@ -3,18 +3,19 @@
     <ion-col size="4">
       <div class="profile-container">
         <!-- Profile Image -->
-        <ng-container *ngIf="headerData?.image && headerData?.image !== ''; else DefaultImg">
-          <div class="profile-img">
-            <ion-icon
-              name="people-outline"
-              *ngIf="headerData?.is_connected"
-            ></ion-icon>
+        <div class="profile-img">
+          <ion-icon
+            name="people-outline"
+            *ngIf="headerData?.is_connected"
+          ></ion-icon>
+          <ng-container *ngIf="headerData?.image && headerData?.image !== ''; else DefaultImg">
             <img [src]="headerData?.image" />
-          </div>
-        </ng-container>
-        <ng-template #DefaultImg>
-          <img src="assets/prof-img/user.png" class="default-img" />
-        </ng-template>
+          </ng-container>
+          <ng-template #DefaultImg>
+            <img src="assets/prof-img/user.png" class="default-img" />
+          </ng-template>
+        </div>
+        
     
         <!-- Rating -->
         <div
