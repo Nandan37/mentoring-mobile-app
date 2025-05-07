@@ -468,6 +468,7 @@ export class CreateSessionPage implements OnInit {
             "allow_custom_entities": false,
             "allow_filtering": false,
             "addPopupType": "file",
+            "add_link":true,
             "labelForAddButton": "Add resource"
           },
           "info": [
@@ -497,6 +498,7 @@ export class CreateSessionPage implements OnInit {
             "allow_custom_entities": false,
             "allow_filtering": false,
             "addPopupType": "file",
+            "add_link":true,
             "labelForAddButton": "Add resource"
           },
           "info": [
@@ -529,7 +531,7 @@ export class CreateSessionPage implements OnInit {
   }
   async getSessionDetailsUpdate(){
     let data = await this.sessionService.getSessionDetailsAPI(this.id);
-    let response = data.result
+    let response = data.result;
         this.sessionDetails= response;
         this.profileImageData.image = response.image;
         this.profileImageData.isUploaded = true;
@@ -589,16 +591,22 @@ export class CreateSessionPage implements OnInit {
       if (control.type === 'search' && control.meta?.addPopupType === 'file' && control.value?.length) {
         console.log(control);
         for (const file of control.value) {
-          if (file instanceof File) {
-            const signedUrl = await this.getSignedUrl(file.name);
-            const uploadedFileUrl = await this.uploadFile(file, signedUrl);
-            console.log(uploadedFileUrl);
+          if(file?.isLink && file.name){
             this.updatedFiles.push({
               "name":file.name,
-              "link":uploadedFileUrl,
+              "link":file.name,
               "type":control.name
           });
-          } else {
+          }else if (file instanceof File && file.name) {
+              const signedUrl = await this.getSignedUrl(file.name);
+              const uploadedFileUrl = await this.uploadFile(file, signedUrl);
+              console.log(uploadedFileUrl);
+              this.updatedFiles.push({
+                "name":file.name,
+                "link":uploadedFileUrl,
+                "type":control.name
+            });
+          } else if (file.name){
             this.updatedFiles.push(file);
           }
         }
@@ -697,7 +705,8 @@ export class CreateSessionPage implements OnInit {
     for (let i = 0; i < this.formData.controls.length; i++) {
       this.formData.controls[i].value =
         existingData[this.formData.controls[i].name];
-      if (this.formData.controls[i].type=='search'){
+      
+      if (this.formData.controls[i].type=='search' &&  this.formData.controls[i].meta.addPopupType !== 'file'){
         this.formData.controls[i].id = this.id;
         if(this.formData.controls[i].meta.multiSelect){
           this.formData.controls[i].meta.searchData = existingData[this.formData.controls[i].name]
@@ -714,6 +723,31 @@ export class CreateSessionPage implements OnInit {
         if(this.formData.controls[i].meta.disableIfSelected&&this.formData.controls[i].value){
           this.formData.controls[i].disabled = true;
         }
+      }else  if (this.formData.controls[i].type === 'search' && this.formData.controls[i].meta.addPopupType === 'file') {
+        const controlName = this.formData.controls[i].name;
+        if (existingData.resources?.length) {
+          const filteredResources = existingData.resources
+            .filter(resource => resource.type === controlName)
+            .map(resource => ({
+              label: resource.name,
+              id: resource.id,
+              type: resource.type, 
+              link: resource.link 
+            }));
+      
+          this.formData.controls[i].value = filteredResources.map(r => r.id);
+          this.formData.controls[i].meta.searchData = filteredResources;
+        }
+      
+        this.formData.controls[i].id = this.id;
+      
+        if (!this.formData.controls[i].meta.disableIfSelected) {
+          this.formData.controls[i].disabled = false;
+        }
+      
+        if (this.formData.controls[i].meta.disableIfSelected && this.formData.controls[i].value?.length) {
+          this.formData.controls[i].disabled = true;
+        }
       }
       let dependedChildIndex = this.formData.controls.findIndex(formControl => formControl.name === this.formData.controls[i].dependedChild)
       if(this.formData.controls[i].dependedChild && this.formData.controls[i].name === 'type'){
@@ -728,7 +762,6 @@ export class CreateSessionPage implements OnInit {
       );
     }
     this.showForm = true;
-    console.log(this.formData)
   }
 
   async imageUploadEvent(event) {

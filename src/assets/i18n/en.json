@@ -314,5 +314,7 @@
     "SET_CALENDAR": "Set Calendar",
     "MESSAGES":"Messages",
     "USER_GUIDE_VIDEOS":"User Guide Videos",
-    "HELP_SIDEMENU":"Report an Issue"
+    "HELP_SIDEMENU":"Report an Issue",
+    "ADD_LINK": "Add link"
+
 }
