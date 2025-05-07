@@ -248,4 +248,8 @@ export class GenericListPage implements OnInit {
   eventHandler(event: string) {
     this.valueFromChipAndFilter = event;
   }
+
+  goToHome(){
+    this.router.navigate([CommonRoutes.HOME]);
+  }
 }

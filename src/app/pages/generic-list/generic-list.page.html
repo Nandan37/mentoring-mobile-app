@@ -9,7 +9,7 @@
       <div class="search-result">
         <div class="search-result-label">
           <ion-buttons slot="start">
-            <ion-back-button defaultHref="/tabs/home"></ion-back-button>
+            <ion-back-button defaultHref="/tabs/home" (click)="goToHome()"></ion-back-button>
           </ion-buttons>
           <ion-label *ngIf="searchText && totalCount > 0">{{"MENTOR_SEARCH_RESULT" | translate}} "{{searchText}}"</ion-label>
         </div>
