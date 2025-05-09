@@ -45,7 +45,9 @@ export class GenericProfileHeaderComponent implements OnInit {
   async action(event) {
     switch (event) {
       case 'edit':
-        this.router.navigate([`/${CommonRoutes.EDIT_PROFILE}`]);
+        this.router.navigate([`/${CommonRoutes.EDIT_PROFILE}`],{
+          replaceUrl: true,
+          queryParams: { redirectUrl: `${CommonRoutes.TABS}/${CommonRoutes.PROFILE}` }});
         break;
 
       case 'role':
@@ -81,7 +83,7 @@ export class GenericProfileHeaderComponent implements OnInit {
           ? this.router.navigate([
               `/${CommonRoutes.CHAT}`,
               this.headerData.connection_details?.room_id,
-            ])
+            ],{queryParams: {id: this.headerData.id}})
           : this.router.navigate([
               `/${CommonRoutes.CHAT_REQ}`,
               this.headerData.id,

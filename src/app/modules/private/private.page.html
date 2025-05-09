@@ -30,8 +30,7 @@
               ><strong>{{user?.name}}</strong></ion-label
             >
             <div class="user-role-labels">
-              <ion-label *ngIf="userRoles"
-                >{{ userRoles[0] | snakeCaseToUpperCase}}
+              <ion-label *ngIf="userRoles">{{ isMentor ? ('MENTOR' | translate): ('MENTEE' | translate)}}
               </ion-label>
               <ion-label class="view-roles" (click)="viewRoles()"
                 >{{"VIEW_ROLES" | translate}}</ion-label
@@ -137,7 +136,7 @@
       >
         <ion-col size="12">
           <div class="d-flex flex-justify-center">
-            <ion-icon name="power" size="large" class="ion-margin-end">
+            <ion-icon name="power" size="large" class="ion-margin-end" color="light">
             </ion-icon>
             <strong class="space-bottom"> {{"LOGOUT" | translate}}</strong>
           </div>

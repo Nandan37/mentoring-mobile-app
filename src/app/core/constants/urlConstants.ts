@@ -26,7 +26,7 @@ export const urlConstants = {
     MENTORS_PROFILE_DETAILS: '/interface/v1/mentors/details/',
     SESSION_DOWNLOAD_CSV: '/mentoring/v1/sessions/getSampleCSV',
     SESSION_BULK_UPLOAD: '/mentoring/v1/sessions/bulkSessionCreate',
-
+    THEME_READ: "/mentoring/v1/org-admin/themeDetails",
     // FORMS
     FORM_READ: '/mentoring/v1/form/read',
     GENERATE_OTP: '/user/v1/account/generateOtp',
@@ -79,5 +79,8 @@ export const urlConstants = {
     GET_PENDING_CONNECTIONS: '/mentoring/v1/connections/pending',
     GET_CHAT_TOKEN: '/mentoring/v1/profile/getCommunicationToken',
     GET_PROFILE_DATA: '/interface/v1/profile/get/',
-  },
+    DASHBOARD_REPORT_FILTER: "/mentoring/v1/reports/filterList?",
+    DASHBOARD_REPORT_DATA: "/mentoring/v1/reports/reportData?",
+    GETUSERIDBYRID:"/mentoring/v1/profile/externalIdMapping"
+  }
 };

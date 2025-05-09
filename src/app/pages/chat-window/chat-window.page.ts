@@ -1,6 +1,8 @@
 import { Location } from '@angular/common';
 import { Component, OnInit } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
+import { urlConstants } from 'src/app/core/constants/urlConstants';
+import { HttpService } from 'src/app/core/services';
 import { ProfileService } from 'src/app/core/services/profile/profile.service';
 import { CommonRoutes } from 'src/global.routes';
 
@@ -21,7 +23,8 @@ export class ChatWindowPage implements OnInit {
     private routerParams: ActivatedRoute,
     private location: Location,
     private profileService: ProfileService,
-    private router: Router
+    private router: Router,
+    private apiServer : HttpService
   ) {
     routerParams.params.subscribe((parameters) => {
       console.log(parameters,"sdfsdfds");
@@ -42,11 +45,9 @@ export class ChatWindowPage implements OnInit {
     this.location.back();
   }
 
-  onClickProfile(){
-    console.log(this.id,"this.id");
-   this.router.navigate([
-         CommonRoutes.MENTOR_DETAILS,
-         this.id,
-       ]);
+  onClickProfile(externalId){
+    this.apiServer.post({url:urlConstants.API_URLS.GETUSERIDBYRID, payload:{"external_user_id":externalId}}).then((resp) =>{
+      this.router.navigate([CommonRoutes.MENTOR_DETAILS, resp?.result?.user_id]);
+    })
   }
 }
