@@ -50,7 +50,7 @@ export class SearchAndSelectComponent implements OnInit, ControlValueAccessor {
   ngOnInit() { 
     this.originalLabel = this.control.label;
     this.isMobile = window.innerWidth <= 950;
-    this.allowCustomEntities = this.control.meta.allow_custom_entities
+    this.allowCustomEntities = this.control.meta.allow_custom_entities;
   }
 
   writeValue(value: any[]) {
@@ -79,6 +79,20 @@ export class SearchAndSelectComponent implements OnInit, ControlValueAccessor {
       event.stopPropagation()
     }
   }
+
+  removeFile(index: number) {
+    if (this.control?.value) {
+      const updatedFiles = [...this.control.value];
+      updatedFiles.splice(index, 1);
+  
+      if (this.control.setValue) {
+        this.control.setValue(updatedFiles);
+      } else {
+        this.control.value = updatedFiles;
+      }
+    }
+  }
+  
 
   async showPopover() {
     this.markAsTouched();
@@ -125,6 +139,46 @@ export class SearchAndSelectComponent implements OnInit, ControlValueAccessor {
             this.selectedChips.push(obj.value)
             this.onChange(this.selectedData.map(data => data.value));
             this.icon = this.selectedData.length ? this.closeIconLight : this.addIconDark
+          }
+      }
+      
+      ],
+    });
+    await alert.present();
+  }
+
+
+  async addLink(data){
+    console.log(data,"data in addlink");
+    const alert = await this.alertController.create({
+      cssClass: 'my-custom-class',
+      header: 'Add Link',
+      inputs: [
+        {
+          name: 'name',
+          type: 'text',
+          placeholder: 'Enter link',
+          attributes: {
+            maxlength: 50,
+          }
+        },
+      ],
+      buttons: [
+        {
+          text: this.translateService.instant('CANCEL'),
+          role: 'cancel',
+          cssClass: 'secondary',
+          handler: () => { },
+        },
+        {
+          text: this.translateService.instant('OK'),
+          handler: (alertData) => {
+            let obj = {
+              name: alertData.name,
+              type: data.name,
+              isLink: true
+            };
+            data.value.push(obj);
           }
       }
       
