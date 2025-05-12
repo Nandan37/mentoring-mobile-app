@@ -33,9 +33,8 @@ export class RequestsPage implements OnInit {
     private sessionService: SessionService
   ) {}
 
-  ngOnInit() { }
-
-  ionViewWillEnter() {
+  ionViewWillEnter(){
+    this.pendingRequest();
     this.route.data.subscribe((data) => {
       this.routeData = data;
       this.buttonConfig = this.routeData?.button_config;
@@ -48,6 +47,8 @@ export class RequestsPage implements OnInit {
         this.noResult = this.routeData?.noDataFound;
       }
     });
+  }
+  ngOnInit() {
   }
 
   segmentChanged(event) {

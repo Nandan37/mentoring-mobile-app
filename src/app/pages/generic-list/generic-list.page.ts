@@ -2,15 +2,13 @@ import { Component, OnInit, ViewChild, ViewEncapsulation } from '@angular/core';
 import { MatPaginator } from '@angular/material/paginator';
 import { ActivatedRoute, Router } from '@angular/router';
 import { ModalController } from '@ionic/angular';
-import { FrontendChatLibraryService } from 'frontend-chat-library-kiran';
 import { FILTER_ROLES } from 'src/app/core/constants/formConstant';
 import {
   NO_RESULT_FOUND_FOR_MENTEE,
   NO_RESULT_FOUND_FOR_MENTOR,
 } from 'src/app/core/constants/genericConstants';
 import { paginatorConstants } from 'src/app/core/constants/paginatorConstants';
-import { urlConstants } from 'src/app/core/constants/urlConstants';
-import { HttpService, UtilService } from 'src/app/core/services';
+import { HttpService, ToastService, UtilService } from 'src/app/core/services';
 import { FormService } from 'src/app/core/services/form/form.service';
 import { PermissionService } from 'src/app/core/services/permission/permission.service';
 import { ProfileService } from 'src/app/core/services/profile/profile.service';
@@ -69,7 +67,7 @@ export class GenericListPage implements OnInit {
     private permissionService: PermissionService,
     private router: Router,
     private profileService: ProfileService,
-    private chatService: FrontendChatLibraryService
+    private toast: ToastService,
   ) {}
 
   ngOnInit() {}
@@ -233,7 +231,7 @@ export class GenericListPage implements OnInit {
     }
   }
 
-  eventAction(event) {
+  eventAction(event : any) {
     switch (event.type) {
       case 'cardSelect':
         this.router.navigate([CommonRoutes.MENTOR_DETAILS, event?.data?.id]);
@@ -242,7 +240,7 @@ export class GenericListPage implements OnInit {
         if (!event.rid) {
           return;
         }
-        this.router.navigate([CommonRoutes.CHAT, event.rid]);
+        this.router.navigate([CommonRoutes.CHAT, event.rid],{queryParams:{id:event.data}});
         break;
       case 'requestSession':
         this.router.navigate([CommonRoutes.SESSION_REQUEST], {queryParams: {data: event.data}});
@@ -252,5 +250,9 @@ export class GenericListPage implements OnInit {
 
   eventHandler(event: string) {
     this.valueFromChipAndFilter = event;
+  }
+
+  goToHome(){
+    this.router.navigate([CommonRoutes.HOME]);
   }
 }

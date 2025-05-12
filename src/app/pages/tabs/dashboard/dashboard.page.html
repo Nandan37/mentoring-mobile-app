@@ -14,7 +14,7 @@
     <ion-grid>
       <ion-row>
         <ion-col size="3" sizeXs="6" sizeLg="3" class="filter-column" *ngFor="let control of dynamicFormControls">
-          <h3>{{ control.label }}</h3>
+          <h3>{{ control.label | translate}}</h3>
           <ion-item fill="outline" lines="none" class="no-label-item custom-border-radius custom-height">
             <ion-select [placeholder]="'Select ' + control.label" [value]="control.defaultValue" (ionChange)="handleFormControlChange(control.value, $event)" [multiple]="control.isMultiple" style="font-size: 13px;">
               <ion-select-option class="custom-font-size" *ngFor="let option of control.entities" [value]="option.value">
@@ -32,7 +32,7 @@
               <h1 style="text-align: center; color: var(--ion-color-primary);" class="my-0">
                 {{ data.value }}
               </h1>
-              <p style="text-align: center;" class="my-0">{{ data.label }}</p>
+              <p style="text-align: center;" class="my-0">{{ data.label | translate}}</p>
             </ion-card-content>
           </ion-card>
         </ion-col>
@@ -40,7 +40,7 @@
       </ion-row>
       <ion-row>
         <ion-col *ngIf="chartBody?.chartUrl && chartBody?.headers">
-          <lib-bar-chart [url]="chartBody?.chartUrl" [headers]="chartBody?.headers" [legends]="chartBody[session_type]['chartConfig']" [chartBody]="chartBodyPayload"></lib-bar-chart>
+          <lib-bar-chart [url]="chartBody?.chartUrl" [headers]="chartBody?.headers" [legends]="translatedChartConfig" [chartBody]="chartBodyPayload"></lib-bar-chart>
         </ion-col>
       </ion-row>
     </ion-grid>
@@ -49,7 +49,7 @@
   <div class="tables inner-div-style"  *ngIf="selectedRole !=='org_admin'">
     <ion-grid>
       <ion-row *ngIf="chartBody?.tableUrl">
-        <lib-table [url]="chartBody?.tableUrl" [headers]="chartBody?.headers" [showDownload]="true" [title]="chartBody?.tableTitle"  style="width: 100%;"></lib-table>
+        <lib-table [url]="chartBody?.tableUrl" [headers]="chartBody?.headers" [showDownload]="true"  [title]="translate.get(chartBody?.tableTitle) | async"  style="width: 100%;" [metaKeys]="metaKeys" ></lib-table>
       </ion-row>
     </ion-grid>
   </div>

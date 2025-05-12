@@ -179,11 +179,12 @@ export class ProfileService {
     var roles = userDetails.user_roles.map(function (item) {
       return item['title'];
     });
-    this.isMentor = roles.includes('mentor') ? true : false;
+    this.isMentor = roles.includes('mentor')?true:false;
     if (!roles.includes("mentee")) {
       roles.unshift("mentee");
     }
-    return roles;
+    this.isMentor = roles.map(s => s.toLowerCase()).includes('mentor')?true:false;
+    return roles
   }
 
   async upDateProfilePopup(
@@ -286,7 +287,7 @@ export class ProfileService {
     }
   }
 
-  async getChatToken() {
+  async getChatToken(): Promise<boolean> {
     const config = {
       url: urlConstants.API_URLS.GET_CHAT_TOKEN,
     };
@@ -297,15 +298,19 @@ export class ProfileService {
           xAuthToken: resp.result.auth_token,
           userId: resp.result.user_id,
           textColor: '#fff',
+          chatBaseUrl:environment['chatBaseUrl'],
+          chatWebSocketUrl:environment['chatWebSocketUrl'],
           bgColor: getComputedStyle(document.documentElement)
             .getPropertyValue('--ion-color-primary')
             .trim(),
         };
         await this.chatService.setConfig(payload);
+        return true;
       }
+      return false;
     } catch (error) {
       this.loaderService.stopLoader();
-      throw error;
+     return false
     }
   }
 }

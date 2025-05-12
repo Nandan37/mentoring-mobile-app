@@ -3,7 +3,7 @@ import { ActivatedRoute, Router } from '@angular/router';
 import { IonContent, IonInfiniteScroll } from '@ionic/angular';
 import { CHAT_MESSAGES } from 'src/app/core/constants/chatConstants';
 import { urlConstants } from 'src/app/core/constants/urlConstants';
-import { HttpService, LoaderService } from 'src/app/core/services';
+import { HttpService, LoaderService, ToastService } from 'src/app/core/services';
 import { CommonRoutes } from 'src/global.routes';
 
 @Component({
@@ -47,7 +47,8 @@ export class MentorDirectoryPage implements OnInit {
     private router: Router,
     private loaderService: LoaderService,
     private httpService: HttpService,
-    private route: ActivatedRoute
+    private route: ActivatedRoute,
+    private toast: ToastService,
   ) {}
 
   ngOnInit() {
@@ -115,7 +116,10 @@ export class MentorDirectoryPage implements OnInit {
         this.router.navigate([CommonRoutes.MENTOR_DETAILS, event?.data?.id]);
         break;
       case 'chat':
-        this.router.navigate([CommonRoutes.CHAT_REQ, event.data]);
+        this.router.navigate([CommonRoutes.CHAT_REQ, event.data],{queryParams:{id:event.data.id}});
+        break;
+      case 'requestSession':
+        this.toast.showToast('COMING_SOON', 'danger');
         break;
       case 'requestSession':
         this.router.navigate([CommonRoutes.SESSION_REQUEST], {queryParams: {data: event.data}});

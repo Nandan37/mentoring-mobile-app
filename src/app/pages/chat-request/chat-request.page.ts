@@ -2,9 +2,11 @@ import { Component, OnInit } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { AlertController } from '@ionic/angular';
 import { TranslateService } from '@ngx-translate/core';
+import { replace } from 'lodash';
 import { CHAT_MESSAGES } from 'src/app/core/constants/chatConstants';
 import { urlConstants } from 'src/app/core/constants/urlConstants';
 import { HttpService, ToastService } from 'src/app/core/services';
+import { CommonRoutes } from 'src/global.routes';
 @Component({
   selector: 'app-chat-request',
   templateUrl: './chat-request.page.html',
@@ -51,6 +53,9 @@ export class ChatRequestPage implements OnInit {
       if (resp?.result?.status == 'REQUESTED') {
         this.message = '';
       }
+      // else if(resp?.result?.status == 'ACCEPTED') {
+      //   this.router.navigate([CommonRoutes.CHAT, resp?.result?.meta.room_id],{queryParams:{id:resp?.result?.id}, replaceUrl: true });
+      // }
       this.info.status = !resp?.result?.status
         ? 'PENDING'
         : resp?.result?.status;
@@ -62,8 +67,8 @@ export class ChatRequestPage implements OnInit {
     });
   }
   sendRequest() {
-    if (this.info.status == 'REQUESTED') {
-      this.toast.showToast('MULTIPLE_MESSAGE_REQ', 'danger');
+    if(this.message.length >this.messageLimit){
+      this.toast.showToast('MESSAGE_TEXT_LIMIT', 'danger');
       return;
     }
     const payload = {
@@ -86,7 +91,11 @@ export class ChatRequestPage implements OnInit {
       },
     };
     this.httpService.post(payload).then((resp) => {
+      const name = this.info?.user_details?.name || 'the user';
+      const message = this.translate.instant('ACCEPTED_MESSAGE_REQ', { name });
+      this.toast.showToast(message, 'success');
       this.info.status = 'ACCEPTED';
+        this.router.navigate([CommonRoutes.CHAT, resp?.result?.meta.room_id],{queryParams:{id:resp?.result?.id}});
     });
   }
 
@@ -129,5 +138,8 @@ export class ChatRequestPage implements OnInit {
       this.messages = CHAT_MESSAGES.RECEIVER;
       this.toast.showToast('REJECTED_MESSAGE_REQ', 'danger');
     });
+  }
+  goToProfile(){
+        this.router.navigate([CommonRoutes.MENTOR_DETAILS, this.id]);
   }
 }
