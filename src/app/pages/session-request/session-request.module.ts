@@ -4,10 +4,9 @@ import { FormsModule } from '@angular/forms';
 
 import { IonicModule } from '@ionic/angular';
 
-import { MessagesPageRoutingModule } from './messages-routing.module';
+import { SessionRequestPageRoutingModule } from './session-request-routing.module';
 
-import { MessagesPage } from './messages.page';
-import { FrontendChatLibraryModule } from 'frontend-chat-library-kiran';
+import { SessionRequestPage } from './session-request.page';
 import { SharedModule } from 'src/app/shared/shared.module';
 
 @NgModule({
@@ -15,10 +14,9 @@ import { SharedModule } from 'src/app/shared/shared.module';
     CommonModule,
     FormsModule,
     IonicModule,
-    MessagesPageRoutingModule,
-    FrontendChatLibraryModule,
+    SessionRequestPageRoutingModule,
     SharedModule,
   ],
-  declarations: [MessagesPage],
+  declarations: [SessionRequestPage]
 })
-export class MessagesPageModule {}
+export class SessionRequestPageModule {}

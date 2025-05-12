@@ -49,6 +49,7 @@ import { OverlayModule } from '@angular/cdk/overlay';
 import { ChipsAndFilterComponent } from './components/chips-and-filter/chips-and-filter.component';
 import { GenericCardComponent } from './components/generic-card/generic-card.component';
 import { OwlDateTimeModule, OwlNativeDateTimeModule } from '@danielmoncada/angular-datetime-picker';
+import {MatExpansionModule} from '@angular/material/expansion';
 
 @NgModule({
   declarations: [
@@ -106,6 +107,7 @@ import { OwlDateTimeModule, OwlNativeDateTimeModule } from '@danielmoncada/angul
     OverlayModule,
     OwlDateTimeModule,
     OwlNativeDateTimeModule,
+    MatExpansionModule
   ],
   exports: [
     DynamicFormComponent,

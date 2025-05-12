@@ -68,12 +68,13 @@ export class UtilService {
         cssClass: 'my-custom-class',
         header: texts[msg.header],
         message: texts[msg.message],
+        inputs: msg.inputs || [],
         buttons: [
           {
             text: texts[msg.submit],
             cssClass: 'alert-button-bg-white',
-            handler: () => {
-              resolve(true);
+            handler: (data) => {
+              resolve(msg.inputs ? data : true);
             },
           },
           {

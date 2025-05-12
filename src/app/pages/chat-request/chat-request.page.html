@@ -75,7 +75,10 @@
   *ngIf="info.created_by === info.user_id  && info.status != 'ACCEPTED'"
 >
   <ion-toolbar>
+    <div class="msg-limit"> {{message?.length}} / {{messageLimit}}
+    </div>
     <div class="p-3 border-t flex items-center psfixed">
+     
       <input type="text" [(ngModel)]="message" placeholder="Type a message..."
         class="flex-1 border rounded-full px-4 py-3 text-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
         (keyup.enter)="sendRequest()" />
