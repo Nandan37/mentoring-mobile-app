@@ -17,11 +17,11 @@
     <div *ngSwitchCase="'slot-requests'">
       <ion-grid >
         <ion-row class="d-flex ">
-          <ion-col *ngFor="let value of data" padding size-xs="12" size-sm="12" size-md="6" size-lg="6" size-xl="4" align-self-stretch>
+          <ion-col *ngFor="let value of slotRequests" padding size-xs="12" size-sm="12" size-md="6" size-lg="6" size-xl="4" align-self-stretch>
             <app-generic-card 
-              [data]="value?.user_details" 
-              [meta]="{ isSent: value?.created_by === value?.user_id, message: value?.meta?.message, timeStamp: '' }" 
-              [buttonConfig]="slotBtnConfig" (onClickEvent)="onCardClick($event)">
+              [data]="value.user_details" 
+              [meta]="{ isSent: value?.requestee_id === value?.user_details?.user_id, message: value?.meta?.message, timeStamp: '', resp: value }" 
+              [buttonConfig]="slotBtnConfig" (onClickEvent)="onCardClick($event, value.id)">
             </app-generic-card>
           </ion-col>
         </ion-row>
@@ -41,7 +41,10 @@
       </ion-grid>
     </div>
   </div>
-  <div *ngIf="!data?.length">
+  <div *ngIf="segmentType === 'slot-requests' && !slotRequests?.length">
+    <app-no-data-found [noResult]="noResult"> </app-no-data-found>
+  </div>
+  <div *ngIf="segmentType === 'message-requests' && !data?.length" class="d-flex flex-justify-center">
     <app-no-data-found [noResult]="noResult"> </app-no-data-found>
   </div>
 </ion-content>

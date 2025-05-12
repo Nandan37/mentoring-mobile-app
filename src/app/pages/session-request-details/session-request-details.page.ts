@@ -1,11 +1,12 @@
 import { Component, OnInit, ViewChild } from '@angular/core';
-import { ActivatedRoute } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
 import { IonModal } from '@ionic/angular';
 import { PLATFORMS } from 'src/app/core/constants/formConstant';
 import { ToastService, UtilService } from 'src/app/core/services';
 import { FormService } from 'src/app/core/services/form/form.service';
 import { SessionService } from 'src/app/core/services/session/session.service';
 import { DynamicFormComponent } from 'src/app/shared/components';
+import { CommonRoutes } from 'src/global.routes';
 
 @Component({
   selector: 'app-session-request-details',
@@ -16,7 +17,7 @@ export class SessionRequestDetailsPage implements OnInit {
   @ViewChild('platformForm') platformForm: DynamicFormComponent;
   @ViewChild(IonModal) modal!: IonModal;
   showFullText: boolean;
-  isAccepted: boolean = false;
+  isAccepted: boolean;
   meetingPlatforms: any;
   selectedLink: any;
   selectedHint: any;
@@ -24,6 +25,13 @@ export class SessionRequestDetailsPage implements OnInit {
   isMeetingLinkAdded: boolean =false;
   isModalOpen: boolean = false;
   isRejected: boolean = false;
+  params: any;
+  apiResponse: any;
+  scheduledSessionDetals: any;
+  meetingInfo: { meeting_info: { platform: any; link: any; value: any; meta: { password: any; meetingId: any; }; }; };
+  sessionId: any;
+  sessionDetails: any;
+  isEnabled: boolean;
 
   constructor(
     private form: FormService,
@@ -31,6 +39,7 @@ export class SessionRequestDetailsPage implements OnInit {
     private toast: ToastService,
     private utilService: UtilService,
     private activateRoute: ActivatedRoute,
+    private router: Router
   ) { }
   public headerConfig: any = {
     backButton: true,
@@ -41,19 +50,46 @@ export class SessionRequestDetailsPage implements OnInit {
 
   ionViewWillEnter() {
     this.getPlatformFormDetails();
-    this.activateRoute.queryParams.subscribe((params) => {console.log(params);});
+    this.activateRoute.queryParams.subscribe((params) => {this.params = params});
+    this.sessionService.getReqSessionDetails(this.params.id).then((res) => {
+      this.apiResponse = res.result;
+      if (this.apiResponse?.status === 'ACCEPTED') {
+        this.sessionService.getSessionDetailsAPI(this.apiResponse.session_id).then((res) => {
+          this.sessionDetails = res.result;
+          this.isMeetingLinkAdded = true;
+          let currentTimeInSeconds=Math.floor(Date.now()/1000);
+          this.isEnabled = ((this.sessionDetails.start_date - currentTimeInSeconds) < 600 || this.sessionDetails?.status?.value=='LIVE') ? true : false;
+        })
+      }
+    });
+    this.sessionService.requestSessionUserAvailability().then((res) => {
+      this.scheduledSessionDetals = res.result;
+    });
   }
 
   toggleText() {
     this.showFullText = !this.showFullText;
   }
 
-  accept(){
-    this.isAccepted = true;
-    this.toast.showToast("You have accepted this session. [Mentee’s Name] has been added to your connections.", 'success');
+  accept(id:any){
+    this.sessionService.requestSessionAccept(id).then((res) => {
+      if (res) {
+        this.isAccepted = true;
+        this.toast.showToast(res.message, 'success');
+        this.sessionService.getReqSessionDetails(this.params.id).then((res) => {
+          this.apiResponse = res.result;
+          if(res){
+            this.sessionService.getSessionDetailsAPI(this.apiResponse.session_id).then((res) => {
+              this.sessionDetails = res.result;
+              this.isMeetingLinkAdded = true;
+            })
+          }
+        });
+      }
+    })
   }
 
-  async reject(){
+  async reject(id:any) {
     let msg = {
       header: 'Reject ?',
       message: 'Are you sure you want to reject the slot request ?',
@@ -67,33 +103,24 @@ export class SessionRequestDetailsPage implements OnInit {
         }
       ]
     };
-    const response = await this.utilService.alertPopup(msg);
+    const response:any = await this.utilService.alertPopup(msg);
     if (response) {
-      this.isRejected = true;
-      this.toast.showToast("You have rejected the message slot request", 'danger');
-      console.log('Rejection Reason:', response); // Access input value
+      this.sessionService.requestSessionReject(id, response?.reason).then((res) => {
+        if (res) {
+          this.isRejected = true;
+          this.sessionService.getReqSessionDetails(this.params.id).then((res) => {
+            this.apiResponse = res.result;});
+          this.toast.showToast(res.message, 'danger');
+        }
+      })
     } else {
       console.log('User canceled the rejection');
     }
   }
 
-  addLink(isOpen: boolean){
+  addLink(isOpen: boolean, id:any) {
     this.isModalOpen = isOpen;
-    if (this.platformForm?.myForm?.valid){
-      let meetingInfo = {
-        'meeting_info':{
-          'platform': this.selectedLink.name,
-          'link': this.platformForm.myForm.value?.link,
-          'value': this.selectedLink.value,
-          "meta": {
-            "password": this.platformForm.myForm.value?.password,
-            "meetingId":this.platformForm.myForm.value?.meetingId
-        }
-
-      }}
-      this.sessionService.createSession(meetingInfo,'33');
-      this.editSessionBtn = true;
-    }
+    this.sessionId = id;
   }
 
  async getPlatformFormDetails() {
@@ -110,27 +137,53 @@ export class SessionRequestDetailsPage implements OnInit {
   };
 
   addNow(){
-    this.isMeetingLinkAdded = true;
     this.modal.dismiss();
     this.isModalOpen =false;
+    if (this.platformForm?.myForm?.valid){
+      this.meetingInfo = {
+        'meeting_info':{
+          'platform': this.selectedLink.name,
+          'link': this.platformForm.myForm.value?.link,
+          'value': this.selectedLink.value,
+          "meta": {
+            "password": this.platformForm.myForm.value?.password,
+            "meetingId":this.platformForm.myForm.value?.meetingId
+        }
+
+      }}
+    }
+    this.sessionService.createSession(this.meetingInfo,this.sessionId).then((res) => {
+    if (res) {
+      this.sessionService.getReqSessionDetails(this.params.id).then((res) => {
+        this.apiResponse = res.result;
+      });
+
+      if (this.apiResponse?.status === 'ACCEPTED') {
+        this.sessionService.getSessionDetailsAPI(this.apiResponse.session_id).then((res) => {
+          this.sessionDetails = res.result;
+          this.isMeetingLinkAdded = true;
+        })
+      }
+    }});
+    this.editSessionBtn = true;
   }
 
-  editLink(isOpen: boolean){
+  editLink(isOpen: boolean, id:any) {
     this.isModalOpen = isOpen;
-
+    this.sessionId = id;
     for(let j=0;j<this?.meetingPlatforms?.length;j++){
-      if( this.existingData.meeting_info.platform == this?.meetingPlatforms[j].name){
+      if( this.sessionDetails.meeting_info.platform == this?.meetingPlatforms[j].name){
          this.selectedLink = this?.meetingPlatforms[j];
          this.selectedHint = this.meetingPlatforms[j].hint;
         let obj = this?.meetingPlatforms[j]?.form?.controls.find( (link:any) => link?.name == 'link')
         let meetingId = this?.meetingPlatforms[j]?.form?.controls.find( (meetingId:any) => meetingId?.name == 'meetingId')
         let password = this?.meetingPlatforms[j]?.form?.controls.find( (password:any) => password?.name == 'password')
-        if(obj && this.existingData?.meeting_info?.link){
-          obj.value = this.existingData?.meeting_info?.link;
+        if(obj && this.sessionDetails?.meeting_info?.link){
+          obj.value = this.sessionDetails?.meeting_info?.link;
         }
-        if(this.existingData?.meeting_info?.meta?.meetingId){
-          meetingId.value = this.existingData?.meeting_info?.meta?.meetingId;
-          password.value = this.existingData?.meeting_info?.meta?.password;
+        if(this.sessionDetails?.meeting_info?.meta?.meetingId){
+          meetingId.value = this.sessionDetails?.meeting_info?.meta?.meetingId;
+          password.value = this.sessionDetails?.meeting_info?.meta?.password;
         }
       }
     }
@@ -139,235 +192,15 @@ export class SessionRequestDetailsPage implements OnInit {
   addLater(){
     this.modal.dismiss();
     this.isModalOpen = false;
-    
   }
 
   viewProfile(id: any){
-    console.log(id)
+    this.router.navigate([CommonRoutes.MENTOR_DETAILS, id]);
   }
 
-  yourScheduledData = [
-    { 
-      date:"2025-01-13",
-      bookedSlots: [
-        { startTime:"12:01:01", 
-          endTime:"13:00:01",
-          title: "Session 1"
-        },
-        { startTime:"01:01:01", 
-          endTime:"14:00:01",
-          title: 'session 2'
-        },
-        { startTime:"12:01:01", 
-          endTime:"13:00:01",
-          title: "Session 1"
-        },
-        { startTime:"01:01:01", 
-          endTime:"14:00:01",
-          title: 'session 2'
-        }
-      ]  
-    },
-    { 
-      date:"2025-02-13",
-      bookedSlots: [
-        { startTime:"12:01:01", 
-          endTime:"13:00:01",
-          title: "Session 1"
-        },
-        { startTime:"01:01:01", 
-          endTime:"14:00:01",
-          title: 'session 2'
-        }
-      ]   
-    },
-    { 
-      date:"2025-01-13",
-      bookedSlots: [
-        { startTime:"12:01:01", 
-          endTime:"13:00:01",
-          title: "Session 1"
-        },
-        { startTime:"01:01:01", 
-          endTime:"14:00:01",
-          title: 'session 2'
-        }
-      ]  
-    },
-    { 
-      date:"2025-02-13",
-      bookedSlots: [
-        { startTime:"12:01:01", 
-          endTime:"13:00:01",
-          title: "Session 1"
-        },
-        { startTime:"01:01:01", 
-          endTime:"14:00:01",
-          title: 'session 2'
-        }
-      ]   
-    },
-    { 
-      date:"2025-01-13",
-      bookedSlots: [
-        { startTime:"12:01:01", 
-          endTime:"13:00:01",
-          title: "Session 1"
-        },
-        { startTime:"01:01:01", 
-          endTime:"14:00:01",
-          title: 'session 2'
-        }
-      ]  
-    },
-    { 
-      date:"2025-02-13",
-      bookedSlots: [
-        { startTime:"12:01:01", 
-          endTime:"13:00:01",
-          title: "Session 1"
-        }
-      ]   
-    }
-  ];
-
-  existingData: any = {
-    "id": 1383,
-    "title": "Demo for meeting link",
-    "description": "link",
-    "recommended_for": [
-        {
-            "label": "Block education officer",
-            "value": "beo",
-            "type": "beo"
-        },
-        {
-            "label": "District education officer",
-            "value": "deo",
-            "type": "deo"
-        }
-    ],
-    "categories": [
-        {
-            "label": "Educational leadership",
-            "value": "educational_leadership",
-            "type": "educational_leadership"
-        },
-        {
-            "label": "School process",
-            "value": "school_process",
-            "type": "school_process"
-        }
-    ],
-    "medium": [
-        {
-            "label": "English",
-            "value": "en_in",
-            "type": "en_in"
-        },
-        {
-            "label": "french",
-            "value": "fr",
-            "type": "fr"
-        }
-    ],
-    "image": [],
-    "mentor_id": "33",
-    "session_reschedule": 0,
-    "status": {
-        "value": "PUBLISHED",
-        "label": "Upcoming"
-    },
-    "time_zone": "Asia/Calcutta",
-    "start_date": "2025-03-31T11:21:00.000Z",
-    "end_date": "2025-03-31T12:21:00.000Z",
-    "started_at": null,
-    "completed_at": null,
-    "is_feedback_skipped": false,
-    "mentee_feedback_question_set": "TheCmentee",
-    "mentor_feedback_question_set": "TheCmentor",
-    "meeting_info": {
-      "link": "https://meet.google.com/duv-zgxk-qro",
-      "meta": {},
-      "value": "Gmeet",
-      "platform": "Google meet"
-  },
-    "meta": null,
-    "visibility": "ASSOCIATED",
-    "visible_to_organizations": [
-        "17",
-        "19",
-        "15"
-    ],
-    "mentor_organization_id": "15",
-    "seats_remaining": 5,
-    "seats_limit": 5,
-    "type": {
-        "value": "PUBLIC",
-        "label": "Public"
-    },
-    "mentor_name": "Anupama pujar all permissions",
-    "created_by": "33",
-    "updated_by": "33",
-    "created_at": "2025-03-19T11:21:45.603Z",
-    "updated_at": "2025-03-19T11:21:48.045Z",
-    "deleted_at": null,
-    "is_enrolled": false,
-    "is_assigned": false,
-    "mentees": [],
-    "organization": "The Catalysts",
-    "mentor_designation": [
-        {
-            "value": "beo",
-            "label": "Block education officer"
-        },
-        {
-            "value": "co",
-            "label": "Cluster officials"
-        },
-        {
-            "value": "deo",
-            "label": "District education officer"
-        },
-        {
-            "value": "te",
-            "label": "Teacher"
-        },
-        {
-            "value": "other",
-            "label": "other"
-        },
-        {
-            "value": "other",
-            "label": "other"
-        }
-    ]
-}
-apiDemoResponse:any = {
-  name: "John don",
-  designation: [
-    {
-        "value": "beo",
-        "label": "Block education officer"
-    },
-    {
-        "value": "co",
-        "label": "Cluster officials"
-    },
-    {
-        "value": "deo",
-        "label": "District education officer"
-    },
-    {
-        "value": "te",
-        "label": "Teacher"
-    },
-],
-  image: '',
-  agenda: 'Contrary to popular belief, Lorem Ipsum is not simply random text. It has roots in a piece of classical Latin literature from 45 BC, making it over 2000 years old. Richard McClintock, a Latin professor at Hampden-Sydney College in Virginia, looked up one of the more obscure Latin words, consectetur, from a Lorem Ipsum passage, and going through the cites of the word in classical literature, discovered the undoubtable source.',
-  slot_request_date: '',
-  request: 'PENDING',
-  id: "11"
-}
+  async onStart(data) {
+    let result = await this.sessionService.startSession(data);
+    result?this.router.navigate([`/${CommonRoutes.TABS}/${CommonRoutes.HOME}`]):null;
+  }
 
 }

@@ -263,4 +263,85 @@ export class SessionService {
     catch (error) {
     }
   }
+
+  async requestSession(obj) {
+    const config = {
+      url: urlConstants.API_URLS.REQUEST_SESSION,
+      payload: obj
+    };
+    try {
+      let data: any = await this.httpService.post(config);
+      return data
+    }
+    catch (error) {
+    }
+  }
+
+  async requestSessionList() {
+    const config = {
+      url: urlConstants.API_URLS.REQUEST_SESSION_LIST + '?pageNo=1&pageSize=100' + '&status=REQUESTED',
+    };
+    try {
+      let data: any = await this.httpService.get(config);
+      return data
+    }
+    catch (error) {
+    }
+  }
+
+  async getReqSessionDetails(id) {
+    const config = {
+      url: urlConstants.API_URLS.REQUEST_SESSION_DETAILS + '?request_session_id=' + id,
+    };
+    try {
+      let data: any = await this.httpService.get(config);
+      return data
+    }
+    catch (error) {
+    }
+  }
+
+  async requestSessionUserAvailability(){
+    const config = {
+      url: urlConstants.API_URLS.REQUEST_SESSION_USER_AVAILABILITY + '?pageNo=1&pageSize=5&searchText&status=PUBLISHED',
+    };
+    try {
+      let data: any = await this.httpService.get(config);
+      return data
+    }
+    catch (error) {
+    }
+  }
+
+  async requestSessionAccept(id){
+    const config = {
+      url: urlConstants.API_URLS.REQUEST_SESSION_ACCEPT,
+      payload: {
+        "request_session_id" : id
+      }
+    };
+    try {
+      let data: any = await this.httpService.post(config);
+      return data
+    }
+    catch (error) {
+    }
+  }
+
+  async requestSessionReject(id, reason){
+    id = id.toString();
+    const config = {
+      url: urlConstants.API_URLS.REQUEST_SESSION_REJECT,
+      payload: {
+        "request_session_id" : id,
+        "reason" : reason
+      }
+    };
+    try {
+      let data: any = await this.httpService.post(config);
+      return data
+    }
+    catch (error) {
+    }
+  }
 }

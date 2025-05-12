@@ -4,6 +4,7 @@ import { localKeys } from 'src/app/core/constants/localStorage.keys';
 import { LocalStorageService, ToastService } from 'src/app/core/services';
 import { DynamicFormComponent } from 'src/app/shared/components';
 import { CommonRoutes } from 'src/global.routes';
+import { SessionService } from '../../core/services/session/session.service';
 
 @Component({
   selector: 'app-session-request',
@@ -41,7 +42,6 @@ export class SessionRequestPage implements OnInit {
       "displayFormat": "DD/MMM/YYYY HH:mm",
       "dependedChild": "end_date",
       "type": "date",
-      "time_zone": "IST",
       "placeHolder": "YYYY-MM-DD hh:mm",
       "errorMessage": {
         "required": "Enter start date"
@@ -60,7 +60,6 @@ export class SessionRequestPage implements OnInit {
       "displayFormat": "DD/MMM/YYYY HH:mm",
       "dependedParent": "start_date",
       "type": "date",
-      "time_zone": "IST",
       "placeHolder": "YYYY-MM-DD hh:mm",
       "errorMessage": {
         "required": "Enter end date"
@@ -69,39 +68,39 @@ export class SessionRequestPage implements OnInit {
         "required": true
       }
     },
-    
-      {
-        "name": "agenda",
-        "label": "Agenda",
-        "value": "",
-        "class": "ion-no-margin",
-        "type": "textarea",
-        "placeHolder": "Let the mentor know what the purpose of this meeting is",
-        "position": "floating",
-        "errorMessage": {
-          "required": "Enter description",
-          "pattern": "This field can only contain alphanumeric characters"
-        },
-        "validators": {
-          "required": true,
-          "maxLength": 255,
-          "pattern": "^[a-zA-Z0-9-.,s ]+$"
-        }
+    {
+      "name": "agenda",
+      "label": "Agenda",
+      "value": "",
+      "class": "ion-no-margin",
+      "type": "textarea",
+      "placeHolder": "Let the mentor know what the purpose of this meeting is",
+      "position": "floating",
+      "errorMessage": {
+        "required": "Enter description",
+        "pattern": "This field can only contain alphanumeric characters"
+      },
+      "validators": {
+        "required": true,
+        "maxLength": 300,
+        "pattern": "^[a-zA-Z0-9-.,s ]+$"
       }
+    }
     ]
 }
 
   isSubmited: boolean = false;
   ids: any = {};
 
-  constructor(private router: Router, private toast: ToastService, private activatedRoute: ActivatedRoute,private localStorage: LocalStorageService,) { }
+  constructor(private router: Router, private toast: ToastService, private activatedRoute: ActivatedRoute,
+    private sessionService: SessionService
+  ) { }
 
   ngOnInit() {
   }
 
   async ionViewWillEnter() {
-    this.activatedRoute.queryParams.subscribe(({ data }) => this.ids.friend_id = data);
-    this.ids.user_id = (await this.localStorage.getLocalData(localKeys.USER_DETAILS))?.id;
+    this.activatedRoute.queryParams.subscribe(({ data }) => this.ids.requestee_id = data);
   }
 
   public headerConfig: any = {
@@ -120,10 +119,13 @@ export class SessionRequestPage implements OnInit {
       form.end_date = (Math.floor((new Date(form.end_date).getTime() / 1000) / 60) * 60).toString();
       const timezone = Intl.DateTimeFormat().resolvedOptions().timeZone;
       form.time_zone = timezone;
-      console.log('form', form);
       this.form1.myForm.markAsPristine();
-      this.router.navigate([`/${CommonRoutes.TABS}/${CommonRoutes.REQUESTS}`]);
-      this.toast.showToast('Your request has been sent successfully', "success")
+      this.sessionService.requestSession(form).then((res) => {
+        if (res) {
+          this.router.navigate([`/${CommonRoutes.TABS}/${CommonRoutes.REQUESTS}`]);
+          this.toast.showToast(res.message, "success");
+          this.isSubmited = true;
+        }}).catch((err) => {});
     }
   }
 

@@ -64,6 +64,7 @@ export class CreateSessionPage implements OnInit {
   sessionType: any;
   queryParams: any;
   formConfig: any;
+  mentor_id: any;
 
   constructor(
     private sessionService: SessionService,
@@ -437,12 +438,14 @@ export class CreateSessionPage implements OnInit {
           showSearch: true,
           viewListMode: false,
           isMobile: this.isMobile,
-          sessionType: this.sessionType
+          sessionType: this.sessionType,
+          mentorId: this.mentor_id
         }
       }
     });
 
     popover.onDidDismiss().then((data) => {
+      this.mentor_id = data.data[0]?.id;
       if (data.data) {
         event.formControl.selectedData = data.data;
         const values = event.formControl.control.meta.multiSelect ? data.data.map(obj => obj.id) : data.data[0].id;

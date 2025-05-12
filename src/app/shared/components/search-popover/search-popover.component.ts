@@ -40,6 +40,7 @@ export class SearchPopoverComponent implements OnInit {
   selectedFilters:any = {};
   selectedList: any=[];
   noDataMessage: string;
+  hasSessionManager: any;
 
   constructor(private platform: Platform, private modalController: ModalController, private toast: ToastService, private localStorage: LocalStorageService, private util: UtilService, private httpService: HttpService) { 
     this.platform.backButton.subscribeWithPriority(10, () => {
@@ -116,7 +117,7 @@ export class SearchPopoverComponent implements OnInit {
     if(this.data.control.id){
       queryString = queryString + '&session_id=' + this.data.control.id
     }
-    const sorting = `&order=${this.sortingData?.order || ''}&sort_by=${this.sortingData?.sort_by || ''}`;
+    const sorting = `&order=${this.sortingData?.order || ''}&sort_by=${this.sortingData?.sort_by || ''}&mentorId=${this.data?.mentorId ? this.data?.mentorId : (this.data.isManagePage ? '' : this.user.id)}`;
     queryString = queryString + sorting
     const config = {
       url: urlConstants.API_URLS[this.data.control.meta.url] + this.page + '&limit=' + this.limit + '&search=' + btoa(this.searchText) + queryString,

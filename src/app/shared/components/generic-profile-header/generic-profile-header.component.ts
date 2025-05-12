@@ -74,7 +74,7 @@ export class GenericProfileHeaderComponent implements OnInit {
         }
         break;
       case 'requestSession':
-        this.router.navigate([`/${CommonRoutes.MY_CONNECTIONS}`]);
+        this.router.navigate([`/${CommonRoutes.SESSION_REQUEST}`], {queryParams: {data: this.headerData.id}});
         break;
       case 'chat':
         this.headerData.is_connected

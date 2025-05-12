@@ -319,5 +319,16 @@
     "NEXT": "Next",
     "VIEW_DETAILS": "View details",
     "BOOK_AGAIN": "Book again",
-    "ROLE": "Role"
+    "ROLE": "Role",
+    "SCHEDULE": "Your schedule",
+    "SLOT_REJECT": "You have rejected the slot request",
+    "START_BTN_ENABLE": "Start button will get enabled 10 min before schedule time",
+    "SLOT_AVAILABLE": "You have a slot available at this time",
+    "PLEASE_WAIT_FOR": "Please wait for",
+    "RESPOND_TO_REQ": "to respond to your request",
+    "AGENDA": "Agenda",
+    "MEETING_TAKE_PLACE": "Meeting will take place on",
+    "PASSCODE": "Passcode",
+    "ADD_LINK": "Add link",
+    "EDIT_LINK": "Edit link"
 }

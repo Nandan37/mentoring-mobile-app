@@ -17,20 +17,20 @@
         <ion-icon name="time"></ion-icon>
       </ng-template>
     
-      <ng-container *ngIf="meta.message; else timeBlock">
+      <ng-container *ngIf="meta.message else timeBlock">
         <p class="max-width-70" style="margin: 2px 5px">{{ meta.message }}</p>
       </ng-container>
     
       <ng-template #timeBlock>
-        <small>
+        <small style="padding-left: 5px;">
           {{
-            meta.startTime * 1000 | date: 'dd MMM, yyyy'
+            meta.resp.start_date * 1000 | date: 'dd MMM, yyyy'
           }},
           {{
-            meta.startTime * 1000 | date: 'h:mm a'
+            meta.resp.start_date * 1000 | date: 'h:mm a'
           }} -
           {{
-            meta.endTime * 1000 | date: 'h:mm a'
+            meta.resp.end_date * 1000 | date: 'h:mm a'
           }}
         </small>
       </ng-template>
@@ -50,9 +50,9 @@
         <ion-item lines="none" class="ion-item-padding-none">
           <ion-label class="auto-margin">
             <h4 class="margin-none">{{ data?.name || data?.title }}</h4>
-            <div class="d-flex" *ngIf="data?.designation?.length">
-              <p class="max-width-50">{{ data?.designation[0]?.label }}</p>
-              <p class="max-width-50">({{ data?.experience }} years)</p>
+            <div class="d-flex">
+              <p class="max-width-50" *ngIf="data?.designation?.length">{{ data?.designation[0]?.label }}</p>
+              <p class="max-width-50" *ngIf="data.experience">({{ data?.experience }} years)</p>
             </div>
           </ion-label>
         </ion-item>
