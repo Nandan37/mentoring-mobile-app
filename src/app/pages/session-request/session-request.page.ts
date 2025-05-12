@@ -1,10 +1,12 @@
 import { Component, OnInit, ViewChild } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
-import { localKeys } from 'src/app/core/constants/localStorage.keys';
-import { LocalStorageService, ToastService } from 'src/app/core/services';
+import { ToastService } from 'src/app/core/services';
 import { DynamicFormComponent } from 'src/app/shared/components';
 import { CommonRoutes } from 'src/global.routes';
 import { SessionService } from '../../core/services/session/session.service';
+import { FormService } from 'src/app/core/services/form/form.service';
+import { REQUEST_SESSION_FORM } from 'src/app/core/constants/formConstant';
+import * as _ from 'lodash';
 
 @Component({
   selector: 'app-session-request',
@@ -14,86 +16,12 @@ import { SessionService } from '../../core/services/session/session.service';
 export class SessionRequestPage implements OnInit {
   @ViewChild('form1') form1: DynamicFormComponent;
 
-  formData = {
-    controls:[
-    {
-      "name": "title",
-      "label": "Title",
-      "value": "",
-      "class": "ion-no-margin",
-      "type": "text",
-      "placeHolder": "Ex. Name of your session",
-      "position": "floating",
-      "errorMessage": {
-        "required": "Enter session title",
-        "pattern": "This field can only contain alphanumeric characters"
-      },
-      "validators": {
-        "required": true,
-        "maxLength": 255,
-        "pattern": "^[a-zA-Z0-9-.,s ]+$"
-      }
-    },
-    {
-      "name": "start_date",
-      "label": "Start date",
-      "class": "ion-no-margin",
-      "value": "",
-      "displayFormat": "DD/MMM/YYYY HH:mm",
-      "dependedChild": "end_date",
-      "type": "date",
-      "placeHolder": "YYYY-MM-DD hh:mm",
-      "errorMessage": {
-        "required": "Enter start date"
-      },
-      "position": "floating",
-      "validators": {
-        "required": true
-      }
-    },
-    {
-      "name": "end_date",
-      "label": "End date",
-      "class": "ion-no-margin",
-      "position": "floating",
-      "value": "",
-      "displayFormat": "DD/MMM/YYYY HH:mm",
-      "dependedParent": "start_date",
-      "type": "date",
-      "placeHolder": "YYYY-MM-DD hh:mm",
-      "errorMessage": {
-        "required": "Enter end date"
-      },
-      "validators": {
-        "required": true
-      }
-    },
-    {
-      "name": "agenda",
-      "label": "Agenda",
-      "value": "",
-      "class": "ion-no-margin",
-      "type": "textarea",
-      "placeHolder": "Let the mentor know what the purpose of this meeting is",
-      "position": "floating",
-      "errorMessage": {
-        "required": "Enter description",
-        "pattern": "This field can only contain alphanumeric characters"
-      },
-      "validators": {
-        "required": true,
-        "maxLength": 300,
-        "pattern": "^[a-zA-Z0-9-.,s ]+$"
-      }
-    }
-    ]
-}
-
   isSubmited: boolean = false;
   ids: any = {};
+  formData: any;
 
   constructor(private router: Router, private toast: ToastService, private activatedRoute: ActivatedRoute,
-    private sessionService: SessionService
+    private sessionService: SessionService, private form: FormService
   ) { }
 
   ngOnInit() {
@@ -101,6 +29,8 @@ export class SessionRequestPage implements OnInit {
 
   async ionViewWillEnter() {
     this.activatedRoute.queryParams.subscribe(({ data }) => this.ids.requestee_id = data);
+    const result = await this.form.getForm(REQUEST_SESSION_FORM);
+    this.formData = _.get(result, 'data.fields');
   }
 
   public headerConfig: any = {
