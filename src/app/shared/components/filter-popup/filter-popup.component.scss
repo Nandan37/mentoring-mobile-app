@@ -2,7 +2,7 @@
     font-weight: bold;
     font-size: 17px;
     letter-spacing: 1px;
-    color:var(--text-color);
+    color:white;
 }
 .close-icon{
     font-size: 20px; 
@@ -12,14 +12,14 @@
     display: flex;
     justify-content: space-between;
     background-color:var(--ion-color-primary);
-    color:var(--text-color);
+    color:white;
     padding: 16px;
 }
 .footer{
     display: flex;
     justify-content: center;
     background-color:var(--ion-color-primary);
-    color:var(--text-color);
+    color:white;
     padding: 16px;
     cursor: pointer;
 }

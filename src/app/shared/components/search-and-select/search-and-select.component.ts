@@ -6,7 +6,7 @@ import {
 import { AlertController, ModalController } from '@ionic/angular';
 import { TranslateService } from '@ngx-translate/core';
 import * as _ from 'lodash-es';
-import { SearchPopoverComponent } from '../search-popover/search-popover.component';
+import { ToastService } from 'src/app/core/services';
 
 @Component({
   selector: 'app-search-and-select',
@@ -40,7 +40,8 @@ export class SearchAndSelectComponent implements OnInit, ControlValueAccessor {
 
   constructor(
     private alertController: AlertController,
-    private translateService: TranslateService
+    private translateService: TranslateService,
+    private toast:ToastService
   ) { }
 
   onChange = (quantity) => {};
@@ -150,39 +151,46 @@ export class SearchAndSelectComponent implements OnInit, ControlValueAccessor {
 
   async addLink(data){
     console.log(data,"data in addlink");
+    data.value = data.value || [];
     const alert = await this.alertController.create({
       cssClass: 'my-custom-class',
-      header: 'Add Link',
+      header: this.translateService.instant('ADD_LINK'),
       inputs: [
-        {
-          name: 'name',
-          type: 'text',
-          placeholder: 'Enter link',
-          attributes: {
-            maxlength: 50,
-          }
-        },
+      {
+        name: 'name',
+        type: 'text',
+        placeholder: 'Enter link',
+        attributes: {
+        maxlength: 50,
+        }
+      },
       ],
       buttons: [
-        {
-          text: this.translateService.instant('CANCEL'),
-          role: 'cancel',
-          cssClass: 'secondary',
-          handler: () => { },
-        },
-        {
-          text: this.translateService.instant('OK'),
-          handler: (alertData) => {
-            let obj = {
-              name: alertData.name,
-              type: data.name,
-              isLink: true
-            };
-            data.value.push(obj);
-          }
+      {
+        text: this.translateService.instant('CANCEL'),
+        role: 'cancel',
+        cssClass: 'secondary',
+        handler: () => { },
+      },
+      {
+        text: this.translateService.instant('OK'),
+        handler: (alertData) => {
+        if (alertData.name && alertData.name.startsWith('http://') || alertData.name.startsWith('https://')) {
+          let obj = {
+          name: alertData.name,
+          type: data.name,
+          isLink: true
+          };
+          data.value.push(obj);
+          return true; 
+        } else {
+          this.toast.showToast(this.translateService.instant('INVALID_LINK'), 'danger');
+          return false; 
+        }
+        }
       }
-      
       ],
+      backdropDismiss: false // Prevent dismissing the modal by clicking outside
     });
     await alert.present();
   }
