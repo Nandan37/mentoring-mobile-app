@@ -108,7 +108,7 @@ export class DynamicFormComponent implements OnInit {
   @ViewChild('picker') picker: MatDatepicker<Date>;
   @ViewChildren(SearchAndSelectComponent) searchAndSelectComponents: QueryList<SearchAndSelectComponent>;
   @Output() customEventEmitter = new EventEmitter()
-  
+  @Input() sesionId : any;
   public showSpinners = true;
   public showSeconds = false;
   public touchUi = false;

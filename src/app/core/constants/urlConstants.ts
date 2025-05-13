@@ -27,6 +27,7 @@ export const urlConstants = {
     SESSION_DOWNLOAD_CSV: '/mentoring/v1/sessions/getSampleCSV',
     SESSION_BULK_UPLOAD: '/mentoring/v1/sessions/bulkSessionCreate',
     THEME_READ: "/mentoring/v1/org-admin/themeDetails",
+    RESOURCES_DELETE:'/mentoring/v1/resources/delete/',
     // FORMS
     FORM_READ: '/mentoring/v1/form/read',
     GENERATE_OTP: '/user/v1/account/generateOtp',

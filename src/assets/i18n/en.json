@@ -366,5 +366,6 @@
     "POST_RESOURCES": "Post resources",
     "PRE_RESOURCES": "Pre resources",
     "INVALID_LINK": "Invalid link, Please enter a valid link",
-    "ENTER_LINK": "Enter link"
+    "ENTER_LINK": "Enter link",
+    "SESSION_RESOURCE_DELETE": "Session resource deleted successfully."
 }

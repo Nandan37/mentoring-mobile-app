@@ -6,6 +6,7 @@ import {
 import { AlertController, ModalController } from '@ionic/angular';
 import { TranslateService } from '@ngx-translate/core';
 import * as _ from 'lodash-es';
+import { urlConstants } from 'src/app/core/constants/urlConstants';
 import { HttpService, ToastService } from 'src/app/core/services';
 
 @Component({
@@ -25,6 +26,8 @@ export class SearchAndSelectComponent implements OnInit, ControlValueAccessor {
   @Output() showSelectionPopover = new EventEmitter()
   @Output() viewSelectedListPopover = new EventEmitter()
   @Input() uniqueId: any;
+  @Input() sessionId: any;
+
   disabled;
   touched = false;
   selectedChips;
@@ -82,14 +85,14 @@ export class SearchAndSelectComponent implements OnInit, ControlValueAccessor {
     }
   }
 
-  removeFile(index: number) {
+  removeFile(data:any,index:number) {
     if (this.control?.value ) {
       const updatedFiles = [...this.control.value];
       updatedFiles.splice(index, 1);
       if(this.control.name == 'pre' || this.control.name == 'post'){
-        this.httpService.delete({url:'',payload:''}).then((res:any) => {
+        this.httpService.get({url:urlConstants.API_URLS.RESOURCES_DELETE+this.control?.id+'?sessionId='+this.sessionId}).then((res:any) => {
           if(res.responseCode == 'OK'){
-            this.toast.showToast(this.translateService.instant('FILE_DELETED'), 'success');
+            this.toast.showToast(this.translateService.instant('SESSION_RESOURCE_DELETE'), 'success');
             if (this.control.setValue) {
               this.control.setValue(updatedFiles);
             } else {

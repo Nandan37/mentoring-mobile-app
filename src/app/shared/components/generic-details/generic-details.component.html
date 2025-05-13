@@ -82,6 +82,7 @@
 <ion-modal [isOpen]="isImageModalOpen" (ionModalDidDismiss)="closeImageModal()">
   <ng-template>
     <ion-content>
+      <ion-icon  name="close-circle" (click)="closeImageModal()" class="close-icon-modal"></ion-icon>
       <ion-img [src]="selectedImageUrl" style="width: 100%; height: auto;"></ion-img>
     </ion-content>
   </ng-template>
