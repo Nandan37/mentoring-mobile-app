@@ -175,7 +175,7 @@ export class CreateSessionPage implements OnInit {
               "name":file.name,
               "link":file.name,
               "type":control.name,
-              "mimeType":"link",
+              "mime_type":"link",
           });
           }else if (file instanceof File && file.name) {
               const signedUrl = await this.getSignedUrl(file.name);
@@ -184,9 +184,10 @@ export class CreateSessionPage implements OnInit {
                 "name":file.name,
                 "link":uploadedFileUrl,
                 "type":control.name,
-                "mimeType":file.type,
+                "mime_type":file.type,
             });
-          } else if (file.name){
+          } 
+          else if (file.name){
             this.updatedFiles.push(file);
           }
         }
@@ -285,6 +286,11 @@ export class CreateSessionPage implements OnInit {
       this.formData.controls[i].value =
         existingData[this.formData.controls[i].name];
         this.formData.controls[i].disabled = this.formData.controls[i].name !== "post" && existingData.status.value  === "COMPLETED" ? true : false;
+          if(
+          this.formData.controls[i].name == "post" && existingData.status.value  !== "COMPLETED"
+          ){
+            this.formData.controls[i].disabled = true;
+        }
       if (this.formData.controls[i].type=='search' &&  this.formData.controls[i].meta.addPopupType !== 'file'){
         this.formData.controls[i].id = this.id;
         if(this.formData.controls[i].meta.multiSelect){
@@ -299,7 +305,7 @@ export class CreateSessionPage implements OnInit {
         if(!this.formData.controls[i].meta.disableIfSelected && existingData.status.value  !== "COMPLETED") {
           this.formData.controls[i].disabled = false;
         }
-        if(this.formData.controls[i].meta.disableIfSelected&&this.formData.controls[i].value && existingData.status.value  !== "COMPLETED"){
+        if(this.formData.controls[i].meta.disableIfSelected&&this.formData.controls[i].value && existingData.status.value  !== "COMPLETED" &&  this.formData.controls[i].meta.addPopupType !== 'file'){
           this.formData.controls[i].disabled = true;
         }
       }else if (this.formData.controls[i].type === 'search' && this.formData.controls[i].meta.addPopupType === 'file') {
@@ -316,17 +322,14 @@ export class CreateSessionPage implements OnInit {
               })
             );
             if(filteredResources){
-              this.formData.controls[i].value = filteredResources.map(r => r.id);
+              this.formData.controls[i].value = filteredResources.map(r => r);
               this.formData.controls[i].meta.searchData = filteredResources;
             }
         }
-      
         this.formData.controls[i].id = this.id;
-      
-        if (!this.formData.controls[i].meta.disableIfSelected && existingData.status.value  !== "COMPLETED") {
+        if (!this.formData.controls[i].meta.disableIfSelected && existingData.status.value  !== "COMPLETED" &&  this.formData.controls[i].meta.addPopupType !== 'file') {
           this.formData.controls[i].disabled = false;
         }
-      
         if (this.formData.controls[i].meta.disableIfSelected && this.formData.controls[i].value?.length && existingData.status.value  !== "COMPLETED") {
           this.formData.controls[i].disabled = true;
         }

@@ -6,7 +6,7 @@ import {
 import { AlertController, ModalController } from '@ionic/angular';
 import { TranslateService } from '@ngx-translate/core';
 import * as _ from 'lodash-es';
-import { ToastService } from 'src/app/core/services';
+import { HttpService, ToastService } from 'src/app/core/services';
 
 @Component({
   selector: 'app-search-and-select',
@@ -41,7 +41,8 @@ export class SearchAndSelectComponent implements OnInit, ControlValueAccessor {
   constructor(
     private alertController: AlertController,
     private translateService: TranslateService,
-    private toast:ToastService
+    private toast:ToastService,
+    private httpService : HttpService
   ) { }
 
   onChange = (quantity) => {};
@@ -82,10 +83,27 @@ export class SearchAndSelectComponent implements OnInit, ControlValueAccessor {
   }
 
   removeFile(index: number) {
-    if (this.control?.value) {
+    if (this.control?.value ) {
       const updatedFiles = [...this.control.value];
       updatedFiles.splice(index, 1);
-  
+      if(this.control.name == 'pre' || this.control.name == 'post'){
+        this.httpService.delete({url:'',payload:''}).then((res:any) => {
+          if(res.responseCode == 'OK'){
+            this.toast.showToast(this.translateService.instant('FILE_DELETED'), 'success');
+            if (this.control.setValue) {
+              this.control.setValue(updatedFiles);
+            } else {
+              this.control.value = updatedFiles;
+            }
+          } else {
+            this.toast.showToast(this.translateService.instant('FILE_NOT_DELETED'), 'danger');
+          }
+        }
+        ).catch((err) => {
+          this.toast.showToast(this.translateService.instant('FILE_NOT_DELETED'), 'danger');
+        }
+        );
+      }else 
       if (this.control.setValue) {
         this.control.setValue(updatedFiles);
       } else {
@@ -150,7 +168,6 @@ export class SearchAndSelectComponent implements OnInit, ControlValueAccessor {
 
 
   async addLink(data){
-    console.log(data,"data in addlink");
     data.value = data.value || [];
     const alert = await this.alertController.create({
       cssClass: 'my-custom-class',
@@ -179,7 +196,8 @@ export class SearchAndSelectComponent implements OnInit, ControlValueAccessor {
           let obj = {
           name: alertData.name,
           type: data.name,
-          isLink: true
+          isLink: true,
+          isNew:true
           };
           data.value.push(obj);
           return true; 

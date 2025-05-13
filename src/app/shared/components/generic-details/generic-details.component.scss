@@ -37,12 +37,43 @@ ion-chip{
     align-items: center;
     padding-right: 10px;
 }
-.resources-link{
-    padding: 10px 14px;
-    border-radius: 12px;
-    border: 1px solid var(--ion-color-primary);
-    margin: 8px 10px;
-    width: fit-content;
-    display: flex;
-    flex-wrap: wrap;
-}
+.resource-item {
+    border: 1px solid #ccc;
+    padding: 10px;
+    border-radius: 8px;
+    text-align: center;
+    height: 100%;
+  }
+  .resource-content{
+    margin: 10px 10px;
+    box-shadow: 1px 4px 5px 2px #ccc;
+    border-radius: 14px;
+    width: 150px;
+    height: 150px;
+    img{
+        width: 150px;
+              height: 150px;
+              border-radius: 14px;
+              object-fit: cover;
+    }
+  }
+  .clickable-image {
+    cursor: pointer;
+    max-width: 100%;
+    height: auto;
+    border-radius: 4px;
+    transition: transform 0.2s;
+  }
+  
+  .resource-content:hover {
+    transform: scale(1.05);
+  }
+  
+  .truncate-text {
+    display: inline-block;
+    max-width: 100%;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    vertical-align: middle;
+  }
