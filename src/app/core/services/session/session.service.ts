@@ -1,20 +1,28 @@
 import { Injectable } from '@angular/core';
-import { HttpService, LoaderService, ToastService } from '..';
+import { HttpService, LoaderService, LocalStorageService, ToastService } from '..';
 import { urlConstants } from '../../constants/urlConstants';
 import * as _ from 'lodash-es';
 import { Browser } from '@capacitor/browser';
 import { Router } from '@angular/router';
 import { JoinDialogBoxComponent } from 'src/app/shared/components/join-dialog-box/join-dialog-box.component';
 import { ModalController } from '@ionic/angular';
+import { localKeys } from '../../constants/localStorage.keys';
 
 @Injectable({
   providedIn: 'root'
 })
 export class SessionService {
+  userDetails: any;
 
-  constructor(private loaderService: LoaderService, private httpService: HttpService, private toast: ToastService, private router: Router, private modalCtrl: ModalController) { }
+  constructor(private loaderService: LoaderService, private httpService: HttpService, private toast: ToastService, private router: Router, private modalCtrl: ModalController,
+    private localStorage: LocalStorageService
+  ) { }
 
   async createSession(formData, queryParams?: string) {
+    this.userDetails = await this.localStorage.getLocalData(localKeys.USER_DETAILS);
+    if (!formData.hasOwnProperty("mentor_id")) {
+      formData.mentor_id = this.userDetails?.id;
+  }
     await this.loaderService.startLoader();
     const config = {
       url: queryParams == null ? urlConstants.API_URLS.CREATE_SESSION : urlConstants.API_URLS.CREATE_SESSION + `/${queryParams}`,
