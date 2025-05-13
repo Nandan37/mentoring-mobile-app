@@ -12,8 +12,10 @@
       <ion-label>{{'MENTORS' | translate}}</ion-label>
     </ion-tab-button>
 
-    <ion-tab-button tab="requests" *ngIf="profile?.isMentor && allowTemplateView(PAGE_IDS.requests)">
-      <ion-icon name="mail" size="large"></ion-icon>
+    <ion-tab-button tab="requests" *ngIf="allowTemplateView(PAGE_IDS.requests)">
+      <ng-container *ngIf="isCustomIcon(customIcon); else defaultIcon">
+        <img [src]="customIcon" style="width: 32px; height: 32px;"/>
+      </ng-container>
       <ng-template #defaultIcon>
         <ion-icon name="chatbubble-ellipses" style="font-size: 32px;"></ion-icon>
       </ng-template>

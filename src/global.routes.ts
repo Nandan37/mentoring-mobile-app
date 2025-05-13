@@ -41,4 +41,6 @@ export class CommonRoutes {
   public static CHAT = 'chat';
   public static MESSAGES = 'messages';
   public static CHAT_REQ = 'chat-request';
+  public static SESSION_REQUEST = 'session-request';
+  public static SESSION_REQUEST_DETAILS = 'session-request-details';
 }

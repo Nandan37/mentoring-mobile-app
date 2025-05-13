@@ -82,6 +82,12 @@ export const urlConstants = {
     GET_PROFILE_DATA: '/interface/v1/profile/get/',
     DASHBOARD_REPORT_FILTER: "/mentoring/v1/reports/filterList?",
     DASHBOARD_REPORT_DATA: "/mentoring/v1/reports/reportData?",
+    REQUEST_SESSION: '/mentoring/v1/requestSessions/create',
+    REQUEST_SESSION_LIST: '/mentoring/v1/requestSessions/list',
+    REQUEST_SESSION_DETAILS: '/mentoring/v1/requestSessions/getDetails',
+    REQUEST_SESSION_USER_AVAILABILITY: '/mentoring/v1/requestSessions/userAvailability',
+    REQUEST_SESSION_ACCEPT: '/mentoring/v1/requestSessions/accept?SkipValidation=true',
+    REQUEST_SESSION_REJECT: '/mentoring/v1/requestSessions/reject',
     GETUSERIDBYRID:"/mentoring/v1/profile/externalIdMapping"
   }
 };

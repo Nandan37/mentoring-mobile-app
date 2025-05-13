@@ -52,9 +52,10 @@ export class ChatRequestPage implements OnInit {
       this.info = resp?.result;
       if (resp?.result?.status == 'REQUESTED') {
         this.message = '';
-      }else if(resp?.result?.status == 'ACCEPTED') {
-        this.router.navigate([CommonRoutes.CHAT, resp?.result?.meta.room_id],{queryParams:{id:resp?.result?.id}, replaceUrl: true });
       }
+      // else if(resp?.result?.status == 'ACCEPTED') {
+      //   this.router.navigate([CommonRoutes.CHAT, resp?.result?.meta.room_id],{queryParams:{id:resp?.result?.id}, replaceUrl: true });
+      // }
       this.info.status = !resp?.result?.status
         ? 'PENDING'
         : resp?.result?.status;
@@ -66,6 +67,10 @@ export class ChatRequestPage implements OnInit {
     });
   }
   sendRequest() {
+    if(this.message.length >this.messageLimit){
+      this.toast.showToast('MESSAGE_TEXT_LIMIT', 'danger');
+      return;
+    }
     const payload = {
       url: urlConstants.API_URLS.SEND_REQUEST,
       payload: {
@@ -86,6 +91,9 @@ export class ChatRequestPage implements OnInit {
       },
     };
     this.httpService.post(payload).then((resp) => {
+      const name = this.info?.user_details?.name || 'the user';
+      const message = this.translate.instant('ACCEPTED_MESSAGE_REQ', { name });
+      this.toast.showToast(message, 'success');
       this.info.status = 'ACCEPTED';
         this.router.navigate([CommonRoutes.CHAT, resp?.result?.meta.room_id],{queryParams:{id:resp?.result?.id}});
     });

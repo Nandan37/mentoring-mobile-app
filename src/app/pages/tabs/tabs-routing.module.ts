@@ -37,7 +37,8 @@ const routes: Routes = [
         canActivate:[PrivateGuard],
         data: {
           button_config: CHAT_MESSAGES.GENERIC_CARD_REQUEST_BTN_CONFIG,
-          noDataFound: MY_CONNECTIONS_NO_RESULT_FOUND
+          noDataFound: MY_CONNECTIONS_NO_RESULT_FOUND,
+          slotButtonConfig: CHAT_MESSAGES.GENERIC_CARD_REQUEST_SLOT_BTN_CONFIG
         }
       },    
       {
