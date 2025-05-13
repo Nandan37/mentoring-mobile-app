@@ -8,7 +8,9 @@ import {
   LocalStorageService,
   ToastService,
   UserService,
+  UtilService,
 } from 'src/app/core/services';
+import { Clipboard } from '@capacitor/clipboard';
 import { SessionService } from 'src/app/core/services/session/session.service';
 import { CommonRoutes } from 'src/global.routes';
 
@@ -19,6 +21,7 @@ import { CommonRoutes } from 'src/global.routes';
 })
 export class MentorDetailsPage implements OnInit {
   mentorId;
+  public isMobile: any;
   public headerConfig: any = {
     backButton: true,
     headerColor: 'primary',
@@ -91,8 +94,10 @@ export class MentorDetailsPage implements OnInit {
     private sessionService: SessionService,
     private userService: UserService,
     private localStorage: LocalStorageService,
-    private toast: ToastService
+    private toast: ToastService,
+    private utilService: UtilService
   ) {
+    this.isMobile = utilService.isMobile();
     routerParams.params.subscribe((params) => {
       this.mentorId = this.buttonConfig.meta.id = params.id;
       this.userService.getUserValue().then(async (result) => {
@@ -148,6 +153,36 @@ export class MentorDetailsPage implements OnInit {
         ? await this.sessionService.getUpcomingSessions(this.mentorId)
         : [];
   }
+
+  action(event) {
+    switch (event) {
+      case 'share':
+        this.share();
+        break;
+    }
+  }
+  async share() {
+    if(this.isMobile && navigator.share){
+          let url = `/${CommonRoutes.MENTOR_DETAILS}/${this.buttonConfig.meta.id}`;
+          let link = await this.utilService.getDeepLink(url);
+          let params = {
+            link: link,
+            subject: "Profile Share",
+            text: '',
+          };
+          await this.utilService.shareLink(params);
+        } else {
+          await this.copyToClipBoard(window.location.href);
+          this.toast.showToast('PROFILE_LINK_COPIED', 'success');
+        }
+  }
+  copyToClipBoard = async (copyData: any) => {
+    await Clipboard.write({
+      string: copyData,
+    }).then(() => {
+      this.toast.showToast('COPIED', 'success');
+    });
+  };
   async onAction(event) {
     switch (event.type) {
       case 'cardSelect':

@@ -40,6 +40,7 @@ export class SearchPopoverComponent implements OnInit {
   selectedFilters:any = {};
   selectedList: any=[];
   noDataMessage: string;
+  hasSessionManager: any;
 
   constructor(private platform: Platform, private modalController: ModalController, private toast: ToastService, private localStorage: LocalStorageService, private util: UtilService, private httpService: HttpService) { 
     this.platform.backButton.subscribeWithPriority(10, () => {
@@ -72,6 +73,7 @@ export class SearchPopoverComponent implements OnInit {
       this.tableData = await this.getMenteelist();
       this.filterData = this.data.isMobile ? [] : await this.getFilters();
       this.filterData = this.data.isMobile ? [] : this.util.getFormatedFilterData(this.filterData, this.data.control.meta);
+      this.filterData = [...this.filterData, this.data.control.meta.filters.type[0]];
     }    
   }
 
@@ -83,6 +85,9 @@ export class SearchPopoverComponent implements OnInit {
     }
     if (this.data.control.meta.filters.organizations && this.data.control.meta.filters.organizations[0].isEnabled) {
       url += `&organization=true`;
+    }
+    if (this.data.control.meta.filters.type && this.data.control.meta.filters.type[0].isEnabled) {
+      url += `&` + this.data.control.meta.filters.type[0].key + `=true`;
     }
     const config = {
       url: urlConstants.API_URLS.FILTER_LIST + url + '&filter_type=' + this.data.control.meta.filterType,
@@ -104,11 +109,15 @@ export class SearchPopoverComponent implements OnInit {
     const designationQueryParam = this.selectedFilters && this.selectedFilters.designation
         ? '&designation=' + this.selectedFilters.designation.map(des => des.value).join(',')
         : '';
-    let queryString = organizationsQueryParam + designationQueryParam;
+    const typeQueryParam = this.selectedFilters && this.selectedFilters.type
+    ? '&' + this.data.control.meta.filters.type[0].key +'=' + this.selectedFilters.type.map(des => des.value).join(',')
+    : '';
+    
+    let queryString = organizationsQueryParam + designationQueryParam + typeQueryParam;
     if(this.data.control.id){
       queryString = queryString + '&session_id=' + this.data.control.id
     }
-    const sorting = `&order=${this.sortingData?.order || ''}&sort_by=${this.sortingData?.sort_by || ''}`;
+    const sorting = `&order=${this.sortingData?.order || ''}&sort_by=${this.sortingData?.sort_by || ''}&mentorId=${this.data?.mentorId ? this.data?.mentorId : (this.data.isManagePage ? '' : this.user.id)}`;
     queryString = queryString + sorting
     const config = {
       url: urlConstants.API_URLS[this.data.control.meta.url] + this.page + '&limit=' + this.limit + '&search=' + btoa(this.searchText) + queryString,

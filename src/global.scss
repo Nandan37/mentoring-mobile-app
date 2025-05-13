@@ -51,6 +51,7 @@
   --green: rgb(20, 189, 20);
   --background-color : #fff;
   --text-color : #000;
+  --blue: #1b6dff;
   input:-webkit-autofill {
     height: 0px;
     -webkit-box-shadow: 0 0 0 10px white inset;
@@ -424,7 +425,7 @@ ion-searchbar {
 }
 
 .auto-margin {
-  margin: auto;
+  margin: auto !important;
 }
 .margin-none {
   margin: 0px !important;
@@ -683,4 +684,10 @@ ion-searchbar {
 }
 .focus\:ring-blue-500:focus {
   --tw-ring-color: #3b82f6;
+}
+.text-left {
+  text-align: left;
+}
+.height-0 {
+  height: auto !important;
 }

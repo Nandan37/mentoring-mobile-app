@@ -4,6 +4,7 @@ import { HttpService } from 'src/app/core/services';
 import { ActivatedRoute } from '@angular/router';
 import { Router } from '@angular/router';
 import { CommonRoutes } from 'src/global.routes';
+import { SessionService } from 'src/app/core/services/session/session.service';
 
 @Component({
   selector: 'app-requests',
@@ -22,11 +23,14 @@ export class RequestsPage implements OnInit {
   data: any;
   noResult: any;
   routeData: any;
+  slotBtnConfig: any;
+  slotRequests: any;
 
   constructor(
     private httpService: HttpService,
     private route: ActivatedRoute,
-    private router: Router
+    private router: Router,
+    private sessionService: SessionService
   ) {}
 
   ionViewWillEnter(){
@@ -34,6 +38,14 @@ export class RequestsPage implements OnInit {
     this.route.data.subscribe((data) => {
       this.routeData = data;
       this.buttonConfig = this.routeData?.button_config;
+      this.slotBtnConfig = this.routeData.slotButtonConfig;
+    });
+    this.pendingRequest();
+    this.sessionService.requestSessionList().then((res) => {
+      this.slotRequests = res.result.data;
+      if (!this.slotRequests.length) {
+        this.noResult = this.routeData?.noDataFound;
+      }
     });
   }
   ngOnInit() {
@@ -59,10 +71,13 @@ export class RequestsPage implements OnInit {
     }
   }
 
-  onCardClick(event) {
+  onCardClick(event, data?) {
     switch (event.type) {
       case 'viewMessage':
         this.router.navigate([CommonRoutes.CHAT_REQ, event.data]);
+        break;
+      case 'viewDetails':
+        this.router.navigate([CommonRoutes.SESSION_REQUEST_DETAILS], {queryParams: {id: data}});
         break;
     }
   }

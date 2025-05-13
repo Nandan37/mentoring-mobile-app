@@ -1,4 +1,4 @@
-<app-page-header [config]="headerConfig" *ngIf="isloaded"></app-page-header>
+<app-page-header [config]="headerConfig" (actionEvent)="action($event)" *ngIf="isloaded" ></app-page-header>
 <app-generic-profile-header
   *ngIf="!userCantAccess && isloaded"
   [headerData]="detailData.data"
