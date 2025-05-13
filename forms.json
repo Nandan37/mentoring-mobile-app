@@ -683,7 +683,7 @@
                       },
                       "info": [
                         {
-                           "message": "Supported formats: PDF, WORD, PPT, IMAGES, VIDEO, AUDIO,LINKS,"
+                           "message": "Supported formats: PDF, WORD, PPT, IMAGES, and inks to online resources (websites, articles, audio, video)"
                         }
                       ]
                     },
@@ -713,7 +713,7 @@
                       },
                       "info": [
                         {
-                          "message": "Supported formats: PDF, WORD, PPT, IMAGES, VIDEO, AUDIO,LINKS,"
+                          "message": "Supported formats: PDF, WORD, PPT, IMAGES, and inks to online resources (websites, articles, audio, video)"
                         }
                       ]
                     }
@@ -1528,7 +1528,7 @@
             },
             "info": [
               {
-                 "message": "Supported formats: PDF, WORD, PPT, IMAGES, VIDEO, AUDIO,LINKS,"
+                 "message": "Supported formats: PDF, WORD, PPT, IMAGES, and inks to online resources (websites, articles, audio, video)"
               }
             ]
           },
@@ -1558,7 +1558,7 @@
             },
             "info": [
               {
-                "message": "Supported formats: PDF, WORD, PPT, IMAGES, VIDEO, AUDIO,LINKS,"
+                "message": "Supported formats: PDF, WORD, PPT, IMAGES, and inks to online resources (websites, articles, audio, video)"
               }
             ]
           }
