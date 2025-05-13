@@ -1,5 +1,6 @@
 <div class="field-wrapper" *ngFor="let item of sessionData.form">
-  <div *ngIf="!sessionData?.menteeForm?.includes(item.title) || (sessionData?.menteeForm?.includes(item.title)&&!isMentor)">
+  <div
+    *ngIf="!sessionData?.menteeForm?.includes(item.title) || (sessionData?.menteeForm?.includes(item.title)&&!isMentor)">
     <p class="session-detail-heading">{{item.title | translate }}</p>
     <div *ngIf="isArray(sessionData.data[item.key]); else elseBlock">
       <ion-chip outline="true" class="ion-margin-top" *ngFor="let chip of sessionData.data[item.key]">
@@ -7,10 +8,12 @@
       </ion-chip>
     </div>
     <ng-template #elseBlock>
-      <p *ngIf="item?.key=='duration';else elseBlock2" class="value">{{sessionData.data.duration.hours}} {{"HOURS" | translate}} {{sessionData.data.duration.minutes}} {{"MINUTES" | translate}}</p>
+      <p *ngIf="item?.key=='duration';else elseBlock2" class="value">{{sessionData.data.duration.hours}} {{"HOURS" |
+        translate}} {{sessionData.data.duration.minutes}} {{"MINUTES" | translate}}</p>
     </ng-template>
     <ng-template #elseBlock2>
-      <p *ngIf="item?.key=='startDate' || item?.key=='endDate';else elseBlock3" class="value">{{sessionData.data[item.key] | date:'MMM d, y, h:mm a'}}</p>
+      <p *ngIf="item?.key=='startDate' || item?.key=='endDate';else elseBlock3" class="value">
+        {{sessionData.data[item.key] | date:'MMM d, y, h:mm a'}}</p>
     </ng-template>
     <ng-template #elseBlock3>
       <div class="d-flex" *ngIf="item?.key=='mentee_count';else elseBlock4">
@@ -32,3 +35,56 @@
     </ng-template>
   </div>
 </div>
+<div *ngIf="preResources.length > 0">
+  <p class="session-detail-heading" style="margin: 0 10px;">{{ 'PRE_RESOURCES' | translate }}</p>
+  <div  style="display: flex; flex-wrap: wrap;">
+    <div   *ngFor="let resource of preResources" 
+        class="resource-content">
+            <img *ngIf="resource.mime_type?.includes('image')" 
+                 [src]="resource.link" 
+                 alt="{{ resource.name }}" 
+                 (click)="openImageModal(resource.link)"
+                 class="clickable-image " />
+            <ng-container *ngIf="resource.mime_type?.includes('pdf') || resource.mime_type?.includes('other')"
+                 class="file-link" style="flex-direction: column;">
+              <a [href]="resource.link" target="_blank" class="truncate-text"><ion-icon name="document" style="width: 150px;height: 150px; vertical-align: middle;"></ion-icon></a>
+          </ng-container>
+
+          <ng-container *ngIf="resource.mime_type?.includes('link')"
+          class="file-link" style="flex-direction: column;">
+       <a [href]="resource.link" target="_blank" class="truncate-text"><ion-icon name="link" style="width: 150px;height: 150px; vertical-align: middle;"></ion-icon></a>
+   </ng-container>
+    </div>
+    </div>
+</div>
+<div *ngIf="postResources.length > 0 && sessionData?.data?.status?.value === 'COMPLETED'">
+  <p class="session-detail-heading" style="margin: 0 10px;">{{ 'POST_RESOURCES' | translate }}</p>
+  <div  style="display: flex; flex-wrap: wrap;">
+      <div   *ngFor="let resource of postResources" 
+          class="resource-content">
+              <img *ngIf="resource.mime_type?.includes('image')" 
+                   [src]="resource.link" 
+                   alt="{{ resource.name }}" 
+                   (click)="openImageModal(resource.link)"
+                   class="clickable-image " />
+              <ng-container *ngIf="resource.mime_type?.includes('pdf') || resource.mime_type?.includes('other')"
+                   class="file-link" style="flex-direction: column;">
+                <a [href]="resource.link" target="_blank" class="truncate-text"><ion-icon name="document" style="width: 150px;height: 150px; vertical-align: middle;"></ion-icon></a>
+            </ng-container>
+
+            <ng-container *ngIf="resource.mime_type?.includes('link')"
+            class="file-link" style="flex-direction: column;">
+         <a [href]="resource.link" target="_blank" class="truncate-text"><ion-icon name="link" style="width: 150px;height: 150px; vertical-align: middle;"></ion-icon></a>
+     </ng-container>
+      </div>
+      </div>
+</div>
+<ion-modal [isOpen]="isImageModalOpen" (ionModalDidDismiss)="closeImageModal()">
+  <ng-template>
+    <ion-content>
+      <ion-icon  name="close-circle" (click)="closeImageModal()" class="close-icon-modal"></ion-icon>
+      <ion-img [src]="selectedImageUrl" style="width: 100%; height: auto;"></ion-img>
+    </ion-content>
+  </ng-template>
+</ion-modal>
+

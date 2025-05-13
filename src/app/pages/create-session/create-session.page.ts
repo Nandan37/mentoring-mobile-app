@@ -1,7 +1,6 @@
-import { HttpClient } from '@angular/common/http';
-import { ChangeDetectorRef, Component, Input, OnInit, ViewChild } from '@angular/core';
+import { ChangeDetectorRef, Component, OnInit, ViewChild } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
-import { AttachmentService, LoaderService, ToastService, UtilService } from 'src/app/core/services';
+import { AttachmentService, LoaderService, ToastService } from 'src/app/core/services';
 import { HttpService } from 'src/app/core/services/http/http.service';
 import { SessionService } from 'src/app/core/services/session/session.service';
 import {
@@ -11,7 +10,7 @@ import {
 import { CommonRoutes } from 'src/global.routes';
 import * as _ from 'lodash-es';
 import { Location } from '@angular/common';
-import { AlertController, ModalController, Platform } from '@ionic/angular';
+import { ActionSheetController, AlertController, ModalController, Platform } from '@ionic/angular';
 import { urlConstants } from 'src/app/core/constants/urlConstants';
 import { TranslateService } from '@ngx-translate/core';
 import { CREATE_SESSION_FORM, MANAGERS_CREATE_SESSION_FORM, PLATFORMS } from 'src/app/core/constants/formConstant';
@@ -47,7 +46,7 @@ export class CreateSessionPage implements OnInit {
     type: 'session',
     haveValidationError: false
   }
-
+  updatedFiles : any= [];
   public formData: JsonFormData;
   showForm: boolean = false;
   isSubmited: boolean;
@@ -62,15 +61,17 @@ export class CreateSessionPage implements OnInit {
   params: any;
   editSessionDisable: boolean;
   isMobile = window.innerWidth <= 950;
+  sessionType: any;
+  queryParams: any;
+  formConfig: any;
+  mentor_id: any;
 
   constructor(
-    private http: HttpClient,
     private sessionService: SessionService,
     private toast: ToastService,
     private activatedRoute: ActivatedRoute,
     private location: Location,
     private attachment: AttachmentService,
-    private platform: Platform,
     private api: HttpService,
     private loaderService: LoaderService,
     private translate: TranslateService,
@@ -80,17 +81,23 @@ export class CreateSessionPage implements OnInit {
     private router: Router,
     private route:ActivatedRoute,
     private modalCtrl:ModalController,
-    private permissionService:PermissionService
+    private permissionService:PermissionService,
+    private actionSheetController: ActionSheetController
   ) {
   }
-  async ngOnInit() {
-    let formConfig =(await this.permissionService.hasPermission({ module: permissions.MANAGE_SESSION, action: manageSessionAction.SESSION_ACTIONS })) ? MANAGERS_CREATE_SESSION_FORM : CREATE_SESSION_FORM
+  ngOnInit() {
+      
+  }
+  async ionViewWillEnter() {
+    await this.updateFormConfig();
+    this.route.queryParams.subscribe(() => this.updateFormConfig());
+    
     const platformForm = await this.getPlatformFormDetails();
-    const result = await this.form.getForm(formConfig);
+    const result = await this.form.getForm(this.formConfig);
     this.formData = _.get(result, 'data.fields');
-    this.entityNames = await this.form.getEntityNames(this.formData)
-    this.entityList = await this.form.getEntities(this.entityNames, 'SESSION')
-    this.formData = await this.form.populateEntity(this.formData,this.entityList)
+    this.entityNames = await this.form.getEntityNames(this.formData);
+    this.entityList = await this.form.getEntities(this.entityNames, 'SESSION');
+    this.formData = await this.form.populateEntity(this.formData,this.entityList);
     this.changeDetRef.detectChanges();
     this.permissionService.getPlatformConfig();
     this.activatedRoute.queryParamMap.subscribe(async (params) => {
@@ -110,14 +117,14 @@ export class CreateSessionPage implements OnInit {
   }
   async getSessionDetailsUpdate(){
     let data = await this.sessionService.getSessionDetailsAPI(this.id);
-    let response = data.result
+    let response = data.result;
         this.sessionDetails= response;
         this.profileImageData.image = response.image;
         this.profileImageData.isUploaded = true;
         response.start_date = new Date(response.start_date * 1000).toISOString();
         response.end_date = new Date(response.end_date * 1000).toISOString();
         this.preFillData(response);
-        this.editSessionDisable = (this.sessionDetails?.status?.value=='LIVE')
+        this.editSessionDisable = (this.sessionDetails?.status?.value=='LIVE');
   }
 
   async getPlatformFormDetails() {
@@ -165,68 +172,96 @@ export class CreateSessionPage implements OnInit {
     return true
   }
 
+  async handleFileUploads() {
+    for (const control of this.formData.controls) {
+      if (control.type === 'search' && control.meta?.addPopupType === 'file' && control.value?.length) {
+        for (const file of control.value) {
+          if(file?.isLink && file.name){
+            this.updatedFiles.push({
+              "name":file.name,
+              "link":file.name,
+              "type":control.name,
+              "mime_type":"link",
+          });
+          }else if (file instanceof File && file.name) {
+              const signedUrl = await this.getSignedUrl(file.name);
+              const uploadedFileUrl = await this.uploadFile(file, signedUrl);
+              this.updatedFiles.push({
+                "name":file.name,
+                "link":uploadedFileUrl,
+                "type":control.name,
+                "mime_type":file.type,
+            });
+          } 
+          else if (file.name){
+            this.updatedFiles.push(file);
+          }
+        }
+      }
+    }
+  }
+
+  async getSignedUrl(fileName: string) {
+    const config = {
+      url: urlConstants.API_URLS.GET_SESSION_IMAGE_UPLOAD_URL + fileName.replace(/[^A-Z0-9]+/ig, "_").toLowerCase()
+    };
+    const data: any = await this.api.get(config);
+    return data.result;
+  }
+
+  async uploadFile(file: File, signedUrl: any) {
+    return new Promise((resolve, reject) => {
+      this.attachment.cloudImageUpload(file, signedUrl).subscribe({
+        next: () => resolve(signedUrl.destFilePath),
+        error: (err) => reject(err)
+      });
+    });
+  }
 
   async onSubmit() {
-    if(!this.isSubmited){
+    if (!this.isSubmited) {
       this.form1.onSubmit();
     }
     if (this.form1.myForm.valid) {
-      if (this.profileImageData.image && !this.profileImageData.isUploaded) {
-        this.getImageUploadUrl(this.localImage);
-      } else {
-        const form = Object.assign({}, {...this.form1.myForm.getRawValue(), ...this.form1.myForm.value});
-        console.log(form)
-        form.start_date = (Math.floor((new Date(form.start_date).getTime() / 1000) / 60) * 60).toString();
-        form.end_date = (Math.floor((new Date(form.end_date).getTime() / 1000) / 60) * 60).toString();
-        const timezone = Intl.DateTimeFormat().resolvedOptions().timeZone;
-        form.time_zone = timezone;
-        _.forEach(this.entityNames, (entityKey) => {
-          let control = this.formData.controls.find(obj => obj.name === entityKey);
-          form[entityKey] = control.multiple && control.type == 'chip' ? _.map(form[entityKey], 'value') : form[entityKey]
-        });
-        if(!this.profileImageData.image){
-          form.image=[]
+      await this.handleFileUploads();
+
+      const form = Object.assign({}, { ...this.form1.myForm.getRawValue(), ...this.form1.myForm.value });
+      form.start_date = (Math.floor((new Date(form.start_date).getTime() / 1000) / 60) * 60).toString();
+      form.end_date = (Math.floor((new Date(form.end_date).getTime() / 1000) / 60) * 60).toString();
+      const timezone = Intl.DateTimeFormat().resolvedOptions().timeZone;
+      form.time_zone = timezone;
+
+      _.forEach(this.entityNames, (entityKey) => {
+        const control = this.formData.controls.find(obj => obj.name === entityKey);
+        if (control) {
+          form[entityKey] = control.multiple && control.type === 'chip'
+            ? _.map(form[entityKey], 'value')
+            : form[entityKey];
         }
-        this.form1.myForm.markAsPristine();
-        let result = await this.sessionService.createSession(form, this.id);
-        if (result) {
-          this.sessionDetails = _.isEmpty(result) ? this.sessionDetails : result;
-          this.isSubmited = true;
-          this.firstStepperTitle = (this.id) ? "EDIT_SESSION_LABEL":"CREATE_NEW_SESSION";
-          this.headerConfig.label = this.id ? "EDIT_SESSION":"CREATE_NEW_SESSION";
-          if(!this.id && result.id){
-            this.router.navigate([CommonRoutes.CREATE_SESSION], { queryParams: { id: result.id , type: 'segment'}, replaceUrl: true });
-          }else {
-            this.type = 'segment';
-          }
+      });
+      if (!this.profileImageData.image) {
+        form.image = [];
+      }
+      form.resources= this.updatedFiles;
+      this.form1.myForm.markAsPristine();
+      const result = await this.sessionService.createSession(form, this.id);
+      if (result) {
+        this.sessionDetails = _.isEmpty(result) ? this.sessionDetails : result;
+        this.isSubmited = true;
+        this.firstStepperTitle = this.id ? "EDIT_SESSION_LABEL" : "CREATE_NEW_SESSION";
+        this.headerConfig.label = this.id ? "EDIT_SESSION" : "CREATE_NEW_SESSION";
+        if (!this.id && result.id) {
+          this.router.navigate([CommonRoutes.CREATE_SESSION], { queryParams: { id: result.id, type: 'segment' }, replaceUrl: true });
         } else {
-          this.profileImageData.image = this.lastUploadedImage;
-          this.profileImageData.isUploaded = false;
+          this.type = 'segment';
         }
+      } else {
+        this.profileImageData.image = this.lastUploadedImage;
+        this.profileImageData.isUploaded = false;
       }
     } else {
       this.toast.showToast("Please fill all the mandatory fields", "danger");
     }
-  }
-
-  async getImageUploadUrl(file) {
-    this.loaderService.startLoader();
-    let config = {
-      url: urlConstants.API_URLS.GET_SESSION_IMAGE_UPLOAD_URL + file.name.replace(/[^A-Z0-9]+/ig, "_").toLowerCase()
-    }
-    let data: any = await this.api.get(config);
-    return this.upload(file, data.result).subscribe()
-  }
-
-  upload(data, uploadUrl) {
-    return this.attachment.cloudImageUpload(data,uploadUrl).pipe(
-      map((resp=>{
-      this.profileImageData.image = uploadUrl.destFilePath;
-      this.form1.myForm.value.image = [uploadUrl.destFilePath];
-      this.profileImageData.isUploaded = true;
-      this.profileImageData.haveValidationError = false;
-      this.onSubmit();
-    })))
   }
 
   resetForm() {
@@ -241,7 +276,7 @@ export class CreateSessionPage implements OnInit {
       if( existingData.meeting_info.platform == this?.meetingPlatforms[j].name){
          this.selectedLink = this?.meetingPlatforms[j];
          this.selectedHint = this.meetingPlatforms[j].hint;
-        let obj = this?.meetingPlatforms[j]?.form?.controls.find( (link:any) => link?.name == 'link')
+        let obj = this?.meetingPlatforms[j]?.form?.controls.find( (link:any) => link?.name == 'link');
         let meetingId = this?.meetingPlatforms[j]?.form?.controls.find( (meetingId:any) => meetingId?.name == 'meetingId')
         let password = this?.meetingPlatforms[j]?.form?.controls.find( (password:any) => password?.name == 'password')
         if(obj && existingData?.meeting_info?.link){
@@ -256,7 +291,13 @@ export class CreateSessionPage implements OnInit {
     for (let i = 0; i < this.formData.controls.length; i++) {
       this.formData.controls[i].value =
         existingData[this.formData.controls[i].name];
-      if (this.formData.controls[i].type=='search'){
+        this.formData.controls[i].disabled = this.formData.controls[i].name !== "post" && existingData.status.value  === "COMPLETED" ? true : false;
+          if(
+          this.formData.controls[i].name == "post" && existingData.status.value  !== "COMPLETED"
+          ){
+            this.formData.controls[i].disabled = true;
+        }
+      if (this.formData.controls[i].type=='search' &&  this.formData.controls[i].meta.addPopupType !== 'file'){
         this.formData.controls[i].id = this.id;
         if(this.formData.controls[i].meta.multiSelect){
           this.formData.controls[i].meta.searchData = existingData[this.formData.controls[i].name]
@@ -267,10 +308,35 @@ export class CreateSessionPage implements OnInit {
             id: existingData[this.formData.controls[i].name]
           }];
         }
-        if(!this.formData.controls[i].meta.disableIfSelected) {
+        if(!this.formData.controls[i].meta.disableIfSelected && existingData.status.value  !== "COMPLETED") {
           this.formData.controls[i].disabled = false;
         }
-        if(this.formData.controls[i].meta.disableIfSelected&&this.formData.controls[i].value){
+        if(this.formData.controls[i].meta.disableIfSelected&&this.formData.controls[i].value && existingData.status.value  !== "COMPLETED" &&  this.formData.controls[i].meta.addPopupType !== 'file'){
+          this.formData.controls[i].disabled = true;
+        }
+      }else if (this.formData.controls[i].type === 'search' && this.formData.controls[i].meta.addPopupType === 'file') {
+        const controlName = this.formData.controls[i].name;
+        if (existingData.resources?.length) {
+          const filteredResources = existingData.resources
+            .filter(resource => resource.type === controlName)
+            .map(resource => 
+              ({
+                label: resource.name,
+                id: resource.id,
+                type: resource.type, 
+                link: resource.link
+              })
+            );
+            if(filteredResources){
+              this.formData.controls[i].value = filteredResources.map(r => r);
+              this.formData.controls[i].meta.searchData = filteredResources;
+            }
+        }
+        this.formData.controls[i].id = this.id;
+        if (!this.formData.controls[i].meta.disableIfSelected && existingData.status.value  !== "COMPLETED" &&  this.formData.controls[i].meta.addPopupType !== 'file') {
+          this.formData.controls[i].disabled = false;
+        }
+        if (this.formData.controls[i].meta.disableIfSelected && this.formData.controls[i].value?.length && existingData.status.value  !== "COMPLETED") {
           this.formData.controls[i].disabled = true;
         }
       }
@@ -287,7 +353,6 @@ export class CreateSessionPage implements OnInit {
       );
     }
     this.showForm = true;
-    console.log(this.formData)
   }
 
   async imageUploadEvent(event) {
@@ -351,8 +416,10 @@ export class CreateSessionPage implements OnInit {
     let dependedControlIndex = this.formData.controls.findIndex(formControl => formControl.name === event.dependedChild)
     let dependedControl = this.form1.myForm.get(event.dependedChild)
     if(event.value === "PUBLIC") {
+      this.sessionType = event?.value;
       this.setControlValidity(dependedControlIndex, dependedControl, false);
     } else {
+      this.sessionType = event?.value;
       this.setControlValidity(dependedControlIndex, dependedControl, true);
     }
     this.formData.controls.forEach(control => {
@@ -386,8 +453,66 @@ export class CreateSessionPage implements OnInit {
       case 'addCompetency view':
         this.viewSelectedCompetencies(event)
         break;
+      case 'file':
+        this.showResourcesPopup(event)
+        break;
     }
   }
+handleSelectedFile(file) {
+    // Handle file upload logic here
+}
+  async showResourcesPopup(event) {
+    const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
+
+    if (isMobile) {
+        // Show options for Camera or File
+        const actionSheet = await this.actionSheetController.create({
+            header: 'Select Resource',
+            buttons: [
+                {
+                    text: 'Camera',
+                    icon: 'camera',
+                    handler: () => {
+                        this.openCamera();
+                    }
+                },
+                {
+                    text: 'File',
+                    icon: 'folder',
+                    handler: () => {
+                        this.openFilePicker(event);
+                    }
+                },
+                {
+                    text: 'Cancel',
+                    icon: 'close',
+                    role: 'cancel'
+                }
+            ]
+        });
+        await actionSheet.present();
+    } else {
+        this.openFilePicker(event);
+    }
+}
+
+openCamera() {
+}
+
+openFilePicker(event) {
+  const input = document.createElement('input');
+  input.type = 'file';
+  input.accept = '*/*';
+  input.onchange = (fileEvent: any) => {
+    const file = fileEvent.target.files[0];
+    event.formControl.control.value = event?.formControl?.control?.value || [];
+    if (event?.formControl?.control?.value) {
+      event.formControl.control.value.push(file);
+    } else {
+    }
+  };
+  input.click();
+}
 
   async showCompetencyPopup(event) {
     const popover = await this.modalCtrl.create({
@@ -429,12 +554,15 @@ export class CreateSessionPage implements OnInit {
           showFilter: true,
           showSearch: true,
           viewListMode: false,
-          isMobile: this.isMobile
+          isMobile: this.isMobile,
+          sessionType: this.sessionType,
+          mentorId: this.mentor_id
         }
       }
     });
 
     popover.onDidDismiss().then((data) => {
+      this.mentor_id = data.data[0]?.id;
       if (data.data) {
         event.formControl.selectedData = data.data;
         const values = event.formControl.control.meta.multiSelect ? data.data.map(obj => obj.id) : data.data[0].id;
@@ -503,5 +631,27 @@ export class CreateSessionPage implements OnInit {
       }
     });
     await popover.present();
+  }
+
+  async updateFormConfig() {
+    const queryParams = this.route.snapshot.queryParams;
+    const isManagePage = queryParams['source'] === 'manage';
+    const isHome = queryParams['source'] === 'home';
+
+    if (isManagePage) {
+      const hasPermission = await this.permissionService.hasPermission({
+        module: permissions.MANAGE_SESSION,
+        action: manageSessionAction.SESSION_ACTIONS,
+      });
+
+      this.formConfig = hasPermission ? MANAGERS_CREATE_SESSION_FORM : CREATE_SESSION_FORM;
+    } else if(isHome) {
+      this.formConfig = CREATE_SESSION_FORM;
+    } else if(queryParams.isCreator) {
+      this.formConfig = CREATE_SESSION_FORM;
+    }else {
+      this.formConfig = MANAGERS_CREATE_SESSION_FORM;
+    }
+    
   }
 }

@@ -119,7 +119,7 @@ export class MentorDirectoryPage implements OnInit {
         this.router.navigate([CommonRoutes.CHAT_REQ, event.data],{queryParams:{id:event.data.id}});
         break;
       case 'requestSession':
-        this.toast.showToast('COMING_SOON', 'danger');
+        this.router.navigate([CommonRoutes.SESSION_REQUEST], {queryParams: {data: event.data}});
         break;
     }
   }

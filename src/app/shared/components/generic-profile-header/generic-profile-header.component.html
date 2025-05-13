@@ -1,8 +1,7 @@
 <div *ngIf="headerData" class="header-bottom-border">
   <ion-row class="content-wrapper">
     <ion-col size="4">
-      <div class="profile-container">
-        <!-- Profile Image -->
+      <div class="d-flex flex-justify-center flex-align-items-center flex-col">
         <div class="profile-img">
           <ion-icon
             name="people-outline"
@@ -15,9 +14,15 @@
             <img src="assets/prof-img/user.png" class="default-img" />
           </ng-template>
         </div>
-        
-    
-        <!-- Rating -->
+        <ng-template #Img>
+          <div class="profile-img">
+            <ion-icon
+              name="people-outline"
+              *ngIf="headerData?.is_connected"
+            ></ion-icon>
+            <img src="{{ headerData?.image }}" />
+          </div>
+        </ng-template>
         <div
           class="ratings-banner"
           *ngIf="headerData?.rating?.average"

@@ -50,7 +50,7 @@ export class PrivatePage implements OnInit {
     {
       title: 'REQUESTS',
       action: 'requests',
-      icon: '/assets/images/request_icon_outline.svg',
+      icon: 'mail',
       class: 'hide-on-small-screen',
       url: CommonRoutes.TABS + '/' + CommonRoutes.REQUESTS,
       pageId: PAGE_IDS.requests,
@@ -221,6 +221,7 @@ export class PrivatePage implements OnInit {
     this.platform.ready().then(() => {
       this.network.netWorkCheck();
       this.profile.getChatToken();
+      this.profile.getTheme();
       setTimeout(async () => {
         this.languageSetting();
         this.setHeader();

@@ -26,7 +26,8 @@ export const urlConstants = {
     MENTORS_PROFILE_DETAILS: '/interface/v1/mentors/details/',
     SESSION_DOWNLOAD_CSV: '/mentoring/v1/sessions/getSampleCSV',
     SESSION_BULK_UPLOAD: '/mentoring/v1/sessions/bulkSessionCreate',
-
+    THEME_READ: "/mentoring/v1/org-admin/themeDetails",
+    RESOURCES_DELETE:'/mentoring/v1/resources/delete/',
     // FORMS
     FORM_READ: '/mentoring/v1/form/read',
     GENERATE_OTP: '/user/v1/account/generateOtp',
@@ -81,6 +82,12 @@ export const urlConstants = {
     GET_PROFILE_DATA: '/interface/v1/profile/get/',
     DASHBOARD_REPORT_FILTER: "/mentoring/v1/reports/filterList?",
     DASHBOARD_REPORT_DATA: "/mentoring/v1/reports/reportData?",
+    REQUEST_SESSION: '/mentoring/v1/requestSessions/create',
+    REQUEST_SESSION_LIST: '/mentoring/v1/requestSessions/list',
+    REQUEST_SESSION_DETAILS: '/mentoring/v1/requestSessions/getDetails',
+    REQUEST_SESSION_USER_AVAILABILITY: '/mentoring/v1/requestSessions/userAvailability',
+    REQUEST_SESSION_ACCEPT: '/mentoring/v1/requestSessions/accept?SkipValidation=true',
+    REQUEST_SESSION_REJECT: '/mentoring/v1/requestSessions/reject',
     GETUSERIDBYRID:"/mentoring/v1/profile/externalIdMapping"
   }
 };

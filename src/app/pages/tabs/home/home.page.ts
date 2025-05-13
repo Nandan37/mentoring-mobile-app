@@ -158,9 +158,9 @@ export class HomePage implements OnInit {
     }
   }
   async getUser() {
-    let data = await this.profileService.getProfileDetailsFromAPI()
-    this.isMentor = this.profileService.isMentor
-    this.user = data
+    let data = await this.profileService.getProfileDetailsFromAPI();
+    this.isMentor = this.profileService.isMentor;
+    this.user = data;
     if (!this.user?.terms_and_conditions) {
       // this.openModal();
     }
@@ -184,7 +184,7 @@ export class HomePage implements OnInit {
   }
   async createSession() {
     if (this.user?.about != null || environment['isAuthBypassed']) {
-      this.router.navigate([`${CommonRoutes.CREATE_SESSION}`]); 
+      this.router.navigate([`${CommonRoutes.CREATE_SESSION}`], { queryParams: { source: 'home' } }); 
     } else {
       this.profileService.upDateProfilePopup()
     }

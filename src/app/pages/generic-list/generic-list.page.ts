@@ -243,7 +243,8 @@ export class GenericListPage implements OnInit {
         this.router.navigate([CommonRoutes.CHAT, event.rid],{queryParams:{id:event.data}});
         break;
       case 'requestSession':
-        this.toast.showToast('COMING_SOON', 'success');
+        this.router.navigate([CommonRoutes.SESSION_REQUEST], {queryParams: {data: event.data}});
+        break;
     }
   }
 

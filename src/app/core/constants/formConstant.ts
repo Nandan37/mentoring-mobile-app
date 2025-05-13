@@ -92,3 +92,8 @@ export const DASHBOARD_TABLE_META_KEYS ={
 	  "noSessions":"NO_SESSIONS",
 	  "noDataFound":"NO_SESSIONS_FOUND",
 	"cancel":"CANCEL"}
+
+export const REQUEST_SESSION_FORM: IFORM = {
+	"type": "requestSession",
+	"sub_type": "requestSessionForm",
+}
