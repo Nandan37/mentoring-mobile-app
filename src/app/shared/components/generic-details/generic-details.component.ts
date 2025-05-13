@@ -11,7 +11,10 @@ export class GenericDetailsComponent implements OnInit {
   @Output() onViewList = new EventEmitter();
   preResources = [];
   postResources = [];
+  isImageModalOpen = false;
+selectedImageUrl: string | null = null;
   constructor() { }
+  
   public isArray(arr:any ) {
     return Array.isArray(arr)
  }
@@ -36,5 +39,15 @@ export class GenericDetailsComponent implements OnInit {
       return 'pdf';
     }
     return 'other';
+  }
+
+  openImageModal(url: string) {
+    this.selectedImageUrl = url;
+    this.isImageModalOpen = true;
+  }
+  
+  closeImageModal() {
+    this.selectedImageUrl = null;
+    this.isImageModalOpen = false;
   }
 }

@@ -50,7 +50,7 @@ export class PrivatePage implements OnInit {
     {
       title: 'REQUESTS',
       action: 'requests',
-      icon: '/assets/images/request_icon_outline.svg',
+      icon: 'mail',
       class: 'hide-on-small-screen',
       url: CommonRoutes.TABS + '/' + CommonRoutes.REQUESTS,
       pageId: PAGE_IDS.requests,

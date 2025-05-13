@@ -37,28 +37,53 @@
 </div>
 <div *ngIf="preResources.length > 0">
   <p class="session-detail-heading" style="margin: 0 10px;">{{ 'PRE_RESOURCES' | translate }}</p>
-  <div *ngFor="let resource of preResources" class="resources-link">
-    <ng-container [ngSwitch]="getFileType(resource)">
-      <img *ngSwitchCase="'image'" [src]="resource.link" alt="{{ resource.name }}" style="max-width: 100%; height: auto;" />
-      <div *ngSwitchCase="'pdf'">
-        <img src="assets/icons/pdf-icon.png" alt="PDF Icon" style="width: 24px; vertical-align: middle;" />
-        <a [href]="resource.link" target="_blank">{{ resource.name }}</a>
-      </div>
-      <a *ngSwitchDefault [href]="resource.link" target="_blank">{{ resource.name }}</a>
-    </ng-container>
-  </div>
-</div>
+  <div  style="display: flex; flex-wrap: wrap;">
+    <div   *ngFor="let resource of preResources" 
+        class="resource-content">
+            <img *ngIf="resource.mime_type?.includes('image')" 
+                 [src]="resource.link" 
+                 alt="{{ resource.name }}" 
+                 (click)="openImageModal(resource.link)"
+                 class="clickable-image " />
+            <ng-container *ngIf="resource.mime_type?.includes('pdf') || resource.mime_type?.includes('other')"
+                 class="file-link" style="flex-direction: column;">
+              <a [href]="resource.link" target="_blank" class="truncate-text"><ion-icon name="document" style="width: 150px;height: 150px; vertical-align: middle;"></ion-icon></a>
+          </ng-container>
 
-<div *ngIf="postResources.length > 0 && sessionData?.data?.status?.value == 'COMPLETED'">
-  <p class="session-detail-heading" style="margin: 0 10px;">{{ 'POST_RESOURCES' | translate }}</p>
-  <div *ngFor="let resource of postResources" class="resources-link">
-    <ng-container [ngSwitch]="getFileType(resource)">
-      <img *ngSwitchCase="'image'" [src]="resource.link" alt="{{ resource.name }}" style="max-width: 100%; height: auto;" />
-      <div *ngSwitchCase="'pdf'">
-        <img src="assets/icons/pdf-icon.png" alt="PDF Icon" style="width: 24px; vertical-align: middle;" />
-        <a [href]="resource.link" target="_blank">{{ resource.name }}</a>
-      </div>
-      <a *ngSwitchDefault [href]="resource.link" target="_blank">{{ resource.name }}</a>
-    </ng-container>
-  </div>
+          <ng-container *ngIf="resource.mime_type?.includes('link')"
+          class="file-link" style="flex-direction: column;">
+       <a [href]="resource.link" target="_blank" class="truncate-text"><ion-icon name="link" style="width: 150px;height: 150px; vertical-align: middle;"></ion-icon></a>
+   </ng-container>
+    </div>
+    </div>
 </div>
+<div *ngIf="postResources.length > 0 && sessionData?.data?.status?.value === 'COMPLETED'">
+  <p class="session-detail-heading" style="margin: 0 10px;">{{ 'POST_RESOURCES' | translate }}</p>
+  <div  style="display: flex; flex-wrap: wrap;">
+      <div   *ngFor="let resource of postResources" 
+          class="resource-content">
+              <img *ngIf="resource.mime_type?.includes('image')" 
+                   [src]="resource.link" 
+                   alt="{{ resource.name }}" 
+                   (click)="openImageModal(resource.link)"
+                   class="clickable-image " />
+              <ng-container *ngIf="resource.mime_type?.includes('pdf') || resource.mime_type?.includes('other')"
+                   class="file-link" style="flex-direction: column;">
+                <a [href]="resource.link" target="_blank" class="truncate-text"><ion-icon name="document" style="width: 150px;height: 150px; vertical-align: middle;"></ion-icon></a>
+            </ng-container>
+
+            <ng-container *ngIf="resource.mime_type?.includes('link')"
+            class="file-link" style="flex-direction: column;">
+         <a [href]="resource.link" target="_blank" class="truncate-text"><ion-icon name="link" style="width: 150px;height: 150px; vertical-align: middle;"></ion-icon></a>
+     </ng-container>
+      </div>
+      </div>
+</div>
+<ion-modal [isOpen]="isImageModalOpen" (ionModalDidDismiss)="closeImageModal()">
+  <ng-template>
+    <ion-content>
+      <ion-img [src]="selectedImageUrl" style="width: 100%; height: auto;"></ion-img>
+    </ion-content>
+  </ng-template>
+</ion-modal>
+
