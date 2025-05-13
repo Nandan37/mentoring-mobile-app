@@ -636,6 +636,7 @@ openFilePicker(event) {
   async updateFormConfig() {
     const queryParams = this.route.snapshot.queryParams;
     const isManagePage = queryParams['source'] === 'manage';
+    const isHome = queryParams['source'] === 'home';
 
     if (isManagePage) {
       const hasPermission = await this.permissionService.hasPermission({
@@ -644,8 +645,12 @@ openFilePicker(event) {
       });
 
       this.formConfig = hasPermission ? MANAGERS_CREATE_SESSION_FORM : CREATE_SESSION_FORM;
-    } else {
+    } else if(isHome) {
       this.formConfig = CREATE_SESSION_FORM;
+    } else if(queryParams.isCreator) {
+      this.formConfig = CREATE_SESSION_FORM;
+    }else {
+      this.formConfig = MANAGERS_CREATE_SESSION_FORM;
     }
     
   }
