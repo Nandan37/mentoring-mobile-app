@@ -21,7 +21,7 @@ import * as _ from 'lodash-es';
 import { PermissionService } from '../../core/services/permission/permission.service';
 import { permissionModule } from 'src/app/core/constants/permissionsConstant';
 import { PAGE_IDS } from 'src/app/core/constants/page.ids';
-import { FrontendChatLibraryService } from 'frontend-chat-library-kiran';
+import { FrontendChatLibraryService } from 'sl-chat-library';
 @Component({
   selector: 'app-private',
   templateUrl: './private.page.html',

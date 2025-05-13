@@ -1071,7 +1071,7 @@
                       "options": [
                           {
                               "label": "Connected mentors",
-                              "value": "connected_mentors"
+                              "value": "true"
                           }
                       ]
                   }
@@ -1133,7 +1133,7 @@
                       "options": [
                           {
                               "label": "Connected mentees",
-                              "value": "connected_mentees"
+                              "value": "true"
                           }
                       ]
                   }

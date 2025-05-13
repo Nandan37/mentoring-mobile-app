@@ -19,7 +19,7 @@ import { TranslateService } from '@ngx-translate/core';
 import { UserListModalComponent } from 'src/app/shared/components/user-list-modal/user-list-modal.component';
 import { ModalController } from '@ionic/angular';
 import { environment } from 'src/environments/environment';
-import { FrontendChatLibraryService } from 'frontend-chat-library-kiran';
+import { FrontendChatLibraryService } from 'sl-chat-library';
 
 @Injectable({
   providedIn: 'root',

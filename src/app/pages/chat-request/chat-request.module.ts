@@ -9,7 +9,7 @@ import { ChatRequestPageRoutingModule } from './chat-request-routing.module';
 import { ChatRequestPage } from './chat-request.page';
 import { CoreModule } from 'src/app/core/core.module';
 import { SharedModule } from 'src/app/shared/shared.module';
-import { FrontendChatLibraryModule } from 'frontend-chat-library-kiran';
+import { FrontendChatLibraryModule } from 'sl-chat-library';
 @NgModule({
   imports: [
     CommonModule,

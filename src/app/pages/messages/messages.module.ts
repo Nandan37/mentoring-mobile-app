@@ -7,7 +7,7 @@ import { IonicModule } from '@ionic/angular';
 import { MessagesPageRoutingModule } from './messages-routing.module';
 
 import { MessagesPage } from './messages.page';
-import { FrontendChatLibraryModule } from 'frontend-chat-library-kiran';
+import { FrontendChatLibraryModule } from 'sl-chat-library';
 import { SharedModule } from 'src/app/shared/shared.module';
 
 @NgModule({
