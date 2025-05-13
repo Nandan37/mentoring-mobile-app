@@ -384,176 +384,281 @@
     "data": {
       "templateName": "defaultTemplate",
       "fields": {
-        "controls": [
-          {
-            "name": "title",
-            "label": "Session title",
-            "value": "",
-            "class": "ion-no-margin",
-            "type": "text",
-            "placeHolder": "Ex. Name of your session",
-            "position": "floating",
-            "errorMessage": {
-              "required": "Enter session title",
-              "pattern": "This field can only contain alphanumeric characters"
-            },
-            "validators": {
-              "required": true,
-              "maxLength": 255,
-              "pattern": "^[a-zA-Z0-9-.,s ]+$"
+                "controls": [
+                    {
+                        "name": "title",
+                        "label": "Session title",
+                        "value": "",
+                        "class": "ion-no-margin",
+                        "type": "text",
+                        "placeHolder": "Ex. Name of your session",
+                        "position": "floating",
+                        "errorMessage": {
+                            "required": "Enter session title",
+                            "pattern": "This field can only contain alphanumeric characters"
+                        },
+                        "validators": {
+                            "required": true,
+                            "maxLength": 255,
+                            "pattern": "^[a-zA-Z0-9-.,s ]+$"
+                        }
+                    },
+                    {
+                        "name": "description",
+                        "label": "Description",
+                        "value": "",
+                        "class": "ion-no-margin",
+                        "type": "textarea",
+                        "placeHolder": "Tell the community something about your session",
+                        "position": "floating",
+                        "errorMessage": {
+                            "required": "Enter description",
+                            "pattern": "This field can only contain alphanumeric characters"
+                        },
+                        "validators": {
+                            "required": true,
+                            "maxLength": 255,
+                            "pattern": "^[a-zA-Z0-9-.,s ]+$"
+                        }
+                    },
+                    {
+                        "name": "type",
+                        "label": "Session type",
+                        "class": "ion-no-margin",
+                        "type": "select",
+                        "dependedChild": "mentees",
+                        "value": "",
+                        "position": "floating",
+                        "info": [
+                            {
+                                "header": "Public session",
+                                "message": "Discoverable. Mentees can enroll and attend"
+                            },
+                            {
+                                "header": "Private session",
+                                "message": "Non-discoverable. Invited mentee can attend"
+                            }
+                        ],
+                        "errorMessage": {
+                            "required": "Please select your session type"
+                        },
+                        "validators": {
+                            "required": true
+                        },
+                        "meta": {
+                            "errorLabel": "Location",
+                            "disabledChildren": [
+                                "mentees",
+                                "mentor_id"
+                            ]
+                        },
+                        "multiple": false,
+                        "options": [
+                            {
+                                "label": "Private",
+                                "value": "PRIVATE"
+                            },
+                            {
+                                "label": "Public",
+                                "value": "PUBLIC"
+                            }
+                        ]
+                    },
+                    {
+                        "name": "mentees",
+                        "label": "Add mentee",
+                        "value": [],
+                        "class": "ion-no-margin",
+                        "disabled": true,
+                        "type": "search",
+                        "meta": {
+                            "multiSelect": true,
+                            "url": "MENTEES_LIST",
+                            "searchLabel": "Search for mentee",
+                            "searchData": [],
+                            "maxCount": "MAX_MENTEE_ENROLLMENT_COUNT",
+                            "labelForListButton": "View Mentee List",
+                            "labelForAddButton": "Add Mentee",
+                            "filters": {
+                                "entity_types": [
+                                    {
+                                        "key": "designation",
+                                        "label": "Designation",
+                                        "type": "checkbox"
+                                    }
+                                ],
+                                "organizations": [
+                                    {
+                                        "isEnabled": true,
+                                        "key": "organizations",
+                                        "type": "checkbox"
+                                    }
+                                ],
+                                "type": [
+                                    {
+                                        "isConnectionEnabled": true,
+                                        "key": "connected_mentees",
+                                        "type": "checkbox",
+                                        "title": "Type",
+                                        "name": "type",
+                                        "options": [
+                                            {
+                                                "label": "Connected mentees",
+                                                "value": "true"
+                                            }
+                                        ]
+                                    }
+                                ]
+                            },
+                            "filterType": "mentee",
+                            "addPopupType": "addUser"
+                        },
+                        "position": "floating",
+                        "info": [
+                            {
+                                "message": "Click to select Mentee(s) for this session"
+                            }
+                        ],
+                        "errorMessage": {
+                            "required": "Please add mentee for the session"
+                        },
+                        "validators": {
+                            "required": true
+                        }
+                    },
+                    {
+                        "name": "start_date",
+                        "label": "Start date",
+                        "class": "ion-no-margin",
+                        "value": "",
+                        "displayFormat": "DD/MMM/YYYY HH:mm",
+                        "dependedChild": "end_date",
+                        "type": "date",
+                        "placeHolder": "YYYY-MM-DD hh:mm",
+                        "errorMessage": {
+                            "required": "Enter start date"
+                        },
+                        "position": "floating",
+                        "validators": {
+                            "required": true
+                        }
+                    },
+                    {
+                        "name": "end_date",
+                        "label": "End date",
+                        "class": "ion-no-margin",
+                        "position": "floating",
+                        "value": "",
+                        "displayFormat": "DD/MMM/YYYY HH:mm",
+                        "dependedParent": "start_date",
+                        "type": "date",
+                        "placeHolder": "YYYY-MM-DD hh:mm",
+                        "errorMessage": {
+                            "required": "Enter end date"
+                        },
+                        "validators": {
+                            "required": true
+                        }
+                    },
+                    {
+                        "name": "recommended_for",
+                        "label": "Recommended for",
+                        "class": "ion-no-margin",
+                        "value": [],
+                        "type": "search",
+                        "position": "",
+                        "disabled": false,
+                        "errorMessage": {
+                            "required": "Enter recommended for"
+                        },
+                        "validators": {
+                            "required": true
+                        },
+                        "options": [],
+                        "meta": {
+                            "entityType": "recommended_for",
+                            "addNewPopupHeader": "Recommended for",
+                            "addNewPopupSubHeader": "Who is this session for?",
+                            "showSelectAll": true,
+                            "multiSelect": true,
+                            "showAddOption": {
+                                "showAddButton": true,
+                                "addChipLabel": ""
+                            },
+                            "allow_custom_entities": true,
+                            "allow_filtering": true,
+                            "addPopupType": "addCompetency",
+                            "labelForAddButton": "Select Recommended for"
+                        },
+                        "multiple": true
+                    },
+                    {
+                        "name": "categories",
+                        "label": "Categories",
+                        "class": "ion-no-margin",
+                        "value": [],
+                        "type": "search",
+                        "position": "",
+                        "disabled": false,
+                        "errorMessage": {
+                            "required": "Enter categories"
+                        },
+                        "validators": {
+                            "required": true
+                        },
+                        "options": [],
+                        "meta": {
+                            "entityType": "categories",
+                            "addNewPopupHeader": "Add new category",
+                            "addNewPopupSubHeader": "Categories for the session",
+                            "showSelectAll": true,
+                            "multiSelect": true,
+                            "showAddOption": {
+                                "showAddButton": true,
+                                "addChipLabel": ""
+                            },
+                            "allow_custom_entities": true,
+                            "allow_filtering": true,
+                            "addPopupType": "addCompetency",
+                            "labelForAddButton": "Select Categories"
+                        },
+                        "multiple": true
+                    },
+                    {
+                        "name": "medium",
+                        "label": "Medium",
+                        "alertLabel": "medium",
+                        "class": "ion-no-margin",
+                        "value": [],
+                        "type": "search",
+                        "position": "",
+                        "disabled": false,
+                        "errorMessage": {
+                            "required": "Enter select medium"
+                        },
+                        "validators": {
+                            "required": true
+                        },
+                        "options": [],
+                        "meta": {
+                            "entityType": "medium",
+                            "addNewPopupHeader": "Add new medium",
+                            "addNewPopupSubHeader": "Medium for the session",
+                            "showSelectAll": true,
+                            "multiSelect": true,
+                            "showAddOption": {
+                                "showAddButton": true,
+                                "addChipLabel": ""
+                            },
+                            "allow_custom_entities": true,
+                            "allow_filtering": true,
+                            "addPopupType": "addCompetency",
+                            "labelForAddButton": "Select Medium"
+                        },
+                        "multiple": true
+                    }
+                ]
             }
-          },
-          {
-            "name": "description",
-            "label": "Description",
-            "value": "",
-            "class": "ion-no-margin",
-            "type": "textarea",
-            "placeHolder": "Tell the community something about your session",
-            "position": "floating",
-            "errorMessage": {
-              "required": "Enter description",
-              "pattern": "This field can only contain alphanumeric characters"
-            },
-            "validators": {
-              "required": true,
-              "maxLength": 255,
-              "pattern": "^[a-zA-Z0-9-.,s ]+$"
-            }
-          },
-          {
-            "name": "start_date",
-            "label": "Start date",
-            "class": "ion-no-margin",
-            "value": "",
-            "displayFormat": "DD/MMM/YYYY HH:mm",
-            "dependedChild": "end_date",
-            "type": "date",
-            "placeHolder": "YYYY-MM-DD hh:mm",
-            "errorMessage": {
-              "required": "Enter start date"
-            },
-            "position": "floating",
-            "validators": {
-              "required": true
-            }
-          },
-          {
-            "name": "end_date",
-            "label": "End date",
-            "class": "ion-no-margin",
-            "position": "floating",
-            "value": "",
-            "displayFormat": "DD/MMM/YYYY HH:mm",
-            "dependedParent": "start_date",
-            "type": "date",
-            "placeHolder": "YYYY-MM-DD hh:mm",
-            "errorMessage": {
-              "required": "Enter end date"
-            },
-            "validators": {
-              "required": true
-            }
-          },
-          {
-            "name": "recommended_for",
-            "label": "Recommended for",
-            "class": "ion-no-margin",
-            "value": [],
-            "type": "search",
-            "position": "",
-            "disabled": false,
-            "errorMessage": {
-              "required": "Enter recommended for"
-            },
-            "validators": {
-              "required": true
-            },
-            "options": [],
-            "meta": {
-              "entityType": "recommended_for",
-              "addNewPopupHeader": "Recommended for",
-              "addNewPopupSubHeader": "Who is this session for?",
-              "showSelectAll": true,
-              "multiSelect": true,
-              "showAddOption": {
-                "showAddButton": true,
-                "addChipLabel": ""
-              },
-              "allow_custom_entities": true,
-              "allow_filtering": true,
-              "addPopupType": "addCompetency",
-              "labelForAddButton": "Select Recommended for"
-            },
-            "multiple": true
-          },
-          {
-            "name": "categories",
-            "label": "Categories",
-            "class": "ion-no-margin",
-            "value": [],
-            "type": "search",
-            "position": "",
-            "disabled": false,
-            "errorMessage": {
-              "required": "Enter categories"
-            },
-            "validators": {
-              "required": true
-            },
-            "options": [],
-            "meta": {
-              "entityType": "categories",
-              "addNewPopupHeader": "Add new category",
-              "addNewPopupSubHeader": "Categories for the session",
-              "showSelectAll": true,
-              "multiSelect": true,
-              "showAddOption": {
-                "showAddButton": true,
-                "addChipLabel": ""
-              },
-              "allow_custom_entities": true,
-              "allow_filtering": true,
-              "addPopupType": "addCompetency",
-              "labelForAddButton": "Select Categories"
-            },
-            "multiple": true
-          },
-          {
-            "name": "medium",
-            "label": "Medium",
-            "alertLabel": "medium",
-            "class": "ion-no-margin",
-            "value": [],
-            "type": "search",
-            "position": "",
-            "disabled": false,
-            "errorMessage": {
-              "required": "Enter select medium"
-            },
-            "validators": {
-              "required": true
-            },
-            "options": [],
-            "meta": {
-              "entityType": "medium",
-              "addNewPopupHeader": "Add new medium",
-              "addNewPopupSubHeader": "Medium for the session",
-              "showSelectAll": true,
-              "multiSelect": true,
-              "showAddOption": {
-                "showAddButton": true,
-                "addChipLabel": ""
-              },
-              "allow_custom_entities": true,
-              "allow_filtering": true,
-              "addPopupType": "addCompetency",
-              "labelForAddButton": "Select Medium"
-            },
-            "multiple": true
-          }
-        ]
-      }
     }
   },
   {

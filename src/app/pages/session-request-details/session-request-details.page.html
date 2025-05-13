@@ -88,7 +88,7 @@
         } @else if (apiResponse && apiResponse.user_details.user_id === apiResponse.requestor_id) {
           <ion-label class="text-left">{{"SLOT_AVAILABLE" | translate}}</ion-label>
         } @else {
-          <ion-label class="text-left"> {{"PLEASE_WAIT_FOR"}} {{apiResponse?.user_details?.name}} {{"RESPOND_TO_REQ" | translate}}</ion-label>
+          <ion-label class="text-left"> {{"PLEASE_WAIT_FOR" | translate}} {{apiResponse?.user_details?.name}} {{"RESPOND_TO_REQ" | translate}}</ion-label>
         }
       </ion-chip>
       
