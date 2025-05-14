@@ -88,10 +88,10 @@ export class SearchAndSelectComponent implements OnInit, ControlValueAccessor {
   removeFile(data:any,index:number) {
     if (this.control?.value ) {
       const updatedFiles = [...this.control.value];
-      updatedFiles.splice(index, 1);
-      if(this.control.name == 'pre' || this.control.name == 'post'){
-        this.httpService.get({url:urlConstants.API_URLS.RESOURCES_DELETE+this.control?.id+'?sessionId='+this.sessionId}).then((res:any) => {
+      if(data.id && this.control.name == 'pre' || this.control.name == 'post'){
+        this.httpService.get({url:urlConstants.API_URLS.RESOURCES_DELETE+data.id+'?sessionId='+this.sessionId}).then((res:any) => {
           if(res.responseCode == 'OK'){
+            updatedFiles.splice(index, 1);
             this.toast.showToast(this.translateService.instant('SESSION_RESOURCE_DELETE'), 'success');
             if (this.control.setValue) {
               this.control.setValue(updatedFiles);
@@ -106,12 +106,15 @@ export class SearchAndSelectComponent implements OnInit, ControlValueAccessor {
           this.toast.showToast(this.translateService.instant('FILE_NOT_DELETED'), 'danger');
         }
         );
-      }else 
+      }else{
+      updatedFiles.splice(index, 1);
       if (this.control.setValue) {
+        this.toast.showToast(this.translateService.instant('SESSION_RESOURCE_DELETE'), 'success');
         this.control.setValue(updatedFiles);
       } else {
         this.control.value = updatedFiles;
       }
+      } 
     }
   }
   
