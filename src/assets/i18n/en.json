@@ -315,7 +315,7 @@
     "PRIVATE_SESSIONS_CREATED": "Private Sessions created",
     "PUBLIC_SESSIONS_CREATED": "Public Sessions created",
     "SESSION_DETAILS": "Session details",
-    "MENTORING_SESSION_DETAILS":"Mentoring session details",
+    "MENTORING_SESSION_DETAILS":"Mentoring Session Details",
     "COMING_SOON":"Coming soon!",
     "END_DATE_LESS_THAN_STARTDATE":"End date should not be less than start date",
     "NO_SESSIONS_FOUND_TIME_PERIOD":"No sessions found in this time period",
