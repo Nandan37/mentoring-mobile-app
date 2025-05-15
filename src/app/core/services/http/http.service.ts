@@ -85,7 +85,9 @@ export class HttpService {
     if (!this.checkNetworkAvailability()) {
       throw Error(null);
     }
+    console.log("88 in service get");
     const headers = requestParam.headers ? requestParam.headers : await this.setHeaders();
+    console.log("headers", headers);
     const options = {
       url: this.baseUrl + requestParam.url,
       headers: headers,
@@ -164,7 +166,7 @@ export class HttpService {
   //token validation and logout 
 
   async getToken() {
-    let token = _.get(this.userService.token, 'access_token');
+    let token = localStorage.getItem('accToken');
     if (!token) {
       return null;
     }
@@ -179,7 +181,8 @@ export class HttpService {
       this.userService.token['access_token'] = access_token;
       await this.localStorage.setLocalData(localKeys.TOKEN, this.userService.token);
     }
-    let userToken = 'bearer ' + _.get(this.userService.token, 'access_token');
+    // let userToken = 'bearer ' + _.get(this.userService.token, 'access_token');
+    let userToken = token;
     return userToken;
   }
 

@@ -45,6 +45,7 @@ export class AuthService {
     }
     try {
       let data: any = await this.httpService.post(config);
+      
       await this.setUserInLocal(data);
       let user = await this.profileService.getProfileDetailsFromAPI();
       this.userService.userEvent.next(user);
@@ -77,10 +78,11 @@ export class AuthService {
     }
   }
   async setUserInLocal(data) {
-    const result = _.pick(data.result, ['refresh_token', 'access_token']);
-    if (!result.access_token) { throw Error(); };
-    this.userService.token = result;
-    await this.localStorage.setLocalData(localKeys.TOKEN, result);
+    // const result = _.pick(data.result, ['refresh_token', 'access_token']);
+    // if (!result.access_token || result?.accToken) { throw Error(); };
+    // this.userService.token = result;
+    // await this.localStorage.setLocalData(localKeys.TOKEN, result);
+
     this.user = data.result.user;
     await this.localStorage.setLocalData(localKeys.USER_ROLES, this.profileService.getUserRole(this.user))
     await this.profileService.getUserRole(this.user);
