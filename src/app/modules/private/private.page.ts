@@ -196,6 +196,12 @@ getUser() {
       this.router.navigate([`/${CommonRoutes.EDIT_PROFILE}`], { replaceUrl: true, queryParams: {redirectUrl: '/tabs/home'}});
     }
     this.isMentor = this.profile.isMentor;
+   let theme: any = localStorage.getItem('theme');
+   console.log(theme,"theme data from local");
+   if(theme){
+    document.documentElement.style.setProperty('--ion-color-primary', theme.primaryColor);
+    document.documentElement.style.setProperty('--ion-color-secondary', theme.secondaryColor);
+   }
   })
 }
 goToProfilePage(){
