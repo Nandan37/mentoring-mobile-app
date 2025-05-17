@@ -82,11 +82,10 @@ export class AuthService {
     // if (!result.access_token || result?.accToken) { throw Error(); };
     // this.userService.token = result;
     // await this.localStorage.setLocalData(localKeys.TOKEN, result);
-
-    this.user = data.result.user;
+    this.user = data;
     await this.localStorage.setLocalData(localKeys.USER_ROLES, this.profileService.getUserRole(this.user))
     await this.profileService.getUserRole(this.user);
-    this.profileService.isMentor = (this.user?.user_roles[0]?.title === 'mentor')
+    this.profileService.isMentor = (this.user?.organizations[0].roles[0]?.title === 'mentor')
     await this.localStorage.setLocalData(localKeys.SELECTED_LANGUAGE, this.user.preferred_language.value);
     this.translate.use(this.user.preferred_language.value)
     return this.user;

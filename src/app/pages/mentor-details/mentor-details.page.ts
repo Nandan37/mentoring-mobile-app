@@ -15,7 +15,7 @@ import { CommonRoutes } from 'src/global.routes';
 export class MentorDetailsPage implements OnInit {
   mentorId;
   public headerConfig: any = {
-    backButton: true,
+    backButton: false,
     headerColor: "primary"
   };
 
@@ -86,13 +86,15 @@ export class MentorDetailsPage implements OnInit {
   ) {
     routerParams.params.subscribe(params => {
       this.mentorId = this.buttonConfig.meta.id = params.id;
-      this.userService.getUserValue().then(async (result) => {
-        if (result) {
-          this.getMentor();
-        } else {
-          this.router.navigate([`/${CommonRoutes.AUTH}/${CommonRoutes.LOGIN}`], { queryParams: { mentorId: this.mentorId } })
-        }
-      })
+      this.getMentor();
+      // this.userService.getUserValue().then(async (result) => {
+      //   console.log(result,"resultresultresultresult");
+      //   if (result) {
+      //     this.getMentor();
+      //   } else {
+      //     this.router.navigate([`/${CommonRoutes.AUTH}/${CommonRoutes.LOGIN}`], { queryParams: { mentorId: this.mentorId } })
+      //   }
+      // })
     })
   }
 
@@ -117,6 +119,7 @@ export class MentorDetailsPage implements OnInit {
     };
     try {
       let data = await this.httpService.get(config);
+      console.log("data ----------", data);
       return data;
     }
     catch (error) {
