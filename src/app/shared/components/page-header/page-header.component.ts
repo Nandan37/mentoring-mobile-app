@@ -1,3 +1,4 @@
+import { Location } from '@angular/common';
 import { Component, Input, OnInit, Output, EventEmitter } from '@angular/core';
 
 @Component({
@@ -9,11 +10,15 @@ export class PageHeaderComponent implements OnInit {
   @Input() config: any;
   @Output() actionEvent = new EventEmitter();
 
-  constructor() {}
+  constructor(private location:Location) {}
 
   ngOnInit() {}
 
   onAction(event) {
     this.actionEvent.next(event);
+  }
+
+  onBack(){
+    this.location.back();
   }
 }
