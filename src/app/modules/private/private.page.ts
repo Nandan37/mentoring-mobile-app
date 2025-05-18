@@ -214,7 +214,7 @@ goToProfilePage(){
 }
 
 async menuItemAction(menu) {
-  this.router.navigate([menu.url]);
+  this.router.navigate([menu.url],{replaceUrl:true});
 }
 
 ngOnDestroy(): void {
