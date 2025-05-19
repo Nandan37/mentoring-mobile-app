@@ -90,7 +90,7 @@ export class SessionsPage implements OnInit {
   }
 
   onAction(event){
-    this.router.navigate([`/${CommonRoutes.SESSIONS_DETAILS}/${event.data._id}`]);
+    this.router.navigate([`/${CommonRoutes.SESSIONS_DETAILS}/${event.data._id}`],{replaceUrl:true});
   }
 
   async onJoin(event){
