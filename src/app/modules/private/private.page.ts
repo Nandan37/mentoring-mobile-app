@@ -184,6 +184,16 @@ logout(){
 }
 
 getUser() {
+  let theme: any = localStorage.getItem('theme');
+  if (theme) {
+    try {
+      theme = JSON.parse(theme);
+      document.documentElement.style.setProperty('--ion-color-primary', theme.primaryColor);
+      document.documentElement.style.setProperty('--ion-color-secondary', theme.secondaryColor);
+    } catch (error) {
+      console.error("Error parsing theme from localStorage:", error);
+    }
+  }
   this.profile.getProfileDetailsFromAPI().then(profileDetails => {
     if(profileDetails?.organizations && profileDetails?.organizations.length == 1){
       this.authService.setUserInLocal(profileDetails);
@@ -196,16 +206,7 @@ getUser() {
       this.router.navigate([`/${CommonRoutes.EDIT_PROFILE}`], { replaceUrl: true, queryParams: {redirectUrl: '/tabs/home'}});
     }
     this.isMentor = this.profile.isMentor;
-   let theme: any = localStorage.getItem('theme');
-   if (theme) {
-     try {
-       theme = JSON.parse(theme);
-       document.documentElement.style.setProperty('--ion-color-primary', theme.primaryColor);
-       document.documentElement.style.setProperty('--ion-color-secondary', theme.secondaryColor);
-     } catch (error) {
-       console.error("Error parsing theme from localStorage:", error);
-     }
-   }
+  
   })
 }
 goToProfilePage(){
