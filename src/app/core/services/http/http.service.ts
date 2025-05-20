@@ -14,6 +14,7 @@ import { FeedbackPage } from 'src/app/pages/feedback/feedback.page';
 import { CapacitorHttp } from '@capacitor/core';
 import { TranslateService } from '@ngx-translate/core';
 import { environment } from 'src/environments/environment';
+import { Router } from '@angular/router';
 
 
 @Injectable({
@@ -35,6 +36,7 @@ export class HttpService {
     private modalController: ModalController,
     private translate: TranslateService,
     private alert: AlertController,
+    private router : Router
   ) {  
     this.baseUrl = environment['baseUrl'];
   }
@@ -220,9 +222,13 @@ export class HttpService {
         this.toastService.showToast(msg ? msg : 'SOMETHING_WENT_WRONG', 'danger')
         break
       case 401:
-          this.triggerLogoutConfirmationAlert(result)
-
-        break
+        if (result.data.message && result.data.message.startsWith('Congratulations')) {
+          this.triggerLogoutConfirmationAlert(result);
+        } else {
+          localStorage.clear();
+          this.router.navigate([""]);
+        }
+        break;
       default:
         this.toastService.showToast(msg ? msg : 'SOMETHING_WENT_WRONG', 'danger')
     }
