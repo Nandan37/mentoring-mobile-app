@@ -103,6 +103,10 @@ export class PrivatePage implements OnInit {
 
  initializeApp() {
    this.platform.ready().then(() => {
+    let token = localStorage.getItem('accToken');
+    if(!token){
+      this.router.navigate([""], { replaceUrl: true });
+    }
      this.network.netWorkCheck();
      setTimeout(async ()=>{
        this.languageSetting();
