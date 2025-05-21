@@ -114,7 +114,7 @@ export class HomePage implements OnInit {
     if (this.user.about || environment['isAuthBypassed']) {
       switch (event.type) {
         case 'cardSelect':
-          this.router.navigate([`/${CommonRoutes.SESSIONS_DETAILS}/${event.data.id}`],{replaceUrl:true});
+          this.router.navigate([`/${CommonRoutes.SESSIONS_DETAILS}/${event.data.id}`]);
           break;
 
         case 'joinAction':

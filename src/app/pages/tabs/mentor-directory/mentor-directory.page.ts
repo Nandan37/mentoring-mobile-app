@@ -94,7 +94,7 @@ export class MentorDirectoryPage implements OnInit {
   eventAction(event){
     switch (event.type) {
       case 'cardSelect':
-        this.router.navigate([CommonRoutes.MENTOR_DETAILS, event?.data?.id],{replaceUrl:true});
+        this.router.navigate([CommonRoutes.MENTOR_DETAILS, event?.data?.id]);
         break;
     }
   }
@@ -106,7 +106,7 @@ export class MentorDirectoryPage implements OnInit {
     event.target.complete();
   }
   onSearch(){
-    this.router.navigate(['/' + CommonRoutes.MENTOR_SEARCH_DIRECTORY], { queryParams: { search: this.searchText,replaceUrl:true } });
+    this.router.navigate(['/' + CommonRoutes.MENTOR_SEARCH_DIRECTORY], { queryParams: { search: this.searchText} });
   }
   
 }
