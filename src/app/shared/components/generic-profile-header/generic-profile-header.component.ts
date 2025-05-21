@@ -28,7 +28,7 @@ export class GenericProfileHeaderComponent implements OnInit {
    }
 
   async ngOnInit() {
-    this.roles = this.headerData.user_roles;
+    this.roles = this.headerData.user_roles.filter((role: any) => role["title"] === "mentor");
   }
 
   async action(event) {
