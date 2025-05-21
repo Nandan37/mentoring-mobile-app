@@ -47,7 +47,7 @@
           </p>
         </div>
       </ion-row>
-      <ion-row class="d-flex flex-align-items-center meeting-platform" *ngIf="meetingPlatform?.platform == 'OFF' && isCreator && (data.status != 'COMPLETED')">
+      <ion-row class="d-flex flex-align-items-center meeting-platform" *ngIf="meetingPlatform?.platform == 'OFF' && isCreator && (data.status.value != 'COMPLETED')">
         <ion-icon name="videocam"></ion-icon>
         <div>
           <p class="platform-date-label">
