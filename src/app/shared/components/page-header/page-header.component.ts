@@ -1,5 +1,6 @@
 import { Location } from '@angular/common';
 import { Component, Input, OnInit, Output, EventEmitter } from '@angular/core';
+import { NavController } from '@ionic/angular';
 
 @Component({
   selector: 'app-page-header',
@@ -10,7 +11,7 @@ export class PageHeaderComponent implements OnInit {
   @Input() config: any;
   @Output() actionEvent = new EventEmitter();
 
-  constructor(private location:Location) {}
+  constructor(private location:NavController) {}
 
   ngOnInit() {}
 

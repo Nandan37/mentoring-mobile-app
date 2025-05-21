@@ -226,7 +226,7 @@ export class HttpService {
           this.triggerLogoutConfirmationAlert(result);
         } else {
           localStorage.clear();
-          this.router.navigate([""]);
+          location.href = environment.unauthorizedRedirectUrl;
         }
         break;
       default:
