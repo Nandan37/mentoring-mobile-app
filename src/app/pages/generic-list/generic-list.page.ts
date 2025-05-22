@@ -83,7 +83,7 @@ export class GenericListPage implements OnInit {
     this.getData(this.routeData);
     if (!this.searchText && this.isMentor && !this.totalCount) {
       this.noResult = NO_RESULT_FOUND_FOR_MENTOR;
-      this.enableExploreButton = true;
+      this.enableExploreButton = false;
     } else if (!this.searchText && !this.isMentor && !this.totalCount) {
       this.noResult = NO_RESULT_FOUND_FOR_MENTEE;
       this.enableExploreButton = true;
@@ -189,17 +189,19 @@ export class GenericListPage implements OnInit {
   }
 
   getUrlQueryData() {
-    const queryString = Object.keys(this.filteredDatas)
-      .map((key) => `${key}=${this.filteredDatas[key]}`)
-      .join('&');
-
-    this.urlQueryData = queryString;
+    const params = Object.entries(this.filteredDatas)
+      .filter(([_, value]) => value !== true && value !== false)
+      .map(([key, value]) => `${key}=${value}`);
+  
+    this.urlQueryData = params.join('&');
   }
+  
 
   removeChip(event) {
     this.chips.splice(event.index, 1);
     this.removeFilteredData(event.chipValue);
     this.getUrlQueryData();
+    this.getData(event);
   }
 
   removeFilteredData(chip: string) {
