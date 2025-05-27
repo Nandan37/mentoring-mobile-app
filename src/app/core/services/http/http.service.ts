@@ -165,7 +165,6 @@ export class HttpService {
     }
   }
 
-  //token validation and logout 
 
   async getToken() {
     let token = localStorage.getItem('accToken');
@@ -183,7 +182,6 @@ export class HttpService {
       this.userService.token['access_token'] = access_token;
       await this.localStorage.setLocalData(localKeys.TOKEN, this.userService.token);
     }
-    // let userToken = 'bearer ' + _.get(this.userService.token, 'access_token');
     let userToken = token;
     return userToken;
   }
@@ -222,10 +220,12 @@ export class HttpService {
         this.toastService.showToast(msg ? msg : 'SOMETHING_WENT_WRONG', 'danger')
         break
       case 401:
+        let auth = this.injector.get(AuthService);
         if (result.data.message && result.data.message.startsWith('Congratulations')) {
           this.triggerLogoutConfirmationAlert(result);
         } else {
           localStorage.clear();
+          auth.clearLocalData();
           location.href = environment.unauthorizedRedirectUrl;
         }
         break;
