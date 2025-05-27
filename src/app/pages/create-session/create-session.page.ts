@@ -263,7 +263,7 @@ export class CreateSessionPage implements OnInit {
           this.formData.controls[i].value = this.formData.controls[i].meta.searchData ? this.formData.controls[i].meta.searchData.map(obj => obj.id || obj.value) : [];
         } else {
           this.formData.controls[i].meta.searchData = [{
-            label: `${existingData.mentor_name}, ${existingData.organization.name}`,
+            label: `${existingData.mentor_name}, ${existingData.organization}`,
             id: existingData[this.formData.controls[i].name]
           }];
         }
