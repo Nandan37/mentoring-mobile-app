@@ -328,5 +328,12 @@
     "CHOOSE_A_DATE":"Choose a date",
     "NO_SESSIONS":"No sessions",
     "START_DATE":"Start date",
-    "END_DATE":"End date"
+    "END_DATE":"End date",
+    "PROFESSIONAL_ROLE":"Professional role",
+    "PROFESSIONAL_SUBROLE":"Professional subrole",
+    "STATE":"State",
+    "CLUSTER":"Cluster",
+    "DISTRICT":"District",
+    "BLOCK":"Block",
+    "SCHOOL":"School"
 }
