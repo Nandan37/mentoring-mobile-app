@@ -190,7 +190,7 @@ export class ProfileService {
   async upDateProfilePopup(msg:any = {header: 'UPDATE_PROFILE',message: 'PLEASE_UPDATE_YOUR_PROFILE_IN_ORDER_TO_PROCEED',cancel:'UPDATE',submit:'CANCEL'}){
     this.utilService.alertPopup(msg).then(async (data) => {
       if(!data){
-        this.router.navigate([`/${CommonRoutes.EDIT_PROFILE}`]);
+        this.router.navigate([`/${CommonRoutes.EDIT_PROFILE}`],{replaceUrl:true});
       }
     }).catch(error => {})
   }
