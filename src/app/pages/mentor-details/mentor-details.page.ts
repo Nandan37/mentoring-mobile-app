@@ -119,9 +119,11 @@ export class MentorDetailsPage implements OnInit {
     //   this.mentorId
     // );
   }
+
   async getMentor() {
     let user = await this.localStorage.getLocalData(localKeys.USER_DETAILS);
     this.mentorProfileData = await this.getMentorDetails();
+    this.updateButtonConfig();
     this.isloaded = true;
     this.userCantAccess =
       this.mentorProfileData?.responseCode == 'OK' ? false : true;
@@ -210,5 +212,24 @@ export class MentorDetailsPage implements OnInit {
         }
         break;
     }
+  }
+  private updateButtonConfig() {
+    this.buttonConfig.buttons = !this.mentorProfileData?.result?.is_mentor
+      ? [
+          {
+            label: 'CHAT',
+            action: 'chat',
+          },
+        ]
+      : [
+          {
+            label: 'CHAT',
+            action: 'chat',
+          },
+          {
+            label: 'REQUEST_SESSION',
+            action: 'requestSession',
+          },
+        ];
   }
 }
