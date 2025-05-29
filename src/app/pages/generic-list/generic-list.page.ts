@@ -1,4 +1,4 @@
-import { Component, OnInit, ViewChild, ViewEncapsulation } from '@angular/core';
+import { Component, Input, OnInit, ViewChild, ViewEncapsulation } from '@angular/core';
 import { MatPaginator } from '@angular/material/paginator';
 import { ActivatedRoute, Router } from '@angular/router';
 import { ModalController } from '@ionic/angular';
@@ -126,7 +126,7 @@ export class GenericListPage implements OnInit {
     }
     if (
       !this.responseData?.length &&
-      this.searchText &&
+      !this.searchText &&
       !this.filterChipsSelected
     ) {
       this.filterIcon = false;
@@ -167,6 +167,7 @@ export class GenericListPage implements OnInit {
         this.page = 1;
         this.setPaginatorToFirstpage = true;
         this.getData(this.urlQueryData);
+        this.filterIcon = true;
       }
     });
     modal.present();
@@ -257,4 +258,10 @@ export class GenericListPage implements OnInit {
   goToHome(){
     this.router.navigate([CommonRoutes.HOME]);
   }
+
+  showChipsAndFilter(): boolean {
+    this.filterIcon = true;
+    return !!this.responseData?.length || !!this.chips?.length || !!this.searchText || !!this.filterChipsSelected;
+  }
+  
 }
