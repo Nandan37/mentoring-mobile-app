@@ -8,11 +8,12 @@
 
     <h2 class="profile-name">{{apiResponse?.user_details?.name}}</h2>
     <p class="profile-description">
-      <ng-container *ngFor="let item of apiResponse?.user_details?.designation.slice(0,2); let i = index">
-        {{ item.label }}<span *ngIf="i < 1">, </span>
+      <ng-container *ngIf="apiResponse?.user_details?.designation?.length">
+        <ng-container *ngFor="let item of apiResponse.user_details.designation.slice(0,2); let last = last">
+          {{ item.label }}<span *ngIf="!last">, </span>
+        </ng-container>
       </ng-container>
     </p>
-
     <ion-button color="primary" (click)="viewProfile(apiResponse?.user_details?.user_id)">{{"VIEW_PROFILE" | translate}}</ion-button>
     <ion-text class="description">
       <h2 class="text-left">{{"AGENDA" | translate}}</h2>
