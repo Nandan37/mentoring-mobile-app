@@ -89,7 +89,7 @@ export class SessionRequestDetailsPage implements OnInit {
     })
   }
 
-  async reject(id:any) {
+  async reject(id:any, name: string) {  
     let msg = {
       header: 'Reject ?',
       message: 'Are you sure you want to reject the slot request ?',
@@ -99,7 +99,7 @@ export class SessionRequestDetailsPage implements OnInit {
         {
           name: 'reason',  
           type: 'textarea',
-          placeholder: 'Let NAME know why you are rejecting there slot...',
+          placeholder: `Let ${name} know why you are rejecting there slot...`,
         }
       ]
     };
