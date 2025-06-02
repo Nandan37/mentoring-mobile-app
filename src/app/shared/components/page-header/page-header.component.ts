@@ -5,7 +5,6 @@ import { NavController } from '@ionic/angular';
 import { PAGE_IDS } from 'src/app/core/constants/page.ids';
 import { environment } from 'src/environments/environment';
 import { CommonRoutes } from 'src/global.routes';
-
 @Component({
   selector: 'app-page-header',
   templateUrl: './page-header.component.html',
@@ -20,7 +19,6 @@ export class PageHeaderComponent implements OnInit {
   ) {}
 
   routes =[
-     { title: 'HOME', action: "home", icon: 'home', class:"hide-on-small-screen" , url: CommonRoutes.TABS+'/'+CommonRoutes.HOME, pageId: PAGE_IDS.home},
      { title: 'MENTORS', action: "mentor-directory", icon: 'people', class:"hide-on-small-screen", url: CommonRoutes.TABS+'/'+CommonRoutes.MENTOR_DIRECTORY, pageId: PAGE_IDS.mentorDirectory},
      { title: 'DASHBOARD', action: "dashboard", icon: 'stats-chart', class:"hide-on-small-screen", url: CommonRoutes.TABS+'/'+CommonRoutes.DASHBOARD, pageId: PAGE_IDS.dashboard },
      { title: 'HELP', action: "help", icon: 'help-circle', url: CommonRoutes.HELP, pageId: PAGE_IDS.help},
@@ -42,10 +40,12 @@ export class PageHeaderComponent implements OnInit {
     return  currentUrl.includes(route.url);
     }
     );
-    if (!isTabRoute) {
-      this.location.back();
-    } else {
+    console.log(currentUrl,"currentUrl");
+    console.log(currentUrl == `/${CommonRoutes.TABS}/${CommonRoutes.HOME}`,"currentUrl == `/${CommonRoutes.TABS}/${CommonRoutes.HOME}`");
+    if(currentUrl == `/${CommonRoutes.TABS}/${CommonRoutes.HOME}`){
       location.href =environment.unauthorizedRedirectUrl;
+    }else{
+      this.location.pop();
     }
   }
 }

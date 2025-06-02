@@ -86,7 +86,7 @@ export class AuthService {
     await this.localStorage.setLocalData(localKeys.USER_ROLES, this.profileService.getUserRole(this.user))
     await this.profileService.getUserRole(this.user);
     this.profileService.isMentor = (this.user?.organizations[0].roles[0]?.title === 'mentor')
-    await this.localStorage.setLocalData(localKeys.SELECTED_LANGUAGE, this.user.preferred_language.value);
+    await this.localStorage.setLocalData(localKeys.SELECTED_LANGUAGE, this.user.preferred_language);
     this.translate.use(this.user.preferred_language.value)
     return this.user;
   }
@@ -143,6 +143,7 @@ export class AuthService {
   }
 
   async clearLocalData(){
+    localStorage.clear();
     this.localStorage.delete(localKeys.USER_DETAILS);
     this.localStorage.delete(localKeys.USER_ROLES);
     this.localStorage.delete(localKeys.TOKEN);
