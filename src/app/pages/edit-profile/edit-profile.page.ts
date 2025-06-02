@@ -169,7 +169,7 @@ export class EditProfilePage implements OnInit, isDeactivatable {
         if(updated && this.redirectUrl){ 
           this.router.navigate([this.redirectUrl], { replaceUrl: true })
         }else{
-          this.location.back()
+        this.router.navigate([`/${CommonRoutes.TABS}/${CommonRoutes.HOME}`], { replaceUrl: true });
         }
       }
     } else {
