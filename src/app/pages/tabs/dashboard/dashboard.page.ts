@@ -99,7 +99,6 @@ export class DashboardPage implements OnInit {
     const endDateEpoch = this.endDate ? this.endDate.unix() : null;
     this.startDateEpoch = startDateEpoch;
     this.endDateEpoch = endDateEpoch;
-    console.log("102 calling prepareTableUrl, prepareChartUrl");
     this.prepareTableUrl();
     this.prepareChartUrl();
     if( this.filteredCards){
@@ -150,7 +149,6 @@ export class DashboardPage implements OnInit {
   }
 
   async handleRoleChange(e) {
-    console.log("Handle role change");
     this.selectedRole = e.detail.value;
     this.session_type = 'ALL';
     this.selectedDuration = 'month';
@@ -168,7 +166,6 @@ export class DashboardPage implements OnInit {
     this.chartBody = this.chartBodyConfig;
     this.calculateDuration();
     setTimeout(() => { 
-    console.log("Calling prepareChartUrl and prepareTableUrl in Handle role change");
       this.prepareChartUrl();
       this.prepareTableUrl();
       },100)
@@ -214,7 +211,6 @@ export class DashboardPage implements OnInit {
       const roleData = this.bigNumberFormData[this.selectedRole];
       const firstObject = this.transformData(roleData, formData);
       this.dynamicFormControls = firstObject.form.controls;
-      console.log(" this.dynamicFormControls",  this.dynamicFormControls);
   }
 
   transformData(firstObj: any, secondObj: any): any {
@@ -321,9 +317,6 @@ export class DashboardPage implements OnInit {
   setTimeout(() => {
   this.chartBody.tableUrl =  `${environment.baseUrl}${urlConstants.API_URLS.DASHBOARD_REPORT_DATA}` +'report_code='+ this.chartBody.table_report_code +queryParams;}, 10);
   this.chartBody.headers = await this.apiService.setHeaders();
-  console.log("prepareChartUrl :", this.chartBody.tableUrl);
-  console.log(" this.chartBody in prepareTableUrl -->", this.chartBody);
-
   }
   async prepareChartUrl(){
     this.chartBody.chartUrl ="";
@@ -339,9 +332,6 @@ export class DashboardPage implements OnInit {
   this.chartBody.chartUrl = `${environment.baseUrl}${urlConstants.API_URLS.DASHBOARD_REPORT_DATA}` + 'report_code='+ this.chartBody.report_code + queryParams;
   }, 10);
   this.chartBody.headers = await this.apiService.setHeaders();
-  console.log("prepareChartUrl :", this.chartBody.chartUrl);
-  console.log(" this.chartBody in prepareChartUrl -->", this.chartBody);
-
   }
 }
 
