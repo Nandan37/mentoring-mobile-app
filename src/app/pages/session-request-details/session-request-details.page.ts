@@ -72,6 +72,7 @@ export class SessionRequestDetailsPage implements OnInit {
   }
 
   accept(id:any){
+    
     this.sessionService.requestSessionAccept(id).then((res) => {
       if (res) {
         this.isAccepted = true;
@@ -83,23 +84,23 @@ export class SessionRequestDetailsPage implements OnInit {
               this.sessionDetails = res.result;
               this.isMeetingLinkAdded = true;
             })
-          }
+          } 
         });
       }
     })
   }
 
-  async reject(id:any) {
+  async reject(id:any, name: string) {  
     let msg = {
       header: 'Reject ?',
-      message: 'Are you sure you want to reject the slot request ?',
+      message: 'Are you sure you want to reject this session request?',
       cancel: 'CANCEL',
       submit: 'Reject',
       inputs: [
         {
           name: 'reason',  
           type: 'textarea',
-          placeholder: 'Let NAME know why you are rejecting there slot...',
+          placeholder: `Let ${name} know why you are rejecting there slot...`,
         }
       ]
     };

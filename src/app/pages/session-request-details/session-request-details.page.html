@@ -8,11 +8,12 @@
 
     <h2 class="profile-name">{{apiResponse?.user_details?.name}}</h2>
     <p class="profile-description">
-      <ng-container *ngFor="let item of apiResponse?.user_details?.designation.slice(0,2); let i = index">
-        {{ item.label }}<span *ngIf="i < 1">, </span>
+      <ng-container *ngIf="apiResponse?.user_details?.designation?.length">
+        <ng-container *ngFor="let item of apiResponse.user_details.designation.slice(0,2); let last = last">
+          {{ item.label }}<span *ngIf="!last">, </span>
+        </ng-container>
       </ng-container>
     </p>
-
     <ion-button color="primary" (click)="viewProfile(apiResponse?.user_details?.user_id)">{{"VIEW_PROFILE" | translate}}</ion-button>
     <ion-text class="description">
       <h2 class="text-left">{{"AGENDA" | translate}}</h2>
@@ -139,25 +140,34 @@
               {{"SCHEDULE" | translate}}
             </mat-panel-description>
           </mat-expansion-panel-header>
-          <div class="timeline">
-            <div class="timeline-item" *ngFor="let event of scheduledSessionDetals">
-              <div class="timeline-dot"></div>
-              <div class="timeline-date">
+          <div class="timeline" *ngFor="let event of scheduledSessionDetals">
+            <div class="timeline-date" >
                 {{event.date}}
-              </div>
-              <div class="timeline-card" *ngFor="let event of event.bookedSlots">
-                <ion-grid>
-                  <ion-row class="ion-align-items-center">
-                    <ion-col size-lg="3">
-                      <p class="margin-none text-left px-4">{{ event?.startTime }}</p> <br />
-                      <p class="margin-none text-left px-4">{{ event?.endTime }}</p>
-                    </ion-col>
-                    <ion-col size-lg="3"> <h3 class="margin-none session-title">{{event?.title}}</h3> </ion-col>
-                  </ion-row>
-                </ion-grid>
-              </div>
+            </div>
+           
+           <div class="timeline-description">
+            <div style="position: relative; width: 5%; display: flex; justify-content: center;">
+              <div class="timeline-dot"></div>
               <div class="timeline-line"></div>
             </div>
+            <div class="timeline-cards">
+              <div class="timeline-card" *ngFor="let event of event.bookedSlots">
+
+                <ion-row class="px-4">
+                  <ion-col size="3">
+                    <p class="margin-none text-left ">{{ event?.startTime }}</p> <br />
+                    <p class="margin-none text-left ">{{ event?.endTime }}</p>
+                  </ion-col>
+                  <ion-col size="9" class="d-flex  ion-align-items-center"> <h3 class="margin-none session-title text-left">{{event?.title}}</h3> </ion-col>
+                </ion-row>
+            </div>
+            </div>
+           
+           
+           </div>
+             
+            
+          
           </div>
           
         </mat-expansion-panel>
@@ -172,7 +182,7 @@
         <ion-button shape="round" color="light" (click)="accept(apiResponse?.id)" class="height-0">
           <ion-icon style="color: var(--green);" name="checkmark-outline" slot="start"></ion-icon> {{"ACCEPT" | translate}}
         </ion-button>
-        <ion-button shape="round" color="light" (click)="reject(apiResponse?.id)" class="height-0">
+        <ion-button shape="round" color="light" (click)="reject(apiResponse?.id, apiResponse?.user_details?.name)" class="height-0">
           <ion-icon style="color:  var(--red);" name="checkmark-outline" slot="start"></ion-icon> {{"REJECT" | translate}}
         </ion-button>
       </div>

@@ -1,4 +1,7 @@
-<ion-card class="shadow-with-radious generic-card" (click)="handleButtonClick('viewMessage', data)">
+<ion-card
+  class="shadow-with-radious generic-card"
+  (click)="handleButtonClick('viewMessage', data)"
+>
   <div class="generic-card-header d-grid" *ngIf="meta">
     <div class="d-flex flex-align-items-center mx-10">
       <ion-icon
@@ -16,22 +19,16 @@
       <ng-template #timeIcon>
         <ion-icon name="time"></ion-icon>
       </ng-template>
-    
-      <ng-container *ngIf="meta.message else timeBlock">
+
+      <ng-container *ngIf="meta.message; else timeBlock">
         <p class="max-width-70" style="margin: 2px 5px">{{ meta.message }}</p>
       </ng-container>
-    
+
       <ng-template #timeBlock>
-        <small style="padding-left: 5px;">
-          {{
-            meta.resp.start_date * 1000 | date: 'dd MMM, yyyy'
-          }},
-          {{
-            meta.resp.start_date * 1000 | date: 'h:mm a'
-          }} -
-          {{
-            meta.resp.end_date * 1000 | date: 'h:mm a'
-          }}
+        <small style="padding-left: 5px">
+          {{ meta.resp.start_date * 1000 | date : "dd MMM, yyyy" }},
+          {{ meta.resp.start_date * 1000 | date : "h:mm a" }} -
+          {{ meta.resp.end_date * 1000 | date : "h:mm a" }}
         </small>
       </ng-template>
     </div>
@@ -40,7 +37,8 @@
     <ion-row>
       <ion-col class="columns" size="4" no-padding>
         <div class="d-flex flex-justify-center">
-          <img (click)="onCardClick(data);   $event.stopPropagation()"
+          <img
+            (click)="onCardClick(data); $event.stopPropagation()"
             class="profile-img"
             [src]="data?.image ? data.image : 'assets/prof-img/user.png'"
           />
@@ -48,11 +46,20 @@
       </ion-col>
       <ion-col class="columns" size="8" no-padding>
         <ion-item lines="none" class="ion-item-padding-none">
-          <ion-label class="auto-margin" (click)="onCardClick(data);   $event.stopPropagation()">
-            <h4 class="margin-none">{{ data?.name || data?.title }}</h4>
+          <ion-label
+            class="auto-margin"
+            (click)="onCardClick(data); $event.stopPropagation()"
+          >
+            <h4 class="margin-none wrap-text">
+              {{ data?.name || data?.title }}
+            </h4>
             <div class="d-flex">
-              <p class="max-width-50" *ngIf="data?.designation?.length">{{ data?.designation[0]?.label }}</p>
-              <p class="max-width-50" *ngIf="data.experience">({{ data?.experience }} years)</p>
+              <p class="wrap-text" *ngIf="data?.designation?.length">
+                {{ data?.designation[0]?.label }}
+              </p>
+              <p class="max-width-50" *ngIf="data.experience">
+                ({{ data?.experience }} years)
+              </p>
             </div>
           </ion-label>
         </ion-item>
