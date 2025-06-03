@@ -80,8 +80,12 @@ export class HomePage implements OnInit {
       })
     });
     let isRoleRequested = await this.localStorage.getLocalData(localKeys.IS_ROLE_REQUESTED)
-    let isBecomeMentorTileClosed = await this.localStorage.getLocalData(localKeys.IS_BECOME_MENTOR_TILE_CLOSED)
-    this.showBecomeMentorCard = isRoleRequested || this.profileService.isMentor || isBecomeMentorTileClosed ? false : true;
+    let isBecomeMentorTileClosed = await this.localStorage.getLocalData(localKeys.IS_BECOME_MENTOR_TILE_CLOSED);
+    console.log(isRoleRequested,"isRoleRequested");
+    console.log(this.profileService.isMentor,"this.profileService.isMentor");
+    console.log(isBecomeMentorTileClosed,"isBecomeMentorTileClosed");
+    this.showBecomeMentorCard = (isRoleRequested || this.profileService.isMentor || isBecomeMentorTileClosed) ? false : true;
+    console.log( this.showBecomeMentorCard ,"isBecomeMentorTileClosed");
 
     if(this.profileService.isMentor){
       this.getCreatedSessionDetails();

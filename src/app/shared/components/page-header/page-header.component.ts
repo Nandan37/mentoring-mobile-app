@@ -41,11 +41,12 @@ export class PageHeaderComponent implements OnInit {
     }
     );
     console.log(currentUrl,"currentUrl");
-    console.log(currentUrl == `/${CommonRoutes.TABS}/${CommonRoutes.HOME}`,"currentUrl == `/${CommonRoutes.TABS}/${CommonRoutes.HOME}`");
-    if(currentUrl == `/${CommonRoutes.TABS}/${CommonRoutes.HOME}`){
-      location.href =environment.unauthorizedRedirectUrl;
-    }else{
-      this.location.pop();
-    }
+    this.location.back();
+    // console.log(currentUrl == `/${CommonRoutes.TABS}/${CommonRoutes.HOME}`,"currentUrl == `/${CommonRoutes.TABS}/${CommonRoutes.HOME}`");
+    // if(currentUrl == `/${CommonRoutes.TABS}/${CommonRoutes.HOME}`){
+    //   location.href =environment.unauthorizedRedirectUrl;
+    // }else{
+    //   this.location.pop();
+    // }
   }
 }
