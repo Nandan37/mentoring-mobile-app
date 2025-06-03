@@ -33,6 +33,7 @@ export class SessionRequestPage implements OnInit {
     this.formData = _.get(result, 'data.fields');
   }
 
+ 
   public headerConfig: any = {
     backButton: true,
     label: "Set agenda",
@@ -55,7 +56,10 @@ export class SessionRequestPage implements OnInit {
           this.router.navigate([`/${CommonRoutes.TABS}/${CommonRoutes.REQUESTS}`]);
           this.toast.showToast(res.message, "success");
           this.isSubmited = true;
+          this.form1.reset();
         }}).catch((err) => {});
+
+      
     }
   }
 
