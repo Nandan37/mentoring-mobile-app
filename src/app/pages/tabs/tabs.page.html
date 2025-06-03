@@ -12,7 +12,7 @@
       <ion-label>{{'MENTORS' | translate}}</ion-label>
     </ion-tab-button>
 
-    <ion-tab-button tab="requests" *ngIf="allowTemplateView(PAGE_IDS.requests)">
+    <!-- <ion-tab-button tab="requests" *ngIf="allowTemplateView(PAGE_IDS.requests)">
       <ng-container *ngIf="isCustomIcon(customIcon); else defaultIcon">
         <img [src]="customIcon" style="width: 32px; height: 32px;"/>
       </ng-container>
@@ -20,7 +20,7 @@
         <ion-icon name="chatbubble-ellipses" style="font-size: 32px;"></ion-icon>
       </ng-template>
       <ion-label>{{ 'REQUESTS' | translate }}</ion-label>
-    </ion-tab-button>
+    </ion-tab-button> -->
     <ion-tab-button tab="dashboard" *allowTemplateView="PAGE_IDS.dashboard">
       <ion-icon name="stats-chart-sharp" size="large"></ion-icon>
       <ion-label>{{'DASHBOARD' | translate}}</ion-label>
