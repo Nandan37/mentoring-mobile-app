@@ -346,7 +346,7 @@
     "RECIEVED_MESSAGE_REQ_INFO_TITLE":"{{name}} wants to send you a message",
     "RECIEVED_MESSAGE_REQ_INFO_SUB_TITLE":"If you accept, {{name}} will also be added to your connections.",
     "REQUESTS": "Requests",
-    "SLOT_REQUESTS": "Slot requests",
+    "SLOT_REQUESTS": "Session requests",
     "MESSAGE_REQUESTS": "Message requests",
     "SENT": "Sent",
     "RECEIVED": "Received",
