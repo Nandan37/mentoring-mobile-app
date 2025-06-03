@@ -50,9 +50,9 @@ export class TabsPage {
       this.activeTab.dispatchEvent(new CustomEvent(eventName));
     }
   }
-  allowTemplateView(page) {
-    return !environment.restictedPages.includes(page);
-  }
+  // allowTemplateView(page) {
+  //   return !environment.restictedPages.includes(page);
+  // }
 
   isCustomIcon(icon: string): boolean {
     return icon ? /\.(svg|png|jpg|jpeg|gif)$/.test(icon) : false;

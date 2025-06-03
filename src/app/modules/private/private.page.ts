@@ -51,7 +51,6 @@ export class PrivatePage implements OnInit {
       title: 'REQUESTS',
       action: 'requests',
       icon: 'mail',
-      class: 'hide-on-small-screen',
       url: CommonRoutes.TABS + '/' + CommonRoutes.REQUESTS,
       pageId: PAGE_IDS.requests,
     },

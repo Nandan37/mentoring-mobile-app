@@ -82,7 +82,10 @@ export class SessionRequestDetailsPage implements OnInit {
             this.sessionService.getSessionDetailsAPI(this.apiResponse.session_id).then((res) => {
               this.sessionDetails = res.result;
               this.isMeetingLinkAdded = true;
-            })
+            });
+            this.sessionService.requestSessionUserAvailability().then((res) => {
+            this.scheduledSessionDetals = res.result;
+          });
           }
         });
       }

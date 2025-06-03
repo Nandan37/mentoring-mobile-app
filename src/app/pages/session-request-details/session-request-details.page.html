@@ -17,13 +17,13 @@
     <ion-text class="description">
       <h2 class="text-left">{{"AGENDA" | translate}}</h2>
       <p style="margin: 0px;" class="text-left">
-        {{ showFullText ? apiResponse.agenda : apiResponse.agenda | slice:0:200 }}{{ apiResponse.agenda.length > 200 && !showFullText ? '...' : '' }}
+        {{ showFullText ? apiResponse.agenda : apiResponse.agenda | slice:0:150 }}{{ apiResponse.agenda.length > 150 && !showFullText ? '...' : '' }}
       </p>
     </ion-text>
-    
-    <ion-label 
-      *ngIf="apiResponse.agenda.length > 200" 
-      class="viewMore" 
+
+    <ion-label
+      *ngIf="apiResponse.agenda.length > 150" 
+      class="viewMore"
       (click)="toggleText()">
       {{ showFullText ? 'View Less' : 'View More' }}
     </ion-label>    
@@ -88,7 +88,7 @@
         } @else if (apiResponse && apiResponse.user_details.user_id === apiResponse.requestor_id) {
           <ion-label class="text-left">{{"SLOT_AVAILABLE" | translate}}</ion-label>
         } @else {
-          <ion-label class="text-left"> {{"PLEASE_WAIT_FOR" | translate}} {{apiResponse?.user_details?.name}} {{"RESPOND_TO_REQ" | translate}}</ion-label>
+          <ion-label class="text-left"> {{ "PENDING" | translate}}</ion-label>
         }
       </ion-chip>
       
@@ -122,8 +122,8 @@
           <ion-footer>
             <ion-toolbar>
               <div class="w-full flex flex-justify-flex-end">
-                <ion-button color="primary"[disabled]="platformForm && !platformForm.myForm.valid" (click)="addNow()">Add now</ion-button>
-                <ion-button color="primary" (click)="addLater()">Add later</ion-button>
+                <ion-button color="primary"[disabled]="platformForm && !platformForm.myForm.valid" (click)="addNow()">{{"ADD_NOW" | translate}}</ion-button>
+                <ion-button color="primary" (click)="addLater()">{{"ADD_LATER" | translate}}</ion-button>
               </div>
             </ion-toolbar>
           </ion-footer>
