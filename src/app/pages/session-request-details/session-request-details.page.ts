@@ -71,7 +71,8 @@ export class SessionRequestDetailsPage implements OnInit {
     this.showFullText = !this.showFullText;
   }
 
-  accept(id:any){
+  accept(id:any, name: string){
+    
     this.sessionService.requestSessionAccept(id).then((res) => {
       if (res) {
         this.isAccepted = true;
@@ -82,8 +83,9 @@ export class SessionRequestDetailsPage implements OnInit {
             this.sessionService.getSessionDetailsAPI(this.apiResponse.session_id).then((res) => {
               this.sessionDetails = res.result;
               this.isMeetingLinkAdded = true;
+              this.toast.showToast(`You have accepted this session. ${name} has been added to your connections.`, 'success');
             })
-          }
+          } 
         });
       }
     })
@@ -92,7 +94,7 @@ export class SessionRequestDetailsPage implements OnInit {
   async reject(id:any, name: string) {  
     let msg = {
       header: 'Reject ?',
-      message: 'Are you sure you want to reject the slot request ?',
+      message: 'Are you sure you want to reject this session request?',
       cancel: 'CANCEL',
       submit: 'Reject',
       inputs: [
