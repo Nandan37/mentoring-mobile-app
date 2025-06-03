@@ -71,7 +71,7 @@ export class SessionRequestDetailsPage implements OnInit {
     this.showFullText = !this.showFullText;
   }
 
-  accept(id:any, name: string){
+  accept(id:any){
     
     this.sessionService.requestSessionAccept(id).then((res) => {
       if (res) {
@@ -83,7 +83,6 @@ export class SessionRequestDetailsPage implements OnInit {
             this.sessionService.getSessionDetailsAPI(this.apiResponse.session_id).then((res) => {
               this.sessionDetails = res.result;
               this.isMeetingLinkAdded = true;
-              this.toast.showToast(`You have accepted this session. ${name} has been added to your connections.`, 'success');
             })
           } 
         });

@@ -179,7 +179,7 @@
   <ion-toolbar>
     <ng-container *ngIf="!isAccepted && apiResponse.status === 'REQUESTED'; else templateA">
       <div class="w-full flex flex-justify-space-around">
-        <ion-button shape="round" color="light" (click)="accept(apiResponse?.id, apiResponse?.user_details?.name)" class="height-0">
+        <ion-button shape="round" color="light" (click)="accept(apiResponse?.id)" class="height-0">
           <ion-icon style="color: var(--green);" name="checkmark-outline" slot="start"></ion-icon> {{"ACCEPT" | translate}}
         </ion-button>
         <ion-button shape="round" color="light" (click)="reject(apiResponse?.id, apiResponse?.user_details?.name)" class="height-0">
