@@ -59,9 +59,10 @@ export class HttpService {
   }
 
   async post(requestParam: RequestParams) {
-    if (!this.checkNetworkAvailability()) {
-      throw Error(null);
-    }
+    if (!(await this.checkNetworkAvailability())) {
+  throw Error(null);
+}
+
     let defaultHeaders = await this.setHeaders();
     const headers = requestParam.headers ?  { ...requestParam.headers, ...defaultHeaders } : defaultHeaders;
     let body = requestParam.payload ? requestParam.payload : {};
@@ -82,9 +83,9 @@ export class HttpService {
   }
 
   async get(requestParam: RequestParams) {
-    if (!this.checkNetworkAvailability()) {
-      throw Error(null);
-    }
+    if (!(await this.checkNetworkAvailability())) {
+  throw Error(null);
+}
     const headers = requestParam.headers ? requestParam.headers : await this.setHeaders();
     const options = {
       url: this.baseUrl + requestParam.url,
@@ -108,9 +109,9 @@ export class HttpService {
   }
 
   async delete(requestParam: RequestParams) {
-    if (!this.checkNetworkAvailability()) {
-      throw Error(null);
-    }
+    if (!(await this.checkNetworkAvailability())) {
+  throw Error(null);
+}
     const headers = requestParam.headers ? requestParam.headers : await this.setHeaders();
     const options = {
       url: this.baseUrl + requestParam.url,
@@ -129,9 +130,9 @@ export class HttpService {
   }
 
   async patch(requestParam: RequestParams) {
-    if (!this.checkNetworkAvailability()) {
-      throw Error(null);
-    }
+    if (!(await this.checkNetworkAvailability())) {
+  throw Error(null);
+}
     let body = requestParam.payload ? requestParam.payload : {};
     const headers = requestParam.headers ? requestParam.headers : await this.setHeaders();
     const options = {
@@ -184,9 +185,9 @@ export class HttpService {
   }
 
   async getAccessToken() {
-    if (!this.checkNetworkAvailability()) {
-      throw Error(null);
-    }
+    if (!(await this.checkNetworkAvailability())) {
+  throw Error(null);
+}
     const options = {
       url: this.baseUrl + urlConstants.API_URLS.REFRESH_TOKEN,
       headers: {
