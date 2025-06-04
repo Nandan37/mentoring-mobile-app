@@ -106,7 +106,8 @@ export class HomePage implements OnInit {
     this.gotToTop();
     let isRoleRequested = await this.localStorage.getLocalData(localKeys.IS_ROLE_REQUESTED)
     let isBecomeMentorTileClosed =await this.localStorage.getLocalData(localKeys.IS_BECOME_MENTOR_TILE_CLOSED);
-    this.showBecomeMentorCard = isRoleRequested || this.profileService.isMentor || isBecomeMentorTileClosed ? false : true;
+    this.showBecomeMentorCard = (isRoleRequested || this.profileService.isMentor || isBecomeMentorTileClosed) ? false : true;
+    this.ckdk.detectChanges();
     var obj = { page: this.page, limit: this.limit, searchText: "" };
     this.isMentor = this.profileService.isMentor;
     this.createdSessions = this.isMentor ? await this.sessionService.getAllSessionsAPI(obj) : []
