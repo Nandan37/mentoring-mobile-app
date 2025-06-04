@@ -1,5 +1,5 @@
 import { HttpClient } from '@angular/common/http';
-import { ChangeDetectorRef, Component, OnInit, ViewChild } from '@angular/core';
+import { Component, OnInit, ViewChild } from '@angular/core';
 import { JsonFormData } from 'src/app/shared/components/dynamic-form/dynamic-form.component';
 import { CommonRoutes } from 'src/global.routes';
 import { ModalController, NavController, IonContent } from '@ionic/angular';
@@ -61,15 +61,13 @@ export class HomePage implements OnInit {
     private localStorage: LocalStorageService,
     private toast: ToastService,
     private permissionService: PermissionService,
-    private utilService: UtilService,
-  private ckdk : ChangeDetectorRef) { }
+    private utilService: UtilService) { }
 
   async ngOnInit() {
     await this.getUser();
     if(this.user && !this.user.profile_mandatory_fields.length){
       this.getSessions();
     }
-    this.isMentor = this.profileService.isMentor
     App.addListener('appStateChange', (state: AppState) => {
       this.localStorage.getLocalData(localKeys.USER_DETAILS).then(data => {
         if (state.isActive == true && data && !data.profile_mandatory_fields.length) {
@@ -83,7 +81,6 @@ export class HomePage implements OnInit {
     let isRoleRequested = await this.localStorage.getLocalData(localKeys.IS_ROLE_REQUESTED)
     let isBecomeMentorTileClosed = await this.localStorage.getLocalData(localKeys.IS_BECOME_MENTOR_TILE_CLOSED);
     this.showBecomeMentorCard = (isRoleRequested || this.profileService.isMentor || isBecomeMentorTileClosed) ? false : true;
-    this.ckdk.detectChanges();
     if(this.profileService.isMentor){
       this.getCreatedSessionDetails();
     }
@@ -103,13 +100,12 @@ export class HomePage implements OnInit {
   }
 
   async ionViewWillEnter() {
+    await this.getUser();
     this.gotToTop();
     let isRoleRequested = await this.localStorage.getLocalData(localKeys.IS_ROLE_REQUESTED)
     let isBecomeMentorTileClosed =await this.localStorage.getLocalData(localKeys.IS_BECOME_MENTOR_TILE_CLOSED);
     this.showBecomeMentorCard = (isRoleRequested || this.profileService.isMentor || isBecomeMentorTileClosed) ? false : true;
-    this.ckdk.detectChanges();
     var obj = { page: this.page, limit: this.limit, searchText: "" };
-    this.isMentor = this.profileService.isMentor;
     this.createdSessions = this.isMentor ? await this.sessionService.getAllSessionsAPI(obj) : []
   }
   async eventAction(event) {
