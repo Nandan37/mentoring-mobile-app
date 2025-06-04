@@ -41,7 +41,7 @@
     </div>
   </ion-grid>
 </ng-template>
-<ion-card *ngIf="!profileService.isMentor && showBecomeMentorCard" class="ion-padding card-config">
+<ion-card *ngIf="!isMentor && showBecomeMentorCard" class="ion-padding card-config">
   <ion-card-header class="ion-no-padding d-flex flex-align-items-center flex-justify-space-between">
     <ion-label class="header-label">{{"CONNECT_SHARE_&_INSPIRE"|translate}}</ion-label>
     <div class="round-icon-button d-flex flex-align-items-center flex-justify-center" (click)="closeCard()">
