@@ -40,13 +40,10 @@ export class PageHeaderComponent implements OnInit {
     return  currentUrl.includes(route.url);
     }
     );
-    console.log(currentUrl,"currentUrl");
-    this.location.back();
-    // console.log(currentUrl == `/${CommonRoutes.TABS}/${CommonRoutes.HOME}`,"currentUrl == `/${CommonRoutes.TABS}/${CommonRoutes.HOME}`");
-    // if(currentUrl == `/${CommonRoutes.TABS}/${CommonRoutes.HOME}`){
-    //   location.href =environment.unauthorizedRedirectUrl;
-    // }else{
-    //   this.location.pop();
-    // }
+    if(currentUrl == `/${CommonRoutes.TABS}/${CommonRoutes.HOME}`){
+      location.href =environment.unauthorizedRedirectUrl;
+    }else{
+      this.location.pop();
+    }
   }
 }
