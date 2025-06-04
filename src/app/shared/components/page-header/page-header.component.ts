@@ -41,7 +41,7 @@ export class PageHeaderComponent implements OnInit {
     }
     );
     if(currentUrl == `/${CommonRoutes.TABS}/${CommonRoutes.HOME}`){
-      location.href =environment.unauthorizedRedirectUrl;
+      window.location.href = `${environment.unauthorizedRedirectUrl}/home`;
     }else{
       this.location.pop();
     }
