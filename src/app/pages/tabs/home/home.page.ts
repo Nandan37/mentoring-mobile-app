@@ -1,5 +1,5 @@
 import { HttpClient } from '@angular/common/http';
-import { Component, OnInit, ViewChild } from '@angular/core';
+import { ChangeDetectorRef, Component, OnInit, ViewChild } from '@angular/core';
 import { JsonFormData } from 'src/app/shared/components/dynamic-form/dynamic-form.component';
 import { CommonRoutes } from 'src/global.routes';
 import { ModalController, NavController, IonContent } from '@ionic/angular';
@@ -61,7 +61,8 @@ export class HomePage implements OnInit {
     private localStorage: LocalStorageService,
     private toast: ToastService,
     private permissionService: PermissionService,
-    private utilService: UtilService) { }
+    private utilService: UtilService,
+  private ckdk : ChangeDetectorRef) { }
 
   async ngOnInit() {
     await this.getUser();
@@ -81,12 +82,8 @@ export class HomePage implements OnInit {
     });
     let isRoleRequested = await this.localStorage.getLocalData(localKeys.IS_ROLE_REQUESTED)
     let isBecomeMentorTileClosed = await this.localStorage.getLocalData(localKeys.IS_BECOME_MENTOR_TILE_CLOSED);
-    console.log(isRoleRequested,"isRoleRequested");
-    console.log(this.profileService.isMentor,"this.profileService.isMentor");
-    console.log(isBecomeMentorTileClosed,"isBecomeMentorTileClosed");
     this.showBecomeMentorCard = (isRoleRequested || this.profileService.isMentor || isBecomeMentorTileClosed) ? false : true;
-    console.log( this.showBecomeMentorCard ,"isBecomeMentorTileClosed");
-
+    this.ckdk.detectChanges();
     if(this.profileService.isMentor){
       this.getCreatedSessionDetails();
     }
