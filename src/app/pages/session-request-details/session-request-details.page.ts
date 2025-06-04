@@ -55,6 +55,7 @@ export class SessionRequestDetailsPage implements OnInit {
       this.apiResponse = res.result;
       if (this.apiResponse?.status === 'ACCEPTED') {
         this.sessionService.getSessionDetailsAPI(this.apiResponse.session_id).then((res) => {
+        
           this.sessionDetails = res.result;
           this.isMeetingLinkAdded = true;
           let currentTimeInSeconds=Math.floor(Date.now()/1000);
@@ -62,6 +63,10 @@ export class SessionRequestDetailsPage implements OnInit {
         })
       }
     });
+    this.getAllUpdatedSession();
+  }
+
+  getAllUpdatedSession() {
     this.sessionService.requestSessionUserAvailability().then((res) => {
       this.scheduledSessionDetals = res.result;
     });
@@ -80,9 +85,9 @@ export class SessionRequestDetailsPage implements OnInit {
         this.sessionService.getReqSessionDetails(this.params.id).then((res) => {
           this.apiResponse = res.result;
           if(res){
+            this.getAllUpdatedSession();
             this.sessionService.getSessionDetailsAPI(this.apiResponse.session_id).then((res) => {
               this.sessionDetails = res.result;
-              this.isMeetingLinkAdded = true;
             })
           } 
         });

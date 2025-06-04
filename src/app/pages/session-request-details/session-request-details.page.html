@@ -6,19 +6,19 @@
       <img [src]="apiResponse?.user_details?.image || 'assets/prof-img/user.png'" alt="Profile Picture" />
     </ion-avatar>    
 
-    <h2 class="profile-name">{{apiResponse?.user_details?.name}}</h2>
+    <h2 class="profile-name">{{apiResponse?.user_details?.name | titlecase}}</h2>
     <p class="profile-description">
       <ng-container *ngIf="apiResponse?.user_details?.designation?.length">
         <ng-container *ngFor="let item of apiResponse.user_details.designation.slice(0,2); let last = last">
-          {{ item.label }}<span *ngIf="!last">, </span>
+          {{ item.label | titlecase }}<span *ngIf="!last">, </span>
         </ng-container>
       </ng-container>
     </p>
     <ion-button color="primary" (click)="viewProfile(apiResponse?.user_details?.user_id)">{{"VIEW_PROFILE" | translate}}</ion-button>
     <ion-text class="description">
-      <h2 class="text-left">{{"AGENDA" | translate}}</h2>
+      <h2 class="text-left">{{"AGENDA" | translate }}</h2>
       <p style="margin: 0px;" class="text-left">
-        {{ showFullText ? apiResponse.agenda : apiResponse.agenda | slice:0:150 }}{{ apiResponse.agenda.length > 150 && !showFullText ? '...' : '' }}
+        {{ showFullText ? (apiResponse.agenda |  titlecase)  : (apiResponse.agenda |  titlecase | slice:0:150 ) }}{{ apiResponse.agenda.length > 150 && !showFullText ? '...' : '' }}
       </p>
     </ion-text>
 
@@ -158,7 +158,7 @@
                     <p class="margin-none text-left ">{{ event?.startTime }}</p> <br />
                     <p class="margin-none text-left ">{{ event?.endTime }}</p>
                   </ion-col>
-                  <ion-col size="9" class="d-flex  ion-align-items-center"> <h3 class="margin-none session-title text-left">{{event?.title}}</h3> </ion-col>
+                  <ion-col size="9" class="d-flex  ion-align-items-center"> <h3 class="margin-none session-title text-left">{{event?.title | titlecase}}</h3> </ion-col>
                 </ion-row>
             </div>
             </div>
