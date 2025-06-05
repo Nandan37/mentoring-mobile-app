@@ -28,12 +28,10 @@ export class ChatWindowPage implements OnInit {
     private toastService: ToastService
   ) {
     routerParams.params.subscribe((parameters) => {
-      console.log(parameters,"sdfsdfds");
       this.rid = parameters?.id;
       this.ngOnInit();
     });
     routerParams.queryParams.subscribe((parameters) => {
-      console.log(parameters,"queryParams");
       this.id = parameters?.id;
     })
   }

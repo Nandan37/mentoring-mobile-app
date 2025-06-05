@@ -1,6 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
-import { UtilService } from 'src/app/core/services';
+import { ToastService, UtilService } from 'src/app/core/services';
 import { ProfileService } from 'src/app/core/services/profile/profile.service';
 import { CommonRoutes } from 'src/global.routes';
 
@@ -22,7 +22,8 @@ export class MessagesPage implements OnInit {
   constructor(
     private route: Router,
     private profileService: ProfileService,
-    private utilsService: UtilService
+    private utilsService: UtilService,
+    private toast: ToastService
   ) {}
   ngOnInit(): void {
       
@@ -43,5 +44,9 @@ export class MessagesPage implements OnInit {
     } else {
       this.utilsService.removeMessageBadge();
     }
+  }
+
+  showToast(event: any) {
+    this.toast.showToast(event.message, event.type);
   }
 }
