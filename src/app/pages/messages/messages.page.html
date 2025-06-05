@@ -4,6 +4,7 @@
     <lib-message-listing
       (onSelect)="onSelect($event)"
       (newMessageEvent)="messageBadge($event)"
+      (toastMessageEvent)="showToast($event)"
     ></lib-message-listing>
   } @else if (isLoaded) {
     <div class="no-data-container">
