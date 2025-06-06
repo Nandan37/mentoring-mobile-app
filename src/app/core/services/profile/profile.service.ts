@@ -304,7 +304,7 @@ export class ProfileService {
             .getPropertyValue('--ion-color-primary')
             .trim(),
         };
-        await this.chatService.setConfig(payload);
+        this.chatService.setConfig(payload);
         return true;
       }
       return false;
