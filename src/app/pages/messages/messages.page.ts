@@ -1,5 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
+import { FrontendChatLibraryService } from 'sl-chat-library';
 import { ToastService, UtilService } from 'src/app/core/services';
 import { ProfileService } from 'src/app/core/services/profile/profile.service';
 import { CommonRoutes } from 'src/global.routes';
@@ -22,7 +23,7 @@ export class MessagesPage implements OnInit {
   constructor(
     private route: Router,
     private profileService: ProfileService,
-    private utilsService: UtilService,
+    private chatService: FrontendChatLibraryService,
     private toast: ToastService
   ) {}
   ngOnInit(): void {
@@ -39,12 +40,11 @@ export class MessagesPage implements OnInit {
   }
 
   messageBadge(event: any) {
-    if (event) {
-      this.utilsService.addMessageBadge();
-    } else {
-      this.utilsService.removeMessageBadge();
-    }
+    this.chatService.messageBadge(event);
+   
   }
+
+
 
   showToast(event: any) {
     this.toast.showToast(event.message, event.type);

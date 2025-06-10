@@ -1,4 +1,9 @@
-import { Component, HostListener, NgZone, OnInit } from '@angular/core';
+import {
+  Component,
+  HostListener,
+  NgZone,
+  OnInit,
+} from '@angular/core';
 import { Router } from '@angular/router';
 import { AlertController, MenuController, Platform } from '@ionic/angular';
 import { TranslateService } from '@ngx-translate/core';
@@ -21,7 +26,11 @@ import * as _ from 'lodash-es';
 import { PermissionService } from '../../core/services/permission/permission.service';
 import { permissionModule } from 'src/app/core/constants/permissionsConstant';
 import { PAGE_IDS } from 'src/app/core/constants/page.ids';
-import { FrontendChatLibraryService } from 'sl-chat-library';
+import {
+  FrontendChatLibraryService,
+  RocketChatApiService,
+} from 'sl-chat-library';
+
 @Component({
   selector: 'app-private',
   templateUrl: './private.page.html',
@@ -140,7 +149,7 @@ export class PrivatePage implements OnInit {
   menuSubscription: any;
   routerSubscription: any;
   adminAccess: boolean;
-  showBadge: boolean = false;
+
   isAuthBypassed = environment['isAuthBypassed'];
   constructor(
     private translate: TranslateService,
@@ -158,27 +167,28 @@ export class PrivatePage implements OnInit {
     private _location: Location,
     private alert: AlertController,
     private permissionService: PermissionService,
-    private chatService: FrontendChatLibraryService
-  ) {
-    this.initializeApp();
-    utilService.messageBadge.subscribe((resp: boolean) => {
-      this.showBadge = resp;
+    private chatService: FrontendChatLibraryService,
+    private rocketChatService: RocketChatApiService
+  ) {}
+
+  async ngOnInit() {
+    await this.initializeApp();
+    await this.rocketChatService.initializeWebSocketAndCheckUnread();
+    if (this.chatService.initialBadge) {
       let page = this.appPages.find(
         (page: any) => page.pageId == PAGE_IDS.messages
       );
-      page.badge = resp;
-    });
+      page.badge = this.chatService.initialBadge;
+    }
 
-    chatService.showBadge.subscribe((resp: boolean) => {
-      this.showBadge = resp;
+
+    this.chatService.showBadge.subscribe((resp: boolean) => {
       let page = this.appPages.find(
         (page: any) => page.pageId == PAGE_IDS.messages
       );
       page.badge = resp;
     });
   }
-
-  ngOnInit() {}
 
   subscribeBackButton() {
     this.backButtonSubscription =
@@ -216,63 +226,75 @@ export class PrivatePage implements OnInit {
       });
   }
 
-  initializeApp() {
-    this.platform.ready().then(() => {
-      this.network.netWorkCheck();
-      this.profile.getChatToken();
-      this.profile.getTheme();
+  async initializeApp() {
+    await this.platform.ready();
+
+    this.network.netWorkCheck();
+
+    await this.profile.getChatToken();
+
+    this.profile.getTheme();
+
+    await new Promise<void>((resolve) => {
       setTimeout(async () => {
         this.languageSetting();
         this.setHeader();
-        this.localStorage
-          .getLocalData(localKeys.USER_DETAILS)
-          .then((userDetails) => {
-            if (userDetails) {
-              this.profile.getUserRole(userDetails);
-              this.adminAccess = userDetails.permissions
-                ? this.permissionService.hasAdminAcess(
-                    this.actionsArrays,
-                    userDetails?.permissions
-                  )
-                : false;
-            }
-            this.getUser();
-          });
+        const userDetails = await this.localStorage.getLocalData(
+          localKeys.USER_DETAILS
+        );
+
+        if (userDetails) {
+          this.profile.getUserRole(userDetails);
+          this.adminAccess = userDetails.permissions
+            ? this.permissionService.hasAdminAcess(
+                this.actionsArrays,
+                userDetails?.permissions
+              )
+            : false;
+        }
+
+        this.getUser();
+        resolve();
       }, 0);
-      this.db.init();
+    });
+
+    this.db.init();
+
+    await new Promise<void>((resolve) => {
       setTimeout(async () => {
         this.userRoles = await this.localStorage.getLocalData(
           localKeys.USER_ROLES
         );
+        resolve();
       }, 1000);
-      setTimeout(() => {
-        document
-          .querySelector('ion-menu')
-          ?.shadowRoot?.querySelector('.menu-inner')
-          ?.setAttribute('style', 'border-radius:8px 8px 0px 0px');
-      }, 2000);
-      this.userEventSubscription = this.userService.userEventEmitted$.subscribe(
-        (data) => {
-          if (data) {
-            this.isMentor = this.profile.isMentor;
-            this.user = data;
-            this.adminAccess = data.permissions
-              ? this.permissionService.hasAdminAcess(
-                  this.actionsArrays,
-                  data?.permissions
-                )
-              : false;
-          }
+    });
+    setTimeout(() => {
+      document
+        .querySelector('ion-menu')
+        ?.shadowRoot?.querySelector('.menu-inner')
+        ?.setAttribute('style', 'border-radius:8px 8px 0px 0px');
+    }, 2000);
+    this.userEventSubscription = this.userService.userEventEmitted$.subscribe(
+      (data) => {
+        if (data) {
+          this.isMentor = this.profile.isMentor;
+          this.user = data;
+          this.adminAccess = data.permissions
+            ? this.permissionService.hasAdminAcess(
+                this.actionsArrays,
+                data?.permissions
+              )
+            : false;
         }
-      );
-      App.addListener('appUrlOpen', (event: URLOpenListenerEvent) => {
-        this.zone.run(() => {
-          const domain = environment.deepLinkUrl;
-          const slug = event.url.split(domain).pop();
-          if (slug) {
-            this.router.navigateByUrl(slug);
-          }
-        });
+      }
+    );
+    App.addListener('appUrlOpen', (event: URLOpenListenerEvent) => {
+      this.zone.run(() => {
+        const domain = environment.deepLinkUrl;
+        const slug = event.url.split(domain).pop();
+        if (slug) {
+          this.router.navigateByUrl(slug);
+        }
       });
     });
     this.subscribeBackButton();
