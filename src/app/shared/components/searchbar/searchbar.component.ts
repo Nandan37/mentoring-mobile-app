@@ -50,7 +50,6 @@ export class SearchbarComponent implements OnInit {
   }
 
   async onSearch(event){
-    console.log(event)
     if(event.length === 0) {
       const emitData = {
         searchText: '',
