@@ -17,6 +17,7 @@ import { CommonRoutes } from 'src/global.routes';
   styleUrls: ['./mentor-search-directory.page.scss'],
 })
 export class MentorSearchDirectoryPage implements OnInit {
+
   @ViewChild(MatPaginator) paginator!: MatPaginator;
   pageSize = paginatorConstants.defaultPageSize;
   pageSizeOptions = paginatorConstants.pageSizeOptions;
@@ -73,38 +74,16 @@ export class MentorSearchDirectoryPage implements OnInit {
     this.filterData = await this.utilService.transformToFilterData(data, obj);
   }
 
-  onSearch(event){
-    if (event.length >= 3) {
-      this.searchText = event;
-      this.showSelectedCriteria = this.selectedChipLabel;
-      this.getMentors();
-    } else {
-      this.toast.showToast("ENTER_MIN_CHARACTER","danger");
-    }
+  async onSearch(event){
+    this.selectedChipName = event?.criterias?.name || undefined;
+    await this.getMentors();
   }
+
+  async onClearSearch($event: string) {
+    await this.getMentors();
+    }
   
-  selectChip(chip) {
-    if (this.selectedChipLabel === chip.label) {
-      this.selectedChipLabel = null;
-      this.selectedChipName = null;
-    } else {
-      this.selectedChipLabel = chip.label;
-      this.selectedChipName = chip.name;
-    }
-  }
 
-  closeCriteriaChip(){
-    this.selectedChipLabel = "";
-    this.selectedChipName = "";
-    this.showSelectedCriteria = "";
-  }
-
-  removeChip(chip: string,index: number) {
-    this.chips.splice(index, 1);
-    this.removeFilteredData(chip)
-    this.getUrlQueryData();
-    this.getMentors();
-  }
 
   async onClickFilter() {
     let modal = await this.modalCtrl.create({

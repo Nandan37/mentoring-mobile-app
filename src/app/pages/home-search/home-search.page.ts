@@ -21,6 +21,7 @@ import { Subscription } from 'rxjs';
 })
 export class HomeSearchPage implements OnInit {
 
+
   @ViewChild(MatPaginator) paginator!: MatPaginator;
   @Output() toggleOverlayEvent = new EventEmitter<void>();
 
@@ -63,6 +64,7 @@ export class HomeSearchPage implements OnInit {
   ) { }
 
   async ngOnInit() {
+
     this.searchTextSubscription = this.utilService.currentSearchText.subscribe(searchText => {
       this.searchText = searchText;
     });
@@ -74,6 +76,7 @@ export class HomeSearchPage implements OnInit {
     this.permissionService.getPlatformConfig().then((config)=>{
       this.overlayChips = config?.result?.search_config?.search?.session?.fields;
     })
+
   }
 
   async ionViewWillEnter() {
@@ -84,15 +87,17 @@ export class HomeSearchPage implements OnInit {
   }
 
   search(event) {
-    if (event.length >= 3) {
-      this.searchText = event;
-      this.showSelectedCriteria = this.criteriaChip;
-      this.isOpen = false;
-      this.fetchSessionList()
-    } else {
-      this.toast.showToast("ENTER_MIN_CHARACTER","danger");
-    }
+    this.showSelectedCriteria = event.criterias;
+    this.criteriaChip = event.criterias;
+    this.isOpen = false;
+    this.fetchSessionList()
+   
   }
+
+  onClearSearch($event: string) {
+    this.isOpen = false;
+    this.fetchSessionList()
+    }
 
   async onClickFilter() {
     let modal = await this.modalCtrl.create({
@@ -181,26 +186,6 @@ export class HomeSearchPage implements OnInit {
     }
   }
 
-  removeChip(chip: string, index: number) {
-    this.chips.splice(index, 1);
-    this.removeFilteredData(chip);
-    this.getUrlQueryData();
-    this.fetchSessionList()
-  }
-
-  closeCriteriaChip(){
-    this.criteriaChip = null;
-    this.showSelectedCriteria = null;
-    this.router.navigate(['/' + CommonRoutes.HOME_SEARCH], { queryParams: {searchString : this.searchText} });
-  }
-
-  selectChip(chip) {
-    if (this.criteriaChip === chip) {
-      this.criteriaChip = null;
-    } else {
-      this.criteriaChip = chip;
-    }
-  }
 
   getUrlQueryData() {
     const queryString = Object.keys(this.filteredDatas)

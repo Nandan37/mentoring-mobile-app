@@ -145,8 +145,7 @@ export class SearchPopoverComponent implements OnInit {
     this.modalController.dismiss(this.selectedList);
   }
 
-  async onClearSearch() {
-    this.searchText ='';
+  async onClearSearch(event: any) {
     this.tableData = await this.getMenteelist();
     }
 
@@ -158,19 +157,9 @@ export class SearchPopoverComponent implements OnInit {
   }
 
   async onSearch(event: any){
-    if(event.detail.value.length === 0) {
-      this.tableData = await this.getMenteelist();
-      return;
-    }
-    if (event.detail.value.length >= 3) {
       this.page=1;
       this.setPaginatorToFirstpage= true
       this.tableData = await this.getMenteelist()
-    } else {
-      this.toast.showToast("ENTER_MIN_CHARACTER","danger");
-    }
-   
-
   }
 
   onButtonCLick(data: any) {
