@@ -52,6 +52,7 @@ export class HomeSearchPage implements OnInit {
   searchTextSubscription: Subscription;
   criteriaChipSubscription: Subscription;
   showSelectedCriteria: any;
+searchAndCriterias: any;
 
   constructor(private modalCtrl: ModalController, private router: Router, private toast: ToastService,
     private sessionService: SessionService,
@@ -87,6 +88,10 @@ export class HomeSearchPage implements OnInit {
   }
 
   search(event) {
+    this.searchText = event.searchText;
+    this.searchAndCriterias = {
+      headerData: event,
+    };
     this.showSelectedCriteria = event.criterias;
     this.criteriaChip = event.criterias;
     this.isOpen = false;
@@ -94,7 +99,12 @@ export class HomeSearchPage implements OnInit {
    
   }
 
+  eventHandler(event: string) {
+    this.criteriaChip = event;
+  }
+
   onClearSearch($event: string) {
+    this.searchText = ''
     this.isOpen = false;
     this.fetchSessionList()
     }
@@ -216,6 +226,12 @@ export class HomeSearchPage implements OnInit {
           }
       }
     }
+  }
+  removeChip(event) {
+    this.chips.splice(event.index, 1);
+    this.removeFilteredData(event.chipValue);
+    this.getUrlQueryData();
+    this.fetchSessionList()
   }
 
   ionViewDidLeave(){

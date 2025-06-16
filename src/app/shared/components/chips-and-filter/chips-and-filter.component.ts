@@ -26,7 +26,8 @@ export class ChipsAndFilterComponent implements OnInit {
   }
 
   closeCriteriaChip(){
-    this.sendChildValue.emit(this.searchAndCriteriaData);
+
+    this.sendChildValue.emit('');
     this.searchAndCriteriaData = '';
   }
 

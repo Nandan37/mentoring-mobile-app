@@ -7,7 +7,6 @@
   (click)="isOpen = !isOpen" 
   #event
   [(ngModel)]="searchText"
-  (ngModelChange)="searchTextChange.emit($event)" 
   (ionClear)="onClearSearch()"
   (keyup.enter)="onSearch(event.value)"></ion-searchbar>
 </div>

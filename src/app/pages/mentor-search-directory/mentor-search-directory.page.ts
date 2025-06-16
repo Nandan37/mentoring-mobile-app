@@ -45,7 +45,10 @@ export class MentorSearchDirectoryPage implements OnInit {
   limit: any;
   chips = [];
   showSelectedCriteria: any;
-  buttonConfig: any;;
+  buttonConfig: any;
+  searchAndCriterias: any;
+  valueFromChipAndFilter: string;
+;
 
   constructor(
     private router: Router,
@@ -75,11 +78,18 @@ export class MentorSearchDirectoryPage implements OnInit {
   }
 
   async onSearch(event){
+    console.log(event)
+    this.searchAndCriterias = {
+      headerData: event,
+    };
+    this.searchText = event.searchText;
     this.selectedChipName = event?.criterias?.name || undefined;
     await this.getMentors();
   }
 
   async onClearSearch($event: string) {
+    this.searchText = '';
+    this.selectedChipName =''
     await this.getMentors();
     }
   
@@ -141,6 +151,9 @@ export class MentorSearchDirectoryPage implements OnInit {
         break;
     }
   }
+  eventHandler(event: any) {
+    this.valueFromChipAndFilter = event;
+  }
 
   onPageChange(event){
     this.page = event.pageIndex + 1,
@@ -184,6 +197,12 @@ export class MentorSearchDirectoryPage implements OnInit {
     }
   }
 
+  removeChip(event) {
+    this.chips.splice(event.index, 1);
+    this.removeFilteredData(event.chipValue);
+    this.getUrlQueryData();
+    this.getMentors();
+  }
   ionViewDidLeave(){
     this.searchText = "";
     this.showSelectedCriteria = "";

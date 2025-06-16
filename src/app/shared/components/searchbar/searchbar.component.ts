@@ -9,14 +9,13 @@ import { ToastService } from 'src/app/core/services';
   styleUrls: ['./searchbar.component.scss'],
 })
 export class SearchbarComponent implements OnInit {
-
+  searchText: any;
   @Input() receivedData: any;
   @Input() data: any;
   @Input() overlayChip: any;
   @Output() outputData = new EventEmitter();
   @Input() valueFromParent: any;
-  @Input() searchText: any;
-  @Output() searchTextChange = new EventEmitter<string>();
+
   @Output() clearText = new EventEmitter<string>();
   @Input() placeholder: string;
   isOpen = false;
@@ -53,17 +52,16 @@ export class SearchbarComponent implements OnInit {
     if(event.length === 0) {
       const emitData = {
         searchText: '',
-        criterias: undefined
+        criterias: this.criteriaChip
       }
       this.outputData.emit(emitData);
       return;
     }
     if (event.length >= 3) {
       this.searchText = event ? event : "";
-      this.showSelectedCriteria = this.criteriaChip;
       const emitData = {
         searchText: this.searchText.trim(),
-        criterias: this.showSelectedCriteria
+        criterias: this.criteriaChip
       }
       this.outputData.emit(emitData);
     } else {
@@ -77,7 +75,6 @@ export class SearchbarComponent implements OnInit {
   }
 
   onClearSearch() {
-    this.searchTextChange.emit('')
     this.clearText.emit('')
     this.criteriaChip= undefined;
     }

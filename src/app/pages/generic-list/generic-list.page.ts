@@ -95,9 +95,9 @@ export class GenericListPage implements OnInit {
   }
 
   searchResults(event) {
+    this.searchText= event.searchText;
     this.searchAndCriterias = {
       headerData: event,
-      routeData: this.routeData,
     };
     this.searchAndCriterias = { ...this.searchAndCriterias };
     this.selectedCriteria = event?.criterias?.name;
@@ -264,7 +264,11 @@ export class GenericListPage implements OnInit {
     return !!this.responseData?.length || !!this.chips?.length || !!this.searchText || !!this.filterChipsSelected;
   }
   onClearSearch($event: string) {
+    this.searchText ='';
+    this.selectedCriteria = '';
+    this.searchAndCriterias = {}
     this.getData();
+    
     }
   
 }

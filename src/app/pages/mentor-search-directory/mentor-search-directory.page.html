@@ -1,8 +1,8 @@
 <app-page-header [config]="headerConfig">
-    <app-searchbar *ngIf="overlayChips" [(searchText)]="searchText" placeholder="{{'MENTOR_SEARCH_PLACEHOLDER' | translate}}" (clearText)="onClearSearch($event)" [overlayChip]="overlayChips"  (outputData)="onSearch($event)" ></app-searchbar>
+    <app-searchbar *ngIf="overlayChips" placeholder="{{'MENTOR_SEARCH_PLACEHOLDER' | translate}}" (clearText)="onClearSearch($event)" [overlayChip]="overlayChips"  (outputData)="onSearch($event)" ></app-searchbar>
 
 </app-page-header>
-
+<app-chips-and-filter  [selectedFilters]="chips" [searchAndCriteriaData]="searchAndCriterias" (removeFilterChip)="removeChip($event)" (filterClick)="onClickFilter()" (sendChildValue)="eventHandler($event)" [isFilterEnable]="true"></app-chips-and-filter>
 <ion-content >
   <div class="search-navigation">
     <div class="search-result">

@@ -146,6 +146,7 @@ export class SearchPopoverComponent implements OnInit {
   }
 
   async onClearSearch(event: any) {
+    this.searchText =''
     this.tableData = await this.getMenteelist();
     }
 
@@ -157,6 +158,7 @@ export class SearchPopoverComponent implements OnInit {
   }
 
   async onSearch(event: any){
+    this.searchText= event.searchText;
       this.page=1;
       this.setPaginatorToFirstpage= true
       this.tableData = await this.getMenteelist()

@@ -1,7 +1,7 @@
 <ion-toolbar position="top">
   <div class="container">
     <div class="search-col d-flex flex-justify-center">
-        <app-searchbar (outputData)="onSearch($event)" [(searchText)]="searchText" [placeholder]="data.control.meta.searchLabel" (clearText)="onClearSearch($event)"></app-searchbar>
+        <app-searchbar (outputData)="onSearch($event)"  [placeholder]="data.control.meta.searchLabel" (clearText)="onClearSearch($event)"></app-searchbar>
     </div>
     <div class="close-col">
       <ion-icon class="close-button" name="close-outline" (click)="closePopover()"></ion-icon>
