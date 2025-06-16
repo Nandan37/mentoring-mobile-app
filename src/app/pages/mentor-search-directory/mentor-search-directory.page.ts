@@ -78,7 +78,6 @@ export class MentorSearchDirectoryPage implements OnInit {
   }
 
   async onSearch(event){
-    console.log(event)
     this.searchAndCriterias = {
       headerData: event,
     };
