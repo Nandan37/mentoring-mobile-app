@@ -35,6 +35,7 @@ export class MentorSearchDirectoryPage implements OnInit {
   selectedChipName: any;
   filterData: any;
   filteredDatas: any[];
+  filterIcon: boolean;
   selectedChips: boolean;
   urlQueryData: string;
   setPaginatorToFirstpage: boolean;
@@ -88,7 +89,6 @@ export class MentorSearchDirectoryPage implements OnInit {
 
   async onClearSearch($event: string) {
     this.searchText = '';
-    this.selectedChipName =''
     await this.getMentors();
     }
   
@@ -186,13 +186,21 @@ export class MentorSearchDirectoryPage implements OnInit {
   async getMentors(){
     var obj = {page: this.page, pageSize: this.pageSize, searchText: this.searchText.trim(), selectedChip: this.selectedChipName, urlQueryData: this.urlQueryData};
     let data = await this.profileService.getMentors(true,obj);
-    if(data && data.result){
+    if(data && data.result.data.length){
       this.isOpen = false;
       this.data = data.result.data;
       this.totalCount = data.result.count;
-    }else{
+      this.filterIcon = true;
+    } else {
+       
       this.data = [];
       this.totalCount = [];
+     
+      if (Object.keys(this.filteredDatas || {}).length === 0 && !this.selectedChipName) {
+        this.filterIcon = false;
+      }
+      
+   
     }
   }
 

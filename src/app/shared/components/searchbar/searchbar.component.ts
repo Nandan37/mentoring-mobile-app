@@ -10,7 +10,7 @@ import { ToastService } from 'src/app/core/services';
 })
 export class SearchbarComponent implements OnInit {
   searchText: any;
-  @Input() receivedData: any;
+  @Input() parentSearchText: string;
   @Input() data: any;
   @Input() overlayChip: any;
   @Output() outputData = new EventEmitter();
@@ -31,6 +31,8 @@ export class SearchbarComponent implements OnInit {
   ) { }
 
   ngOnInit() {
+    if(this.parentSearchText)
+      this.searchText = this.parentSearchText;
     this.router.events
       .pipe(filter(event => event instanceof NavigationEnd))
       .subscribe(() => {
@@ -75,6 +77,7 @@ export class SearchbarComponent implements OnInit {
   }
 
   onClearSearch() {
+    this.isOpen =false;
     this.clearText.emit('')
     this.criteriaChip= undefined;
     }

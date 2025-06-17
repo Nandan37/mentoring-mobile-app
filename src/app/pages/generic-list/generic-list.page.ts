@@ -99,7 +99,7 @@ export class GenericListPage implements OnInit {
     this.searchAndCriterias = {
       headerData: event,
     };
-    this.searchAndCriterias = { ...this.searchAndCriterias };
+
     this.selectedCriteria = event?.criterias?.name;
     this.getData();
   }
@@ -123,16 +123,17 @@ export class GenericListPage implements OnInit {
     if (this.searchText && !this.responseData.length) {
       this.noResult = this.routeData?.noDataFound;
       this.enableExploreButton = false;
-    }
-    if (
-      !this.responseData?.length &&
-      !this.searchText &&
-      !this.filterChipsSelected
-    ) {
-      this.filterIcon = false;
-    } else {
+    } 
+    if(this.responseData.length) {
       this.filterIcon = true;
+    } else {
+      if(Object.keys(this.filteredDatas || {}).length === 0
+      && !this.selectedCriteria) {
+        this.filterIcon = false;
+      } 
     }
+      
+    
   }
 
   async onClickFilter() {
@@ -259,16 +260,9 @@ export class GenericListPage implements OnInit {
     this.router.navigate([CommonRoutes.HOME]);
   }
 
-  showChipsAndFilter(): boolean {
-    this.filterIcon = true;
-    return !!this.responseData?.length || !!this.chips?.length || !!this.searchText || !!this.filterChipsSelected;
-  }
   onClearSearch($event: string) {
     this.searchText ='';
-    this.selectedCriteria = '';
-    this.searchAndCriterias = {}
     this.getData();
-    
     }
   
 }

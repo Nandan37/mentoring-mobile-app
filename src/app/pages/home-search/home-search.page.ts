@@ -1,18 +1,22 @@
 import { Component, EventEmitter, OnInit, Output, ViewChild } from '@angular/core';
-import { ActivatedRoute, Router } from '@angular/router';
-import { ModalController } from '@ionic/angular';
-import { LocalStorageService, ToastService, UtilService } from 'src/app/core/services';
-import { SessionService } from 'src/app/core/services/session/session.service';
-import { FilterPopupComponent } from 'src/app/shared/components/filter-popup/filter-popup.component';
+import {  Router } from '@angular/router';
 import { CommonRoutes } from 'src/global.routes';
-import { MatPaginator } from '@angular/material/paginator';
-import { localKeys } from 'src/app/core/constants/localStorage.keys';
-import { ProfileService } from 'src/app/core/services/profile/profile.service';
 import { Location } from '@angular/common';
+import { environment } from 'src/environments/environment';
+import { localKeys } from 'src/app/core/constants/localStorage.keys';
+//ionic
+import { ModalController } from '@ionic/angular';
+//service
+import { SessionService } from 'src/app/core/services/session/session.service';
+import { LocalStorageService, ToastService, UtilService } from 'src/app/core/services';
+import { ProfileService } from 'src/app/core/services/profile/profile.service';
 import { PermissionService } from 'src/app/core/services/permission/permission.service';
 import { FormService } from 'src/app/core/services/form/form.service';
-import { environment } from 'src/environments/environment';
+//3rd party
 import { Subscription } from 'rxjs';
+import { MatPaginator } from '@angular/material/paginator';
+//component
+import { FilterPopupComponent } from 'src/app/shared/components/filter-popup/filter-popup.component';
 
 @Component({
   selector: 'app-home-search',
@@ -36,6 +40,7 @@ export class HomeSearchPage implements OnInit {
   type:any;
   filterData: any;
   filteredDatas = []
+  filterIcon: boolean;
   page = 1;
   setPaginatorToFirstpage:any = false;
   totalCount: any;
@@ -64,13 +69,21 @@ searchAndCriterias: any;
     private utilService: UtilService,
   ) { }
 
-  async ngOnInit() {
-
+   ngOnInit() {
     this.searchTextSubscription = this.utilService.currentSearchText.subscribe(searchText => {
       this.searchText = searchText;
     });
     this.criteriaChipSubscription = this.utilService.currentCriteriaChip.subscribe(selectedCriteria => {
       this.criteriaChip = selectedCriteria ? JSON.parse(selectedCriteria) : "";
+      setTimeout(() => {
+        this.searchAndCriterias = {
+          headerData: {
+            searchText: '',
+            criterias: this.criteriaChip
+          },
+        };
+      },500);
+      
     });
     this.user = this.localStorage.getLocalData(localKeys.USER_DETAILS)
     this.fetchSessionList()
@@ -104,9 +117,9 @@ searchAndCriterias: any;
   }
 
   onClearSearch($event: string) {
-    this.searchText = ''
+    this.searchText = '';
     this.isOpen = false;
-    this.fetchSessionList()
+    this.fetchSessionList();
     }
 
   async onClickFilter() {
@@ -138,6 +151,14 @@ searchAndCriterias: any;
     var obj={page: this.page, limit: this.pageSize, type: this.type, searchText : this.searchText, selectedChip : this.criteriaChip?.name, filterData : this.urlQueryData}
     var response = await this.sessionService.getSessionsList(obj);
     this.results = response.result.data;
+
+    if(response.result.data.length){
+      this.filterIcon = true;
+    } else {
+      if(Object.keys(this.filteredDatas || {}).length === 0 && !this.criteriaChip?.name) {
+        this.filterIcon = false;
+      }
+    }
     this.totalCount = response.result.count;
     this.noDataMessage = obj.searchText ? "SEARCH_RESULT_NOT_FOUND" : "THIS_SPACE_LOOKS_EMPTY"
   }
