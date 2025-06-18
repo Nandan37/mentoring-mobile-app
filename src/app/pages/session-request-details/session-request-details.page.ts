@@ -107,7 +107,7 @@ export class SessionRequestDetailsPage implements OnInit {
         {
           name: 'reason',  
           type: 'textarea',
-          placeholder: `Let ${name} know why you are rejecting there slot...`,
+          placeholder: `Let ${name} know why you are rejecting their slot...`,
         }
       ]
     };
