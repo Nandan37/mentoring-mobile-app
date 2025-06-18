@@ -32,13 +32,13 @@
     <p class="request-info text-left">
       You have requested a slot at <strong style="padding-left: 5px;">
         {{
-          apiResponse.start_date * 1000 | date: 'dd MMM, yyyy'
+           apiResponse.start_date * 1000 | date: 'dd MMM, yyyy'
         }},
         {{
-          apiResponse.start_date * 1000 | date: 'h:mm a'
+          formatUnixTime(apiResponse.start_date)
         }} -
         {{
-          apiResponse.end_date * 1000 | date: 'h:mm a'
+          formatUnixTime(apiResponse.end_date)
         }}
       </strong>
     </p>
