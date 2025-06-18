@@ -9,7 +9,7 @@
     <h2 class="profile-name">{{apiResponse?.user_details?.name | titlecase}}</h2>
     <p class="profile-description">
       <ng-container *ngIf="apiResponse?.user_details?.designation?.length">
-        <ng-container *ngFor="let item of apiResponse.user_details.designation.slice(0,2); let last = last">
+        <ng-container *ngFor="let item of apiResponse.user_details.designation let last = last">
           {{ item.label | titlecase }}<span *ngIf="!last">, </span>
         </ng-container>
       </ng-container>
