@@ -155,8 +155,8 @@
 
                 <ion-row class="px-4">
                   <ion-col size="3">
-                    <p class="margin-none text-left ">{{ event?.startTime }}</p> <br />
-                    <p class="margin-none text-left ">{{ event?.endTime }}</p>
+                    <p class="margin-none text-left ">{{  formatUnixTime(event?.startTime)  }}</p> <br />
+                    <p class="margin-none text-left ">{{ formatUnixTime(event?.endTime) }}</p>
                   </ion-col>
                   <ion-col size="9" class="d-flex  ion-align-items-center"> <h3 class="margin-none session-title text-left">{{event?.title | titlecase}}</h3> </ion-col>
                 </ion-row>
