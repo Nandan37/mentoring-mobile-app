@@ -30,7 +30,7 @@
     </ion-label>    
 
     <p class="request-info text-left">
-      You have requested a slot at <strong style="padding-left: 5px;">
+      {{apiResponse?.user_details?.name | titlecase}} requested a slot at<strong style="padding-left: 5px;">
         {{
            apiResponse.start_date * 1000 | date: 'dd MMM, yyyy'
         }},
