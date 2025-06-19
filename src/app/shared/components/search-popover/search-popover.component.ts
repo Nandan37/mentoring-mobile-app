@@ -11,6 +11,7 @@ import { HttpService, LocalStorageService, ToastService, UtilService } from 'src
   styleUrls: ['./search-popover.component.scss'],
 })
 export class SearchPopoverComponent implements OnInit {
+
   @Input() data: any;
   showFilterHeader = true
   columnData = [
@@ -144,6 +145,11 @@ export class SearchPopoverComponent implements OnInit {
     this.modalController.dismiss(this.selectedList);
   }
 
+  async onClearSearch() {
+    this.searchText ='';
+    this.tableData = await this.getMenteelist();
+    }
+
   async filtersChanged(event) {
     this.selectedFilters = event
     this.page=1;
@@ -151,10 +157,20 @@ export class SearchPopoverComponent implements OnInit {
     this.tableData = await this.getMenteelist()
   }
 
-  async onSearch(){
-    this.page=1;
-    this.setPaginatorToFirstpage= true
-    this.tableData = await this.getMenteelist()
+  async onSearch(event: any){
+    if(event.detail.value.length === 0) {
+      this.tableData = await this.getMenteelist();
+      return;
+    }
+    if (event.detail.value.length >= 3) {
+      this.page=1;
+      this.setPaginatorToFirstpage= true
+      this.tableData = await this.getMenteelist()
+    } else {
+      this.toast.showToast("ENTER_MIN_CHARACTER","danger");
+    }
+   
+
   }
 
   onButtonCLick(data: any) {
