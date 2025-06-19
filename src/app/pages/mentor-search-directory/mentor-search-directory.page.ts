@@ -17,6 +17,7 @@ import { CommonRoutes } from 'src/global.routes';
   styleUrls: ['./mentor-search-directory.page.scss'],
 })
 export class MentorSearchDirectoryPage implements OnInit {
+
   @ViewChild(MatPaginator) paginator!: MatPaginator;
   pageSize = paginatorConstants.defaultPageSize;
   pageSizeOptions = paginatorConstants.pageSizeOptions;
@@ -34,6 +35,7 @@ export class MentorSearchDirectoryPage implements OnInit {
   selectedChipName: any;
   filterData: any;
   filteredDatas: any[];
+  filterIcon: boolean;
   selectedChips: boolean;
   urlQueryData: string;
   setPaginatorToFirstpage: boolean;
@@ -44,7 +46,10 @@ export class MentorSearchDirectoryPage implements OnInit {
   limit: any;
   chips = [];
   showSelectedCriteria: any;
-  buttonConfig: any;;
+  buttonConfig: any;
+  searchAndCriterias: any;
+  valueFromChipAndFilter: string;
+;
 
   constructor(
     private router: Router,
@@ -73,38 +78,21 @@ export class MentorSearchDirectoryPage implements OnInit {
     this.filterData = await this.utilService.transformToFilterData(data, obj);
   }
 
-  onSearch(event){
-    if (event.length >= 3) {
-      this.searchText = event;
-      this.showSelectedCriteria = this.selectedChipLabel;
-      this.getMentors();
-    } else {
-      this.toast.showToast("ENTER_MIN_CHARACTER","danger");
-    }
+  async onSearch(event){
+    this.searchAndCriterias = {
+      headerData: event,
+    };
+    this.searchText = event.searchText;
+    this.selectedChipName = event?.criterias?.name || undefined;
+    await this.getMentors();
   }
+
+  async onClearSearch($event: string) {
+    this.searchText = '';
+    await this.getMentors();
+    }
   
-  selectChip(chip) {
-    if (this.selectedChipLabel === chip.label) {
-      this.selectedChipLabel = null;
-      this.selectedChipName = null;
-    } else {
-      this.selectedChipLabel = chip.label;
-      this.selectedChipName = chip.name;
-    }
-  }
 
-  closeCriteriaChip(){
-    this.selectedChipLabel = "";
-    this.selectedChipName = "";
-    this.showSelectedCriteria = "";
-  }
-
-  removeChip(chip: string,index: number) {
-    this.chips.splice(index, 1);
-    this.removeFilteredData(chip)
-    this.getUrlQueryData();
-    this.getMentors();
-  }
 
   async onClickFilter() {
     let modal = await this.modalCtrl.create({
@@ -162,6 +150,9 @@ export class MentorSearchDirectoryPage implements OnInit {
         break;
     }
   }
+  eventHandler(event: any) {
+    this.valueFromChipAndFilter = event;
+  }
 
   onPageChange(event){
     this.page = event.pageIndex + 1,
@@ -195,16 +186,30 @@ export class MentorSearchDirectoryPage implements OnInit {
   async getMentors(){
     var obj = {page: this.page, pageSize: this.pageSize, searchText: this.searchText.trim(), selectedChip: this.selectedChipName, urlQueryData: this.urlQueryData};
     let data = await this.profileService.getMentors(true,obj);
-    if(data && data.result){
+    if(data && data.result.data.length){
       this.isOpen = false;
       this.data = data.result.data;
       this.totalCount = data.result.count;
-    }else{
+      this.filterIcon = true;
+    } else {
+       
       this.data = [];
       this.totalCount = [];
+     
+      if (Object.keys(this.filteredDatas || {}).length === 0 && !this.selectedChipName) {
+        this.filterIcon = false;
+      }
+      
+   
     }
   }
 
+  removeChip(event) {
+    this.chips.splice(event.index, 1);
+    this.removeFilteredData(event.chipValue);
+    this.getUrlQueryData();
+    this.getMentors();
+  }
   ionViewDidLeave(){
     this.searchText = "";
     this.showSelectedCriteria = "";

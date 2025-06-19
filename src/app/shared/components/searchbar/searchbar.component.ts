@@ -9,16 +9,21 @@ import { ToastService } from 'src/app/core/services';
   styleUrls: ['./searchbar.component.scss'],
 })
 export class SearchbarComponent implements OnInit {
-  @Input() receivedData: any;
+  searchText: any;
+  @Input() parentSearchText: string;
   @Input() data: any;
   @Input() overlayChip: any;
   @Output() outputData = new EventEmitter();
   @Input() valueFromParent: any;
+
+  @Output() clearText = new EventEmitter<string>();
+  @Input() placeholder: string;
   isOpen = false;
   criteriaChipSubscription: any;
   criteriaChip: any;
   showSelectedCriteria: any;
-  searchText: any;
+
+
 
   constructor(
     private toast: ToastService,
@@ -26,6 +31,8 @@ export class SearchbarComponent implements OnInit {
   ) { }
 
   ngOnInit() {
+    if(this.parentSearchText)
+      this.searchText = this.parentSearchText;
     this.router.events
       .pipe(filter(event => event instanceof NavigationEnd))
       .subscribe(() => {
@@ -44,12 +51,19 @@ export class SearchbarComponent implements OnInit {
   }
 
   async onSearch(event){
+    if(event.length === 0) {
+      const emitData = {
+        searchText: '',
+        criterias: this.criteriaChip
+      }
+      this.outputData.emit(emitData);
+      return;
+    }
     if (event.length >= 3) {
       this.searchText = event ? event : "";
-      this.showSelectedCriteria = this.criteriaChip;
       const emitData = {
         searchText: this.searchText.trim(),
-        criterias: this.showSelectedCriteria
+        criterias: this.criteriaChip
       }
       this.outputData.emit(emitData);
     } else {
@@ -61,4 +75,10 @@ export class SearchbarComponent implements OnInit {
   private resetSearch() {
     this.searchText = null;
   }
+
+  onClearSearch() {
+    this.isOpen =false;
+    this.clearText.emit('')
+    this.criteriaChip= undefined;
+    }
 }
