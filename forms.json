@@ -2510,11 +2510,10 @@
                       "required": "Enter description",
                       "pattern": "This field can only contain alphanumeric characters"
                   },
-                  "validators": {
-                      "required": true,
-                      "maxLength": 300,
-                      "pattern": "^[a-zA-Z0-9-.,s ]+$"
-                  }
+                 "validators": {
+                 "required": true,
+                 "maxLength": 300
+                }
               }
           ]
       }
