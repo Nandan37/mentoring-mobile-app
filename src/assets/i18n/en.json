@@ -385,5 +385,7 @@
     "ACCEPTED_MESSAGE_REQ":"You have accepted this message request, and {{name}} is added to your connections.",
     "PENDING": "Pending",
     "ADD_NOW": "Add now",
-    "ADD_LATER": "Add later"
+    "ADD_LATER": "Add later",
+    "USER_INFO_NOT_FOUND": "User information cannot be found",
+    "USER_PROFILE_NOT_AVAILABLE": "It appears that the user's profile is no longer available."
 }
