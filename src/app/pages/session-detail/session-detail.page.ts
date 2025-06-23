@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnDestroy, OnInit } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { LocalStorageService, ToastService, UserService, UtilService } from 'src/app/core/services';
 import { SessionService } from 'src/app/core/services/session/session.service';
@@ -20,7 +20,7 @@ import { environment } from 'src/environments/environment';
   templateUrl: './session-detail.page.html',
   styleUrls: ['./session-detail.page.scss'],
 })
-export class SessionDetailPage implements OnInit {
+export class SessionDetailPage implements OnInit, OnDestroy {
   id: any;
   showEditButton: any;
   isConductor:any =false;
@@ -211,7 +211,14 @@ export class SessionDetailPage implements OnInit {
     } 
     this.dismissWhenBack = true;
   }
-  ionViewWillLeave(){
+
+  ionViewWillLeave() {
+    if(!this.skipWhenDelete && this.snackbarRef){
+      this.snackbarRef = this.toaster.dismiss()
+    }
+   }
+
+   ngOnDestroy() {
     if(!this.skipWhenDelete && this.snackbarRef){
       this.snackbarRef = this.toaster.dismiss()
     }
