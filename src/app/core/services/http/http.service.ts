@@ -99,6 +99,9 @@ export class HttpService {
           this.isFeedbackTriggered = true;
           this.openModal(result?.meta?.data[0]);
         }
+        if(options.url.includes("interface/v1/profile/get") && result?.responseCode) {
+          return result;
+        }else
         if (result.responseCode === "OK") {
           return result;
         } else {
