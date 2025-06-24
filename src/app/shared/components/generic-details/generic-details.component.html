@@ -54,6 +54,10 @@
           class="file-link" style="flex-direction: column;">
        <a [href]="resource.link" target="_blank" class="truncate-text"><ion-icon name="link" style="width: 150px;height: 150px; vertical-align: middle;"></ion-icon></a>
    </ng-container>
+   <ng-container *ngIf="resource.mime_type?.includes('video')"
+      class="file-link" style="flex-direction: column;">
+      <a [href]="resource.link" target="_blank" class="truncate-text"><ion-icon name="videocam" style="width: 150px;height: 150px; vertical-align: middle;"></ion-icon></a>
+   </ng-container>
     </div>
     </div>
 </div>
