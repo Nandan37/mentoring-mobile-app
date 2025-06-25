@@ -389,5 +389,12 @@
     "USER_INFO_NOT_FOUND": "User information cannot be found",
     "USER_PROFILE_NOT_AVAILABLE": "It appears that the user's profile is no longer available.",
     "CANT_SEND_MESSAGE": "Messages cannot be sent",
-    "CANT_SEND_MESSAGE_TO_MENTOR": "You can no longer send messages to this user."
+    "CANT_SEND_MESSAGE_TO_MENTOR": "You can no longer send messages to this user.",
+    "PROFESSIONAL_ROLE":"Professional role",
+    "PROFESSIONAL_SUBROLE":"Professional subrole",
+    "STATE":"State",
+    "CLUSTER":"Cluster",
+    "DISTRICT":"District",
+    "BLOCK":"Block",
+    "SCHOOL":"School"
 }

@@ -174,7 +174,7 @@ searchAndCriterias: any;
     if (this.user.about || environment['isAuthBypassed']) {
       switch (event.type) {
         case 'cardSelect':
-          this.router.navigate([`/${CommonRoutes.SESSIONS_DETAILS}/${event.data.id}`]);
+          this.router.navigate([`/${CommonRoutes.SESSIONS_DETAILS}/${event.data.id}`],{replaceUrl:true});
           break;
 
         case 'joinAction':

@@ -70,7 +70,7 @@ export class SessionDetailPage implements OnInit, OnDestroy {
   }
 
   public headerConfig: any = {
-    backButton: true,
+    backButton: false,
     label: "",
     share: false
   };

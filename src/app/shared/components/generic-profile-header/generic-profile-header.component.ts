@@ -40,15 +40,14 @@ export class GenericProfileHeaderComponent implements OnInit {
   }
 
   async ngOnInit() {
-    this.roles = this.headerData?.user_roles;
+    this.roles = this.headerData.organizations?.length && this.headerData.organizations[0].roles.filter((role: any) => role["title"] === "mentor");
+    this.isMentor =this.roles?.length && this.roles .some((role: any) => role.title === 'mentor');
   }
 
   async action(event) {
     switch (event) {
       case 'edit':
-        this.router.navigate([`/${CommonRoutes.EDIT_PROFILE}`],{
-          replaceUrl: true,
-          queryParams: { redirectUrl: `${CommonRoutes.TABS}/${CommonRoutes.PROFILE}` }});
+        this.router.navigate([`/${CommonRoutes.EDIT_PROFILE}`], {replaceUrl:true});
         break;
 
       case 'role':
@@ -110,8 +109,8 @@ export class GenericProfileHeaderComponent implements OnInit {
     });
   };
 
-  async viewRoles() {
-    const titlesArray = this.roles.map((item) => item.title);
+  async viewRoles(){
+    const titlesArray = this.headerData.organizations[0].roles.map(item => item.title);
     this.profileService.viewRolesModal(titlesArray);
   }
 }

@@ -23,8 +23,8 @@ export class MentorDetailsPage implements OnInit {
   mentorId;
   public isMobile: any;
   public headerConfig: any = {
-    backButton: true,
-    headerColor: 'primary',
+    backButton: false,
+    headerColor: "primary"
   };
 
   public buttonConfig = {
@@ -102,17 +102,16 @@ export class MentorDetailsPage implements OnInit {
     this.isMobile = utilService.isMobile();
     routerParams.params.subscribe((params) => {
       this.mentorId = this.buttonConfig.meta.id = params.id;
-      this.userService.getUserValue().then(async (result) => {
-        if (result) {
-          this.getMentor();
-        } else {
-          this.router.navigate(
-            [`/${CommonRoutes.AUTH}/${CommonRoutes.LOGIN}`],
-            { queryParams: { mentorId: this.mentorId } }
-          );
-        }
-      });
-    });
+      this.getMentor();
+      // this.userService.getUserValue().then(async (result) => {
+      //   console.log(result,"resultresultresultresult");
+      //   if (result) {
+      //     this.getMentor();
+      //   } else {
+      //     this.router.navigate([`/${CommonRoutes.AUTH}/${CommonRoutes.LOGIN}`], { queryParams: { mentorId: this.mentorId } })
+      //   }
+      // })
+    })
   }
 
   ngOnInit() {}
@@ -152,6 +151,7 @@ export class MentorDetailsPage implements OnInit {
     };
     try {
       let data = await this.httpService.get(config);
+      console.log("data ----------", data);
       return data;
     } catch (error) {}
   }
@@ -200,9 +200,7 @@ export class MentorDetailsPage implements OnInit {
   async onAction(event) {
     switch (event.type) {
       case 'cardSelect':
-        this.router.navigate([
-          `/${CommonRoutes.SESSIONS_DETAILS}/${event.data.id}`,
-        ]);
+        this.router.navigate([`/${CommonRoutes.SESSIONS_DETAILS}/${event.data.id}`],{replaceUrl:true});
         break;
 
       case 'joinAction':

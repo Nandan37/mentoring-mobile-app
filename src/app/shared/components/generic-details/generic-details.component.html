@@ -4,7 +4,7 @@
     <p class="session-detail-heading">{{item.title | translate }}</p>
     <div *ngIf="isArray(sessionData.data[item.key]); else elseBlock">
       <ion-chip outline="true" class="ion-margin-top" *ngFor="let chip of sessionData.data[item.key]">
-        <ion-label>{{chip.label}}</ion-label>
+        <ion-label>{{chip?.label}}</ion-label>
       </ion-chip>
     </div>
     <ng-template #elseBlock>
@@ -23,7 +23,7 @@
     </ng-template>
     <ng-template #elseBlock4>
       <div *ngIf="item?.key=='mentor_name';else elseBlock5">
-        <p class="break-word">{{sessionData.data[item.key] }}</p>
+        <p class="break-word">{{sessionData.data[item.key]['label'] || sessionData.data[item.key]}}</p>
         <div>
           {{sessionData.data.mentor_designation}}
         </div>
@@ -31,7 +31,9 @@
     </ng-template>
     <ng-template #elseBlock5>
       <p *ngIf="item?.key=='experience'" class="value">{{sessionData.data[item.key]}} {{"YEARS"|translate}}</p>
-      <p *ngIf="item?.key!='experience'" class="value">{{sessionData.data[item.key]}}</p>
+      <p *ngIf="item?.key!='experience'" class="value">
+        <span>{{ sessionData.data[item.key]?.label ? sessionData.data[item.key].label : (sessionData.data[item.key] || '') }} </span>
+      </p>
     </ng-template>
   </div>
 </div>

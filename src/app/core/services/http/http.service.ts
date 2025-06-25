@@ -14,6 +14,7 @@ import { FeedbackPage } from 'src/app/pages/feedback/feedback.page';
 import { CapacitorHttp } from '@capacitor/core';
 import { TranslateService } from '@ngx-translate/core';
 import { environment } from 'src/environments/environment';
+import { Router } from '@angular/router';
 
 
 @Injectable({
@@ -35,6 +36,7 @@ export class HttpService {
     private modalController: ModalController,
     private translate: TranslateService,
     private alert: AlertController,
+    private router : Router
   ) {  
     this.baseUrl = environment['baseUrl'];
   }
@@ -87,6 +89,7 @@ export class HttpService {
   throw Error(null);
 }
     const headers = requestParam.headers ? requestParam.headers : await this.setHeaders();
+    console.log("headers", headers);
     const options = {
       url: this.baseUrl + requestParam.url,
       headers: headers,
@@ -165,10 +168,9 @@ export class HttpService {
     }
   }
 
-  //token validation and logout 
 
   async getToken() {
-    let token = _.get(this.userService.token, 'access_token');
+    let token = localStorage.getItem('accToken');
     if (!token) {
       return null;
     }
@@ -183,7 +185,7 @@ export class HttpService {
       this.userService.token['access_token'] = access_token;
       await this.localStorage.setLocalData(localKeys.TOKEN, this.userService.token);
     }
-    let userToken = 'bearer ' + _.get(this.userService.token, 'access_token');
+    let userToken = token;
     return userToken;
   }
 
@@ -221,9 +223,15 @@ export class HttpService {
         this.toastService.showToast(msg ? msg : 'SOMETHING_WENT_WRONG', 'danger')
         break
       case 401:
-          this.triggerLogoutConfirmationAlert(result)
-
-        break
+        let auth = this.injector.get(AuthService);
+        if (result.data.message && result.data.message.startsWith('Congratulations')) {
+          this.triggerLogoutConfirmationAlert(result);
+        } else {
+          localStorage.clear();
+          auth.clearLocalData();
+          location.href = environment.unauthorizedRedirectUrl;
+        }
+        break;
       default:
         this.toastService.showToast(msg ? msg : 'SOMETHING_WENT_WRONG', 'danger')
     }
