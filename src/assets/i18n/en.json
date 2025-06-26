@@ -387,5 +387,9 @@
     "ADD_NOW": "Add now",
     "ADD_LATER": "Add later",
     "ADD_FILE": "Add file",
-    "INVALID_FILE": "Please provide both a name and a file."
+    "INVALID_FILE": "Please provide both a name and a file.",
+    "USER_INFO_NOT_FOUND": "User information cannot be found",
+    "USER_PROFILE_NOT_AVAILABLE": "It appears that the user's profile is no longer available.",
+    "CANT_SEND_MESSAGE": "Messages cannot be sent",
+    "CANT_SEND_MESSAGE_TO_MENTOR": "You can no longer send messages to this user."
 }

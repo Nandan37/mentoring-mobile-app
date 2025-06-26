@@ -82,11 +82,13 @@ export class MentorDetailsPage implements OnInit {
       organizationName: '',
     },
   };
-  userCantAccess: any;
+  userCantAccess?: boolean = false;
   isloaded: boolean = false;
   segmentValue = 'about';
   upcomingSessions;
   mentorProfileData: any;
+  userNotFound: boolean = false;
+  userCanAccess: boolean;
   constructor(
     private routerParams: ActivatedRoute,
     private httpService: HttpService,
@@ -125,11 +127,21 @@ export class MentorDetailsPage implements OnInit {
     this.mentorProfileData = await this.getMentorDetails();
     this.updateButtonConfig();
     this.isloaded = true;
-    this.userCantAccess =
-      this.mentorProfileData?.responseCode == 'OK' ? false : true;
+    switch (this.mentorProfileData?.responseCode) {
+      case 'OK':
+        this.userCanAccess = true;
+        break;
+      case 'SERVER_ERROR':
+        this.userCantAccess = true;
+        break;
+      case 'CLIENT_ERROR':
+        this.userNotFound = true;
+        break;
+    }
+
     this.detailData.data = this.mentorProfileData?.result;
     this.detailData.data.organizationName =
-      this.mentorProfileData?.result?.organization.name;
+      this.mentorProfileData?.result?.organization?.name;
     this.headerConfig.share = this.detailData.data?.is_mentor;
   }
 

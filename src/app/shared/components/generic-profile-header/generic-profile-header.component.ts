@@ -22,6 +22,7 @@ export class GenericProfileHeaderComponent implements OnInit {
   @Input() buttonConfig: any;
   @Input() showRole: any;
   @Input() isMentor: any;
+  @Input() userNotFound?: any;
   labels = ['CHECK_OUT_MENTOR', 'PROFILE_ON_MENTORED_EXPLORE_THE_SESSIONS'];
 
   public isMobile: any;
@@ -39,7 +40,7 @@ export class GenericProfileHeaderComponent implements OnInit {
   }
 
   async ngOnInit() {
-    this.roles = this.headerData.user_roles;
+    this.roles = this.headerData?.user_roles;
   }
 
   async action(event) {
