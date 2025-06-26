@@ -385,5 +385,7 @@
     "ACCEPTED_MESSAGE_REQ":"You have accepted this message request, and {{name}} is added to your connections.",
     "PENDING": "Pending",
     "ADD_NOW": "Add now",
-    "ADD_LATER": "Add later"
+    "ADD_LATER": "Add later",
+    "ADD_FILE": "Add file",
+    "INVALID_FILE": "Please provide both a name and a file."
 }

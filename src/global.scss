@@ -691,3 +691,13 @@ ion-searchbar {
 .height-0 {
   height: auto !important;
 }
+
+.pre-custom-modal {
+  --height: 300px;
+  @media (max-width: 768px) {
+    --height: 300px;
+    padding: 50px;
+  }
+
+
+}
