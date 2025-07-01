@@ -182,7 +182,8 @@ export class SearchAndSelectComponent implements OnInit, ControlValueAccessor {
       cssClass: 'pre-custom-modal',
       componentProps: {
         data: data, 
-        type: 'link'
+        type: 'link',
+        heading: 'ADD_LINK'
       },
       backdropDismiss: false
     });

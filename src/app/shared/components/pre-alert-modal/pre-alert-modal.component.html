@@ -2,7 +2,7 @@
   <div class="custom-pre-toolbar">
     <ion-title>
       {{
-        type === "link" ? ("ADD_LINK" | translate) : ("ADD_FILE" | translate)
+        heading | translate
       }}
     </ion-title>
     <ion-buttons slot="end">
@@ -14,20 +14,20 @@
 
   <ion-content class="">
     <ion-item class="custom-input">
-      <ion-label position="stacked">Name</ion-label>
+      <ion-label position="stacked">  {{"Name" | translate}}</ion-label>
       <ion-input
         [(ngModel)]="name"
-        placeholder="Enter Name"
+        [placeholder]="'Enter Name' | translate"
         maxlength="50"
       >
       </ion-input>
     </ion-item>
 
     <ion-item *ngIf="type === 'link'" class="custom-input">
-      <ion-label position="stacked">Link</ion-label>
+      <ion-label position="stacked">  {{"Link" | translate}}</ion-label>
       <ion-input
         [(ngModel)]="link"
-        placeholder="Enter link"
+        [placeholder]="'Enter Link' | translate"
         maxlength="50"
       >
       </ion-input>
@@ -39,7 +39,7 @@
       (click)="openFilePicker()"
     >
       <ion-icon name="add-circle-outline"></ion-icon>
-      Attach File
+      {{"Attach File" | translate}}
     </ion-button>
     @if (uploadedFile) {
       <ng-container >

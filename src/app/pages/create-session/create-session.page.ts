@@ -469,7 +469,8 @@ handleSelectedFile(file) {
             cssClass: 'pre-custom-modal',
             componentProps: {
               data: event.formControl.control, 
-              type: 'file'
+              type: 'file',
+              heading: 'ADD_FILE'
             },
             backdropDismiss: false
           });
