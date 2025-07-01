@@ -228,12 +228,9 @@ export class PrivatePage implements OnInit {
 
   async initializeApp() {
     await this.platform.ready();
-
     this.network.netWorkCheck();
-
     await this.profile.getChatToken();
-
-    this.profile.getTheme();
+    // this.profile.getTheme();
 
     await new Promise<void>((resolve) => {
       setTimeout(async () => {
