@@ -66,6 +66,7 @@ export class CreateSessionPage implements OnInit {
   queryParams: any;
   formConfig: any;
   mentor_id: any;
+  isHome: boolean;
 
   constructor(
     private sessionService: SessionService,
@@ -526,7 +527,8 @@ handleSelectedFile(file) {
           viewListMode: false,
           isMobile: this.isMobile,
           sessionType: this.sessionType,
-          mentorId: this.mentor_id
+          mentorId: this.mentor_id,
+          formConfig: this.isHome,
         }
       }
     });
@@ -606,7 +608,7 @@ handleSelectedFile(file) {
   async updateFormConfig() {
     const queryParams = this.route.snapshot.queryParams;
     const isManagePage = queryParams['source'] === 'manage';
-    const isHome = queryParams['source'] === 'home';
+    this.isHome = queryParams['source'] === 'home';
 
     if (isManagePage) {
       const hasPermission = await this.permissionService.hasPermission({
@@ -615,13 +617,12 @@ handleSelectedFile(file) {
       });
 
       this.formConfig = hasPermission ? MANAGERS_CREATE_SESSION_FORM : CREATE_SESSION_FORM;
-    } else if(isHome) {
+    } else if(this.isHome) {
       this.formConfig = CREATE_SESSION_FORM;
     } else if(queryParams.isCreator) {
       this.formConfig = CREATE_SESSION_FORM;
     }else {
       this.formConfig = MANAGERS_CREATE_SESSION_FORM;
     }
-    
   }
 }
