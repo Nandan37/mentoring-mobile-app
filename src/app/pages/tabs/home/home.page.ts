@@ -15,6 +15,7 @@ import { Capacitor } from '@capacitor/core';
 import { PermissionService } from 'src/app/core/services/permission/permission.service';
 import { environment } from 'src/environments/environment';
 import { FormBuilder, FormGroup } from '@angular/forms';
+import { MANAGERS_CREATE_SESSION_FORM } from 'src/app/core/constants/formConstant';
 
 @Component({
   selector: 'app-home',
@@ -251,7 +252,9 @@ export class HomePage implements OnInit {
       const cleaned = raw.replace(/```(?:json)?|```/g, '').trim();
       const json = JSON.parse(cleaned);
       console.log(json,"json ---? ");
+      this.utilService.openFormModel(json, MANAGERS_CREATE_SESSION_FORM);
       // this.sessionForm.patchValue(data);
+
     } catch (err) {
       console.error('Error processing voice input:', err);
     } finally {

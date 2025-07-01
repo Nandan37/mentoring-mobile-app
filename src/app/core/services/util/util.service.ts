@@ -9,6 +9,9 @@ import { BehaviorSubject, Subject } from 'rxjs';
 import * as Papa from 'papaparse';
 import { LocalStorageService } from '../localstorage.service';
 import { environment } from 'src/environments/environment';
+import { DynamicFormComponent, JsonFormData } from 'src/app/shared/components';
+import { FormService } from '../form/form.service';
+import * as _ from 'lodash-es';
 
 @Injectable({
   providedIn: 'root',
@@ -29,7 +32,8 @@ export class UtilService {
     private modalCtrl: ModalController,
     private alert: AlertController,
     private translate: TranslateService,
-    private localstorage: LocalStorageService
+    private localstorage: LocalStorageService,
+    private form : FormService
   ) {
     const browser = Bowser.getParser(window.navigator.userAgent);
   }
@@ -291,4 +295,79 @@ export class UtilService {
   removeMessageBadge() {
     this.messageBadge.next(false);
   }
+
+async openFormModel(data, formType){
+  console.log(data,"data");
+  console.log(formType,"formData");
+
+  const result = await this.form.getForm(formType);
+  let formData = _.get(result, 'data.fields');
+
+  let entityNames = await this.form.getEntityNames(formData);
+  let entityList = await this.form.getEntities(entityNames, 'SESSION');
+  let formDataJSON = await this.form.populateEntity(formData,entityList);
+  for (let i = 0; i < formDataJSON.controls.length; i++) {
+    formDataJSON.controls[i].value =
+      data[formDataJSON.controls[i].name];
+    if (formDataJSON.controls[i].type=='search' &&  formDataJSON.controls[i].meta.addPopupType !== 'file'){
+      if(formDataJSON.controls[i].meta.multiSelect){
+        formDataJSON.controls[i].meta.searchData = data[formDataJSON.controls[i].name]
+        formDataJSON.controls[i].value = formDataJSON.controls[i].meta.searchData ? formDataJSON.controls[i].meta.searchData.map(obj => obj.id || obj.value) : [];
+      } else {
+        // formDataJSON.controls[i].meta.searchData = [{
+        //   label: `${data.mentor_name}, ${data.organization.name}`,
+        //   id: data[formDataJSON.controls[i].name]
+        // }];
+      }
+   
+    }else if (formDataJSON.controls[i].type === 'search' && formDataJSON.controls[i].meta.addPopupType === 'file') {
+      const controlName = formDataJSON.controls[i].name;
+      // if (data.resources?.length) {
+      //   const filteredResources = data.resources
+      //     .filter(resource => resource.type === controlName)
+      //     .map(resource => 
+      //       ({
+      //         label: resource.name,
+      //         id: resource.id,
+      //         type: resource.type, 
+      //         link: resource.link
+      //       })
+      //     );
+      //     if(filteredResources){
+      //       formDataJSON.controls[i].value = filteredResources.map(r => r);
+      //       formDataJSON.controls[i].meta.searchData = filteredResources;
+      //     }
+      // }
+      // if (!formDataJSON.controls[i].meta.disableIfSelected && data.status.value  !== "COMPLETED" &&  formDataJSON.controls[i].meta.addPopupType !== 'file') {
+      //   formDataJSON.controls[i].disabled = false;
+      // }
+      // if (formDataJSON.controls[i].meta.disableIfSelected && formDataJSON.controls[i].value?.length && data.status.value  !== "COMPLETED") {
+      //   formDataJSON.controls[i].disabled = true;
+      // }
+    }
+    let dependedChildIndex = formDataJSON.controls.findIndex(formControl => formControl.name === formDataJSON.controls[i].dependedChild)
+    if(formDataJSON.controls[i].dependedChild && formDataJSON.controls[i].name === 'type'){
+      if(data[formDataJSON.controls[i].name].value){
+        formDataJSON.controls[i].disabled = true;
+        formDataJSON.controls[dependedChildIndex].validators['required']= data[formDataJSON.controls[i].name].value=='PUBLIC' ? false : true
+      }
+    }
+    formDataJSON.controls[i].options = _.unionBy(
+      formDataJSON.controls[i].options,
+      formDataJSON.controls[i].value, 'value'
+    );
+  }
+  
+  this.modalCtrl.create({
+    component: ModelComponent,
+    componentProps: {
+      data: formDataJSON,
+      readonly: false
+    },
+    backdropDismiss: false
+  }).then(modal => {
+    modal.present();
+  });
+}
+
 }
