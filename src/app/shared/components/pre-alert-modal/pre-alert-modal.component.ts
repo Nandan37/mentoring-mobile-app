@@ -1,4 +1,4 @@
-import { Component, Input } from '@angular/core';
+import { Component, ElementRef, Input, ViewChild } from '@angular/core';
 import { ActionSheetController, ModalController } from '@ionic/angular';
 import { TranslateService } from '@ngx-translate/core';
 import { ToastService, UtilService } from 'src/app/core/services';
@@ -9,7 +9,7 @@ import { ToastService, UtilService } from 'src/app/core/services';
   styleUrls: ['./pre-alert-modal.component.scss'],
 })
 export class PreAlertModalComponent {
-
+  @ViewChild('fileUpload') fileUpload: ElementRef;
   @Input() data: any;
   @Input() type: 'link' | 'file' = 'link';
   @Input() heading: string = '';
@@ -92,7 +92,7 @@ export class PreAlertModalComponent {
                     text: 'Camera',
                     icon: 'camera',
                     handler: () => {
-                        this.openCamera();
+                      this.openCamera();
                     }
                 },
                 {
@@ -115,7 +115,20 @@ export class PreAlertModalComponent {
     }
   
   }
+
   openCamera() {
+    this.fileUpload.nativeElement.click();
+  }
+
+  uploadCamera(event) {
+    const allowedFormats = ['image/jpeg', 'image/png'];
+    if (allowedFormats.includes(event.target.files[0].type)) {
+      this.uploadedFile = event.target.files[0];
+      this.toast.showToast("SUCCESSFULLY_ATTACHED", "success")
+    }
+    else {
+      this.toast.showToast("PLEASE_UPLOAD_IMAGE_FILE", "danger")
+    }
   }
 
 
