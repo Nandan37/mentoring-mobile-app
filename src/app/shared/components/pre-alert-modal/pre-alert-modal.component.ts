@@ -124,7 +124,10 @@ export class PreAlertModalComponent {
     const allowedFormats = ['image/jpeg', 'image/png'];
     if (allowedFormats.includes(event.target.files[0].type)) {
       this.uploadedFile = event.target.files[0];
-      this.toast.showToast("SUCCESSFULLY_ATTACHED", "success")
+      this.toast.showToast("SUCCESSFULLY_ATTACHED", "success");
+      if (this.fileUpload?.nativeElement) {
+        this.fileUpload.nativeElement.value = '';
+      }
     }
     else {
       this.toast.showToast("PLEASE_UPLOAD_IMAGE_FILE", "danger")
