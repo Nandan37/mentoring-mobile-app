@@ -68,8 +68,6 @@ export class FilterTreeComponent implements OnInit {
     if (filter.name === 'type') {
       if (sessionType === 'PUBLIC') {
         return true; 
-      } else if (sessionType === 'PRIVATE') {
-        return !filter.isConnectionEnabled;
       } else {
         return !filter.isConnectionEnabled;
       }

@@ -698,6 +698,16 @@ ion-searchbar {
     --height: 300px;
     padding: 50px;
   }
+}
 
+ion-item.item-interactive.ion-focused,
+ion-item.item-interactive.item-has-focus {
+  --highlight-color-focused: transparent !important;
+  --highlight-background: transparent !important;
+  box-shadow: none !important;
 
+}
+
+.has-focus.ion-valid.sc-ion-input-md-h {
+  --highlight-color: var(--ion-color-primary);
 }

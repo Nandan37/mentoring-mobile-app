@@ -32,7 +32,6 @@ export class PreAlertModalComponent {
 
   saveLink() {
     if (this.type === 'file') {
-      if(this.uploadedFile && this.name) {
         const obj = {
           name: this.name, 
           file: this.uploadedFile
@@ -41,13 +40,6 @@ export class PreAlertModalComponent {
           data: obj,
           success: true,
         });
-      } else {
-        this.toast.showToast(
-          this.translateService.instant('INVALID_FILE'),
-          'danger'
-        );
-        return;
-      }
     } else if(this.type === 'link') {
       if (
         this.link && this.name &&
@@ -133,8 +125,6 @@ export class PreAlertModalComponent {
       this.toast.showToast("PLEASE_UPLOAD_IMAGE_FILE", "danger")
     }
   }
-
-
 
   removeFile() {
     this.uploadedFile = null;
