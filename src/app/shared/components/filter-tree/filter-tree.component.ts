@@ -20,11 +20,18 @@ export class FilterTreeComponent implements OnInit {
   ngOnInit() {
     if (this.eventData.control.validators.required) {
       this.filterData.forEach(filter => {
-        if (filter.name === "type" && filter.key === "connected_mentees" && this.eventData?.formConfig) {
+      if (filter.name === "type" && filter.key === "connected_mentees" && this.eventData?.formConfig) {
           filter.options.forEach(option => {
             option.selected = true;
             this.onFilterChange();  
             option.readOnly = true; 
+          });
+        }  
+        if (filter.name === "type" && filter.key === "connected_mentors" ) {
+          filter.options.forEach(option => {
+            option.selected = false;
+            this.onFilterChange();  
+            option.readOnly = false; 
           });
         }
       });
