@@ -478,6 +478,7 @@ handleSelectedFile(file) {
         
           modal.onDidDismiss().then((result) => {
             if (result.data && result.data.success) {
+              event.formControl.control.value = event.formControl.control.value || [];
               event.formControl.control.value.push(result.data.data);
             }
           });
