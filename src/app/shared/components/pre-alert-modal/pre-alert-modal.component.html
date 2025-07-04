@@ -29,8 +29,13 @@
         [(ngModel)]="link"
         [placeholder]="'ENTER_LINK' | translate"
         maxlength="50"
+        (ionInput)="onLinkInput()"
+        [debounce]="500"
       >
       </ion-input>
+      <ion-text color="danger" *ngIf="showLinkError">
+        {{ "INVALID_LINK" | translate }}
+      </ion-text>
     </ion-item>
     <div class="pre-button-container">
       <ion-button
@@ -60,7 +65,7 @@
       <ion-button
         color="primary"
         fill="solid"
-        [disabled]="!name || (!link && !uploadedFile)"
+        [disabled]="!name || (type === 'link' && (!link || showLinkError)) || (type === 'file' && !uploadedFile)"
         (click)="saveLink()"
       >
         {{ "ADD" | translate }}
