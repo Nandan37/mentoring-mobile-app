@@ -21,6 +21,7 @@ import { manageSessionAction, permissions } from 'src/app/core/constants/permiss
 import { PermissionService } from 'src/app/core/services/permission/permission.service';
 import { SearchPopoverComponent } from 'src/app/shared/components/search-popover/search-popover.component';
 import { SearchCompetencyComponent } from 'src/app/shared/components/search-competency/search-competency.component';
+import { PreAlertModalComponent } from 'src/app/shared/components/pre-alert-modal/pre-alert-modal.component';
 
 @Component({
   selector: 'app-create-session',
@@ -65,6 +66,7 @@ export class CreateSessionPage implements OnInit {
   queryParams: any;
   formConfig: any;
   mentor_id: any;
+  isHome: boolean;
 
   constructor(
     private sessionService: SessionService,
@@ -176,21 +178,21 @@ export class CreateSessionPage implements OnInit {
     for (const control of this.formData.controls) {
       if (control.type === 'search' && control.meta?.addPopupType === 'file' && control.value?.length) {
         for (const file of control.value) {
-          if(file?.isLink && file.name){
+          if(file?.isLink && file.link){
             this.updatedFiles.push({
               "name":file.name,
-              "link":file.name,
+              "link":file.link,
               "type":control.name,
               "mime_type":"link",
           });
-          }else if (file instanceof File && file.name) {
-              const signedUrl = await this.getSignedUrl(file.name);
-              const uploadedFileUrl = await this.uploadFile(file, signedUrl);
+          }else if (file.file instanceof File && file.file.name) {
+              const signedUrl = await this.getSignedUrl(file.file.name);
+              const uploadedFileUrl = await this.uploadFile(file.file, signedUrl);
               this.updatedFiles.push({
                 "name":file.name,
                 "link":uploadedFileUrl,
                 "type":control.name,
-                "mime_type":file.type,
+                "mime_type":file.file.type,
             });
           } 
           else if (file.name){
@@ -221,6 +223,7 @@ export class CreateSessionPage implements OnInit {
   async onSubmit() {
     if (!this.isSubmited) {
       this.form1.onSubmit();
+
     }
     if (this.form1.myForm.valid) {
       await this.handleFileUploads();
@@ -462,56 +465,25 @@ handleSelectedFile(file) {
     // Handle file upload logic here
 }
   async showResourcesPopup(event) {
-    const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
-
-    if (isMobile) {
-        // Show options for Camera or File
-        const actionSheet = await this.actionSheetController.create({
-            header: 'Select Resource',
-            buttons: [
-                {
-                    text: 'Camera',
-                    icon: 'camera',
-                    handler: () => {
-                        this.openCamera();
-                    }
-                },
-                {
-                    text: 'File',
-                    icon: 'folder',
-                    handler: () => {
-                        this.openFilePicker(event);
-                    }
-                },
-                {
-                    text: 'Cancel',
-                    icon: 'close',
-                    role: 'cancel'
-                }
-            ]
-        });
-        await actionSheet.present();
-    } else {
-        this.openFilePicker(event);
-    }
-}
-
-openCamera() {
-}
-
-openFilePicker(event) {
-  const input = document.createElement('input');
-  input.type = 'file';
-  input.accept = '*/*';
-  input.onchange = (fileEvent: any) => {
-    const file = fileEvent.target.files[0];
-    event.formControl.control.value = event?.formControl?.control?.value || [];
-    if (event?.formControl?.control?.value) {
-      event.formControl.control.value.push(file);
-    } else {
-    }
-  };
-  input.click();
+       const modal = await this.modalCtrl.create({
+            component: PreAlertModalComponent,
+            cssClass: 'pre-custom-modal',
+            componentProps: {
+              data: event.formControl.control, 
+              type: 'file',
+              heading: 'ADD_FILE'
+            },
+            backdropDismiss: false
+          });
+        
+          modal.onDidDismiss().then((result) => {
+            if (result.data && result.data.success) {
+              event.formControl.control.value = event.formControl.control.value || [];
+              event.formControl.control.value.push(result.data.data);
+            }
+          });
+        
+          return await modal.present();
 }
 
   async showCompetencyPopup(event) {
@@ -556,7 +528,8 @@ openFilePicker(event) {
           viewListMode: false,
           isMobile: this.isMobile,
           sessionType: this.sessionType,
-          mentorId: this.mentor_id
+          mentorId: this.mentor_id,
+          formConfig: this.isHome,
         }
       }
     });
@@ -636,7 +609,7 @@ openFilePicker(event) {
   async updateFormConfig() {
     const queryParams = this.route.snapshot.queryParams;
     const isManagePage = queryParams['source'] === 'manage';
-    const isHome = queryParams['source'] === 'home';
+    this.isHome = queryParams['source'] === 'home';
 
     if (isManagePage) {
       const hasPermission = await this.permissionService.hasPermission({
@@ -645,13 +618,12 @@ openFilePicker(event) {
       });
 
       this.formConfig = hasPermission ? MANAGERS_CREATE_SESSION_FORM : CREATE_SESSION_FORM;
-    } else if(isHome) {
+    } else if(this.isHome) {
       this.formConfig = CREATE_SESSION_FORM;
     } else if(queryParams.isCreator) {
       this.formConfig = CREATE_SESSION_FORM;
     }else {
       this.formConfig = MANAGERS_CREATE_SESSION_FORM;
     }
-    
   }
 }

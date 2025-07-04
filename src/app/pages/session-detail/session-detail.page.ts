@@ -233,7 +233,7 @@ export class SessionDetailPage implements OnInit, OnDestroy {
         this.isConductor = this.userDetails.id == response.mentor_id ? true : false;
       }
       let twentyFourHoursInSeconds = 24 * 60 * 60;
-      this.headerConfig.edit = (this.isCreator && response?.status?.value !="COMPLETED" && response.end_date > 0 && (currentTimeInSeconds - response.end_date) <= twentyFourHoursInSeconds);
+      this.headerConfig.edit = (this.isCreator  && response.end_date > 0 && (currentTimeInSeconds - response.end_date) <= twentyFourHoursInSeconds);
       this.headerConfig.delete = (this.isCreator && response?.status?.value !="COMPLETED" && response?.status?.value !="LIVE" &&  ((response.end_date>currentTimeInSeconds)))?true:null;
   }
 

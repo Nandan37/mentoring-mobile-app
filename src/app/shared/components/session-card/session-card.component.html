@@ -97,7 +97,7 @@
           *ngIf="
             meetingPlatform?.platform == 'OFF' &&
             isCreator &&
-            data.status != 'COMPLETED'
+            data.status.value != 'COMPLETED'
           "
         >
           <ion-icon name="videocam"></ion-icon>

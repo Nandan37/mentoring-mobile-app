@@ -9,6 +9,7 @@ import { BehaviorSubject, Subject } from 'rxjs';
 import * as Papa from 'papaparse';
 import { LocalStorageService } from '../localstorage.service';
 import { environment } from 'src/environments/environment';
+import { ToastService } from '../toast.service';
 
 @Injectable({
   providedIn: 'root',
@@ -29,7 +30,8 @@ export class UtilService {
     private modalCtrl: ModalController,
     private alert: AlertController,
     private translate: TranslateService,
-    private localstorage: LocalStorageService
+    private localstorage: LocalStorageService,
+    private toast: ToastService
   ) {
     const browser = Bowser.getParser(window.navigator.userAgent);
   }
@@ -291,4 +293,42 @@ export class UtilService {
   removeMessageBadge() {
     this.messageBadge.next(false);
   }
+
+  uploadFile(): Promise<File | null> {
+    return new Promise((resolve) => {
+      const input = document.createElement('input');
+      input.type = 'file';
+      input.accept = '*/*';
+  
+      input.addEventListener('change', (fileEvent: Event) => {
+        const target = fileEvent.target as HTMLInputElement;
+        const file = target.files?.[0];
+  
+        if (!file) {
+          this.toast.showToast(
+            this.translate.instant('No file selected'),
+            'danger'
+          );
+          return resolve(null);
+        }
+  
+        if (!file.type || file.type.trim() === '') {
+          this.toast.showToast(
+            this.translate.instant('Cannot upload file: File type is not detected. Please try a different file.'),
+            'danger'
+          );
+          return resolve(null);
+        }
+  
+        if (!file.name || file.name.trim() === '') {
+          return resolve(null);
+        }
+  
+        return resolve(file);
+      });
+  
+      input.click();
+    });
+  }
+  
 }

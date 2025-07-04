@@ -1276,7 +1276,7 @@
                 ],
                 "type": [
                   {
-                      "isConnectionEnabled": false,
+                      "isConnectionEnabled": true,
                       "isEnabled": true,
                       "key": "connected_mentors",
                       "type": "checkbox",
