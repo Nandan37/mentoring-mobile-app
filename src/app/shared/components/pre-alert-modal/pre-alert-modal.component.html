@@ -41,12 +41,12 @@
       <ion-button
       fill="outline"
       shape="round"
-     *ngIf="type === 'file' && !uploadedFile" 
+      *ngIf="type === 'file' && !uploadedFile" 
       (click)="openFilePicker()"
-    >
-      <ion-icon name="add-circle-outline"></ion-icon>
+        >
+      <ion-icon name="add-circle-outline" style="margin-right: 8px;"></ion-icon>
       {{"ATTACH_FILE" | translate}}
-    </ion-button>
+        </ion-button>
     @if (uploadedFile) {
       <ng-container >
         <ion-chip  class="color-red">
