@@ -55,9 +55,9 @@ export class SessionDetailPage implements OnInit, OnDestroy {
     this.isMobile = utilService.isMobile()
   }
   ngOnInit() {
-      App.addListener('appStateChange', (state: AppState) => {
+      App.addListener('appStateChange', async (state: AppState) => {
         if (state.isActive == true && this.id && this.sessionDatas && !this.dismissWhenBack) {
-          this.fetchSessionDetails();
+          await this.fetchSessionDetails();
         }
       });
   }
@@ -66,7 +66,7 @@ export class SessionDetailPage implements OnInit, OnDestroy {
     this.detailData.form = JSON.parse(JSON.stringify(this.defaultUiForm));
     await this.user.getUserValue();
     this.userDetails = await this.localStorage.getLocalData(localKeys.USER_DETAILS);
-    this.fetchSessionDetails();
+    await this.fetchSessionDetails();
   }
 
   public headerConfig: any = {
