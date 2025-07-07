@@ -3,6 +3,7 @@ import { Component, OnInit } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { localKeys } from 'src/app/core/constants/localStorage.keys';
 import { urlConstants } from 'src/app/core/constants/urlConstants';
+import { SKELETON } from 'src/app/core/constants/skeleton.constant';
 import {
   HttpService,
   LocalStorageService,
@@ -89,6 +90,7 @@ export class MentorDetailsPage implements OnInit {
   mentorProfileData: any;
   userNotFound: boolean = false;
   userCanAccess: boolean;
+  SKELETON = SKELETON;
   constructor(
     private routerParams: ActivatedRoute,
     private httpService: HttpService,
@@ -151,7 +153,6 @@ export class MentorDetailsPage implements OnInit {
     };
     try {
       let data = await this.httpService.get(config);
-      console.log("data ----------", data);
       return data;
     } catch (error) {}
   }
@@ -161,7 +162,8 @@ export class MentorDetailsPage implements OnInit {
   }
 
   async segmentChanged(ev: any) {
-    this.segmentValue = ev.detail.value;
+       this.segmentValue = ev.detail.value;
+    if(this.upcomingSessions) return;
     this.upcomingSessions =
       this.segmentValue == 'upcoming'
         ? await this.sessionService.getUpcomingSessions(this.mentorId)
