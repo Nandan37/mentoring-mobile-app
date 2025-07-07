@@ -16,6 +16,7 @@ export class PreAlertModalComponent {
 
   name: string = '';
   link: string = '';
+  showLinkError: boolean = false;
   uploadedFile: File;
 
   constructor(
@@ -26,7 +27,19 @@ export class PreAlertModalComponent {
     private utilService: UtilService
   ) {}
 
+  onLinkInput() {
+    const trimmed = this.link?.trim() || '';
+    if (!trimmed) {
+      this.showLinkError = false;
+      return;
+    }
+    const urlRegex = /^(https?:\/\/)[\w.-]+(:\d+)?(\/[\w\-./?%&=]*)?$/i;
+    this.showLinkError = !urlRegex.test(trimmed);
+  }
+  
+
   dismissModal() {
+    this.showLinkError = false;
     this.modalController.dismiss();
   }
 
@@ -41,10 +54,6 @@ export class PreAlertModalComponent {
           success: true,
         });
     } else if(this.type === 'link') {
-      if (
-        this.link && this.name &&
-        (this.link.startsWith('http://') || this.link.startsWith('https://'))
-      ) {
         const obj = {
           name: this.name,
           link: this.link,
@@ -57,14 +66,7 @@ export class PreAlertModalComponent {
           data: obj,
           success: true,
         });
-      } else {
-        this.toast.showToast(
-          this.translateService.instant('INVALID_LINK'),
-          'danger'
-        );
-        return;
-      }
-    }
+      } 
   }
   selectFile() {
    this.utilService.uploadFile().then((file: File) => {
