@@ -39,11 +39,19 @@
     </ion-grid>
 
     <ion-list *ngSwitchCase="'upcoming'">
-      <div *ngIf="!upcomingSessions?.length">
+      <div *ngIf="!upcomingSessions">
+          <app-skeleton
+        [type]="SKELETON.SESSION_CARD_SKELETON"
+        [repetition]="4"
+      ></app-skeleton>
+      </div>
+
+      <div *ngIf="upcomingSessions && upcomingSessions.length === 0">
         <p class="no-details-message">
           {{ "NO_UPCOMING_SESSIONS" | translate }}
         </p>
       </div>
+
       <ion-grid>
         <ion-row class="d-flex">
           <ion-col
