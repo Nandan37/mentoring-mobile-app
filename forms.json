@@ -542,21 +542,6 @@
                                         "key": "organizations",
                                         "type": "checkbox"
                                     }
-                                ],
-                                "type": [
-                                    {
-                                        "isConnectionEnabled": true,
-                                        "key": "connected_mentees",
-                                        "type": "checkbox",
-                                        "title": "Type",
-                                        "name": "type",
-                                        "options": [
-                                            {
-                                                "label": "Connected mentees",
-                                                "value": "true"
-                                            }
-                                        ]
-                                    }
                                 ]
                             },
                             "filterType": "mentee",
