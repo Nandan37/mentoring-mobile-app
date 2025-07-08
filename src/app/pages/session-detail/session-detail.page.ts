@@ -66,7 +66,7 @@ export class SessionDetailPage implements OnInit, OnDestroy {
     this.detailData.form = JSON.parse(JSON.stringify(this.defaultUiForm));
     await this.user.getUserValue();
     this.userDetails = await this.localStorage.getLocalData(localKeys.USER_DETAILS);
-    await this.fetchSessionDetails();
+     await this.fetchSessionDetails();
   }
 
   public headerConfig: any = {
@@ -172,14 +172,20 @@ export class SessionDetailPage implements OnInit, OnDestroy {
       } else {
         this.isEnabled = ((response.start_date-currentTimeInSeconds)<600 || response?.status?.value=='LIVE')?true:false;
       }
-      this.detailData.data = Object.assign({}, response);
-      this.detailData.data.start_date = readableStartDate;
-      this.detailData.data.meeting_info = response.meeting_info?.platform;
-      this.detailData.data.mentee_count = response.seats_limit - response.seats_remaining
+      this.detailData = {
+        data: {
+            ...response,
+            start_date: readableStartDate,
+            meeting_info: response.meeting_info?.platform,
+            mentee_count: response.seats_limit - response.seats_remaining,
+            mentor_designation: response?.mentor_designation.map(d => d?.label).join(', ')
+          },
+          form: [...this.detailData.form]
+        };
       this.startDate = (response.start_date>0)?new Date(response.start_date * 1000):this.startDate;
       this.endDate = (response.end_date>0)?new Date(response.end_date * 1000):this.endDate;
       this.platformOff = (response?.meeting_info?.platform == 'OFF') ? true : false;
-      this.detailData.data.mentor_designation = response?.mentor_designation.map(designation => designation?.label).join(', ');
+     
       if((!this.isConductor && !this.detailData.form.some(obj => obj.title === 'MENTOR'))){
         this.detailData.form.push(
           {
