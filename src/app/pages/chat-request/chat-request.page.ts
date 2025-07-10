@@ -95,7 +95,7 @@ export class ChatRequestPage implements OnInit {
       const message = this.translate.instant('ACCEPTED_MESSAGE_REQ', { name });
       this.toast.showToast(message, 'success');
       this.info.status = 'ACCEPTED';
-        this.router.navigate([CommonRoutes.CHAT, resp?.result?.meta.room_id],{queryParams:{id:resp?.result?.id}});
+        this.router.navigate([CommonRoutes.CHAT, resp?.result?.meta.room_id],{replaceUrl: true, queryParams:{id:resp?.result?.id}});
     });
   }
 
