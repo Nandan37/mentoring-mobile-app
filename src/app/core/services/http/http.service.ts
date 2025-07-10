@@ -215,6 +215,9 @@ export class HttpService {
 
   public handleError(result) {
     let msg = result.data.message;
+    if (result.url.includes(urlConstants.API_URLS.GET_CHAT_TOKEN)) {
+      return;
+    }
     switch (result.status) {
       case 400:
       case 406:
