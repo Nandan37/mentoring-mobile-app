@@ -711,3 +711,8 @@ ion-item.item-interactive.item-has-focus {
 .has-focus.ion-valid.sc-ion-input-md-h {
   --highlight-color: var(--ion-color-primary);
 }
+
+ion-textarea textarea {
+  font-family: "NotoSans-Regular" !important;
+  font-weight: normal !important;
+}
