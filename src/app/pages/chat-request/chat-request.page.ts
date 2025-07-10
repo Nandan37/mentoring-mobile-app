@@ -112,13 +112,13 @@ export class ChatRequestPage implements OnInit {
       buttons: [
         {
           text: texts['REJECT'],
-          role: 'cancel',
           handler: () => {
             this.rejectRequest();
           },
         },
         {
           text: texts['CANCEL'],
+          role: 'cancel',
           handler: () => {},
         },
       ],
