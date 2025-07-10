@@ -53,9 +53,9 @@ export class ChatRequestPage implements OnInit {
       if (resp?.result?.status == 'REQUESTED') {
         this.message = '';
       }
-      // else if(resp?.result?.status == 'ACCEPTED') {
-      //   this.router.navigate([CommonRoutes.CHAT, resp?.result?.meta.room_id],{queryParams:{id:resp?.result?.id}, replaceUrl: true });
-      // }
+      else if(resp?.result?.status == 'ACCEPTED') {
+        this.router.navigate([CommonRoutes.CHAT, resp?.result?.meta.room_id],{queryParams:{id:resp?.result?.id}, replaceUrl: true });
+      }
       this.info.status = !resp?.result?.status
         ? 'PENDING'
         : resp?.result?.status;
