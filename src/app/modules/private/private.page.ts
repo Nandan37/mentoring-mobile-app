@@ -229,7 +229,16 @@ export class PrivatePage implements OnInit {
   async initializeApp() {
     await this.platform.ready();
     this.network.netWorkCheck();
-    await this.profile.getChatToken();
+    let theme: any =  localStorage.getItem('theme');
+    if (theme) {
+      try {
+        theme = JSON.parse(theme);
+        document.documentElement.style.setProperty('--ion-color-primary', theme.primaryColor);
+        document.documentElement.style.setProperty('--ion-color-secondary', theme.secondaryColor);
+      } catch (error) {
+        console.error("Error parsing theme from localStorage:", error);
+      }
+    }
     // this.profile.getTheme();
 
     await new Promise<void>((resolve) => {
@@ -249,7 +258,7 @@ export class PrivatePage implements OnInit {
               )
             : false;
         }
-
+        await this.profile.getChatToken();
         this.getUser();
         resolve();
       }, 0);
