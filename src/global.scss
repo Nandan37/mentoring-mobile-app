@@ -711,3 +711,16 @@ ion-item.item-interactive.item-has-focus {
 .has-focus.ion-valid.sc-ion-input-md-h {
   --highlight-color: var(--ion-color-primary);
 }
+
+
+.custom-alert-with-close .alert-header {
+  position: relative;
+}
+.custom-alert-with-close .close-alert-icon {
+  position: absolute;
+  top: 12px;
+  right: 12px;
+  font-size: 24px;
+  cursor: pointer;
+  color: #000;
+}
