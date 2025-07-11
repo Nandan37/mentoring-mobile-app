@@ -94,7 +94,7 @@ async ionViewWillEnter() {
 
   if (chip) {
     const matchedField = this.overlayChips?.find(d => d.name === chip);
-    if (matchedField) {
+    if (matchedField && search) {
       this.searchAndCriterias = {
         ...this.searchAndCriterias,
         headerData: {
@@ -133,7 +133,6 @@ async ionViewWillEnter() {
   async onClearSearch($event: string) {
     this.searchAndCriterias.headerData.searchText = '';
     this.searchAndCriterias.headerData.criterias = undefined;
-    
     this.router.navigate([], {
       relativeTo: this.route,
       queryParams: { search: '', chip: '' },
@@ -246,7 +245,6 @@ async ionViewWillEnter() {
       this.isOpen = false;
       this.data = data.result.data;
       this.totalCount = data.result.count;
-      this.filterIcon = true;
     } else {
        
       this.data = [];
@@ -256,6 +254,7 @@ async ionViewWillEnter() {
         this.filterIcon = false;
       }
     }
+    this.filterIcon = !!obj.searchText?.trim();
   }
 
   removeChip(event) {
@@ -274,6 +273,7 @@ async ionViewWillEnter() {
         }
       }
     };
+    this.filterIcon = false;
     this.chips = [];
     this.urlQueryData = null;
   }
