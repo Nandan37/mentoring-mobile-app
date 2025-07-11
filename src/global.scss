@@ -712,6 +712,11 @@ ion-item.item-interactive.item-has-focus {
   --highlight-color: var(--ion-color-primary);
 }
 
+ion-textarea textarea {
+  font-family: "NotoSans-Regular" !important;
+  font-weight: normal !important;
+}
+
 
 .custom-alert-with-close .alert-header {
   position: relative;

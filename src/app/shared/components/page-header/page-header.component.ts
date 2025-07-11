@@ -36,13 +36,12 @@ export class PageHeaderComponent implements OnInit {
 
   onBack() {
     const currentUrl = this.router.url;
-    const isTabRoute = this.routes.some(route =>{
-    return  currentUrl.includes(route.url);
-    }
-    );
-    if(currentUrl == `/${CommonRoutes.TABS}/${CommonRoutes.HOME}`){
-      window.location.href = `${environment.unauthorizedRedirectUrl}/home`;
-    }else{
+    console.log(currentUrl,"currentUrl --->", this.router.url);
+    console.log(window.location.origin,"window.location.origin; --->");
+    if (currentUrl === `/${CommonRoutes.TABS}/${CommonRoutes.HOME}`) {
+      const baseUrl = window.location.origin;
+      window.location.href = `${baseUrl}/home`;
+    } else {
       this.location.pop();
     }
   }
