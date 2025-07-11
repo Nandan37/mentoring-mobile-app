@@ -28,11 +28,9 @@ export class MentorSearchDirectoryPage implements OnInit {
     headerColor: 'primary',
     // label:'MENU'
   };
-  searchText: string = '';
+  
   isOpen = false;
   overlayChips = [];
-  selectedChipLabel: any;
-  selectedChipName: any;
   filterData: any;
   filteredDatas: any[];
   filterIcon: boolean;
@@ -45,11 +43,17 @@ export class MentorSearchDirectoryPage implements OnInit {
   totalCount: any;
   limit: any;
   chips = [];
-  showSelectedCriteria: any;
   buttonConfig: any;
-  searchAndCriterias: any;
+  searchAndCriterias: any = {
+    headerData: {
+      searchText: '',
+      criterias: {
+        name: undefined,
+        label: undefined
+      }
+    }
+  };
   valueFromChipAndFilter: string;
-;
 
   constructor(
     private router: Router,
@@ -68,31 +72,75 @@ export class MentorSearchDirectoryPage implements OnInit {
     })
    }
 
-  async ionViewWillEnter() {
-    this.getMentors();
-    this.permissionService.getPlatformConfig().then((config)=>{
-      this.overlayChips = config?.result?.search_config?.search?.mentor?.fields;
-    });
-    const obj = {filterType: 'mentor', org: true};
-    let data = await this.formService.filterList(obj);
-    this.filterData = await this.utilService.transformToFilterData(data, obj);
+async ionViewWillEnter() {
+  const queryParams = this.route.snapshot.queryParams;
+  const search = queryParams['search'];
+  const chip = queryParams['chip'];
+
+  if (search) {
+    this.searchAndCriterias = {
+      ...this.searchAndCriterias,
+      headerData: {
+        ...this.searchAndCriterias.headerData,
+        searchText: search
+      }
+    };
   }
+
+  this.getMentors();
+
+  const config = await this.permissionService.getPlatformConfig();
+  this.overlayChips = config?.result?.search_config?.search?.mentor?.fields;
+
+  if (chip) {
+    const matchedField = this.overlayChips?.find(d => d.name === chip);
+    if (matchedField) {
+      this.searchAndCriterias = {
+        ...this.searchAndCriterias,
+        headerData: {
+          ...this.searchAndCriterias.headerData,
+          criterias: {
+            name: matchedField.name,
+            label: matchedField.label
+          }
+        }
+      };
+    }
+  }
+
+  const obj = {filterType: 'mentor', org: true};
+  let data = await this.formService.filterList(obj);
+  this.filterData = await this.utilService.transformToFilterData(data, obj);
+
+}
+
 
   async onSearch(event){
     this.searchAndCriterias = {
       headerData: event,
     };
-    this.searchText = event.searchText;
-    this.selectedChipName = event?.criterias?.name || undefined;
+    this.router.navigate([], {
+      relativeTo: this.route,
+      queryParams: { 
+        search: event.searchText, 
+        chip: event?.criterias?.name 
+      },
+      queryParamsHandling: 'merge',
+    });
     await this.getMentors();
   }
 
   async onClearSearch($event: string) {
-    this.searchText = '';
+    this.searchAndCriterias.headerData.searchText = '';
+    this.searchAndCriterias.headerData.criterias = undefined;
+    
+    this.router.navigate([], {
+      relativeTo: this.route,
+      queryParams: { search: '', chip: '' },
+      queryParamsHandling: 'merge',
+    });
     await this.getMentors();
-    }
-  
-
+  }
 
   async onClickFilter() {
     let modal = await this.modalCtrl.create({
@@ -150,8 +198,10 @@ export class MentorSearchDirectoryPage implements OnInit {
         break;
     }
   }
+  
   eventHandler(event: any) {
     this.valueFromChipAndFilter = event;
+    this.searchAndCriterias.headerData.criterias = {name: undefined, label: undefined}
   }
 
   onPageChange(event){
@@ -184,7 +234,13 @@ export class MentorSearchDirectoryPage implements OnInit {
   }
 
   async getMentors(){
-    var obj = {page: this.page, pageSize: this.pageSize, searchText: this.searchText.trim(), selectedChip: this.selectedChipName, urlQueryData: this.urlQueryData};
+    var obj = {
+      page: this.page, 
+      pageSize: this.pageSize, 
+      searchText: this.searchAndCriterias.headerData.searchText?.trim(), 
+      selectedChip: this.searchAndCriterias.headerData.criterias?.name, 
+      urlQueryData: this.urlQueryData
+    };
     let data = await this.profileService.getMentors(true,obj);
     if(data && data.result.data.length){
       this.isOpen = false;
@@ -196,11 +252,9 @@ export class MentorSearchDirectoryPage implements OnInit {
       this.data = [];
       this.totalCount = [];
      
-      if (Object.keys(this.filteredDatas || {}).length === 0 && !this.selectedChipName) {
+      if (Object.keys(this.filteredDatas || {}).length === 0 && !this.searchAndCriterias.headerData.criterias?.name) {
         this.filterIcon = false;
       }
-      
-   
     }
   }
 
@@ -210,13 +264,17 @@ export class MentorSearchDirectoryPage implements OnInit {
     this.getUrlQueryData();
     this.getMentors();
   }
+  
   ionViewDidLeave(){
-    this.searchText = "";
-    this.showSelectedCriteria = "";
-    this.selectedChipLabel = null;
-    this.selectedChipName = null;
+    this.searchAndCriterias = {
+      headerData: {
+        searchText: '',
+        criterias: {
+          name: undefined
+        }
+      }
+    };
     this.chips = [];
     this.urlQueryData = null;
   }
-
 }
