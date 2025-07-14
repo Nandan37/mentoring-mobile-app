@@ -5,7 +5,7 @@ import { TranslateService } from '@ngx-translate/core';
 import { replace } from 'lodash';
 import { CHAT_MESSAGES } from 'src/app/core/constants/chatConstants';
 import { urlConstants } from 'src/app/core/constants/urlConstants';
-import { HttpService, ToastService } from 'src/app/core/services';
+import { HttpService, ToastService, UtilService } from 'src/app/core/services';
 import { CommonRoutes } from 'src/global.routes';
 @Component({
   selector: 'app-chat-request',
@@ -30,7 +30,8 @@ export class ChatRequestPage implements OnInit {
     private toast: ToastService,
     private alert: AlertController,
     private translate: TranslateService,
-    private router: Router
+    private router: Router,
+    private utilService: UtilService
   ) {
     routerParams.params.subscribe((parameters) => {
       this.id = parameters?.id;
@@ -99,32 +100,25 @@ export class ChatRequestPage implements OnInit {
     });
   }
 
-  async rejectConfirmation() {
+   async rejectConfirmation() {  
     let texts: any;
     this.translate
       .get(['MESSAGE_REQ_REJECT', 'REJECT', 'CANCEL'])
       .subscribe((text) => {
         texts = text;
       });
-    const alert = await this.alert.create({
+    let msg = {
       header: texts['REJECT'] + '?',
       message: texts['MESSAGE_REQ_REJECT'],
-      buttons: [
-        {
-          text: texts['REJECT'],
-          handler: () => {
-            this.rejectRequest();
-          },
-        },
-        {
-          text: texts['CANCEL'],
-          role: 'cancel',
-          handler: () => {},
-        },
-      ],
-    });
-
-    await alert.present();
+      cancel: 'CANCEL',
+      submit: 'Reject',
+    };
+    const response:any = await this.utilService.alertPopup(msg);
+    if (response) {
+     this.rejectRequest();
+    } else {
+      console.log('User canceled the rejection');
+    }
   }
   rejectRequest() {
     const payload = {

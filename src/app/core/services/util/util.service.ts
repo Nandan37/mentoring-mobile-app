@@ -67,27 +67,38 @@ export class UtilService {
           texts = text;
         });
       const alert = await this.alert.create({
-        cssClass: 'my-custom-class',
+        cssClass: 'custom-alert-with-close',
         header: texts[msg.header],
         message: texts[msg.message],
         inputs: msg.inputs || [],
         buttons: [
-          {
-            text: texts[msg.submit],
-            cssClass: 'alert-button-bg-white',
-            handler: (data) => {
-              resolve(msg.inputs ? data : true);
-            },
-          },
-          {
-            text: texts[msg.cancel],
-            role: 'cancel',
-            cssClass: 'alert-button-red',
-            handler: (blah) => {
-              resolve(false);
-            },
-          },
-        ],
+      {
+        text: texts[msg.submit],
+        cssClass: 'alert-button-bg-white',
+        handler: (data) => {
+          resolve(msg.inputs ? data : true);
+        },
+      },
+      {
+        text: texts[msg.cancel],
+        role: 'cancel',
+        cssClass: 'alert-button-red',
+        handler: () => {
+          resolve(false);
+        },
+      },
+    ],
+      });
+      const headerEl = document.querySelector('.custom-alert-with-close .alert-head');
+      if (headerEl) {
+        const closeBtn = document.createElement('span');
+        closeBtn.innerHTML = '&times;';
+        closeBtn.className = 'close-alert-icon';
+        closeBtn.onclick = () => alert.dismiss();
+        headerEl.appendChild(closeBtn);
+      }
+      document.querySelector('.close-alert-icon')?.addEventListener('click', () => {
+        alert.dismiss();
       });
       await alert.present();
     });

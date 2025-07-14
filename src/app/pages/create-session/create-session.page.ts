@@ -1,6 +1,6 @@
 import { ChangeDetectorRef, Component, OnInit, ViewChild } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
-import { AttachmentService, LoaderService, ToastService } from 'src/app/core/services';
+import { AttachmentService, LoaderService, LocalStorageService, ToastService } from 'src/app/core/services';
 import { HttpService } from 'src/app/core/services/http/http.service';
 import { SessionService } from 'src/app/core/services/session/session.service';
 import {
@@ -22,6 +22,7 @@ import { PermissionService } from 'src/app/core/services/permission/permission.s
 import { SearchPopoverComponent } from 'src/app/shared/components/search-popover/search-popover.component';
 import { SearchCompetencyComponent } from 'src/app/shared/components/search-competency/search-competency.component';
 import { PreAlertModalComponent } from 'src/app/shared/components/pre-alert-modal/pre-alert-modal.component';
+import { localKeys } from 'src/app/core/constants/localStorage.keys';
 
 @Component({
   selector: 'app-create-session',
@@ -67,12 +68,14 @@ export class CreateSessionPage implements OnInit {
   formConfig: any;
   mentor_id: any;
   isHome: boolean;
+  user: any;
 
   constructor(
     private sessionService: SessionService,
     private toast: ToastService,
     private activatedRoute: ActivatedRoute,
     private location: Location,
+     private localStorage: LocalStorageService, 
     private attachment: AttachmentService,
     private api: HttpService,
     private loaderService: LoaderService,
@@ -93,7 +96,7 @@ export class CreateSessionPage implements OnInit {
   async ionViewWillEnter() {
     await this.updateFormConfig();
     this.route.queryParams.subscribe(() => this.updateFormConfig());
-    
+    this.user = await this.localStorage.getLocalData(localKeys.USER_DETAILS)
     const platformForm = await this.getPlatformFormDetails();
     const result = await this.form.getForm(this.formConfig);
     this.formData = _.get(result, 'data.fields');
@@ -245,6 +248,7 @@ export class CreateSessionPage implements OnInit {
       if (!this.profileImageData.image) {
         form.image = [];
       }
+      form.mentor_id = form?.mentor_id ?? this.user.id;
       form.resources= this.updatedFiles;
       this.form1.myForm.markAsPristine();
       const result = await this.sessionService.createSession(form, this.id);
@@ -344,9 +348,13 @@ export class CreateSessionPage implements OnInit {
         }
       }
       let dependedChildIndex = this.formData.controls.findIndex(formControl => formControl.name === this.formData.controls[i].dependedChild)
+      if(this.formData.controls[i].name === 'mentor_id') {
+        this.mentor_id = existingData[this.formData.controls[i].name];
+      }
       if(this.formData.controls[i].dependedChild && this.formData.controls[i].name === 'type'){
         if(existingData[this.formData.controls[i].name].value){
           this.formData.controls[i].disabled = true;
+          this.sessionType = existingData[this.formData.controls[i].name].value;
           this.formData.controls[dependedChildIndex].validators['required']= existingData[this.formData.controls[i].name].value=='PUBLIC' ? false : true
         }
       }
@@ -530,6 +538,7 @@ handleSelectedFile(file) {
           sessionType: this.sessionType,
           mentorId: this.mentor_id,
           formConfig: this.isHome,
+          isCreator: this.route.snapshot.queryParams.isCreator
         }
       }
     });
@@ -606,24 +615,23 @@ handleSelectedFile(file) {
     await popover.present();
   }
 
-  async updateFormConfig() {
-    const queryParams = this.route.snapshot.queryParams;
-    const isManagePage = queryParams['source'] === 'manage';
-    this.isHome = queryParams['source'] === 'home';
+ async updateFormConfig() {
+  const queryParams = this.route.snapshot.queryParams;
+  const source = queryParams['source'];
+  this.isHome = source === 'home';
+  const isManagePage = source === 'manage';
 
-    if (isManagePage) {
-      const hasPermission = await this.permissionService.hasPermission({
-        module: permissions.MANAGE_SESSION,
-        action: manageSessionAction.SESSION_ACTIONS,
-      });
+  const hasPermission = await this.permissionService.hasPermission({
+    module: permissions.MANAGE_SESSION,
+    action: manageSessionAction.SESSION_ACTIONS,
+  });
 
-      this.formConfig = hasPermission ? MANAGERS_CREATE_SESSION_FORM : CREATE_SESSION_FORM;
-    } else if(this.isHome) {
-      this.formConfig = CREATE_SESSION_FORM;
-    } else if(queryParams.isCreator) {
-      this.formConfig = CREATE_SESSION_FORM;
-    }else {
-      this.formConfig = MANAGERS_CREATE_SESSION_FORM;
-    }
+  if (isManagePage) {
+    this.formConfig = hasPermission ? MANAGERS_CREATE_SESSION_FORM : CREATE_SESSION_FORM;
+  } else if ((this.isHome || queryParams.isCreator) && !hasPermission) {
+    this.formConfig = CREATE_SESSION_FORM;
+  } else {
+    this.formConfig = MANAGERS_CREATE_SESSION_FORM;
   }
+}
 }
