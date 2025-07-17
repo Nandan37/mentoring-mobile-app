@@ -21,6 +21,10 @@ export class FilterPopupComponent implements OnInit {
   }
 
   onClickApply(){
+    if (!this.selectedFilters || Object.keys(this.selectedFilters).length === 0) {
+      this.modalCtrl.dismiss({});
+      return;
+    }
     const dataToSendBack = {
       selectedFilters: this.selectedFilters
     };
