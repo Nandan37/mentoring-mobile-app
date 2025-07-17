@@ -9,3 +9,6 @@ export * from './toast.service';
 export * from './db/db.service';
 export * from './network.service';
 export * from './attachment/attachment.service'
+export * from './voice.service'
+export * from './ollama.service'
+
