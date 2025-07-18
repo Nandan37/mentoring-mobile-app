@@ -174,11 +174,11 @@ export class SessionDetailPage implements OnInit, OnDestroy {
       }
       this.detailData = {
         data: {
-        ...response,
-        start_date: readableStartDate,
-        meeting_info: response.meeting_info?.platform,
-        mentee_count: response.seats_limit - response.seats_remaining,
-        mentor_designation: response?.mentor_designation?.length
+          ...response,
+          start_date: readableStartDate,
+          meeting_info: response.meeting_info?.platform,
+          mentee_count: response.seats_limit - response.seats_remaining,
+          mentor_designation: response?.mentor_designation?.length
           ? response.mentor_designation.map((d: any) => d?.label).join(', ')
           : []
           },
