@@ -104,7 +104,6 @@ export class AttachmentService {
     }
 
       async getImageUploadUrl(file) {
-        console.log(file)
         let config = {
         url: urlConstants.API_URLS.GET_FILE_UPLOAD_URL + file.name.replace(/ /g, "_")
         }
