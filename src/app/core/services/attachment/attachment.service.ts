@@ -5,6 +5,7 @@ import { FILE_EXTENSION_HEADERS } from "../../constants/file-extensions";
 import { HttpService } from "../http/http.service";
 import { UtilService } from "../util/util.service";
 import { HttpClient } from "@angular/common/http";
+import { urlConstants } from "../../constants/urlConstants";
 
 @Injectable({
     providedIn: 'root'
@@ -20,6 +21,7 @@ export class AttachmentService {
         private toastController: ToastController,
         private utils: UtilService,
         private http: HttpClient,
+        private httpService: HttpService,
         private translate: TranslateService,
     ) {
     }
@@ -100,4 +102,14 @@ export class AttachmentService {
         };
         return this.http.put(uploadUrl.signedUrl, fileDetails, options)
     }
+
+      async getImageUploadUrl(file) {
+        console.log(file)
+        let config = {
+        url: urlConstants.API_URLS.GET_FILE_UPLOAD_URL + file.name.replace(/ /g, "_")
+        }
+        let data: any = await this.httpService.get(config);
+        return  data.result;
+    }
+
 }
