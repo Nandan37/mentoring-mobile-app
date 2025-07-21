@@ -36,8 +36,6 @@ export class PageHeaderComponent implements OnInit {
 
   onBack() {
     const currentUrl = this.router.url;
-    console.log(currentUrl,"currentUrl --->", this.router.url);
-    console.log(window.location.origin,"window.location.origin; --->");
     if (currentUrl === `/${CommonRoutes.TABS}/${CommonRoutes.HOME}`) {
       const baseUrl = window.location.origin;
       window.location.href = `${baseUrl}/home`;

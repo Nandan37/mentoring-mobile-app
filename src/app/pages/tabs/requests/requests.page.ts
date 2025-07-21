@@ -33,37 +33,29 @@ export class RequestsPage implements OnInit {
     private sessionService: SessionService
   ) {}
 
-  ionViewWillEnter(){
+  async ionViewWillEnter(){
     this.route.data.subscribe((data) => {
       this.routeData = data;
       this.buttonConfig = this.routeData?.button_config;
       this.slotBtnConfig = this.routeData.slotButtonConfig;
     });
-    this.sessionService.requestSessionList().then((res) => {
-        this.slotRequests = res?.result?.data ?? [];
-        if (!this.slotRequests.length) {
-          this.noResult = { subHeader: this.routeData?.noDataFound.noSession };
-        }
-      })
-      .catch((error) => {
-        console.error('Error fetching session list:', error);
-      });
-      this.pendingRequest();
+    if (this.segmentType === 'slot-requests') {
+    await this.slotRequestData();
+  } else {
+    await this.pendingRequest();
+  }
+   
 
   }
   ngOnInit() {
   }
 
- segmentChanged(event: any) {
+async segmentChanged(event: any) {
   this.segmentType = event.target.value;
   if (this.segmentType === 'slot-requests') {
-    if (!this.slotRequests?.length) {
-      this.noResult = { subHeader: this.routeData?.noDataFound.noSession }
-    }
+    await this.slotRequestData();
   } else {
-    if (!this.data?.length) {
-      this.noResult = { subHeader: this.routeData?.noDataFound.noMessage };
-    }
+    await this.pendingRequest();
   }
 }
 
@@ -75,10 +67,25 @@ export class RequestsPage implements OnInit {
     try {
       let data: any = await this.httpService.get(config);
       this.data = data ? data.result.data : '';
+      if (!this.data?.length) {
+      this.noResult = { subHeader: this.routeData?.noDataFound.noMessage };
+    }
       return data;
     } catch (error) {
       return error;
     }
+  }
+
+  async slotRequestData() {
+     this.sessionService.requestSessionList().then((res) => {
+        this.slotRequests = res?.result?.data ?? [];
+        if (!this.slotRequests.length) {
+          this.noResult = { subHeader: this.routeData?.noDataFound.noSession };
+        }
+      })
+      .catch((error) => {
+        console.error('Error fetching session list:', error);
+      });
   }
 
   onCardClick(event, data?) {
@@ -92,8 +99,4 @@ export class RequestsPage implements OnInit {
     }
   }
 
-  ionViewWillLeave() {
-    this.noResult = {};
-    this.segmentType = 'slot-requests';
-  }
 }

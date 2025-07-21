@@ -210,6 +210,14 @@ async ionViewWillEnter() {
   }
 
   removeFilteredData(chip){
+    this.filterData.map((filter) => {
+      filter.options.map((option) => {
+       if (option.value === chip) {
+          option.selected = false;
+        }
+      });
+      return filter;
+    })
     for (let key in this.filteredDatas) {
       if (this.filteredDatas.hasOwnProperty(key)) {
 

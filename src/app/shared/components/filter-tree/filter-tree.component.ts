@@ -18,8 +18,8 @@ export class FilterTreeComponent implements OnInit {
   constructor() { }
 
   ngOnInit() {
-    if (this.eventData.control.validators.required) {
-      this.filterData.forEach(filter => { 
+    if (this.eventData?.control?.validators?.required) {
+      this.filterData?.forEach(filter => { 
         if (filter.name === "type" && filter.key === "connected_mentors" ) {
           filter.options.forEach(option => {
             option.selected = false;
@@ -41,6 +41,7 @@ export class FilterTreeComponent implements OnInit {
 }
 
   onFilterChange() {
+    console.log(this.filterData)
     const selectedOptionsByCategory = {};
     this.filterData.forEach(category => {
       const selectedOptions = category.options.filter(option => option.selected);
@@ -53,8 +54,7 @@ export class FilterTreeComponent implements OnInit {
     this.filtersChanged.emit(selectedOptionsByCategory);
   }
   isCheckboxDisabled(filter: any, sessionType: string): boolean {
-    
-    if (filter.name === 'type') {
+    if (filter.name === 'type' && filter.isEnabled) {
       if (sessionType === 'PUBLIC') {
         return true; 
       } else {

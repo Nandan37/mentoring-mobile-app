@@ -44,9 +44,12 @@ export class MessagesPage implements OnInit {
    
   }
 
-
-
   showToast(event: any) {
     this.toast.showToast(event.message, event.type);
   }
+
+  ionViewWillLeave() {
+    this.showChat = null
+ }
 }
+

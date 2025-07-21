@@ -89,7 +89,6 @@ export class HttpService {
   throw Error(null);
 }
     const headers = requestParam.headers ? requestParam.headers : await this.setHeaders();
-    console.log("headers", headers);
     const options = {
       url: this.baseUrl + requestParam.url,
       headers: headers,

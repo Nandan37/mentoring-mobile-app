@@ -124,7 +124,7 @@ export class CreateSessionPage implements OnInit {
     let data = await this.sessionService.getSessionDetailsAPI(this.id);
     let response = data.result;
         this.sessionDetails= response;
-        this.profileImageData.image = response.image;
+        this.profileImageData.image = response.image[0];
         this.profileImageData.isUploaded = true;
         response.start_date = new Date(response.start_date * 1000).toISOString();
         response.end_date = new Date(response.end_date * 1000).toISOString();
@@ -189,7 +189,7 @@ export class CreateSessionPage implements OnInit {
               "mime_type":"link",
           });
           }else if (file.file instanceof File && file.file.name) {
-              const signedUrl = await this.getSignedUrl(file.file.name);
+              const signedUrl = await this.attachment.getImageUploadUrl(file.file);
               const uploadedFileUrl = await this.uploadFile(file.file, signedUrl);
               this.updatedFiles.push({
                 "name":file.name,
@@ -206,13 +206,7 @@ export class CreateSessionPage implements OnInit {
     }
   }
 
-  async getSignedUrl(fileName: string) {
-    const config = {
-      url: urlConstants.API_URLS.GET_SESSION_IMAGE_UPLOAD_URL + fileName.replace(/[^A-Z0-9]+/ig, "_").toLowerCase()
-    };
-    const data: any = await this.api.get(config);
-    return data.result;
-  }
+ 
 
   async uploadFile(file: File, signedUrl: any) {
     return new Promise((resolve, reject) => {
@@ -230,7 +224,6 @@ export class CreateSessionPage implements OnInit {
     }
     if (this.form1.myForm.valid) {
       await this.handleFileUploads();
-
       const form = Object.assign({}, { ...this.form1.myForm.getRawValue(), ...this.form1.myForm.value });
       form.start_date = (Math.floor((new Date(form.start_date).getTime() / 1000) / 60) * 60).toString();
       form.end_date = (Math.floor((new Date(form.end_date).getTime() / 1000) / 60) * 60).toString();
@@ -245,9 +238,17 @@ export class CreateSessionPage implements OnInit {
             : form[entityKey];
         }
       });
+       if (this.profileImageData.image && !this.profileImageData.isUploaded) {
+        const signedUrl = await this.attachment.getImageUploadUrl(this.localImage);
+        const updatedUrl = await this.uploadFile(this.localImage, signedUrl);
+        this.profileImageData.image = updatedUrl;
+        form.image = [ updatedUrl ];
+        this.profileImageData.isUploaded = true;
+      }
       if (!this.profileImageData.image) {
         form.image = [];
       }
+      
       form.mentor_id = form?.mentor_id ?? this.user.id;
       form.resources= this.updatedFiles;
       this.form1.myForm.markAsPristine();
