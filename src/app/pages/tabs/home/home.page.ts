@@ -7,7 +7,7 @@ import { SKELETON } from 'src/app/core/constants/skeleton.constant';
 import { Router } from '@angular/router';
 import { localKeys } from 'src/app/core/constants/localStorage.keys';
 import { ProfileService } from 'src/app/core/services/profile/profile.service';
-import { HttpService, LoaderService, LocalStorageService, OllamaService, ToastService, UserService, UtilService, VoiceService } from 'src/app/core/services';
+import { HttpService, LoaderService, LocalStorageService, ToastService, UserService, UtilService } from 'src/app/core/services';
 import { SessionService } from 'src/app/core/services/session/session.service';
 import { TermsAndConditionsPage } from '../../terms-and-conditions/terms-and-conditions.page';
 import { App, AppState } from '@capacitor/app';
@@ -64,8 +64,6 @@ export class HomePage implements OnInit {
     private toast: ToastService,
     private permissionService: PermissionService,
     private utilService: UtilService,
-    private voiceService: VoiceService,
-  private ollamaService : OllamaService,
   private fb: FormBuilder) { 
     this.sessionForm = this.fb.group({
       date: [''],
@@ -242,24 +240,5 @@ export class HomePage implements OnInit {
     this.criteriaChip = '';
     this.searchText = '';
   }
-
-  async startVoiceInput() {
-    try {
-      const voiceText = await this.voiceService.startListening();
-      const response = await this.ollamaService.parseInputToFormData(voiceText).toPromise();
-      const raw = response.response;
-      const cleaned = raw.replace(/```(?:json)?|```/g, '').trim();
-      const json = JSON.parse(cleaned);
-      console.log(json,"json ---? ");
-      this.utilService.openFormModel(json, MANAGERS_CREATE_SESSION_FORM);
-      // this.sessionForm.patchValue(data);
-
-    } catch (err) {
-      console.error('Error processing voice input:', err);
-    } finally {
-      // this.loading = false;
-    }
-  }
-
   
 }
