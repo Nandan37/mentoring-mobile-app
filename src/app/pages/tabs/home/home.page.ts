@@ -14,7 +14,8 @@ import { App, AppState } from '@capacitor/app';
 import { Capacitor } from '@capacitor/core';
 import { PermissionService } from 'src/app/core/services/permission/permission.service';
 import { environment } from 'src/environments/environment';
-
+import { FormBuilder, FormGroup } from '@angular/forms';
+import { MANAGERS_CREATE_SESSION_FORM } from 'src/app/core/constants/formConstant';
 
 @Component({
   selector: 'app-home',
@@ -34,6 +35,7 @@ export class HomePage implements OnInit {
   status = "PUBLISHED,LIVE";
   showBecomeMentorCard = false;
   @ViewChild(IonContent) content: IonContent;
+  sessionForm: FormGroup;
 
   public headerConfig: any = {
     menu: true,
@@ -61,7 +63,16 @@ export class HomePage implements OnInit {
     private localStorage: LocalStorageService,
     private toast: ToastService,
     private permissionService: PermissionService,
-    private utilService: UtilService) { }
+    private utilService: UtilService,
+  private fb: FormBuilder) { 
+    this.sessionForm = this.fb.group({
+      date: [''],
+      time: [''],
+      duration: [''],
+      link: ['']
+    });
+  }
+ 
 
   async ngOnInit() {
     await this.getUser();
@@ -229,5 +240,5 @@ export class HomePage implements OnInit {
     this.criteriaChip = '';
     this.searchText = '';
   }
-
+  
 }

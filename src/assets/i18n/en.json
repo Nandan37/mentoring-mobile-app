@@ -144,6 +144,7 @@
     "AT":"at",
     "START_CREATE_SESSION":"Start creating your sessions now",
     "CREATE_SESSION":"Create session",
+    "CREATE_SESSION_VOICE":"Create session with voice",
     "START_CREATING_SESSION":"Start creating sessions now to share your knowledge with other people",
     "CHECK_ALLSESSION_TO_ENROLL":"Find and enroll for sessions by professional mentors in the 'All sessions' tab",
     "NO_UPCOMING_SESSIONS":"There are no upcoming sessions scheduled by the Mentor",

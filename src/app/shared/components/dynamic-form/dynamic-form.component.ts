@@ -17,7 +17,6 @@ import { MatDatepicker } from '@angular/material/datepicker';
 import { debounceTime } from 'rxjs/operators';
 import { SearchAndSelectComponent } from '../search-and-select/search-and-select.component';
 import { OWL_DATE_TIME_FORMATS } from '@danielmoncada/angular-datetime-picker';
-
 interface JsonFormValidators {
   min?: number;
   max?: number;
@@ -101,6 +100,7 @@ const CUSTOM_DATE_FORMATS = {
 })
 export class DynamicFormComponent implements OnInit {
   @Input() jsonFormData: any;
+  @Input() existingData : any;
   @Input() readonly: any = false;
   @Output() formValid = new EventEmitter()
   @Output() onEnter = new EventEmitter()

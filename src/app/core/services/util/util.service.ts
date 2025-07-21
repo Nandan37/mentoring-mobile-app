@@ -9,7 +9,9 @@ import { BehaviorSubject, Subject } from 'rxjs';
 import * as Papa from 'papaparse';
 import { LocalStorageService } from '../localstorage.service';
 import { environment } from 'src/environments/environment';
+
 import { ToastService } from '../toast.service';
+
 
 @Injectable({
   providedIn: 'root',
@@ -31,7 +33,7 @@ export class UtilService {
     private alert: AlertController,
     private translate: TranslateService,
     private localstorage: LocalStorageService,
-    private toast: ToastService
+    private toast: ToastService,
   ) {
     const browser = Bowser.getParser(window.navigator.userAgent);
   }
@@ -341,5 +343,5 @@ export class UtilService {
       input.click();
     });
   }
-  
+
 }
