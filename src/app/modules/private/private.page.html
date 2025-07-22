@@ -9,7 +9,7 @@
     <ion-header
       [translucent]="true"
       class="ion-no-border"
-      [ngClass]="{'disable-div': user?.profile_mandatory_fields.length && !isAuthBypassed || !user?.about && !isAuthBypassed }"
+      [ngClass]="{'disable-div': user?.profile_mandatory_fields.length || !user?.about}" 
     >
       <div *ngIf="user">
         <div class="sub-menu-toolbar">
@@ -49,7 +49,7 @@
     <ion-content
       *ngIf="user"
       fullscreen
-      [ngClass]="{'disable-div': user?.profile_mandatory_fields.length && !isAuthBypassed || !user?.about && !isAuthBypassed}"
+      [ngClass]="{'disable-div': user?.profile_mandatory_fields.length || !user?.about}" 
     >
       <div class="menu-css">
         <ion-list lines="none" class="sub-menu-list">
