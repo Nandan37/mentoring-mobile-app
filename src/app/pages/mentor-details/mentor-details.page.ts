@@ -142,7 +142,7 @@ export class MentorDetailsPage implements OnInit {
 
     this.detailData.data = this.mentorProfileData?.result;
     this.detailData.data.organizationName =
-      this.mentorProfileData?.result?.organization?.name;
+      this.mentorProfileData?.result?.organization?.name || '';
     this.headerConfig.share = this.detailData.data?.is_mentor;
   }
 
