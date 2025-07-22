@@ -90,7 +90,7 @@
         >
         <ion-label class="location" *ngIf="!headerData?.is_mentor"
           >{{ "SESSIONS_ATTENDED" | translate }} :
-          {{ headerData?.sessions_hosted || 0 }}</ion-label
+          {{ headerData?.sessions_attended || 0 }}</ion-label
         >
       </div>
       <div *ngIf="buttonConfig" class="flex flex-justify-start mt-4 wrap">
