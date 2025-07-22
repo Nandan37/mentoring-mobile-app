@@ -39,7 +39,9 @@ export class UtilService {
   }
 
   getDeepLink(url) {
-    return environment.deepLinkUrl + url;
+    const baseUrl = window.location.origin;
+    console.log(baseUrl,"window.location.origin");
+    return baseUrl + url;
   }
 
   async shareLink(param: ISocialSharing) {
