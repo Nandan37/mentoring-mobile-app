@@ -68,6 +68,9 @@ export class ChatRequestPage implements OnInit {
     });
   }
   sendRequest() {
+    if(this.message.trim() === ''){
+      return;
+    }
     if(this.message.length >this.messageLimit){
       this.toast.showToast('MESSAGE_TEXT_LIMIT', 'danger');
       return;
