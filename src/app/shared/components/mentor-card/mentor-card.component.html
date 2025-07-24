@@ -17,6 +17,11 @@
             <ion-label>{{label?.label}}{{isLast ? '' : ', '}} </ion-label>
           </span>
         </div>
+        <div class="margin-btm-10 align-area-of-expertise" *ngIf="!data?.competency?.length && data?.designation?.length">
+          <span class="ion-margin-top" *ngFor="let label of data?.designation;  let isLast=last">
+            <ion-label>{{label?.label}}{{isLast ? '' : ', '}} </ion-label>
+          </span>
+        </div>
       </div>
     </div>
   </ion-col>    
