@@ -40,7 +40,6 @@ export class UtilService {
 
   getDeepLink(url) {
     const baseUrl = window.location.origin;
-    console.log(baseUrl,"window.location.origin");
     return baseUrl + url;
   }
 

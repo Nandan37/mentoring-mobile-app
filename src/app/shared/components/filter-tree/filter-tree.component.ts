@@ -41,7 +41,6 @@ export class FilterTreeComponent implements OnInit {
 }
 
   onFilterChange() {
-    console.log(this.filterData)
     const selectedOptionsByCategory = {};
     this.filterData.forEach(category => {
       const selectedOptions = category.options.filter(option => option.selected);
