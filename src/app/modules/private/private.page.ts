@@ -296,7 +296,8 @@ export class PrivatePage implements OnInit {
     );
     App.addListener('appUrlOpen', (event: URLOpenListenerEvent) => {
       this.zone.run(() => {
-        const domain = environment.deepLinkUrl;
+        const domain = window.location.origin;
+        console.log(domain,"window.location.origin");
         const slug = event.url.split(domain).pop();
         if (slug) {
           this.router.navigateByUrl(slug);

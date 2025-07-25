@@ -34,7 +34,7 @@ export class SessionRequestDetailsPage implements OnInit {
   sessionId: any;
   sessionDetails: any;
   isEnabled: boolean;
-
+  userId : any;
   constructor(
     private form: FormService,
     private sessionService: SessionService,
@@ -52,6 +52,7 @@ export class SessionRequestDetailsPage implements OnInit {
 
   ionViewWillEnter() {
     this.getPlatformFormDetails();
+    this.userId = localStorage.getItem('userId');
     this.activateRoute.queryParams.subscribe((params) => {this.params = params});
     this.sessionService.getReqSessionDetails(this.params.id).then((res) => {
       this.apiResponse = res.result;

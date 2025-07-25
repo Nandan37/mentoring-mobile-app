@@ -405,5 +405,6 @@
     "CLUSTER":"Cluster",
     "DISTRICT":"District",
     "BLOCK":"Block",
-    "SCHOOL":"School"
+    "SCHOOL":"School",
+    "YOU_HAVE" :"You have"
 }
