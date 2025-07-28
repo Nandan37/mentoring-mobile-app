@@ -47,9 +47,7 @@
       </div>
 
       <div *ngIf="upcomingSessions && upcomingSessions.length === 0">
-        <p class="no-details-message">
-          {{ "NO_UPCOMING_SESSIONS" | translate }}
-        </p>
+        <app-no-data-found [messageHeader]="'NO_UPCOMING_SESSIONS_PLANNED'" [messageDescription]="'NO_UPCOMING_SESSIONS'"></app-no-data-found>
       </div>
 
       <ion-grid>

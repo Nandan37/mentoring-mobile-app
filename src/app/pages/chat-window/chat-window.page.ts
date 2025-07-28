@@ -7,6 +7,7 @@ import { HttpService, ToastService } from 'src/app/core/services';
 import { ProfileService } from 'src/app/core/services/profile/profile.service';
 import { CommonRoutes } from 'src/global.routes';
 import { TranslateService } from '@ngx-translate/core';
+import { RocketChatApiService } from 'sl-chat-library';
 
 @Component({
   selector: 'app-chat-window',
@@ -29,7 +30,8 @@ export class ChatWindowPage implements OnInit {
     private router: Router,
     private apiServer : HttpService,
     private toastService: ToastService,
-    private translate: TranslateService
+    private translate: TranslateService,
+    private rocket: RocketChatApiService
   ) {
     routerParams.params.subscribe((parameters) => {
       this.rid = parameters?.id;
@@ -60,5 +62,16 @@ export class ChatWindowPage implements OnInit {
 
   limitExceeded(event){
     this.toastService.showToast('MESSAGE_TEXT_LIMIT','danger');
+  }
+
+  ngOnDestroy(): void {
+    if(this.rid)
+    this.rocket.isWebSocketInitialized =false;
+    
+  }
+
+  ionViewWillLeave() {
+    if(this.rid)
+      this.rocket.isWebSocketInitialized =false;
   }
 }
