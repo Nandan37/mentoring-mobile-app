@@ -105,6 +105,8 @@ export class PrivatePage implements OnInit {
    this.platform.ready().then(() => {
      this.network.netWorkCheck();
      setTimeout(async ()=>{
+      const lang = localStorage.getItem('websiteLanguage');
+      this.localStorage.setLocalData(localKeys.SELECTED_LANGUAGE,lang);
        this.languageSetting();
        this.setHeader();
        this.localStorage.getLocalData(localKeys.USER_DETAILS).then((userDetails)=>{
