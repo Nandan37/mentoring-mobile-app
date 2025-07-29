@@ -60,10 +60,19 @@
         </div>
     
         
-        <div *ngIf="headerData?.district" class="location-info">
+        <div *ngIf="headerData?.district || headerData?.state" class="location-info">
           <ion-label class="location">
             <ion-icon name="location"></ion-icon>
-            {{ headerData?.district?.label}}, {{ headerData?.state?.label}}
+               
+            <span *ngIf="headerData?.district?.label">
+               {{ headerData.district.label }}
+             </span>
+
+              <span *ngIf="headerData?.state?.label">
+              <span *ngIf="headerData?.district?.label">, </span>
+              {{ headerData.state.label }}
+              </span>
+
           </ion-label>
         </div>
       </div>
