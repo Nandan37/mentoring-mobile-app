@@ -54,6 +54,32 @@ export class MentorSearchDirectoryPage implements OnInit {
     }
   };
   valueFromChipAndFilter: string;
+  mentorForm = {
+  "type": "mentorCard",
+  "sub_type": "mentorCard",
+  "action": "create",
+  "template_name": "genericCardTemplate",
+  "data": [
+    {
+      "name": "image",
+      "type": "image",
+    },
+    {
+      "name": "name",
+      "type": "text",
+      "format": "titleCase"
+    },
+    {
+      "name": "designation",
+      "type": "array",
+    },
+    {
+      "name": "experience",
+      "type": "text",
+    }
+]
+}
+
 
   constructor(
     private router: Router,
