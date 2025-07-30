@@ -88,14 +88,11 @@
           >{{ headerData?.name }}
         </ion-label>
       </div>
-      <div class="roles-div">
-        <ion-label
-          >{{ headerData?.designation[0]?.label }} ({{
-            headerData?.experience
-          }}
-          years)</ion-label
-        >
-      </div>
+     <div class="roles-div" *ngIf="headerData?.designation?.[0]?.label && headerData?.experience">
+      <ion-label>
+        {{ headerData.designation[0].label }} ({{ headerData.experience }} years)
+      </ion-label>
+    </div>
       <div class="d-inline-flex flex-align-items-center my-4">
         <ion-label class="location" *ngIf="headerData?.is_mentor"
           >{{ "SESSIONS_CONDUCTED" | translate }} :
