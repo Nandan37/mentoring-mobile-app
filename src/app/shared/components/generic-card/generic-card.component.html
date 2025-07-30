@@ -1,5 +1,5 @@
 <ion-card
-  class="shadow-with-radious generic-card min-h-100 p flex flex-col ion-justify-content-between "
+  class="shadow-with-radious generic-card min-h-100 d-flex flex-col"
   (click)="handleButtonClick('viewMessage', data)"
 >
   <div class="generic-card-header d-grid" *ngIf="meta">
@@ -8,7 +8,7 @@
         [ngClass]="meta.isSent ? 'rotate-icon-sent' : 'rotate-icon-receive'"
         name="arrow-back-outline"
       ></ion-icon>
-      <p class="max-width-70" style="margin: 2px 5px">
+      <p class="max-width-70 wrap-text" style="margin: 2px 5px">
         {{ meta.isSent ? ("SENT" | translate) : ("RECEIVED" | translate) }}
       </p>
     </div>
@@ -21,11 +21,11 @@
       </ng-template>
 
       <ng-container *ngIf="meta.message; else timeBlock">
-        <p class="max-width-70" style="margin: 2px 5px">{{ meta.message }}</p>
+        <p class="max-width-70 wrap-text" style="margin: 2px 5px">{{ meta.message }}</p>
       </ng-container>
 
       <ng-template #timeBlock>
-        <small style="padding-left: 5px">
+        <small class="wrap-text" style="padding-left: 5px">
           {{ meta.resp.start_date * 1000 | date : "dd MMM, yyyy" }},
           {{ meta.resp.start_date * 1000 | date : "h:mm a" }} -
           {{ meta.resp.end_date * 1000 | date : "h:mm a" }}
@@ -33,55 +33,49 @@
       </ng-template>
     </div>
   </div>
-  <ion-grid class="flex-1 w-100" >
-    
-  <ion-row >
-    <ion-col size="3" class="ion-no-padding ">
-      @for(avail of mentorCardForm; track avail.name) {
-        @if(avail.type === 'image') {
-          <div class="ion-padding-start">
-            <img
-              (click)="onCardClick(data); $event.stopPropagation()"
-              class="profile-img"
-              [src]="data?.[avail.name] ? data?.[avail.name] : 'assets/prof-img/user.png'"
-            />
-          </div>
-        }
-      }
-    </ion-col>
-  
-    <ion-col size="9" class="ion-no-padding">
-      <ion-item lines="none" class="ion-no-padding">
-   <ion-label class="">
+
+  <div class="card-content flex-1 d-flex gap-3 mx-10 py-2">
     @for(avail of mentorCardForm; track avail.name) {
-      @if(avail.type !== 'image' && avail.name !== 'experience') {
-        <div class="d-flex ion-align-items-center">
-          @if(avail.name === 'name' || avail.name === 'title') {
-            <h4 class="ion-no-margin ion-text-wrap">
-              {{ data?.[avail.name] | titlecase }}
-            </h4>
-          } @else {
-            <p class="ion-text-wrap ion-no-margin">
-              {{ avail.type === 'array' && data?.[avail.name]?.length ? data?.[avail.name][0]?.label : data?.[avail.name] }}
-            </p>
-            @if(data?.experience) {
-              <p class="ion-no-margin ion-margin-start ion-text-nowrap">
-                ({{ data.experience }} years)
-              </p>
-            }
-          }
+      @if(avail.type === 'image') {
+        <div class="image-container">
+          <img
+            (click)="onCardClick(data); $event.stopPropagation()"
+            class="profile-img"
+            [src]="data?.[avail.name] ? data?.[avail.name] : 'assets/prof-img/user.png'"
+          />
         </div>
       }
     }
-</ion-label>
-      </ion-item>
-    </ion-col>
-  </ion-row>
-   
-  </ion-grid>
-   <div
-        class="d-flex flex-justify-flex-end "
-        [ngClass]="{ 'flex-justify-start': buttonConfig?.length > 1 }"
+    
+    <div class="text-content flex-1">
+      @for(avail of mentorCardForm; track avail.name) {
+        @if(avail.type !== 'image' && avail.name !== 'experience') {
+          <div class="text-row">
+            @if(avail.name === 'name' || avail.name === 'title') {
+              <h4 class="card-title wrap-text">
+                {{ data?.[avail.name] | titlecase }}
+              </h4>
+            } @else {
+              <div class="d-flex flex-align-items-center">
+                <p class="card-text wrap-text ">
+                  {{ avail.type === 'array' && data?.[avail.name]?.length ? data?.[avail.name][0]?.label : data?.[avail.name] }}
+                </p>
+                @if(data?.experience) {
+                  <p class="experience-text wrap-text">
+                    ({{ data.experience }} years)
+                  </p>
+                }
+              </div>
+            }
+          </div>
+        }
+      }
+    </div>
+  </div>
+
+      <div
+       class="d-flex flex-justify-flex-end p-1"
+          [ngClass]="{ 'flex-justify-start': buttonConfig?.length > 1 }"
         >
           <ng-container *ngFor="let button of buttonConfig">
             <ion-button

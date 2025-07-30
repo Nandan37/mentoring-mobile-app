@@ -181,6 +181,14 @@ body{
   background-image: none;
 }
 
+.p-1 {
+  padding: 4px;
+}
+
+.gap-3 {
+  gap: 12px;
+}
+
 .header-bottom-border {
   background-color: var(--ion-color-primary);
   color: white;
