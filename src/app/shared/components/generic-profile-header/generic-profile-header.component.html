@@ -62,10 +62,7 @@
         
         <div *ngIf="headerData?.district || headerData?.state" class="location-info">
           <ion-label class="location">
-            <ion-icon name="location"></ion-icon>
-               
-            <ng-container *ngIf="headerData">
-
+             <ion-icon name="location"></ion-icon>
             <ng-container *ngIf="headerData.district?.label as district">
             {{ district }}
              <ng-container *ngIf="headerData.state?.label">, </ng-container>
@@ -74,8 +71,6 @@
            <ng-container *ngIf="headerData.state?.label as state">
              {{ state }}
             </ng-container>
-
-             </ng-container>
 
           </ion-label>
         </div>
@@ -88,14 +83,11 @@
           >{{ headerData?.name }}
         </ion-label>
       </div>
-      <div class="roles-div">
-        <ion-label
-          >{{ headerData?.designation[0]?.label }} ({{
-            headerData?.experience
-          }}
-          years)</ion-label
-        >
-      </div>
+     <div class="roles-div" *ngIf="headerData?.designation?.[0]?.label && headerData?.experience">
+      <ion-label>
+        {{ headerData.designation[0].label }} ({{ headerData.experience }} years)
+      </ion-label>
+    </div>
       <div class="d-inline-flex flex-align-items-center my-4">
         <ion-label class="location" *ngIf="headerData?.is_mentor"
           >{{ "SESSIONS_CONDUCTED" | translate }} :

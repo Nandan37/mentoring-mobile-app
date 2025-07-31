@@ -179,7 +179,7 @@ export class MentorDetailsPage implements OnInit {
   }
   async share() {
     if(this.isMobile && navigator.share){
-          let url = `mentoring/${CommonRoutes.MENTOR_DETAILS}/${this.buttonConfig.meta.id}`;
+          let url = `/mentoring/${CommonRoutes.MENTOR_DETAILS}/${this.buttonConfig.meta.id}`;
           let link = await this.utilService.getDeepLink(url);
           let params = {
             link: link,

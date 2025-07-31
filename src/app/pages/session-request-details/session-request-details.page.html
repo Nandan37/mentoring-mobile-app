@@ -36,9 +36,7 @@
       : ("YOU_HAVE" | translate)
       }}
       requested a slot at<strong style="padding-left: 5px;">
-        {{
-           apiResponse.start_date * 1000 | date: 'dd MMM, yyyy'
-        }},
+         {{ apiResponse.start_date * 1000 | date : "dd MMM yyyy," }}
         {{
           formatUnixTime(apiResponse.start_date)
         }} -
@@ -74,6 +72,7 @@
                 {{sessionDetails?.meeting_info?.platform}} : {{sessionDetails?.meeting_info?.value}}
               </ion-label>
             </div>
+          } @else if(sessionDetails?.meeting_info?.value ==='OFF') {
           } @else {
             <div>
               <ion-label>
