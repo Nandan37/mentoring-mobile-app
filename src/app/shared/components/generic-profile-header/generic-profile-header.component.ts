@@ -61,7 +61,7 @@ export class GenericProfileHeaderComponent implements OnInit {
       case 'share':
         if (this.isMobile && navigator.share && this.buttonConfig.meta) {
           this.translateText();
-          let url = `mentoring/${CommonRoutes.MENTOR_DETAILS}/${this.buttonConfig.meta.id}`;
+          let url = `/mentoring/${CommonRoutes.MENTOR_DETAILS}/${this.buttonConfig.meta.id}`;
           let link = await this.utilService.getDeepLink(url);
           this.headerData.name = this.headerData.name.trim();
           let params = {
