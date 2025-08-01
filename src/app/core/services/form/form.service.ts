@@ -13,7 +13,6 @@ export class FormService {
     //Check if form is available in local DB
     let form = await this.db.getItem(this.getUniqueKey(formBody))
     let dbForm = JSON.parse(form);
-
     // Check if local form is expired; return the form if not expired
     if (form && !this.checkIfexpired(dbForm?.ttl)) {
       return dbForm;
@@ -25,7 +24,7 @@ export class FormService {
       payload: formBody,
     };
     const resp = await this.http.post(args);
-    if (!_.has(resp, 'result.data.fields')) {
+    if (!_.has(resp, 'result.data')) {
       return resp.result; // if form is not present return without storing
     }
     

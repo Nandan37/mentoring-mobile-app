@@ -1,6 +1,6 @@
 <ion-card
-  class="shadow-with-radious generic-card"
-  (click)="handleButtonClick('viewMessage', data)"
+  class="shadow-with-radious generic-card min-h-100 d-flex flex-col"
+  (click)="onCardClick(data)"
 >
   <div class="generic-card-header d-grid" *ngIf="meta">
     <div class="d-flex flex-align-items-center mx-10">
@@ -8,7 +8,7 @@
         [ngClass]="meta.isSent ? 'rotate-icon-sent' : 'rotate-icon-receive'"
         name="arrow-back-outline"
       ></ion-icon>
-      <p class="max-width-70" style="margin: 2px 5px">
+      <p class="max-width-70 wrap-text" style="margin: 2px 5px">
         {{ meta.isSent ? ("SENT" | translate) : ("RECEIVED" | translate) }}
       </p>
     </div>
@@ -21,7 +21,7 @@
       </ng-template>
 
       <ng-container *ngIf="meta.message; else timeBlock">
-        <p class="max-width-70" style="margin: 2px 5px">{{ meta.message }}</p>
+        <p class="max-width-70 wrap-text" style="margin: 2px 5px">{{ meta.message }}</p>
       </ng-container>
 
       <ng-template #timeBlock>
@@ -33,38 +33,49 @@
       </ng-template>
     </div>
   </div>
-  <ion-grid>
-    <ion-row>
-      <ion-col class="columns" size="3"  no-padding>
-        <div class="d-flex flex-justify-center">
-          <img
-            (click)="onCardClick(data); $event.stopPropagation()"
-            class="profile-img"
-            [src]="data?.image ? data.image : 'assets/prof-img/user.png'"
-          />
-        </div>
-      </ion-col>
-      <ion-col class="columns" size="9" no-padding>
-        <ion-item lines="none" class="ion-item-padding-none">
-          <ion-label
-            class="auto-margin pl-5"
-            (click)="onCardClick(data); $event.stopPropagation()"
-          >
-            <h4 class="margin-none wrap-text">
-              {{ data?.name || data?.title  | titlecase }}
-            </h4>
-            <div class="d-flex">
-              <p class="wrap-text" *ngIf="data?.designation?.length">
-                {{ data?.designation[0]?.label }}
-              </p>
-              <p class="max-width-50" *ngIf="data.experience">
-                ({{ data?.experience }} years)
-              </p>
-            </div>
-          </ion-label>
-        </ion-item>
-        <div
-            class="d-flex flex-justify-flex-end"
+
+  <div class="card-content flex-1 d-flex gap-3 mx-10 py-2">
+    @for(avail of mentorCardForm; track avail.header.image) {
+    @if(avail.header.image) {
+      <div class="image-container">
+        <img
+          (click)="onCardClick(data); $event.stopPropagation()"
+          class="profile-img"
+          [src]="data?.[avail.header.image] ? data?.[avail.header.image] : 'assets/prof-img/user.png'"
+        />
+      </div>
+    }
+
+    <div class="text-content flex-1">
+      <div class="text-row">
+        @if(avail.header.title) {
+          <h4 class="card-title wrap-text">
+            {{ data?.[avail.header.title] | titlecase }}
+          </h4>
+        }
+        @for(item of avail.body; track item.name) {
+          <div class="d-flex flex-align-items-center">
+            <p class="card-text wrap-text">
+              {{ item.type === 'array' && data?.[item.name]?.length ? data?.[item.name][0]?.label : data?.[item.name] }}
+            </p>
+            @if(item.children) {
+            @for(child of item.children; track child.name) {
+              @if(data?.[child.name]) {
+                <p class="experience-text wrap-text">
+                  ({{ data?.[child.name] }} {{child?.subText | translate}})
+                </p>
+              }
+            }
+          }
+          </div>
+        }
+      </div>
+    </div>
+    }
+  </div>
+
+      <div
+       class="d-flex flex-justify-flex-end p-1"
           [ngClass]="{ 'flex-justify-start': buttonConfig?.length > 1 }"
         >
           <ng-container *ngFor="let button of buttonConfig">
@@ -81,7 +92,4 @@ x              (click)="
             </ion-button>
           </ng-container>
         </div>
-      </ion-col>
-    </ion-row>
-  </ion-grid>
 </ion-card>

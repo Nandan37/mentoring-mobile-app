@@ -12,10 +12,12 @@ export class GenericCardComponent implements OnInit {
   @Output() onClickEvent = new EventEmitter();
   @Input() buttonConfig: any;
   @Input() meta: any;
+  @Input() mentorCardForm: any;
 
   constructor(private router: Router) {}
 
-  ngOnInit() {}
+  ngOnInit() {
+  }
 
   onCardClick(data) {
     this.router.navigate([
