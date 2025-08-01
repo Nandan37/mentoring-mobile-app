@@ -2615,5 +2615,86 @@
           ]
       }
   }
+},
+{
+  "type": "mentorDirectoryCard",
+  "sub_type": "mentorDirectoryCardForm",
+  "action": "create",
+  "template_name": "genericCardTemplate",
+  "data": [
+    {
+      "header": {
+              "image":"image",
+              "title":"name"
+            },
+      "body": [
+            {
+              "name": "designation",
+              "type": "array",
+              "children": [
+              {
+              "name": "experience",
+              "subText": "YEARS",
+              "type": "text"
+              }
+              ]
+            }
+          ]
+    }
+]
+},
+{
+  "type": "mentorRequestCard",
+  "sub_type": "mentorRequestCardForm",
+  "action": "create",
+  "template_name": "genericCardTemplate",
+  "data": [
+    {
+      "header": {
+              "image":"image",
+              "title":"name"
+            },
+      "body": [
+            {
+              "name": "designation",
+              "type": "array",
+              "children": [
+              {
+              "name": "experience",
+              "subText": "YEARS",
+              "type": "text"
+              }
+              ]
+            }
+          ]
+    }
+]
+},
+{
+  "type": "mentorConnectionCard",
+  "sub_type": "mentorConnectionCardForm",
+  "action": "create",
+  "template_name": "genericCardTemplate",
+  "data": [
+    {
+      "header": {
+              "image":"image",
+              "title":"name"
+            },
+      "body": [
+            {
+              "name": "designation",
+              "type": "array",
+              "children": [
+              {
+              "name": "experience",
+              "subText": "YEARS",
+              "type": "text"
+              }
+              ]
+            }
+          ]
+    }
+]
 }
 ]

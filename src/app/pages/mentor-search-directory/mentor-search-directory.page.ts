@@ -2,7 +2,9 @@ import { Component, OnInit, ViewChild } from '@angular/core';
 import { MatPaginator } from '@angular/material/paginator';
 import { ActivatedRoute, Router } from '@angular/router';
 import { ModalController } from '@ionic/angular';
+import * as _ from 'lodash';
 import { CHAT_MESSAGES } from 'src/app/core/constants/chatConstants';
+import { MENTOR_DIR_CARD_FORM } from 'src/app/core/constants/formConstant';
 import { paginatorConstants } from 'src/app/core/constants/paginatorConstants';
 import { ToastService, UtilService } from 'src/app/core/services';
 import { FormService } from 'src/app/core/services/form/form.service';
@@ -54,31 +56,7 @@ export class MentorSearchDirectoryPage implements OnInit {
     }
   };
   valueFromChipAndFilter: string;
-  mentorForm = {
-  "type": "mentorCard",
-  "sub_type": "mentorCard",
-  "action": "create",
-  "template_name": "genericCardTemplate",
-  "data": [
-    {
-      "name": "image",
-      "type": "image",
-    },
-    {
-      "name": "name",
-      "type": "text",
-      "format": "titleCase"
-    },
-    {
-      "name": "designation",
-      "type": "array",
-    },
-    {
-      "name": "experience",
-      "type": "text",
-    }
-]
-}
+  mentorForm: any
 
 
   constructor(
@@ -99,6 +77,8 @@ export class MentorSearchDirectoryPage implements OnInit {
    }
 
 async ionViewWillEnter() {
+  const result = await this.formService.getForm(MENTOR_DIR_CARD_FORM);
+  this.mentorForm = _.get(result, 'data');
   const queryParams = this.route.snapshot.queryParams;
   const search = queryParams['search'];
   const chip = queryParams['chip'];

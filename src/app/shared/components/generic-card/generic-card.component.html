@@ -35,42 +35,43 @@
   </div>
 
   <div class="card-content flex-1 d-flex gap-3 mx-10 py-2">
-    @for(avail of mentorCardForm; track avail.name) {
-      @if(avail.type === 'image') {
-        <div class="image-container">
-          <img
-            (click)="onCardClick(data); $event.stopPropagation()"
-            class="profile-img"
-            [src]="data?.[avail.name] ? data?.[avail.name] : 'assets/prof-img/user.png'"
-          />
-        </div>
-      }
+    @for(avail of mentorCardForm; track avail.header.image) {
+    @if(avail.header.image) {
+      <div class="image-container">
+        <img
+          (click)="onCardClick(data); $event.stopPropagation()"
+          class="profile-img"
+          [src]="data?.[avail.header.image] ? data?.[avail.header.image] : 'assets/prof-img/user.png'"
+        />
+      </div>
     }
-    
+
     <div class="text-content flex-1">
-      @for(avail of mentorCardForm; track avail.name) {
-        @if(avail.type !== 'image' && avail.name !== 'experience') {
-          <div class="text-row">
-            @if(avail.name === 'name' || avail.name === 'title') {
-              <h4 class="card-title wrap-text">
-                {{ data?.[avail.name] | titlecase }}
-              </h4>
-            } @else {
-              <div class="d-flex flex-align-items-center">
-                <p class="card-text wrap-text ">
-                  {{ avail.type === 'array' && data?.[avail.name]?.length ? data?.[avail.name][0]?.label : data?.[avail.name] }}
+      <div class="text-row">
+        @if(avail.header.title) {
+          <h4 class="card-title wrap-text">
+            {{ data?.[avail.header.title] | titlecase }}
+          </h4>
+        }
+        @for(item of avail.body; track item.name) {
+          <div class="d-flex flex-align-items-center">
+            <p class="card-text wrap-text">
+              {{ item.type === 'array' && data?.[item.name]?.length ? data?.[item.name][0]?.label : data?.[item.name] }}
+            </p>
+            @if(item.children) {
+            @for(child of item.children; track child.name) {
+              @if(data?.[child.name]) {
+                <p class="experience-text wrap-text">
+                  ({{ data?.[child.name] }} {{child?.subText | translate}})
                 </p>
-                @if(data?.experience) {
-                  <p class="experience-text wrap-text">
-                    ({{ data.experience }} years)
-                  </p>
-                }
-              </div>
+              }
             }
+          }
           </div>
         }
-      }
+      </div>
     </div>
+    }
   </div>
 
       <div
