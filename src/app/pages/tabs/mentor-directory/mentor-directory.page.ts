@@ -64,7 +64,7 @@ export class MentorDirectoryPage implements OnInit {
 
   async ionViewWillEnter() {
     const result = await this.form.getForm(MENTOR_DIR_CARD_FORM);
-    this.mentorForm = _.get(result, 'data');
+    this.mentorForm = _.get(result, 'data.fields.controls');
     this.page = 1;
     this.mentors = [];
     this.getMentors();

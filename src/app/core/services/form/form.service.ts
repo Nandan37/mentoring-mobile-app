@@ -24,7 +24,7 @@ export class FormService {
       payload: formBody,
     };
     const resp = await this.http.post(args);
-    if (!_.has(resp, 'result.data')) {
+    if (!_.has(resp, 'result.data.fields')) {
       return resp.result; // if form is not present return without storing
     }
     

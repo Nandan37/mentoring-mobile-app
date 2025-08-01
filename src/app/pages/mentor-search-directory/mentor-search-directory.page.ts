@@ -78,7 +78,7 @@ export class MentorSearchDirectoryPage implements OnInit {
 
 async ionViewWillEnter() {
   const result = await this.formService.getForm(MENTOR_DIR_CARD_FORM);
-  this.mentorForm = _.get(result, 'data');
+  this.mentorForm = _.get(result, 'data.fields.controls');
   const queryParams = this.route.snapshot.queryParams;
   const search = queryParams['search'];
   const chip = queryParams['chip'];

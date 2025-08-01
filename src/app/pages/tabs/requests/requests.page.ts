@@ -41,7 +41,7 @@ export class RequestsPage implements OnInit {
 
   async ionViewWillEnter(){
     const result = await this.form.getForm(MENTOR_REQ_CARD_FORM);
-    this.mentorForm = _.get(result, 'data');
+    this.mentorForm = _.get(result, 'data.fields.controls');
     this.route.data.subscribe((data) => {
       this.routeData = data;
       this.buttonConfig = this.routeData?.button_config;

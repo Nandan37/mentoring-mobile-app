@@ -78,7 +78,7 @@ export class GenericListPage implements OnInit {
   async ionViewWillEnter() {
     this.isMentor = this.profileService.isMentor;
     const result = await this.formService.getForm(MENTOR_CONNECTION_CARD_FORM);
-    this.mentorForm = _.get(result, 'data');
+    this.mentorForm = _.get(result, 'data.fields.controls');
     this.route.data.subscribe((data) => {
       this.routeData = data;
       this.action(this.routeData);
