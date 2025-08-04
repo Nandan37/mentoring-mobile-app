@@ -84,7 +84,7 @@
   [showRole]="false"
 >
 </app-generic-profile-header>
-  <div *ngIf="isloaded" class="d-flex flex-justify-center">
+  <div *ngIf="isloaded" class="d-flex flex-justify-center flex-1 flex-align-items-center"  >
   <app-no-data-found
     [messageHeader]="'USER_CANT_ACCESS_THIS_PROFILE'"
     [messageDescription]="'USER_CANT_ACCESS_PROFILE_GO_TO_HOME_PAGE'"
@@ -93,8 +93,6 @@
   </app-no-data-found>
 </div>
 } @else if (userNotFound) {
-  <div style="display: contents;">
-    <div>
       <app-page-header [config]="headerConfig" (actionEvent)="action($event)" *ngIf="isloaded" ></app-page-header>
       <app-generic-profile-header
         *ngIf="isloaded"
@@ -104,10 +102,9 @@
         [userNotFound]="userNotFound"
       >
       </app-generic-profile-header>
-    </div>
     
-    <div class="flex flex-justify-center flex-align-items-center text-center">
-      <div>
+    <div class="d-flex flex-justify-center flex-1 flex-align-items-center" >
+      <div >
         <ion-icon name="information-circle" style="font-size: 24px;"></ion-icon>
         <span style="vertical-align: super; font-size: 16px;">
           {{ "USER_INFO_NOT_FOUND" | translate }}
@@ -117,7 +114,6 @@
         </p>
       </div>
     </div>
-  </div>
 }
 
 <ion-footer *ngIf="isloaded" class="ion-no-border footer-button">
