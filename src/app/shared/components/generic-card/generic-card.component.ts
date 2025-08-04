@@ -12,7 +12,7 @@ export class GenericCardComponent implements OnInit {
   @Output() onClickEvent = new EventEmitter();
   @Input() buttonConfig: any;
   @Input() meta: any;
-  @Input() mentorCardForm: any;
+  @Input() cardConfig: any;
 
   constructor(private router: Router) {}
 

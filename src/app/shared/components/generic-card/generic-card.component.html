@@ -34,24 +34,23 @@
     </div>
   </div>
   <div class="card-content flex-1 d-flex gap-3 mx-10 py-2">
-    @if(mentorCardForm.header.image) {
+    @if(cardConfig.header.image) {
       <div class="image-container">
         <img
-          (click)="onCardClick(data); $event.stopPropagation()"
           class="profile-img"
-          [src]="data?.[mentorCardForm.header.image] ? data?.[mentorCardForm.header.image] : 'assets/prof-img/user.png'"
+          [src]="data?.[cardConfig.header.image] ? data?.[cardConfig.header.image] : 'assets/prof-img/user.png'"
         />
       </div>
     }
 
     <div class="text-content flex-1">
       <div class="text-row">
-        @if(mentorCardForm.header.title) {
+        @if(cardConfig.header.title) {
           <h4 class="card-title wrap-text">
-            {{ data?.[mentorCardForm.header.title] | titlecase }}
+            {{ data?.[cardConfig.header.title] | titlecase }}
           </h4>
         }
-        @for(item of mentorCardForm.body; track item.name) {
+        @for(item of cardConfig.body; track item.name) {
           <div class="d-flex flex-align-items-center">
             <p class="card-text wrap-text">
               {{ item.type === 'array' && data?.[item.name]?.length ? data?.[item.name][0]?.label : data?.[item.name] }}
