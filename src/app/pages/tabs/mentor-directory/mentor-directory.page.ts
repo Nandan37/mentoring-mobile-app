@@ -1,9 +1,12 @@
 import { Component, OnInit, ViewChild } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { IonContent, IonInfiniteScroll } from '@ionic/angular';
+import * as _ from 'lodash';
 import { CHAT_MESSAGES } from 'src/app/core/constants/chatConstants';
+import { MENTOR_DIR_CARD_FORM } from 'src/app/core/constants/formConstant';
 import { urlConstants } from 'src/app/core/constants/urlConstants';
 import { HttpService, LoaderService, ToastService } from 'src/app/core/services';
+import { FormService } from 'src/app/core/services/form/form.service';
 import { CommonRoutes } from 'src/global.routes';
 
 @Component({
@@ -26,6 +29,7 @@ export class MentorDirectoryPage implements OnInit {
   };
 
   mentors = [];
+  mentorForm: any;
   mentorsCount;
   isLoaded: boolean = false;
   filterData: any;
@@ -49,6 +53,7 @@ export class MentorDirectoryPage implements OnInit {
     private httpService: HttpService,
     private route: ActivatedRoute,
     private toast: ToastService,
+    private form: FormService,
   ) {}
 
   ngOnInit() {
@@ -58,6 +63,8 @@ export class MentorDirectoryPage implements OnInit {
   }
 
   async ionViewWillEnter() {
+    const result = await this.form.getForm(MENTOR_DIR_CARD_FORM);
+    this.mentorForm = _.get(result, 'data.fields.controls');
     this.page = 1;
     this.mentors = [];
     this.getMentors();

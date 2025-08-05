@@ -101,26 +101,16 @@ export class MentorDetailsPage implements OnInit {
     private toast: ToastService,
     private utilService: UtilService
   ) {
-    this.isMobile = utilService.isMobile();
-    routerParams.params.subscribe((params) => {
-      this.mentorId = this.buttonConfig.meta.id = params.id;
-      this.getMentor();
-      // this.userService.getUserValue().then(async (result) => {
-      //   console.log(result,"resultresultresultresult");
-      //   if (result) {
-      //     this.getMentor();
-      //   } else {
-      //     this.router.navigate([`/${CommonRoutes.AUTH}/${CommonRoutes.LOGIN}`], { queryParams: { mentorId: this.mentorId } })
-      //   }
-      // })
-    })
+    
   }
 
   ngOnInit() {}
   async ionViewWillEnter() {
-    // this.upcomingSessions = await this.sessionService.getUpcomingSessions(
-    //   this.mentorId
-    // );
+    this.isMobile = this.utilService.isMobile();
+    this.routerParams.params.subscribe((params) => {
+      this.mentorId = this.buttonConfig.meta.id = params.id;
+      this.getMentor();
+    })
   }
 
   async getMentor() {

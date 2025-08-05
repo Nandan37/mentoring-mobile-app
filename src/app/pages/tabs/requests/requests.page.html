@@ -21,7 +21,8 @@
             <app-generic-card 
               [data]="value.user_details" 
               [meta]="{ isSent: value?.requestee_id === value?.user_details?.user_id, message: value?.meta?.message, timeStamp: '', resp: value }" 
-              [buttonConfig]="slotBtnConfig" (onClickEvent)="onCardClick($event, value.id)">
+              [buttonConfig]="slotBtnConfig" (onClickEvent)="onCardClick($event, value.id)"
+              [cardConfig]="mentorForm">
             </app-generic-card>
           </ion-col>
         </ion-row>
@@ -34,7 +35,7 @@
             <app-generic-card 
               [data]="value?.user_details" 
               [meta]="{ isSent: value?.created_by === value?.user_id, message: value?.meta?.message, timeStamp: '' }" 
-              [buttonConfig]="buttonConfig" (onClickEvent)="onCardClick($event)">
+              [buttonConfig]="buttonConfig" (onClickEvent)="onCardClick($event)" [cardConfig]="mentorForm">
             </app-generic-card>
           </ion-col>
         </ion-row>

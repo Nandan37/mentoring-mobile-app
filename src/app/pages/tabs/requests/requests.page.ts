@@ -1,10 +1,14 @@
 import { Component, OnInit } from '@angular/core';
 import { urlConstants } from 'src/app/core/constants/urlConstants';
-import { HttpService } from 'src/app/core/services';
 import { ActivatedRoute } from '@angular/router';
 import { Router } from '@angular/router';
 import { CommonRoutes } from 'src/global.routes';
+import { MENTOR_REQ_CARD_FORM } from 'src/app/core/constants/formConstant';
+import * as _ from 'lodash';
+//service
 import { SessionService } from 'src/app/core/services/session/session.service';
+import { FormService } from 'src/app/core/services/form/form.service';
+import { HttpService } from 'src/app/core/services';
 
 @Component({
   selector: 'app-requests',
@@ -25,15 +29,19 @@ export class RequestsPage implements OnInit {
   routeData: any;
   slotBtnConfig: any;
   slotRequests: any;
+  mentorForm:any
 
   constructor(
     private httpService: HttpService,
     private route: ActivatedRoute,
     private router: Router,
-    private sessionService: SessionService
+    private sessionService: SessionService,
+    private form: FormService
   ) {}
 
   async ionViewWillEnter(){
+    const result = await this.form.getForm(MENTOR_REQ_CARD_FORM);
+    this.mentorForm = _.get(result, 'data.fields.controls');
     this.route.data.subscribe((data) => {
       this.routeData = data;
       this.buttonConfig = this.routeData?.button_config;

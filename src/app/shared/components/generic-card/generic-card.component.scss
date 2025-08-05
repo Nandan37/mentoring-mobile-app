@@ -1,38 +1,58 @@
 .generic-card {
   cursor: pointer;
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
 }
-p {
-  color: var(--dark-gray);
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
+.generic-card-header {
+  background-color: var(--light-gray);
+  flex-shrink: 0;
 }
 
-.columns {
-  --ion-grid-column-padding: 0;
+.card-content {
+  overflow: hidden;
 }
+
+.image-container {
+  flex-shrink: 0;
+  align-self: flex-start;
+}
+
 .profile-img {
   width: 70px;
   height: 70px;
   object-fit: cover;
   border-radius: 50%;
+  display: block;
 }
 
-.button-container {
-  justify-content: space-between;
-  width: auto;
+.experience-text {
+  margin: 0;
+  margin-left: 8px;
+  color: var(--dark-gray, #666);
+  font-size: 0.85em;
+  flex-shrink: 0;
 }
 
-.button-text::part(native) {
-  --ion-color-contrast: var(--ion-color-primary);
+.wrap-text {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  min-width: 0;
 }
 
-.generic-card-header {
-  background-color: var(--light-gray);
+.button-section {
+  display: flex;
+  flex-shrink: 0;
+  gap: 8px;
 }
 
 .rotate-icon-receive {
   transform: rotate(320deg);
+}
+
+.rotate-icon-sent {
+  transform: rotate(130deg);
 }
 
 .max-width-70 {
@@ -43,15 +63,14 @@ p {
   max-width: 50%;
 }
 
-.wrap-text {
-  white-space: nowrap;
+p {
+  color: var(--dark-gray, #666);
   overflow: hidden;
   text-overflow: ellipsis;
+  white-space: nowrap;
+  margin: 0;
 }
 
-.rotate-icon-sent {
-  transform: rotate(130deg);
-}
-.pl-5{
-  padding-left: 5px;
+.button-text::part(native) {
+  --ion-color-contrast: var(--ion-color-primary);
 }

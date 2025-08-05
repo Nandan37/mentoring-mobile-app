@@ -50,6 +50,19 @@ export const MANAGERS_CREATE_SESSION_FORM: IFORM = {
 	"sub_type": "managersSessionForm",
 }
 
+export const MENTOR_DIR_CARD_FORM: IFORM = {
+	"type": "mentorDirectoryCard",
+	"sub_type": "mentorDirectoryCardForm",
+}
+export const MENTOR_REQ_CARD_FORM: IFORM = {
+	"type": "mentorRequestCard",
+	"sub_type": "mentorRequestCardForm",
+}
+export const MENTOR_CONNECTION_CARD_FORM: IFORM = {
+	"type": "mentorConnectionCard",
+	"sub_type": "mentorConnectionCardForm",
+}
+
 export const BIG_NUMBER_DASHBOARD_FORM: IFORM = {
 	"type": "bignumberDashboard",
 	"sub_type": "bignumberDashboardForm"

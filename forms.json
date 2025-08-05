@@ -2615,5 +2615,92 @@
           ]
       }
   }
+},
+{
+  "type": "mentorDirectoryCard",
+  "sub_type": "mentorDirectoryCardForm",
+  "action": "create",
+  "data": {
+    "template_name": "defaultTemplate",
+    "fields": {
+    "controls" : {
+        "header": {
+              "image":"image",
+              "title":"name"
+            },
+        "body": [
+            {
+              "name": "designation",
+              "type": "array",
+              "children": [
+              {
+              "name": "experience",
+              "subText": "YEARS",
+              "type": "text"
+              }
+              ]
+            }
+          ]
+      }
+    }
+  }
+},
+{
+  "type": "mentorRequestCard",
+  "sub_type": "mentorRequestCardForm",
+  "action": "create",
+  "data": {
+    "template_name": "defaultTemplate",
+    "fields": {
+      "controls": {
+          "header": {
+            "image": "image",
+            "title": "name"
+          },
+          "body": [
+            {
+              "name": "designation",
+              "type": "array",
+              "children": [
+                {
+                  "name": "experience",
+                  "subText": "YEARS",
+                  "type": "text"
+                }
+              ]
+            }
+          ]
+        }
+    }
+  }
+},
+{
+  "type": "mentorConnectionCard",
+  "sub_type": "mentorConnectionCardForm",
+  "action": "create",
+  "data": {
+    "template_name": "defaultTemplate",
+    "fields": {
+      "controls": {
+          "header": {
+            "image": "image",
+            "title": "name"
+          },
+          "body": [
+            {
+              "name": "designation",
+              "type": "array",
+              "children": [
+                {
+                  "name": "experience",
+                  "subText": "YEARS",
+                  "type": "text"
+                }
+              ]
+            }
+          ]
+        }
+    }
+  }
 }
 ]
