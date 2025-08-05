@@ -65,7 +65,7 @@
       <ion-button
         color="primary"
         fill="solid"
-        [disabled]="!name || (type === 'link' && (!link || showLinkError)) || (type === 'file' && !uploadedFile)"
+        [disabled]="(type === 'link' && (!link || showLinkError)) || (type === 'file' && !uploadedFile)"
         (click)="saveLink()"
       >
         {{ "ADD" | translate }}
