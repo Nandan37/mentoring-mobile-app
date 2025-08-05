@@ -374,7 +374,7 @@
     "INVALID_LINK": "Invalid link, Please enter a valid link.",
     "LINK": "Link",
     "ENTER_LINK": "Enter link",
-    "ATTACH_FILE": "Attach file",
+    "FILE_UPLOAD": "File Upload",
     "SESSION_RESOURCE_DELETE": "Session resource deleted successfully.",
     "AGENDA_FOR_SESSION": "Agenda for session",
     "SUBMIT_REQ": "Submit request",
