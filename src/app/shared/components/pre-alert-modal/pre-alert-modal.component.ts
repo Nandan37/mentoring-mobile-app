@@ -46,7 +46,7 @@ export class PreAlertModalComponent {
   saveLink() {
     if (this.type === 'file') {
         const obj = {
-          name: this.name, 
+          name: this.name ? this.name : this.uploadedFile.name,
           file: this.uploadedFile
         };
         this.modalController.dismiss({
@@ -55,7 +55,7 @@ export class PreAlertModalComponent {
         });
     } else if(this.type === 'link') {
         const obj = {
-          name: this.name,
+          name: this.name ? this.name : this.link,
           link: this.link,
           type: this.data.name,
           isLink: true,
