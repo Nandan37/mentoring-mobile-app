@@ -52,6 +52,7 @@ export class CreateSessionPage implements OnInit {
   public formData: JsonFormData;
   showForm: boolean = false;
   isSubmited: boolean;
+  isNotCompleted: boolean = true;
   type: any ;
   selectedLink: any;
   selectedHint: any;
@@ -116,7 +117,6 @@ export class CreateSessionPage implements OnInit {
         this.showForm = true;
       }
     });
-    this.isSubmited = true; //to be removed
     this.profileImageData.isUploaded = true;
     this.changeDetRef.detectChanges();
   }
@@ -267,6 +267,8 @@ export class CreateSessionPage implements OnInit {
         this.profileImageData.image = this.lastUploadedImage;
         this.profileImageData.isUploaded = false;
       }
+      if(!this.isNotCompleted) 
+        this.router.navigate([`/${"session-detail"}/${this.id}`],{replaceUrl: true})
     } else {
       this.toast.showToast("Please fill all the mandatory fields", "danger");
     }
@@ -300,6 +302,7 @@ export class CreateSessionPage implements OnInit {
       this.formData.controls[i].value =
         existingData[this.formData.controls[i].name];
         this.formData.controls[i].disabled = this.formData.controls[i].name !== "post" && existingData.status.value  === "COMPLETED" ? true : false;
+        this.isNotCompleted = existingData.status.value  !== "COMPLETED" ;
           if(
           this.formData.controls[i].name == "post" && existingData.status.value  !== "COMPLETED"
           ){
