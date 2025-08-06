@@ -76,7 +76,7 @@ export class SearchPopoverComponent implements OnInit {
       this.tableData = await this.getMenteelist();
       this.filterData = this.data.isMobile ? [] : await this.getFilters();
       this.filterData = this.data.isMobile ? [] : this.util.getFormatedFilterData(this.filterData, this.data.control.meta);
-      this.filterData = [...this.filterData, this.data.control.meta.filters.type[0]];
+      this.filterData = [...this.filterData, this.data?.control?.meta?.filters?.type[0]];
     }    
   }
 
@@ -116,7 +116,7 @@ export class SearchPopoverComponent implements OnInit {
     ? '&' + this.data.control.meta.filters.type[0].key +'=' + this.selectedFilters.type.map(des => des.value).join(',')
     : '';
     let queryString = organizationsQueryParam + designationQueryParam + 
-    ((this.data.sessionType === 'PRIVATE' && (this.data.formConfig || Boolean(this.data.isCreator)) && !this.roles.includes("session_manager")) 
+    ((this.data.sessionType === 'PRIVATE' && (this.data.formConfig || Boolean(this.data.isCreator))) 
     ? '&connected_mentees=true' 
     : typeQueryParam);
 

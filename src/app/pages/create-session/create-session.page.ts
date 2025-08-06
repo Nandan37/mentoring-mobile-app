@@ -635,7 +635,7 @@ handleSelectedFile(file) {
   } else if ((this.isHome || queryParams.isCreator) && !hasPermission) {
     this.formConfig = CREATE_SESSION_FORM;
   } else {
-    this.formConfig = MANAGERS_CREATE_SESSION_FORM;
+    this.formConfig = CREATE_SESSION_FORM;
   }
 }
 }
