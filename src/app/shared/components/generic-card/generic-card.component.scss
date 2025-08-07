@@ -74,3 +74,18 @@ p {
 .button-text::part(native) {
   --ion-color-contrast: var(--ion-color-primary);
 }
+
+.tag-container {
+  top: 0;
+  right: 0;
+}
+
+.tag {
+  color: white;
+  padding: 5px;
+  border-bottom-left-radius: 10px;
+}
+
+.expired-tag {
+  background-color: var(--dark-gray);
+}
