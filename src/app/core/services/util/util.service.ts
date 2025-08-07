@@ -308,39 +308,46 @@ export class UtilService {
     this.messageBadge.next(false);
   }
 
-  uploadFile(): Promise<File | null> {
+ uploadFile(allowedExtensions?: string[], maxSizeMB?: number, errorMsgs?:any): Promise<File | null> {
     return new Promise((resolve) => {
       const input = document.createElement('input');
       input.type = 'file';
-      input.accept = '*/*';
-  
+      const extensions = allowedExtensions && allowedExtensions.length > 0
+        ? allowedExtensions.map(ext => `.${ext}`).join(',')
+        : '*/*';
+      input.accept = extensions;
       input.addEventListener('change', (fileEvent: Event) => {
         const target = fileEvent.target as HTMLInputElement;
         const file = target.files?.[0];
   
         if (!file) {
-          this.toast.showToast(
-            this.translate.instant('No file selected'),
-            'danger'
-          );
+          this.toast.showToast('No file selected', 'danger');
           return resolve(null);
         }
+        if (allowedExtensions && allowedExtensions.length > 0) {
+          const fileName = file.name;
+          const fileExt = fileName.split('.').pop()?.toLowerCase();
   
-        if (!file.type || file.type.trim() === '') {
-          this.toast.showToast(
-            this.translate.instant('Cannot upload file: File type is not detected. Please try a different file.'),
-            'danger'
-          );
-          return resolve(null);
+          if (!fileExt || !allowedExtensions.includes(fileExt)) {
+            this.toast.showToast(
+              errorMsgs?.invalidFormatError,
+              'danger'
+            );
+            return resolve(null);
+          }
         }
-  
-        if (!file.name || file.name.trim() === '') {
-          return resolve(null);
+        if (maxSizeMB) {
+          const maxSizeBytes = maxSizeMB * 1024 * 1024;
+          if (file.size > maxSizeBytes) {
+            this.toast.showToast(
+              errorMsgs?.maxSizeError,
+              'danger'
+            );
+            return resolve(null);
+          }
         }
-  
         return resolve(file);
       });
-  
       input.click();
     });
   }

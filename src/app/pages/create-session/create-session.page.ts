@@ -477,13 +477,16 @@ handleSelectedFile(file) {
     // Handle file upload logic here
 }
   async showResourcesPopup(event) {
-       const modal = await this.modalCtrl.create({
+     const modal = await this.modalCtrl.create({
             component: PreAlertModalComponent,
             cssClass: 'pre-custom-modal',
             componentProps: {
               data: event.formControl.control, 
               type: 'file',
-              heading: 'ADD_FILE'
+              heading: 'ADD_FILE',
+              allowedFileTypes:event.formControl.control.allowedFileTypes,
+              maxSize:event.formControl.control.maxSize,
+              errorMsg : event.formControl.control.errorMessage
             },
             backdropDismiss: false
           });
