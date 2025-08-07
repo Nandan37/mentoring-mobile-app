@@ -701,7 +701,7 @@
                       "disabled": false,
                       "validators": {
                         "required": false,
-                        "allowedFileTypes": "[pdf,docx,ppt,doc]",
+                        "allowedFileTypes": ["pdf", "docx", "ppt", "doc"],
                         "maxSize":"50"
                       },
                       "errorMessage": {
@@ -737,7 +737,7 @@
                       "disabled": true,
                       "validators": {
                         "required": false,
-                         "allowedFileTypes": "[pdf,docx,ppt,doc]",
+                         "allowedFileTypes": ["pdf", "docx", "ppt", "doc"],
                          "maxSize":"50"
                       },
                       "errorMessage": {
@@ -1558,7 +1558,7 @@
                       "disabled": false,
                       "validators": {
                         "required": false,
-                        "allowedFileTypes": "[pdf,docx,ppt,doc]",
+                        "allowedFileTypes": ["pdf", "docx", "ppt", "doc"],
                         "maxSize":"50"
                       },
                       "errorMessage": {
@@ -1594,7 +1594,7 @@
                       "disabled": true,
                       "validators": {
                         "required": false,
-                         "allowedFileTypes": "[pdf,docx,ppt,doc]",
+                         "allowedFileTypes": ["pdf", "docx", "ppt", "doc"],
                          "maxSize":"50"
                       },
                       "errorMessage": {
