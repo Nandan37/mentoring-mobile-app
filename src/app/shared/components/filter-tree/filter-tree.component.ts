@@ -20,7 +20,7 @@ export class FilterTreeComponent implements OnInit {
   ngOnInit() {
     if (this.eventData?.control?.validators?.required) {
       this.filterData?.forEach(filter => { 
-        if (filter.name === "type" && filter.key === "connected_mentors" ) {
+        if (filter.name === "type" ) {
           filter.options.forEach(option => {
             option.selected = false;
             this.onFilterChange();  
