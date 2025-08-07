@@ -2,7 +2,10 @@
   class="shadow-with-radious generic-card min-h-100 d-flex flex-col"
   (click)="onCardClick(data)"
 >
-  <div class="generic-card-header d-grid" *ngIf="meta">
+  <div class="generic-card-header d-grid relative" *ngIf="meta">
+    <div class="tag-container absolute">
+    <div *ngIf="isSessionExpired" class="tag expired-tag">{{'EXPIRED' | translate}}</div>
+   </div>
     <div class="d-flex flex-align-items-center mx-10">
       <ion-icon
         [ngClass]="meta.isSent ? 'rotate-icon-sent' : 'rotate-icon-receive'"

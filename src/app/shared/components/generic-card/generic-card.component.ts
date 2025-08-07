@@ -19,6 +19,12 @@ export class GenericCardComponent implements OnInit {
   ngOnInit() {
   }
 
+  get isSessionExpired(): boolean {
+  const endDate = this.meta?.resp?.end_date;
+  if (!endDate) return false; 
+  return Date.now() > endDate * 1000;
+  }
+
   onCardClick(data) {
     this.router.navigate([
       CommonRoutes.MENTOR_DETAILS,

@@ -700,7 +700,13 @@
                       "position": "",
                       "disabled": false,
                       "validators": {
-                        "required": false
+                        "required": false,
+                        "allowedFileTypes": ["pdf", "docx", "ppt", "doc"],
+                        "maxSize":"50"
+                      },
+                      "errorMessage": {
+                        "invalidFormatError": "Unsupported file format. Please upload files in [e.g., PDF, DOCX, PDF, PPTX, URLs] format.",
+                        "maxSizeError" :"File too large. Maximum allowed size is 50 MB."
                       },
                       "meta": {
                         "showSelectAll": true,
@@ -713,11 +719,11 @@
                         "allow_filtering": false,
                         "addPopupType": "file",
                         "add_link":true,
-                        "labelForAddButton": "Add resource"
+                        "labelForAddButton": "Attach Files"
                       },
                       "info": [
                         {
-                           "message": "Supported formats: PDF, WORD, PPT, IMAGES, and inks to online resources (websites, articles, audio, video)"
+                           "message": "Supported formats: PDF, Docx, PPT, and URLs"
                         }
                       ]
                     },
@@ -730,7 +736,13 @@
                       "position": "",
                       "disabled": true,
                       "validators": {
-                        "required": false
+                        "required": false,
+                         "allowedFileTypes": ["pdf", "docx", "ppt", "doc"],
+                         "maxSize":"50"
+                      },
+                      "errorMessage": {
+                        "invalidFormatError": "Unsupported file format. Please upload files in [e.g., PDF, DOCX, PDF, PPTX, URLs] format.",
+                        "maxSizeError" :"File too large. Maximum allowed size is 50 MB."
                       },
                       "meta": {
                         "showSelectAll": true,
@@ -743,11 +755,11 @@
                         "allow_filtering": false,
                         "addPopupType": "file",
                         "add_link":true,
-                        "labelForAddButton": "Add resource"
+                        "labelForAddButton": "Attach Files"
                       },
                       "info": [
                         {
-                          "message": "Supported formats: PDF, WORD, PPT, IMAGES, and inks to online resources (websites, articles, audio, video)"
+                          "message": "Supported formats: PDF, Docx, PPT, and URLs"
                         }
                       ]
                     }
@@ -1535,66 +1547,79 @@
               "labelForAddButton": "Select Medium"
             },
             "multiple": true
-          },{
-            "name": "pre",
-            "label": "Pre  session resources",
-            "class": "ion-no-margin",
-            "value": [],
-            "type": "search",
-            "position": "",
-            "disabled": false,
-            "validators": {
-              "required": false
-            },
-            "meta": {
-              "showSelectAll": true,
-              "multiSelect": true,
-              "showAddOption": {
-                "showAddButton": true,
-                "addChipLabel": ""
-              },
-              "allow_custom_entities": false,
-              "allow_filtering": false,
-              "addPopupType": "file",
-              "add_link":true,
-              "labelForAddButton": "Add resource"
-            },
-            "info": [
-              {
-                 "message": "Supported formats: PDF, WORD, PPT, IMAGES, and inks to online resources (websites, articles, audio, video)"
-              }
-            ]
           },
           {
-            "name": "post",
-            "label": "Post  session resources",
-            "class": "ion-no-margin",
-            "value": [],
-            "type": "search",
-            "position": "",
-            "disabled": true,
-            "validators": {
-              "required": false
-            },
-            "meta": {
-              "showSelectAll": true,
-              "multiSelect": true,
-              "showAddOption": {
-                "showAddButton": true,
-                "addChipLabel": ""
-              },
-              "allow_custom_entities": false,
-              "allow_filtering": false,
-              "addPopupType": "file",
-              "add_link":true,
-              "labelForAddButton": "Add resource"
-            },
-            "info": [
-              {
-                "message": "Supported formats: PDF, WORD, PPT, IMAGES, and inks to online resources (websites, articles, audio, video)"
-              }
-            ]
-          }
+                      "name": "pre",
+                      "label": "Pre  session resources",
+                      "class": "ion-no-margin",
+                      "value": [],
+                      "type": "search",
+                      "position": "",
+                      "disabled": false,
+                      "validators": {
+                        "required": false,
+                        "allowedFileTypes": ["pdf", "docx", "ppt", "doc"],
+                        "maxSize":"50"
+                      },
+                      "errorMessage": {
+                        "invalidFormatError": "Unsupported file format. Please upload files in [e.g., PDF, DOCX, PDF, PPTX, URLs] format.",
+                        "maxSizeError" :"File too large. Maximum allowed size is 50 MB."
+                      },
+                      "meta": {
+                        "showSelectAll": true,
+                        "multiSelect": true,
+                        "showAddOption": {
+                          "showAddButton": true,
+                          "addChipLabel": ""
+                        },
+                        "allow_custom_entities": false,
+                        "allow_filtering": false,
+                        "addPopupType": "file",
+                        "add_link":true,
+                        "labelForAddButton": "Attach Files"
+                      },
+                      "info": [
+                        {
+                           "message": "Supported formats: PDF, Docx, PPT, and URLs"
+                        }
+                      ]
+                    },
+                    {
+                      "name": "post",
+                      "label": "Post  session resources",
+                      "class": "ion-no-margin",
+                      "value": [],
+                      "type": "search",
+                      "position": "",
+                      "disabled": true,
+                      "validators": {
+                        "required": false,
+                         "allowedFileTypes": ["pdf", "docx", "ppt", "doc"],
+                         "maxSize":"50"
+                      },
+                      "errorMessage": {
+                        "invalidFormatError": "Unsupported file format. Please upload files in [e.g., PDF, DOCX, PDF, PPTX, URLs] format.",
+                        "maxSizeError" :"File too large. Maximum allowed size is 50 MB."
+                      },
+                      "meta": {
+                        "showSelectAll": true,
+                        "multiSelect": true,
+                        "showAddOption": {
+                          "showAddButton": true,
+                          "addChipLabel": ""
+                        },
+                        "allow_custom_entities": false,
+                        "allow_filtering": false,
+                        "addPopupType": "file",
+                        "add_link":true,
+                        "labelForAddButton": "Attach Files"
+                      },
+                      "info": [
+                        {
+                          "message": "Supported formats: PDF, Docx, PPT, and URLs"
+                        }
+                      ]
+                    }
         ]
       }
     }
