@@ -484,8 +484,8 @@ handleSelectedFile(file) {
               data: event.formControl.control, 
               type: 'file',
               heading: 'ADD_FILE',
-              allowedFileTypes:event.formControl.control.allowedFileTypes,
-              maxSize:event.formControl.control.maxSize,
+              allowedFileTypes:event.formControl.control.validators.allowedFileTypes,
+              maxSize:event.formControl.control.validators.maxSize,
               errorMsg : event.formControl.control.errorMessage
             },
             backdropDismiss: false
