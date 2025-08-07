@@ -755,7 +755,7 @@
                         "allow_filtering": false,
                         "addPopupType": "file",
                         "add_link":true,
-                        "labelForAddButton": "Add resource"
+                        "labelForAddButton": "Attach Files"
                       },
                       "info": [
                         {
@@ -1576,7 +1576,7 @@
                         "allow_filtering": false,
                         "addPopupType": "file",
                         "add_link":true,
-                        "labelForAddButton": "Add resource"
+                        "labelForAddButton": "Attach Files"
                       },
                       "info": [
                         {
