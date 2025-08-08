@@ -62,6 +62,7 @@ export class PrivatePage implements OnInit {
       icon: 'mail',
       url: CommonRoutes.TABS + '/' + CommonRoutes.REQUESTS,
       pageId: PAGE_IDS.requests,
+      badge: false,
     },
     {
       title: 'MY_CONNECTIONS',
@@ -172,8 +173,19 @@ export class PrivatePage implements OnInit {
   ) {}
 
   async ngOnInit() {
+    const { result } = await this.profile.getRequestCount();
+    const { sessionRequestCount = 0, connectionRequestCount = 0 } = result || {};
+    if (sessionRequestCount > 0 || connectionRequestCount > 0) {
+    const page = this.appPages.find(
+      (page: any) => page.pageId === PAGE_IDS.requests
+    );
+    if (page) {
+      page.badge = true;
+    }
+  }
+
     await this.initializeApp();
-    await this.rocketChatService.initializeWebSocketAndCheckUnread();
+    await this.rocketChatService.initializeWebSocketAndCheckUnread();    
     if (this.chatService.initialBadge) {
       let page = this.appPages.find(
         (page: any) => page.pageId == PAGE_IDS.messages

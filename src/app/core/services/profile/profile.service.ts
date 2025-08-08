@@ -322,4 +322,16 @@ export class ProfileService {
     catch (error) {
     }
   }
+
+    async getRequestCount(){
+    const config = {
+      url: urlConstants.API_URLS.REQUEST_SESSION_COUNT,
+    };
+    try {
+      let data: any = await this.httpService.get(config);
+      return data
+    }
+    catch (error) {
+    }
+  }
 }
