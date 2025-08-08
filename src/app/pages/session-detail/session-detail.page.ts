@@ -187,8 +187,7 @@ export class SessionDetailPage implements OnInit, OnDestroy {
       this.startDate = (response.start_date>0)?new Date(response.start_date * 1000):this.startDate;
       this.endDate = (response.end_date>0)?new Date(response.end_date * 1000):this.endDate;
       this.platformOff = (response?.meeting_info?.platform == 'OFF') ? true : false;
-     
-      if((!this.isConductor && !this.detailData.form.some(obj => obj.title === 'MENTOR'))){
+      if((!this.detailData.form.some(obj => obj.title === 'MENTOR'))){
         this.detailData.form.push(
           {
             title: 'MENTOR',
