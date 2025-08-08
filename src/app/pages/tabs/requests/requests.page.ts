@@ -8,7 +8,7 @@ import * as _ from 'lodash';
 //service
 import { SessionService } from 'src/app/core/services/session/session.service';
 import { FormService } from 'src/app/core/services/form/form.service';
-import { HttpService } from 'src/app/core/services';
+import { HttpService, UtilService } from 'src/app/core/services';
 
 @Component({
   selector: 'app-requests',
@@ -36,7 +36,8 @@ export class RequestsPage implements OnInit {
     private route: ActivatedRoute,
     private router: Router,
     private sessionService: SessionService,
-    private form: FormService
+    private form: FormService,
+    public utils: UtilService
   ) {}
 
   async ionViewWillEnter(){

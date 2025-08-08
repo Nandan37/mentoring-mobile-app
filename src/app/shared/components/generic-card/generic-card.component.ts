@@ -1,5 +1,6 @@
 import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
 import { Router } from '@angular/router';
+import { UtilService } from 'src/app/core/services';
 import { CommonRoutes } from 'src/global.routes';
 
 @Component({
@@ -13,16 +14,11 @@ export class GenericCardComponent implements OnInit {
   @Input() buttonConfig: any;
   @Input() meta: any;
   @Input() cardConfig: any;
+  @Input() disableButton: boolean;
 
-  constructor(private router: Router) {}
+  constructor(private router: Router, public utils: UtilService) {}
 
   ngOnInit() {
-  }
-
-  get isSessionExpired(): boolean {
-  const endDate = this.meta?.resp?.end_date;
-  if (!endDate) return false; 
-  return Date.now() > endDate * 1000;
   }
 
   onCardClick(data) {

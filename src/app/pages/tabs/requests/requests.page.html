@@ -22,7 +22,8 @@
               [data]="value.user_details" 
               [meta]="{ isSent: value?.requestee_id === value?.user_details?.user_id, message: value?.meta?.message, timeStamp: '', resp: value }" 
               [buttonConfig]="slotBtnConfig" (onClickEvent)="onCardClick($event, value.id)"
-              [cardConfig]="mentorForm">
+              [cardConfig]="mentorForm"
+              [disableButton]="utils.isSessionExpired({ isSent: value?.requestee_id === value?.user_details?.user_id, message: value?.meta?.message, timeStamp: '', resp: value })">
             </app-generic-card>
           </ion-col>
         </ion-row>
