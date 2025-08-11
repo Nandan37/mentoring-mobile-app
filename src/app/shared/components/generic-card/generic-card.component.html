@@ -3,8 +3,11 @@
 >
   <div class="generic-card-header d-grid relative" *ngIf="meta">
     <div class="tag-container absolute">
-    <div *ngIf="utils.isSessionExpired(meta)" class="tag expired-tag">{{'EXPIRED' | translate}}</div>
-   </div>
+  <div *ngIf="showTag" [ngClass]="['tag', showTag.cssClass]">
+    {{ showTag.label | translate }}
+  </div>
+
+  </div>
     <div class="d-flex flex-align-items-center mx-10">
       <ion-icon
         [ngClass]="meta.isSent ? 'rotate-icon-sent' : 'rotate-icon-receive'"
@@ -81,7 +84,7 @@
             size="small"
               *ngIf="showButton(button, data)"
               [color]="button?.color"
-               (click)="
+              (click)="
                 handleButtonClick(button?.action, data);
                 $event.stopPropagation()
               "

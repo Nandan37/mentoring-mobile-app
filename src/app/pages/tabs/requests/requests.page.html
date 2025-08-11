@@ -18,13 +18,16 @@
       <ion-grid >
         <ion-row class="d-flex ">
           <ion-col *ngFor="let value of slotRequests" padding size-xs="12" size-sm="12" size-md="6" size-lg="6" size-xl="4" align-self-stretch>
-            <app-generic-card 
-              [data]="value.user_details" 
-              [meta]="{ isSent: value?.requestee_id === value?.user_details?.user_id, message: value?.meta?.message, timeStamp: '', resp: value }" 
-              [buttonConfig]="slotBtnConfig" (onClickEvent)="onCardClick($event, value.id)"
-              [cardConfig]="mentorForm"
-              [disableButton]="utils.isSessionExpired({ isSent: value?.requestee_id === value?.user_details?.user_id, message: value?.meta?.message, timeStamp: '', resp: value })">
-            </app-generic-card>
+          <app-generic-card
+            [data]="value.user_details"
+            [meta]="value.meta"
+            [showTag]="value.showTag"
+            [buttonConfig]="slotBtnConfig"
+            (onClickEvent)="onCardClick($event, value.id)"
+            [cardConfig]="mentorForm"
+            [disableButton]="value.disableButton">
+          </app-generic-card>
+
           </ion-col>
         </ion-row>
       </ion-grid>

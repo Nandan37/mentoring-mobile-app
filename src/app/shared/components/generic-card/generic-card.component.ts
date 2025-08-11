@@ -1,6 +1,5 @@
 import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
 import { Router } from '@angular/router';
-import { UtilService } from 'src/app/core/services';
 import { CommonRoutes } from 'src/global.routes';
 
 @Component({
@@ -15,8 +14,9 @@ export class GenericCardComponent implements OnInit {
   @Input() meta: any;
   @Input() cardConfig: any;
   @Input() disableButton: boolean;
+  @Input() showTag: any;
 
-  constructor(private router: Router, public utils: UtilService) {}
+  constructor(private router: Router) {}
 
   ngOnInit() {
   }
