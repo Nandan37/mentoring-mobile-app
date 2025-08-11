@@ -168,7 +168,7 @@ export class HttpService {
   }
 
 
-  async getToken() {
+async getToken() {
     let token = localStorage.getItem('accToken');
     if (!token) {
       return null;
@@ -231,7 +231,7 @@ export class HttpService {
         } else {
           localStorage.clear();
           auth.clearLocalData();
-          location.href = environment.unauthorizedRedirectUrl;
+          location.href = window.location.origin;
         }
         break;
       default:
@@ -285,7 +285,7 @@ export class HttpService {
         if(environment.isAuthBypassed) {
           let auth = this.injector.get(AuthService);
           auth.clearLocalData();
-          location.href = environment.unauthorizedRedirectUrl
+          location.href = window.location.origin
         } else {
           let auth = this.injector.get(AuthService);
           auth.logoutAccount(true);
