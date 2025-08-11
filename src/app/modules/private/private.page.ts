@@ -173,18 +173,19 @@ export class PrivatePage implements OnInit {
   ) {}
 
   async ngOnInit() {
-    const { result } = await this.profile.getRequestCount();
-    const { sessionRequestCount = 0, connectionRequestCount = 0 } = result || {};
-    if (sessionRequestCount > 0 || connectionRequestCount > 0) {
-    const page = this.appPages.find(
-      (page: any) => page.pageId === PAGE_IDS.requests
-    );
-    if (page) {
-      page.badge = true;
-    }
-  }
-
     await this.initializeApp();
+    if(this.isMentor) {
+      const { result } = await this.profile.getRequestCount();
+      const { sessionRequestCount = 0, connectionRequestCount = 0 } = result || {};
+      if (sessionRequestCount > 0 || connectionRequestCount > 0) {
+      const page = this.appPages.find(
+        (page: any) => page.pageId === PAGE_IDS.requests
+      );
+      if (page) {
+        page.badge = true;
+      }
+      }
+    }
     await this.rocketChatService.initializeWebSocketAndCheckUnread();    
     if (this.chatService.initialBadge) {
       let page = this.appPages.find(
