@@ -76,7 +76,7 @@ export class CreateSessionPage implements OnInit {
     private toast: ToastService,
     private activatedRoute: ActivatedRoute,
     private location: Location,
-     private localStorage: LocalStorageService, 
+    private localStorage: LocalStorageService, 
     private attachment: AttachmentService,
     private api: HttpService,
     private loaderService: LoaderService,
@@ -434,6 +434,7 @@ export class CreateSessionPage implements OnInit {
   };
 
   formValueChanged(event){
+    const formRawValue = this.form1.myForm.getRawValue();
     let dependedControlIndex = this.formData.controls.findIndex(formControl => formControl.name === event.dependedChild)
     let dependedControl = this.form1.myForm.get(event.dependedChild)
     if(event.value === "PUBLIC") {
@@ -441,6 +442,7 @@ export class CreateSessionPage implements OnInit {
       this.setControlValidity(dependedControlIndex, dependedControl, false, true);
     } else {
       this.sessionType = event?.value;
+      if((typeof formRawValue?.mentor_id === 'string' && formRawValue?.mentor_id)  || this.isHome)
       this.setControlValidity(dependedControlIndex, dependedControl, true, false);
     }
     this.formData.controls.forEach(control => {
@@ -558,7 +560,16 @@ handleSelectedFile(file) {
     });
 
     popover.onDidDismiss().then((data) => {
-      this.mentor_id = data.data[0]?.id;
+      if(data.data[0]?.data?.is_mentor) {
+        this.mentor_id = data.data[0]?.id;
+        if(this.sessionType != 'PUBLIC') {
+        this.formData.controls.forEach(control => {
+        if (control.name === "mentees") {
+          control.disabled = false;
+        }
+        });
+        }
+      }
       if (data.data) {
         event.formControl.selectedData = data.data;
         const values = event.formControl.control.meta.multiSelect ? data.data.map(obj => obj.id) : data.data[0].id;
