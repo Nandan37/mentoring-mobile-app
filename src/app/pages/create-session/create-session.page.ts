@@ -432,21 +432,22 @@ export class CreateSessionPage implements OnInit {
     let dependedControl = this.form1.myForm.get(event.dependedChild)
     if(event.value === "PUBLIC") {
       this.sessionType = event?.value;
-      this.setControlValidity(dependedControlIndex, dependedControl, false);
+      this.setControlValidity(dependedControlIndex, dependedControl, false, true);
     } else {
       this.sessionType = event?.value;
-      this.setControlValidity(dependedControlIndex, dependedControl, true);
+      this.setControlValidity(dependedControlIndex, dependedControl, true, false);
     }
     this.formData.controls.forEach(control => {
-      if (event.meta.disabledChildren.includes(control.name)) {
-        control.disabled = false;
-      }
-    })
+    if (control.name === "mentor_id") {
+      control.disabled = false;
+    }
+    });
+
   }
   
-  setControlValidity(index, control, required) {
+  setControlValidity(index, control, required, disabled) {
     this.formData.controls[index].validators['required'] = required;
-    this.formData.controls[index].disabled = false;
+    this.formData.controls[index].disabled = disabled;
     control.setValidators(required ? [Validators.required] : null);
     control.updateValueAndValidity();
   }
