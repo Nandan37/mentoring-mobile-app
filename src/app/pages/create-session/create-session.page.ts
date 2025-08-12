@@ -248,7 +248,9 @@ export class CreateSessionPage implements OnInit {
       if (!this.profileImageData.image) {
         form.image = [];
       }
-      
+      if(form?.mentees.length && form?.type === "PUBLIC") {
+        form.mentees = [];
+      }
       form.mentor_id = form?.mentor_id ?? this.user.id;
       form.resources= this.updatedFiles;
       this.form1.myForm.markAsPristine();
@@ -298,6 +300,7 @@ export class CreateSessionPage implements OnInit {
         }
       }
     }
+    
     for (let i = 0; i < this.formData.controls.length; i++) {
       this.formData.controls[i].value =
         existingData[this.formData.controls[i].name];
@@ -362,6 +365,9 @@ export class CreateSessionPage implements OnInit {
           this.formData.controls[dependedChildIndex].validators['required']= existingData[this.formData.controls[i].name].value=='PUBLIC' ? false : true
         }
       }
+        if(this.formData.controls[i]?.name === "mentees" && this.sessionType ==='PUBLIC') {
+          this.formData.controls[i].disabled = true;
+        }
       this.formData.controls[i].options = _.unionBy(
         this.formData.controls[i].options,
         this.formData.controls[i].value, 'value'
@@ -623,9 +629,8 @@ handleSelectedFile(file) {
     await popover.present();
   }
 
- async updateFormConfig() {
-  const queryParams = this.route.snapshot.queryParams;
-  const source = queryParams['source'];
+async updateFormConfig() {
+  const { source, isCreator } = this.route.snapshot.queryParams;
   this.isHome = source === 'home';
   const isManagePage = source === 'manage';
 
@@ -634,12 +639,14 @@ handleSelectedFile(file) {
     action: manageSessionAction.SESSION_ACTIONS,
   });
 
-  if (isManagePage) {
-    this.formConfig = hasPermission ? MANAGERS_CREATE_SESSION_FORM : CREATE_SESSION_FORM;
-  } else if ((this.isHome || queryParams.isCreator) && !hasPermission) {
-    this.formConfig = CREATE_SESSION_FORM;
+  if (
+    (isManagePage && hasPermission) ||
+    (!this.isHome && !isCreator && hasPermission)
+  ) {
+    this.formConfig = MANAGERS_CREATE_SESSION_FORM;
   } else {
     this.formConfig = CREATE_SESSION_FORM;
   }
 }
+
 }
