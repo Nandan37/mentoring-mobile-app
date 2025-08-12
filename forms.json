@@ -701,11 +701,11 @@
                       "disabled": false,
                       "validators": {
                         "required": false,
-                        "allowedFileTypes": ["pdf", "docx", "ppt", "doc"],
+                        "allowedFileTypes": ["pdf", "docx", "pptx", "doc"],
                         "maxSize":"50"
                       },
                       "errorMessage": {
-                        "invalidFormatError": "Unsupported file format. Please upload files in [e.g., PDF, DOCX, PDF, PPTX, URLs] format.",
+                        "invalidFormatError": "Unsupported file format. Please upload files in [e.g., PDF, DOCX, PPTX, URLs] format.",
                         "maxSizeError" :"File too large. Maximum allowed size is 50 MB."
                       },
                       "meta": {
@@ -723,7 +723,7 @@
                       },
                       "info": [
                         {
-                           "message": "Supported formats: PDF, Docx, PPT, and URLs"
+                           "message": "Supported formats: PDF, DOCX, PPTX, URL"
                         }
                       ]
                     },
@@ -737,11 +737,11 @@
                       "disabled": true,
                       "validators": {
                         "required": false,
-                         "allowedFileTypes": ["pdf", "docx", "ppt", "doc"],
+                         "allowedFileTypes": ["pdf", "docx", "pptx", "doc"],
                          "maxSize":"50"
                       },
                       "errorMessage": {
-                        "invalidFormatError": "Unsupported file format. Please upload files in [e.g., PDF, DOCX, PDF, PPTX, URLs] format.",
+                        "invalidFormatError": "Unsupported file format. Please upload files in [e.g., PDF, DOCX, PPTX, URLs] format.",
                         "maxSizeError" :"File too large. Maximum allowed size is 50 MB."
                       },
                       "meta": {
@@ -759,7 +759,7 @@
                       },
                       "info": [
                         {
-                          "message": "Supported formats: PDF, Docx, PPT, and URLs"
+                          "message": "Supported formats: PDF, DOCX, PPTX, URL"
                         }
                       ]
                     }
@@ -1558,11 +1558,11 @@
                       "disabled": false,
                       "validators": {
                         "required": false,
-                        "allowedFileTypes": ["pdf", "docx", "ppt", "doc"],
+                        "allowedFileTypes": ["pdf", "docx", "pptx", "doc"],
                         "maxSize":"50"
                       },
                       "errorMessage": {
-                        "invalidFormatError": "Unsupported file format. Please upload files in [e.g., PDF, DOCX, PDF, PPTX, URLs] format.",
+                        "invalidFormatError": "Unsupported file format. Please upload files in [e.g., PDF, DOCX, PPTX, URLs] format.",
                         "maxSizeError" :"File too large. Maximum allowed size is 50 MB."
                       },
                       "meta": {
@@ -1580,7 +1580,7 @@
                       },
                       "info": [
                         {
-                           "message": "Supported formats: PDF, Docx, PPT, and URLs"
+                           "message": "Supported formats: PDF, DOCX, PPTX, URL"
                         }
                       ]
                     },
@@ -1594,11 +1594,11 @@
                       "disabled": true,
                       "validators": {
                         "required": false,
-                         "allowedFileTypes": ["pdf", "docx", "ppt", "doc"],
+                         "allowedFileTypes": ["pdf", "docx", "pptx", "doc"],
                          "maxSize":"50"
                       },
                       "errorMessage": {
-                        "invalidFormatError": "Unsupported file format. Please upload files in [e.g., PDF, DOCX, PDF, PPTX, URLs] format.",
+                        "invalidFormatError": "Unsupported file format. Please upload files in [e.g., PDF, DOCX, PPTX, URLs] format.",
                         "maxSizeError" :"File too large. Maximum allowed size is 50 MB."
                       },
                       "meta": {
@@ -1616,7 +1616,7 @@
                       },
                       "info": [
                         {
-                          "message": "Supported formats: PDF, Docx, PPT, and URLs"
+                          "message": "Supported formats: PDF, DOCX, PPTX, URL"
                         }
                       ]
                     }

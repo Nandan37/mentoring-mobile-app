@@ -352,4 +352,9 @@ export class UtilService {
     });
   }
 
+  isSessionExpired(meta): boolean {
+  const endDate = meta?.resp?.end_date;
+  if (!endDate) return false; 
+  return Date.now() > endDate * 1000;
+  }
 }

@@ -76,6 +76,7 @@ export class SearchPopoverComponent implements OnInit {
       this.tableData = await this.getMenteelist();
       this.filterData = this.data.isMobile ? [] : await this.getFilters();
       this.filterData = this.data.isMobile ? [] : this.util.getFormatedFilterData(this.filterData, this.data.control.meta);
+      if(this.data.control.name != "mentor_id")
       this.filterData = [...this.filterData, this.data?.control?.meta?.filters?.type[0]];
     }    
   }

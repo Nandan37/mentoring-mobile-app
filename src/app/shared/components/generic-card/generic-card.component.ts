@@ -13,16 +13,12 @@ export class GenericCardComponent implements OnInit {
   @Input() buttonConfig: any;
   @Input() meta: any;
   @Input() cardConfig: any;
+  @Input() disableButton: boolean;
+  @Input() showTag: any;
 
   constructor(private router: Router) {}
 
   ngOnInit() {
-  }
-
-  get isSessionExpired(): boolean {
-  const endDate = this.meta?.resp?.end_date;
-  if (!endDate) return false; 
-  return Date.now() > endDate * 1000;
   }
 
   onCardClick(data) {

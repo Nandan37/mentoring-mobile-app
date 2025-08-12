@@ -30,13 +30,17 @@ export class RequestsPage implements OnInit {
   slotBtnConfig: any;
   slotRequests: any;
   mentorForm:any
+  expiryTag = {
+    label: 'EXPIRED',
+    cssClass: 'expired-tag'
+  }
 
   constructor(
     private httpService: HttpService,
     private route: ActivatedRoute,
     private router: Router,
     private sessionService: SessionService,
-    private form: FormService
+    private form: FormService,
   ) {}
 
   async ionViewWillEnter(){
@@ -52,7 +56,6 @@ export class RequestsPage implements OnInit {
   } else {
     await this.pendingRequest();
   }
-   
 
   }
   ngOnInit() {
@@ -84,18 +87,43 @@ async segmentChanged(event: any) {
     }
   }
 
-  async slotRequestData() {
-     this.sessionService.requestSessionList().then((res) => {
-        this.slotRequests = res?.result?.data ?? [];
-        if (!this.slotRequests.length) {
-          this.noResult = { subHeader: this.routeData?.noDataFound.noSession };
-        }
-      })
-      .catch((error) => {
-        console.error('Error fetching session list:', error);
-      });
-  }
+ async slotRequestData() {
+  try {
+    const res = await this.sessionService.requestSessionList();
+    const data = res?.result?.data ?? [];
 
+    if (data.length === 0) {
+      this.noResult = { subHeader: this.routeData?.noDataFound?.noSession };
+    }
+
+    this.slotRequests = data.map(value => ({
+      ...value,
+      meta: this.getMeta(value),
+      showTag: this.isSessionExpired(value) ? this.expiryTag : '',
+      disableButton: this.isSessionExpired(value)
+    }));
+
+  } catch (error) {
+    console.error('Error fetching session list:', error);
+  }
+}
+
+
+  getMeta(value: any) {
+  return {
+    isSent: value?.requestee_id === value?.user_details?.user_id,
+    message: value?.meta?.message,
+    timeStamp: '',
+    resp: value
+  };
+}
+
+  isSessionExpired(meta): boolean {
+  const endDate = meta?.end_date;
+  if (!endDate) return false; 
+  return Date.now() > endDate * 1000;
+  }
+  
   onCardClick(event, data?) {
     switch (event.type) {
       case 'viewMessage':

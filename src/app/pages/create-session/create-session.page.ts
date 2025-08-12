@@ -76,7 +76,7 @@ export class CreateSessionPage implements OnInit {
     private toast: ToastService,
     private activatedRoute: ActivatedRoute,
     private location: Location,
-     private localStorage: LocalStorageService, 
+    private localStorage: LocalStorageService, 
     private attachment: AttachmentService,
     private api: HttpService,
     private loaderService: LoaderService,
@@ -248,7 +248,9 @@ export class CreateSessionPage implements OnInit {
       if (!this.profileImageData.image) {
         form.image = [];
       }
-      
+      if(form?.mentees.length && form?.type === "PUBLIC") {
+        form.mentees = [];
+      }
       form.mentor_id = form?.mentor_id ?? this.user.id;
       form.resources= this.updatedFiles;
       this.form1.myForm.markAsPristine();
@@ -298,6 +300,7 @@ export class CreateSessionPage implements OnInit {
         }
       }
     }
+    
     for (let i = 0; i < this.formData.controls.length; i++) {
       this.formData.controls[i].value =
         existingData[this.formData.controls[i].name];
@@ -362,6 +365,9 @@ export class CreateSessionPage implements OnInit {
           this.formData.controls[dependedChildIndex].validators['required']= existingData[this.formData.controls[i].name].value=='PUBLIC' ? false : true
         }
       }
+        if(this.formData.controls[i]?.name === "mentees" && this.sessionType ==='PUBLIC') {
+          this.formData.controls[i].disabled = true;
+        }
       this.formData.controls[i].options = _.unionBy(
         this.formData.controls[i].options,
         this.formData.controls[i].value, 'value'
@@ -428,25 +434,28 @@ export class CreateSessionPage implements OnInit {
   };
 
   formValueChanged(event){
+    const formRawValue = this.form1.myForm.getRawValue();
     let dependedControlIndex = this.formData.controls.findIndex(formControl => formControl.name === event.dependedChild)
     let dependedControl = this.form1.myForm.get(event.dependedChild)
     if(event.value === "PUBLIC") {
       this.sessionType = event?.value;
-      this.setControlValidity(dependedControlIndex, dependedControl, false);
+      this.setControlValidity(dependedControlIndex, dependedControl, false, true);
     } else {
       this.sessionType = event?.value;
-      this.setControlValidity(dependedControlIndex, dependedControl, true);
+      if((typeof formRawValue?.mentor_id === 'string' && formRawValue?.mentor_id)  || this.isHome)
+      this.setControlValidity(dependedControlIndex, dependedControl, true, false);
     }
     this.formData.controls.forEach(control => {
-      if (event.meta.disabledChildren.includes(control.name)) {
-        control.disabled = false;
-      }
-    })
+    if (control.name === "mentor_id") {
+      control.disabled = false;
+    }
+    });
+
   }
   
-  setControlValidity(index, control, required) {
+  setControlValidity(index, control, required, disabled) {
     this.formData.controls[index].validators['required'] = required;
-    this.formData.controls[index].disabled = false;
+    this.formData.controls[index].disabled = disabled;
     control.setValidators(required ? [Validators.required] : null);
     control.updateValueAndValidity();
   }
@@ -551,7 +560,16 @@ handleSelectedFile(file) {
     });
 
     popover.onDidDismiss().then((data) => {
-      this.mentor_id = data.data[0]?.id;
+      if(data.data[0]?.data?.is_mentor) {
+        this.mentor_id = data.data[0]?.id;
+        if(this.sessionType != 'PUBLIC') {
+        this.formData.controls.forEach(control => {
+        if (control.name === "mentees") {
+          control.disabled = false;
+        }
+        });
+        }
+      }
       if (data.data) {
         event.formControl.selectedData = data.data;
         const values = event.formControl.control.meta.multiSelect ? data.data.map(obj => obj.id) : data.data[0].id;
@@ -622,9 +640,8 @@ handleSelectedFile(file) {
     await popover.present();
   }
 
- async updateFormConfig() {
-  const queryParams = this.route.snapshot.queryParams;
-  const source = queryParams['source'];
+async updateFormConfig() {
+  const { source, isCreator } = this.route.snapshot.queryParams;
   this.isHome = source === 'home';
   const isManagePage = source === 'manage';
 
@@ -633,12 +650,14 @@ handleSelectedFile(file) {
     action: manageSessionAction.SESSION_ACTIONS,
   });
 
-  if (isManagePage) {
-    this.formConfig = hasPermission ? MANAGERS_CREATE_SESSION_FORM : CREATE_SESSION_FORM;
-  } else if ((this.isHome || queryParams.isCreator) && !hasPermission) {
-    this.formConfig = CREATE_SESSION_FORM;
+  if (
+    (isManagePage && hasPermission) ||
+    (!this.isHome && !isCreator && hasPermission)
+  ) {
+    this.formConfig = MANAGERS_CREATE_SESSION_FORM;
   } else {
     this.formConfig = CREATE_SESSION_FORM;
   }
 }
+
 }
