@@ -743,3 +743,13 @@ ion-textarea textarea {
   cursor: pointer;
   color: #000;
 }
+
+.toast-title {
+  font-weight: bold;
+  font-size: 14px;
+}
+
+.toast-subtext {
+  font-size: 12px;
+  opacity: 0.8;
+}
