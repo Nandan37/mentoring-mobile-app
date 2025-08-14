@@ -100,13 +100,15 @@
       </div>
       <div *ngIf="buttonConfig" class="flex flex-justify-start mt-4 wrap">
         <div *ngFor="let button of buttonConfig.buttons">
-          <ion-button
-            color="light"
-            expand="block"
-            (click)="action(button?.action)"
-            >{{ button?.label | translate }}</ion-button
-          >
-        </div>
+        <ion-button
+          *ngIf="(button.action === 'chat' && chatConfig == 'true') || button.action !== 'chat'"
+          color="light"
+          expand="block"
+          (click)="action(button?.action)"
+        >
+          {{ button?.label | translate }}
+        </ion-button>
+      </div>
       </div>
     </ion-col>
   </ion-row>

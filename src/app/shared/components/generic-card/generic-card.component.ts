@@ -1,5 +1,7 @@
 import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
 import { Router } from '@angular/router';
+import { localKeys } from 'src/app/core/constants/localStorage.keys';
+import { LocalStorageService } from 'src/app/core/services';
 import { CommonRoutes } from 'src/global.routes';
 
 @Component({
@@ -8,6 +10,7 @@ import { CommonRoutes } from 'src/global.routes';
   styleUrls: ['./generic-card.component.scss'],
 })
 export class GenericCardComponent implements OnInit {
+  chatConfig: string;
   @Input() data: any;
   @Output() onClickEvent = new EventEmitter();
   @Input() buttonConfig: any;
@@ -16,9 +19,10 @@ export class GenericCardComponent implements OnInit {
   @Input() disableButton: boolean;
   @Input() showTag: any;
 
-  constructor(private router: Router) {}
+  constructor(private router: Router, private localStorage: LocalStorageService) {}
 
-  ngOnInit() {
+  async ngOnInit() {
+    this.chatConfig = await this.localStorage.getLocalData(localKeys['CHAT_CONFIG'])
   }
 
   onCardClick(data) {
@@ -36,6 +40,9 @@ export class GenericCardComponent implements OnInit {
     this.onClickEvent.emit(value);
   }
   showButton(event, data) {
+    if (event.action === 'chat' && this.chatConfig != 'true') {
+      return false;
+      }
     if (!event.hasCondition) {
       return true;
     } else if (event[event.onCheck] == data[event.onCheck]) {
