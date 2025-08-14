@@ -270,6 +270,8 @@
     "LAST_LOGIN_AT": "Last login at",
     "YOUR_CURRENT_DEVICE": "Your current device ",
     "LOGGED_IN": "Logged in",
+    "SESSION_MENTEE_LIMIT": "Session limit reached!",
+    "SESSION_MENTEE_LIMIT_SUB_TEXT": "You will not be able to add more than {{count}} number of mentees for this session",
     "LOGGED_OUT_AT": "Logged out at",
     "EXPIRED": "Expired",
     "GENERATE_OTP":"Generate OTP",

@@ -5,5 +5,6 @@ export const localKeys = {
     IS_ROLE_REQUESTED: 'isRoleRequested',
     USER_ROLES: 'userRoles',
     IS_BECOME_MENTOR_TILE_CLOSED:'isBecomeMentorTileClosed',
-    MAX_MENTEE_ENROLLMENT_COUNT: 'maxMenteeEnrollmentCount'
+    MAX_MENTEE_ENROLLMENT_COUNT: 'maxMenteeEnrollmentCount',
+    CHAT_CONFIG: 'chatConfig'
 }

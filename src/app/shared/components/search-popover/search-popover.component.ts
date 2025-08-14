@@ -1,5 +1,6 @@
 import { Component, Input, OnInit } from '@angular/core';
 import { ModalController, Platform } from '@ionic/angular';
+import { TranslateService } from '@ngx-translate/core';
 import * as _ from 'lodash-es';
 import { localKeys } from 'src/app/core/constants/localStorage.keys';
 import { urlConstants } from 'src/app/core/constants/urlConstants';
@@ -44,7 +45,7 @@ export class SearchPopoverComponent implements OnInit {
   noDataMessage: string;
   hasSessionManager: any;
 
-  constructor(private platform: Platform, private modalController: ModalController, private toast: ToastService, private localStorage: LocalStorageService, private util: UtilService, private httpService: HttpService) { 
+  constructor(private platform: Platform, private modalController: ModalController, private toast: ToastService,private translate: TranslateService, private localStorage: LocalStorageService, private util: UtilService, private httpService: HttpService) { 
     this.platform.backButton.subscribeWithPriority(10, () => {
       this.handleBackButton();
     });
@@ -187,7 +188,9 @@ export class SearchPopoverComponent implements OnInit {
             let addedData = data.element
             this.selectedList.push(addedData)
           } else {
-            this.toast.showToast("Session seat limit exceed","danger")
+            this.translate.get('SESSION_MENTEE_LIMIT_SUB_TEXT', { count: this.maxCount }).subscribe(subText => {
+            this.toast.showToast('SESSION_MENTEE_LIMIT', 'danger', 5000, [], subText);
+            });
           }
         }
         break;

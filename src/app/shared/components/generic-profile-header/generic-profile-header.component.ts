@@ -27,6 +27,7 @@ export class GenericProfileHeaderComponent implements OnInit {
 
   public isMobile: any;
   roles: any;
+  chatConfig: string;
 
   constructor(
     private router: Router,
@@ -40,6 +41,7 @@ export class GenericProfileHeaderComponent implements OnInit {
   }
 
   async ngOnInit() {
+     this.chatConfig = await this.localStorage.getLocalData(localKeys['CHAT_CONFIG'])
     this.roles = this.headerData.organizations?.length && this.headerData?.organizations[0]?.roles.filter((role: any) => role["title"] === "mentor");
     this.isMentor =this.roles?.length && this.roles .some((role: any) => role.title === 'mentor');
   }
