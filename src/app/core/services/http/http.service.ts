@@ -101,9 +101,6 @@ export class HttpService {
           this.isFeedbackTriggered = true;
           this.openModal(result?.meta?.data[0]);
         }
-        if(options.url.includes("interface/v1/profile/get") && result?.responseCode) {
-          return result;
-        }else
         if (result.responseCode === "OK") {
           return result;
         } else {
@@ -216,6 +213,9 @@ async getToken() {
     let msg = result.data.message;
     if (result.url.includes(urlConstants.API_URLS.GET_CHAT_TOKEN)) {
       return;
+    }
+    if(result.url.includes("interface/v1/profile/get")) {
+      throw result;
     }
     switch (result.status) {
       case 400:
