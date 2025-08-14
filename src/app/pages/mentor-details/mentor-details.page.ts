@@ -118,34 +118,32 @@ export class MentorDetailsPage implements OnInit {
     this.mentorProfileData = await this.getMentorDetails();
     this.updateButtonConfig();
     this.isloaded = true;
-    switch (this.mentorProfileData?.responseCode) {
-      case 'OK':
-        this.userCanAccess = true;
-        break;
-      case 'SERVER_ERROR':
-        this.userCantAccess = true;
-        break;
-      case 'CLIENT_ERROR':
-        this.userNotFound = true;
-        break;
-    }
-
     this.detailData.data = this.mentorProfileData?.result;
     this.detailData.data.organizationName =
       this.mentorProfileData?.result?.organization?.name || '';
     this.headerConfig.share = this.detailData.data?.is_mentor;
   }
 
-  async getMentorDetails() {
-    const config = {
-      url: urlConstants.API_URLS.GET_PROFILE_DATA + this.mentorId,
-      payload: {},
-    };
-    try {
-      let data = await this.httpService.get(config);
-      return data;
-    } catch (error) {}
+async getMentorDetails() {
+  const config = {
+    url: urlConstants.API_URLS.GET_PROFILE_DATA + this.mentorId,
+    payload: {},
+  };
+  try {
+    const data = await this.httpService.get(config);
+    if (data) {
+      this.userCanAccess = true;
+    }
+    return data;
+  } catch (error: any) {
+    if (error?.status === 404) {
+      this.userNotFound = true;
+    } else {
+      this.userCantAccess = true;
+    }
   }
+}
+
 
   goToHome() {
     this.router.navigate([`/${CommonRoutes.TABS}/${CommonRoutes.HOME}`]);
