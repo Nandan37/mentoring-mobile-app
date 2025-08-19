@@ -2656,14 +2656,12 @@
         "body": [
             {
               "name": "designation",
-              "type": "array",
-              "children": [
-              {
+              "type": "array"
+            },
+            {
               "name": "experience",
               "subText": "YEARS",
               "type": "text"
-              }
-              ]
             }
           ]
       }
@@ -2685,14 +2683,12 @@
           "body": [
             {
               "name": "designation",
-              "type": "array",
-              "children": [
-                {
-                  "name": "experience",
-                  "subText": "YEARS",
-                  "type": "text"
-                }
-              ]
+              "type": "array"
+            },
+            {
+              "name": "experience",
+              "subText": "YEARS",
+              "type": "text"
             }
           ]
         }
@@ -2714,14 +2710,12 @@
           "body": [
             {
               "name": "designation",
-              "type": "array",
-              "children": [
-                {
-                  "name": "experience",
-                  "subText": "YEARS",
-                  "type": "text"
-                }
-              ]
+              "type": "array"
+            },
+            {
+              "name": "experience",
+              "subText": "YEARS",
+              "type": "text"
             }
           ]
         }
