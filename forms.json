@@ -2644,7 +2644,7 @@
 {
   "type": "mentorDirectoryCard",
   "sub_type": "mentorDirectoryCardForm",
-  "action": "create",
+  "action": "update",
   "data": {
     "template_name": "defaultTemplate",
     "fields": {
@@ -2671,7 +2671,7 @@
 {
   "type": "mentorRequestCard",
   "sub_type": "mentorRequestCardForm",
-  "action": "create",
+  "action": "update",
   "data": {
     "template_name": "defaultTemplate",
     "fields": {
@@ -2698,7 +2698,7 @@
 {
   "type": "mentorConnectionCard",
   "sub_type": "mentorConnectionCardForm",
-  "action": "create",
+  "action": "update",
   "data": {
     "template_name": "defaultTemplate",
     "fields": {
