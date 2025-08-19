@@ -2644,7 +2644,7 @@
 {
   "type": "mentorDirectoryCard",
   "sub_type": "mentorDirectoryCardForm",
-  "action": "create",
+  "action": "update",
   "data": {
     "template_name": "defaultTemplate",
     "fields": {
@@ -2656,14 +2656,12 @@
         "body": [
             {
               "name": "designation",
-              "type": "array",
-              "children": [
-              {
+              "type": "array"
+            },
+            {
               "name": "experience",
               "subText": "YEARS",
               "type": "text"
-              }
-              ]
             }
           ]
       }
@@ -2673,7 +2671,7 @@
 {
   "type": "mentorRequestCard",
   "sub_type": "mentorRequestCardForm",
-  "action": "create",
+  "action": "update",
   "data": {
     "template_name": "defaultTemplate",
     "fields": {
@@ -2685,14 +2683,12 @@
           "body": [
             {
               "name": "designation",
-              "type": "array",
-              "children": [
-                {
-                  "name": "experience",
-                  "subText": "YEARS",
-                  "type": "text"
-                }
-              ]
+              "type": "array"
+            },
+            {
+              "name": "experience",
+              "subText": "YEARS",
+              "type": "text"
             }
           ]
         }
@@ -2702,7 +2698,7 @@
 {
   "type": "mentorConnectionCard",
   "sub_type": "mentorConnectionCardForm",
-  "action": "create",
+  "action": "update",
   "data": {
     "template_name": "defaultTemplate",
     "fields": {
@@ -2714,14 +2710,12 @@
           "body": [
             {
               "name": "designation",
-              "type": "array",
-              "children": [
-                {
-                  "name": "experience",
-                  "subText": "YEARS",
-                  "type": "text"
-                }
-              ]
+              "type": "array"
+            },
+            {
+              "name": "experience",
+              "subText": "YEARS",
+              "type": "text"
             }
           ]
         }

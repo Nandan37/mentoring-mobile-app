@@ -30,9 +30,11 @@
       </div>
     </ng-template>
     <ng-template #elseBlock5>
-      <p *ngIf="item?.key=='experience'" class="value">{{sessionData.data[item.key]}} {{"YEARS"|translate}}</p>
+      <p *ngIf="item?.key=='experience'" class="value">
+        {{sessionData.data[item.key] ? sessionData.data[item.key] + ' ' + ('YEARS'|translate) : ('NOT_UPDATED_MSG' | translate)}}
+        </p>
       <p *ngIf="item?.key!='experience'" class="value">
-        <span>{{ sessionData.data[item.key]?.label ? sessionData.data[item.key].label : (sessionData.data[item.key] || '') }} </span>
+        <span>{{ sessionData.data[item.key]?.label ? sessionData.data[item.key].label : (sessionData.data[item.key] || ('NOT_UPDATED_MSG' | translate)) }} </span>
       </p>
     </ng-template>
   </div>
