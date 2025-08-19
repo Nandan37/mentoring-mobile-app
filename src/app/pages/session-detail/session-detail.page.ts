@@ -286,7 +286,7 @@ export class SessionDetailPage implements OnInit, OnDestroy {
 
   editSession() {
     this.activeUrl = this.router.url;
-    (this.sessionDatas?.status?.value=='LIVE') ? this.router.navigate([CommonRoutes.CREATE_SESSION], { queryParams: { id: this.id , type: 'segment'} }) : this.router.navigate([CommonRoutes.CREATE_SESSION], { queryParams: { id: this.id, isCreator: this.isCreator } });
+    (this.sessionDatas?.status?.value=='LIVE') ? this.router.navigate([CommonRoutes.CREATE_SESSION], { queryParams: { id: this.id , type: 'segment'} }) : this.router.navigate([CommonRoutes.CREATE_SESSION], { queryParams: { id: this.id, isCreator: this.isConductor } });
   }
 
   deleteSession() {

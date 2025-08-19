@@ -649,10 +649,9 @@ async updateFormConfig() {
     module: permissions.MANAGE_SESSION,
     action: manageSessionAction.SESSION_ACTIONS,
   });
-
   if (
     (isManagePage && hasPermission) ||
-    (!this.isHome && !isCreator && hasPermission)
+    (!this.isHome && isCreator != 'true' && hasPermission)
   ) {
     this.formConfig = MANAGERS_CREATE_SESSION_FORM;
   } else {
