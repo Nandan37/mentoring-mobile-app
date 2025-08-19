@@ -7,6 +7,7 @@ export const PAGE_IDS = {
   home: 'HOME_PAGE',
   adminWorkspace: 'ADMIN_WORKSPACE_PAGE',
   language: 'LANGUAGE_PAGE',
+  blockedUsers: 'BLOCKED_USERS_PAGE',
   helpVideos: 'HELP_VIDEOS_PAGE',
   help: 'HELP_PAGE',
   faq: 'FAQ_PAGE',

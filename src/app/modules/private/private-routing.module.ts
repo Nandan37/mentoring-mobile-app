@@ -124,6 +124,19 @@ const routes: Routes = [
           pageId: PAGE_IDS.language,
         },
       },
+
+      {
+        path: CommonRoutes.BLOCKED_USERS,
+        loadChildren: () =>
+          import('../../pages/blocked-users/blocked-users.module').then(
+            (m) => m.BlockedUsersPageModule
+          ),
+        canActivate: [PrivateGuard, AllowPageAccess],
+        data: {
+          pageId: PAGE_IDS.blockedUsers,
+        },
+      }, 
+      
       {
         path: CommonRoutes.HELP_VIDEOS,
         loadChildren: () =>

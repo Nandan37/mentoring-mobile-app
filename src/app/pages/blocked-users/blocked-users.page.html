@@ -1,0 +1,18 @@
+
+<app-page-header [config]="headerConfig"> </app-page-header>
+
+<ion-content>
+
+  <div class="wrapper">
+<app-generic-card 
+*ngFor="let user of blockedUsers"
+[data]="user"
+[cardConfig]="cardConfig"
+[buttonConfig]="buttonConfig"
+(onClickEvent)="onUnblock($event)"
+>
+ </app-generic-card>
+</div>
+
+</ion-content>
+
