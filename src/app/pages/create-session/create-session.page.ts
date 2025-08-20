@@ -248,9 +248,6 @@ export class CreateSessionPage implements OnInit {
       if (!this.profileImageData.image) {
         form.image = [];
       }
-      if(form?.mentees.length && form?.type === "PUBLIC") {
-        form.mentees = [];
-      }
       form.mentor_id = form?.mentor_id ?? this.user.id;
       form.resources= this.updatedFiles;
       this.form1.myForm.markAsPristine();
@@ -442,13 +439,20 @@ export class CreateSessionPage implements OnInit {
     const formRawValue = this.form1.myForm.getRawValue();
     let dependedControlIndex = this.formData.controls.findIndex(formControl => formControl.name === event.dependedChild)
     let dependedControl = this.form1.myForm.get(event.dependedChild)
+    this.sessionType = event?.value;
     if(event.value === "PUBLIC") {
-      this.sessionType = event?.value;
+      if((typeof formRawValue?.mentor_id === 'string' && formRawValue?.mentor_id)  || this.isHome) {
+      this.setControlValidity(dependedControlIndex, dependedControl, false, false);
+      return;
+      }
       this.setControlValidity(dependedControlIndex, dependedControl, false, true);
     } else {
-      this.sessionType = event?.value;
-      if((typeof formRawValue?.mentor_id === 'string' && formRawValue?.mentor_id)  || this.isHome)
-      this.setControlValidity(dependedControlIndex, dependedControl, true, false);
+      if((typeof formRawValue?.mentor_id === 'string' && formRawValue?.mentor_id)  || this.isHome) {
+        this.setControlValidity(dependedControlIndex, dependedControl, true, false);
+        return;
+      }
+      this.setControlValidity(dependedControlIndex, dependedControl, true, true);
+      
     }
     this.formData.controls.forEach(control => {
     if (control.name === "mentor_id") {
@@ -567,13 +571,11 @@ handleSelectedFile(file) {
     popover.onDidDismiss().then((data) => {
       if(data.data[0]?.data?.is_mentor) {
         this.mentor_id = data.data[0]?.id;
-        if(this.sessionType != 'PUBLIC') {
         this.formData.controls.forEach(control => {
         if (control.name === "mentees") {
           control.disabled = false;
         }
         });
-        }
       }
       if (data.data) {
         event.formControl.selectedData = data.data;
@@ -663,5 +665,4 @@ async updateFormConfig() {
     this.formConfig = CREATE_SESSION_FORM;
   }
 }
-
 }
