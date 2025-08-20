@@ -61,11 +61,11 @@ export class UtilService {
     const { data, role } = await this.modal.onWillDismiss();
   }
 
-  async alertPopup(msg) {
+  async alertPopup(msg, parameters? : any) {
     return new Promise(async (resolve) => {
       let texts: any;
       this.translate
-        .get([msg.header, msg.message, msg.cancel, msg.submit])
+        .get([msg.header, msg.message, msg.cancel, msg.submit], parameters)
         .subscribe((text) => {
           texts = text;
         });

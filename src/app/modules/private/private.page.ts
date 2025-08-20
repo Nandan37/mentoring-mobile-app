@@ -116,7 +116,7 @@ export class PrivatePage implements OnInit {
       pageId: PAGE_IDS.language,
     },
     {
-      title: 'Blocked users',
+      title: 'BLOCKED_USERS',
       action: 'blocked-users',
       icon: 'ban',
       url: CommonRoutes.BLOCKED_USERS,

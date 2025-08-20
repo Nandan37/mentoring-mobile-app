@@ -1,5 +1,10 @@
 import { Component, OnInit } from '@angular/core';
-import { HttpClient } from '@angular/common/http';
+import { UtilService } from 'src/app/core/services';
+import { ToastService } from 'src/app/core/services';
+import { Router } from '@angular/router';
+import { CommonRoutes } from 'src/global.routes';
+import { urlConstants } from 'src/app/core/constants/urlConstants';
+import { HttpService } from 'src/app/core/services';
 
 
 @Component({
@@ -13,7 +18,7 @@ export class BlockedUsersPage implements OnInit {
     menu: true,
     headerColor: 'primary',
     notification: false,
-    label:'Blocked Users'
+    label:"BLOCKED_USERS"
   };
 
   blockedUsers : any =[
@@ -60,43 +65,59 @@ export class BlockedUsersPage implements OnInit {
 
   buttonConfig : any = [
     {
-      "color" : "red",
+      "color" : "ion-color-secondary",
       "action": "",
-      "label" : "Unblock",
-      "bgColor": " white",
-      "textColor": "#c03b3b"
+      "label" : "UNBLOCK",
+      "textColor": "red"
     }
   ]
 
-  constructor(private http : HttpClient ) { }
+  constructor(
+              private util : UtilService,
+              private toast : ToastService,
+              private router : Router,
+              private httpService : HttpService
+              ) { }
 
   ngOnInit() {
-    this.getBlockedUsers();
+    // this.getBlockedUsers();
   }
 
-  getBlockedUsers(){
+  // getBlockedUsers(){
+  //   const config = {
+  //                    url:,
+  //                   };
+  //    this.httpService.get(config).then((resp) => {
+  //          this.blockedUsers= resp;
+  //        });
+  // }
 
-    this.http.get<any[]>("").subscribe({
-      next: (res) => {
-        console.log("Blocked users fetched:", res);
-        this.blockedUsers = res;
-      }
-    });
-  }
+  async onUnblock(user: any) {
+    const userId = user.data;
+    const result = await this.util.alertPopup({
+    header: "CONFIRM_UNBLOCK_HEADER",   
+    message: "CONFIRM_UNBLOCK_MESSAGE", 
+    cancel: "CANCEL",
+    submit: "UNBLOCK",
+  },
+   {name: user.name}
+  );
 
-   onUnblock(eventData: any) {
-   console.log("data received", eventData);
-
+  if (result) {
+    // const payload = {
+    //       url:,
+    //       payload: {user_id: userId},
+    //       };
+    //     this.httpService.post(payload)
+        this.toast.showToast("UNBLOCK_TOAST_MESSAGE", "success")
+        this.router.navigate([CommonRoutes.MENTOR_DETAILS, userId]);
+  } 
   
-  const userId = eventData.data;
-  console.log(userId, "77 data")
-
-  this.http.post("", {userId}).subscribe();
+  
 }
 
 cardConfig = 
   {
-
           "header": {
             "image": "image",
             "title": "name"

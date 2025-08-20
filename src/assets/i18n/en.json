@@ -411,5 +411,11 @@
     "BLOCK":"Block",
     "SCHOOL":"School",
     "YOU_HAVE" :"You have",
-    "BLOCKED_USERS":"Blocked Users"
+    "BLOCKED_USERS":"BLOCKED_USERS",
+    "CONFIRM_UNBLOCK_HEADER": "Are you sure you want to unblock?",
+    "CONFIRM_UNBLOCK_MESSAGE": "You can continue conversations with {{name}} once they send you a connection request again.",
+    "UNBLOCK": "Unblock",
+    "UNBLOCK_TOAST_MESSAGE" : "You have unblocked successfully!"
+
+
 }
