@@ -286,8 +286,8 @@ export class CreateSessionPage implements OnInit {
 
     for(let j=0;j<this?.meetingPlatforms?.length;j++){
       if( existingData.meeting_info.platform == this?.meetingPlatforms[j].name){
-         this.selectedLink = this?.meetingPlatforms[j];
-         this.selectedHint = this.meetingPlatforms[j].hint;
+        this.selectedLink = this?.meetingPlatforms[j];
+        this.selectedHint = this.meetingPlatforms[j].hint;
         let obj = this?.meetingPlatforms[j]?.form?.controls.find( (link:any) => link?.name == 'link');
         let meetingId = this?.meetingPlatforms[j]?.form?.controls.find( (meetingId:any) => meetingId?.name == 'meetingId')
         let password = this?.meetingPlatforms[j]?.form?.controls.find( (password:any) => password?.name == 'password')
@@ -317,17 +317,22 @@ export class CreateSessionPage implements OnInit {
           this.formData.controls[i].meta.searchData = existingData[this.formData.controls[i].name]
           this.formData.controls[i].value = this.formData.controls[i].meta.searchData ? this.formData.controls[i].meta.searchData.map(obj => obj.id || obj.value) : [];
         } else {
-          this.formData.controls[i].meta.searchData = [{
+          if(existingData[this.formData.controls[i].name]) {
+            this.formData.controls[i].meta.searchData = [{
             label: `${existingData.mentor_name}, ${existingData.organization}`,
             id: existingData[this.formData.controls[i].name]
-          }];
+          }];}
         }
         if(!this.formData.controls[i].meta.disableIfSelected && existingData.status.value  !== "COMPLETED") {
           this.formData.controls[i].disabled = false;
         }
         if(this.formData.controls[i].meta.disableIfSelected&&this.formData.controls[i].value && existingData.status.value  !== "COMPLETED" &&  this.formData.controls[i].meta.addPopupType !== 'file'){
+        if(this.formData.controls[i].name === 'mentor_id') {
+        if(existingData[this.formData.controls[i].name]){
           this.formData.controls[i].disabled = true;
-        }
+        }} else {
+          this.formData.controls[i].disabled = true;
+        }}
       }else if (this.formData.controls[i].type === 'search' && this.formData.controls[i].meta.addPopupType === 'file') {
         const controlName = this.formData.controls[i].name;
         if (existingData.resources?.length) {
@@ -649,10 +654,9 @@ async updateFormConfig() {
     module: permissions.MANAGE_SESSION,
     action: manageSessionAction.SESSION_ACTIONS,
   });
-
   if (
     (isManagePage && hasPermission) ||
-    (!this.isHome && !isCreator && hasPermission)
+    (!this.isHome && isCreator != 'true' && hasPermission)
   ) {
     this.formConfig = MANAGERS_CREATE_SESSION_FORM;
   } else {
