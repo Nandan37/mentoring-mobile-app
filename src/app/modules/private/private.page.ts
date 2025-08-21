@@ -183,9 +183,9 @@ export class PrivatePage implements OnInit {
       );
       if (page) {
         page.badge = true;
-      }
-      }
+      }}
     }
+    this.updateBadgeFlag();
     await this.rocketChatService.initializeWebSocketAndCheckUnread();    
     if (this.chatService.initialBadge) {
       let page = this.appPages.find(
@@ -193,15 +193,20 @@ export class PrivatePage implements OnInit {
       );
       page.badge = this.chatService.initialBadge;
     }
-
-
+    this.updateBadgeFlag();
     this.chatService.showBadge.subscribe((resp: boolean) => {
       let page = this.appPages.find(
         (page: any) => page.pageId == PAGE_IDS.messages
       );
       page.badge = resp;
+      this.updateBadgeFlag();
     });
   }
+
+  updateBadgeFlag() {
+  const hasBadge = this.appPages.some(p => p.badge);
+  this.utilService.setHasBadge(hasBadge);
+}
 
   subscribeBackButton() {
     this.backButtonSubscription =
