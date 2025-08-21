@@ -193,7 +193,6 @@ export class PrivatePage implements OnInit {
       );
       page.badge = this.chatService.initialBadge;
     }
-    console.log('hii')
     this.updateBadgeFlag();
     this.chatService.showBadge.subscribe((resp: boolean) => {
       let page = this.appPages.find(
