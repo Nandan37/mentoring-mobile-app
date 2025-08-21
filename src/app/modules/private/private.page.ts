@@ -184,8 +184,8 @@ export class PrivatePage implements OnInit {
       if (page) {
         page.badge = true;
       }}
+      this.updateBadgeFlag();
     }
-    this.updateBadgeFlag();
     await this.rocketChatService.initializeWebSocketAndCheckUnread();    
     if (this.chatService.initialBadge) {
       let page = this.appPages.find(
@@ -193,6 +193,7 @@ export class PrivatePage implements OnInit {
       );
       page.badge = this.chatService.initialBadge;
     }
+    console.log('hii')
     this.updateBadgeFlag();
     this.chatService.showBadge.subscribe((resp: boolean) => {
       let page = this.appPages.find(
