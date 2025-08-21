@@ -126,11 +126,13 @@ cardConfig =
             {
               "name": "designation",
               "type": "string",
+              "subText": ""
             },
 
             {
               "name": "organization",
               "type": "string",
+              "subText": ""
             },
           ]
         }
