@@ -50,6 +50,14 @@ ion-buttons {
   border-radius: 50%;
   position: absolute;
   left: 40px;
-  margin-top: 5px;
+  top: 5px;
   z-index: 999;
+}
+
+.mobile-badge {
+display: none;
+
+  @media (max-width: 767px) {  // Adjust breakpoint as needed
+    display: inline-block;
+}
 }
