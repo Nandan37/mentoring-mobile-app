@@ -184,8 +184,8 @@ export class PrivatePage implements OnInit {
       if (page) {
         page.badge = true;
       }}
+      this.updateBadgeFlag();
     }
-    this.updateBadgeFlag();
     await this.rocketChatService.initializeWebSocketAndCheckUnread();    
     if (this.chatService.initialBadge) {
       let page = this.appPages.find(
