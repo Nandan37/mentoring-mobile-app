@@ -43,3 +43,13 @@ ion-col{
 ion-buttons {
     cursor: pointer;
 }
+.badge {
+  width: 10px;
+  height: 10px;
+  background-color: #79D579;
+  border-radius: 50%;
+  position: absolute;
+  left: 40px;
+  margin-top: 5px;
+  z-index: 999;
+}

@@ -5,7 +5,7 @@ import { TranslateService } from '@ngx-translate/core';
 import { ISocialSharing } from '../../interface/soical-sharing-interface';
 import { ModelComponent } from 'src/app/shared/components/model/model.component';
 import * as Bowser from 'bowser';
-import { BehaviorSubject, Subject } from 'rxjs';
+import { BehaviorSubject, Observable, Subject } from 'rxjs';
 import * as Papa from 'papaparse';
 import { LocalStorageService } from '../localstorage.service';
 import { environment } from 'src/environments/environment';
@@ -24,6 +24,8 @@ export class UtilService {
   private criteriaChipSource = new BehaviorSubject<string>('');
   currentSearchText = this.searchTextSource.asObservable();
   currentCriteriaChip = this.criteriaChipSource.asObservable();
+  private hasBadgeSubject = new BehaviorSubject<boolean>(false);
+  hasBadge$: Observable<boolean> = this.hasBadgeSubject.asObservable();
 
   ionMenuShow(data: boolean) {
     this.canIonMenuShow.next(data);
@@ -357,4 +359,9 @@ export class UtilService {
   if (!endDate) return false; 
   return Date.now() > endDate * 1000;
   }
+
+  setHasBadge(value: boolean): void {
+    this.hasBadgeSubject.next(value);
+  }
+  
 }
