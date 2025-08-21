@@ -9,8 +9,9 @@
     <ion-buttons slot="start" *ngIf="config?.menu">
       <ion-menu-button>
       </ion-menu-button>
+        <span class="badge mobile-badge" *ngIf=" hasBadge"></span>
     </ion-buttons>
-   <span class="badge mobile-badge" *ngIf="config?.menu && hasBadge"></span>
+ 
     <!-- <ion-buttons slot="start">
       <ion-back-button defaultHref="/tabs/home" *ngIf="config?.backButton"></ion-back-button>
     </ion-buttons> -->
