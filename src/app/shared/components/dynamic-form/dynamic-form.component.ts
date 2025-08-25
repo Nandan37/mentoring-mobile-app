@@ -18,6 +18,7 @@ import { debounceTime } from 'rxjs/operators';
 import { SearchAndSelectComponent } from '../search-and-select/search-and-select.component';
 import { OWL_DATE_TIME_FORMATS } from '@danielmoncada/angular-datetime-picker';
 import * as moment from 'moment-timezone';
+
 interface JsonFormValidators {
   min?: number;
   max?: number;
@@ -103,9 +104,11 @@ export class DynamicFormComponent implements OnInit {
   @Input() jsonFormData: any;
   @Input() existingData : any;
   @Input() readonly: any = false;
+  @Input()  selectedDynamicValue: string;
   @Output() formValid = new EventEmitter()
   @Output() onEnter = new EventEmitter()
   @Output() formValueChanged = new EventEmitter()
+  @Output() dynamicSelectClicked = new EventEmitter()
   @ViewChild('picker') picker: MatDatepicker<Date>;
   @ViewChildren(SearchAndSelectComponent) searchAndSelectComponents: QueryList<SearchAndSelectComponent>;
   @Output() customEventEmitter = new EventEmitter()
@@ -118,9 +121,7 @@ export class DynamicFormComponent implements OnInit {
   public stepMinute = 1;
   public stepSecond = 1;
   public color: ThemePalette = 'warn';
-   timezones: string[] = moment.tz.names(); // All timezones
-  selectedTimezone: string ;
-  currentDate: any;
+  currentDate = moment().startOf('day').toDate();
   currentTime: string = '';
   interval: any;
 
@@ -135,14 +136,9 @@ export class DynamicFormComponent implements OnInit {
   isMobile = window.innerWidth <= 950;
 
   constructor(private fb: UntypedFormBuilder, private toast: ToastService,
-        private attachment: AttachmentService,
-    
+        private attachment: AttachmentService
   ) {}
   ngOnInit() {
-     this.updateTime();
-    // Auto update every second
-    // this.interval = setInterval(() => this.updateTime(), 1000);
-
     this.jsonFormData.controls.find((element, index) => {
       if(element.type == "select"){
         this.jsonFormData.controls[index].options = _.sortBy(this.jsonFormData.controls[index].options, ['label']);
@@ -158,29 +154,6 @@ export class DynamicFormComponent implements OnInit {
       this.showForm = true;
     });
   }
-
-   updateTime(event?: any) {
-
-    if (event) {
-          console.log('updateTime called', event.target.value);
-      this.selectedTimezone = event.target.value;
-    }
-    if (this.selectedTimezone) {
-      let timeString = moment().tz(this.selectedTimezone).format('dddd, MMMM Do YYYY, h:mm:ss A z');
-console.log(timeString);
-      console.log('hiii',this.selectedTimezone, moment().tz(this.selectedTimezone).toDate())
-      this.currentDate = moment().tz(this.selectedTimezone).toDate();
-
-      console.log(this.currentDate);
-      this.currentTime = moment().tz(this.selectedTimezone).format('hh:mm:ss A');
-    }
-  }
-  ngOnDestroy() {
-    if (this.interval) {
-      clearInterval(this.interval);
-    }
-  }
-
 
   createForm(controls: JsonFormControls[]) {
     for (const control of controls) {
@@ -264,47 +237,20 @@ console.log(timeString);
     control.showPasswordIcon = true;
   }
 
-  dateSelected(event, control){
-   console.log(event.value, this.selectedTimezone);
-  const userTimezone = moment.tz.guess();
-  // Parse the original IST date
-  const originalIST = moment.tz(event.value, userTimezone);
-
-  const currentTimeInSelectedTZ = moment.tz(this.selectedTimezone);
-
-  // Get as epoch milliseconds
-  const currentEpochInSelectedTZ = currentTimeInSelectedTZ.valueOf();
-
-
-  // Extract time components (hours, minutes, seconds)
-  const hours = originalIST.hours();
-  const minutes = originalIST.minutes();
-  const seconds = originalIST.seconds();
-
-  // Create a new date with the SAME TIME but in the selected timezone
-  const eventDateInSelectedTZ = moment.tz(this.selectedTimezone)
-    .hours(hours)
-    .minutes(minutes)
-    .seconds(seconds)
-    .milliseconds(0);
-
-    // Get the epoch milliseconds
-    const eventEpochInSelectedTZ = eventDateInSelectedTZ.valueOf();
-
-    console.log('Original IST time:', originalIST.format('HH:mm:ss'));
-    console.log('Same time in', this.selectedTimezone + ':', eventDateInSelectedTZ.format('HH:mm:ss'));
-    console.log('Epoch milliseconds:', eventEpochInSelectedTZ, currentEpochInSelectedTZ);
-    if(eventEpochInSelectedTZ < currentEpochInSelectedTZ) {
-      console.log('hiii');
-      this.myForm.controls[control.name].setValue(currentEpochInSelectedTZ);
-    } if(control.dependedChild){
+   dateSelected(event, control){
+    if(event.value < this.currentDate) {
+      this.myForm.controls[control.name].setValue(this.currentDate);
+    }
+    if(control.dependedChild){
       this.dependedChild = control.dependedChild;
-      this.dependedChildDate = eventEpochInSelectedTZ;
-      console.log(this.dependedChildDate, this.myForm.controls[this.dependedChild].value);
-      // if(event.value > new Date(this.myForm.controls[this.dependedChild].value)) {
-      this.myForm.controls[this.dependedChild].setValue(this.dependedChildDate);
-      // }
+      this.dependedChildDate = event.value;
+      if(event.value > new Date(this.myForm.controls[this.dependedChild].value)) {
+        this.myForm.controls[this.dependedChild].setValue(this.dependedChildDate);
+      }
     }    
+  }
+    async openDynamicSelectModal() {
+      this.dynamicSelectClicked.emit(); 
   }
 
   dateInputClick(control, datetimePicker) {
@@ -314,6 +260,7 @@ console.log(timeString);
       datetimePicker.open();
     },500)
   }
+
 
   selectionChanged(control, event){
     const indexToEdit = this.jsonFormData.controls.findIndex(formControl => formControl.name === control.name);

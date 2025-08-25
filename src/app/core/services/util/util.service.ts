@@ -11,6 +11,7 @@ import { LocalStorageService } from '../localstorage.service';
 import { environment } from 'src/environments/environment';
 
 import { ToastService } from '../toast.service';
+import * as moment from 'moment-timezone';
 
 
 @Injectable({
@@ -363,5 +364,49 @@ export class UtilService {
   setHasBadge(value: boolean): void {
     this.hasBadgeSubject.next(value);
   }
+
+
+  convertDatesToTimezone(startDate, endDate, selectedTimezone) {
+  // Guess user's current timezone
+  const userTimezone = moment.tz.guess();
+  
+  // Parse dates in user's timezone
+  const startDateTimezoned = moment.tz(startDate, userTimezone);
+  const endDateTimezoned = moment.tz(endDate, userTimezone);
+  
+  // Get current time in selected timezone
+  const currentTimeInSelectedTZ = moment.tz(selectedTimezone);
+  const currentEpochInSelectedTZ = currentTimeInSelectedTZ.valueOf();
+  
+  // Extract time components from original dates
+  const startDatehours = startDateTimezoned.hours();
+  const startDateminutes = startDateTimezoned.minutes();
+  const startDateseconds = startDateTimezoned.seconds();
+  const endDatehours = endDateTimezoned.hours();
+  const endDateminutes = endDateTimezoned.minutes();
+  const endDateseconds = endDateTimezoned.seconds();
+  
+  // Create new dates with the SAME TIME but in the selected timezone
+  const eventStartDateInSelectedTZ = moment.tz(selectedTimezone)
+    .hours(startDatehours)
+    .minutes(startDateminutes)
+    .seconds(startDateseconds)
+    .milliseconds(0);
+  
+  const eventEndDateInSelectedTZ = moment.tz(selectedTimezone)
+    .hours(endDatehours)
+    .minutes(endDateminutes)
+    .seconds(endDateseconds)
+    .milliseconds(0);
+  
+  // Get the epoch milliseconds
+  const eventStartEpochInSelectedTZ = eventStartDateInSelectedTZ.valueOf();
+  const eventEndEpochInSelectedTZ = eventEndDateInSelectedTZ.valueOf();
+  
+  return {
+    eventStartEpochInSelectedTZ,
+    eventEndEpochInSelectedTZ,
+  };
+}
   
 }

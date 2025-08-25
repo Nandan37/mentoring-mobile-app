@@ -1,0 +1,34 @@
+<ion-header>
+  <ion-toolbar>
+    <ion-title>{{ title }}</ion-title>
+
+    <ion-buttons slot="end">
+      <ion-button (click)="dismiss()">
+        <ion-icon name="close"></ion-icon>
+      </ion-button>
+    </ion-buttons>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content>
+  <ion-searchbar
+    [(ngModel)]="searchTerm"
+    (ionInput)="filterItems($event)"
+    placeholder="Search..."
+    showClearButton="focus">
+  </ion-searchbar>
+
+  <ion-list>
+    <ion-item
+      button
+      *ngFor="let item of filteredItems"
+      (click)="selectItem(item)">
+      <ion-label>{{ item }}</ion-label>
+      <ion-radio
+        slot="start"
+        [value]="item"
+        [(ngModel)]="selectedItem">
+      </ion-radio>
+    </ion-item>
+  </ion-list>
+</ion-content>

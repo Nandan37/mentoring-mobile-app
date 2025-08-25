@@ -51,6 +51,7 @@ import { GenericCardComponent } from './components/generic-card/generic-card.com
 import { OwlDateTimeModule, OwlNativeDateTimeModule } from '@danielmoncada/angular-datetime-picker';
 import {MatExpansionModule} from '@angular/material/expansion';
 import { PreAlertModalComponent } from './components/pre-alert-modal/pre-alert-modal.component';
+import { DynamicSelectModalComponent } from '../dynamic-select-modal/dynamic-select-modal.component';
 
 @NgModule({
   declarations: [
@@ -91,7 +92,8 @@ import { PreAlertModalComponent } from './components/pre-alert-modal/pre-alert-m
     SearchbarComponent,
     ChipsAndFilterComponent,
     GenericCardComponent,
-    PreAlertModalComponent
+    PreAlertModalComponent,
+    DynamicSelectModalComponent
   ],
   imports: [
     CommonModule,
@@ -147,7 +149,9 @@ import { PreAlertModalComponent } from './components/pre-alert-modal/pre-alert-m
     SearchbarComponent,
     ChipsAndFilterComponent,
     GenericCardComponent,
-    PreAlertModalComponent
+    PreAlertModalComponent,
+    DynamicSelectModalComponent
+    
   ],
 })
 export class SharedModule {}
