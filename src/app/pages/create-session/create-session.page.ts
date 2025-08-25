@@ -441,7 +441,7 @@ export class CreateSessionPage implements OnInit {
     let dependedControl = this.form1.myForm.get(event.dependedChild)
     this.sessionType = event?.value;
     if(event.value === "PUBLIC") {
-      if((typeof formRawValue?.mentor_id === 'string' && formRawValue?.mentor_id)  || this.isHome) {
+      if((typeof formRawValue?.mentor_id === 'string' && formRawValue?.mentor_id)) {
       this.setControlValidity(dependedControlIndex, dependedControl, false, false);
       return;
       }
@@ -452,7 +452,6 @@ export class CreateSessionPage implements OnInit {
         return;
       }
       this.setControlValidity(dependedControlIndex, dependedControl, true, true);
-      
     }
     this.formData.controls.forEach(control => {
     if (control.name === "mentor_id") {
