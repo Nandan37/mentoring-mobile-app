@@ -23,6 +23,8 @@ import { SearchPopoverComponent } from 'src/app/shared/components/search-popover
 import { SearchCompetencyComponent } from 'src/app/shared/components/search-competency/search-competency.component';
 import { PreAlertModalComponent } from 'src/app/shared/components/pre-alert-modal/pre-alert-modal.component';
 import { localKeys } from 'src/app/core/constants/localStorage.keys';
+import * as moment from 'moment-timezone';
+import { DynamicSelectModalComponent } from 'src/app/dynamic-select-modal/dynamic-select-modal.component';
 
 @Component({
   selector: 'app-create-session',
@@ -30,6 +32,9 @@ import { localKeys } from 'src/app/core/constants/localStorage.keys';
   styleUrls: ['./create-session.page.scss'],
 })
 export class CreateSessionPage implements OnInit {
+
+  timezones: string[] = moment.tz.names(); // All timezones
+  selectedTimezone = Intl.DateTimeFormat().resolvedOptions().timeZone;
   lastUploadedImage: boolean;
   private win: any = window;
   @ViewChild('form1') form1: DynamicFormComponent;
@@ -493,6 +498,25 @@ export class CreateSessionPage implements OnInit {
 handleSelectedFile(file) {
     // Handle file upload logic here
 }
+
+    async onDynamicSelectClicked() {
+    const modal = await this.modalCtrl.create({
+      component: DynamicSelectModalComponent,
+      componentProps: {
+        items: this.timezones ? this.timezones : [],
+        selectedItem: this.selectedTimezone,
+        title: 'SELECT_TIMEZONE'
+      }
+    });
+
+    modal.onDidDismiss().then((result) => {
+      if (result.data) {
+        this.selectedTimezone = result.data;
+      }
+    });
+
+    return await modal.present();
+  }
   async showResourcesPopup(event) {
      const modal = await this.modalCtrl.create({
             component: PreAlertModalComponent,

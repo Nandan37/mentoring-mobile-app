@@ -10,7 +10,6 @@ export class DynamicSelectModalComponent implements OnInit {
   @Input() items: string[] = [];           
   @Input() selectedItem: string = '';      
   @Input() title: string = 'Select Item';  
-
   searchTerm: string = '';
   filteredItems: string[] = [];
 

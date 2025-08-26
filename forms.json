@@ -2587,6 +2587,21 @@
                   }
               },
               {
+                "name": "timezone",
+                "label": "Timezone",
+                "class": "ion-no-margin",
+                "value": "",
+                "type": "search-select",
+                "position": "floating",
+                "disabled": false,
+                "errorMessage": {
+                    "required": "Enter timezone"
+                },
+                "validators": {
+                    "required": false
+                }
+              },
+              {
                   "name": "start_date",
                   "label": "Start date",
                   "class": "ion-no-margin",

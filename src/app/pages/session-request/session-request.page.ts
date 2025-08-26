@@ -35,94 +35,7 @@ export class SessionRequestPage implements OnInit {
   async ionViewWillEnter() {
     this.activatedRoute.queryParams.subscribe(({ data }) => this.ids.requestee_id = data);
     const result = await this.form.getForm(REQUEST_SESSION_FORM);
-    this.formData = {
-          "controls": [
-              {
-                  "name": "title",
-                  "label": "Title",
-                  "value": "",
-                  "class": "ion-no-margin",
-                  "type": "text",
-                  "placeHolder": "Ex. Name of your session",
-                  "position": "floating",
-                  "errorMessage": {
-                      "required": "Enter session title",
-                      "pattern": "This field can only contain alphanumeric characters"
-                  },
-                  "validators": {
-                      "required": true,
-                      "maxLength": 255,
-                      "pattern": "^[a-zA-Z0-9-.,s ]+$"
-                  }
-              },
-             {
-                        "name": "timezone",
-                        "label": "Timezone",
-                        "class": "ion-no-margin",
-                        "value": "",
-                        "type": "search-select",
-                        "position": "floating",
-                        "disabled": false,
-                        "errorMessage": {
-                            "required": "Enter timezone"
-                        },
-                        "validators": {
-                            "required": false
-                        },
-              },
-              {
-                  "name": "start_date",
-                  "label": "Start date",
-                  "class": "ion-no-margin",
-                  "value": "",
-                  "displayFormat": "DD/MMM/YYYY HH:mm",
-                  "dependedChild": "end_date",
-                  "type": "date",
-                  "placeHolder": "YYYY-MM-DD hh:mm",
-                  "errorMessage": {
-                      "required": "Enter start date"
-                  },
-                  "position": "floating",
-                  "validators": {
-                      "required": true
-                  }
-              },
-              {
-                  "name": "end_date",
-                  "label": "End date",
-                  "class": "ion-no-margin",
-                  "position": "floating",
-                  "value": "",
-                  "displayFormat": "DD/MMM/YYYY HH:mm",
-                  "dependedParent": "start_date",
-                  "type": "date",
-                  "placeHolder": "YYYY-MM-DD hh:mm",
-                  "errorMessage": {
-                      "required": "Enter end date"
-                  },
-                  "validators": {
-                      "required": true
-                  }
-              },
-              {
-                  "name": "agenda",
-                  "label": "Agenda",
-                  "value": "",
-                  "class": "ion-no-margin",
-                  "type": "textarea",
-                  "placeHolder": "Let the mentor know what the purpose of this meeting is",
-                  "position": "floating",
-                  "errorMessage": {
-                      "required": "Enter description",
-                      "pattern": "This field can only contain alphanumeric characters"
-                  },
-                 "validators": {
-                 "required": true,
-                 "maxLength": 300
-                }
-              }
-          ]
-      }
+    this.formData = _.get(result, 'data.fields');
   }
 
  
@@ -133,12 +46,13 @@ export class SessionRequestPage implements OnInit {
   };
 
     async onDynamicSelectClicked() {
+
     const modal = await this.modalController.create({
       component: DynamicSelectModalComponent,
       componentProps: {
-        items: this.timezones,
+        items: this.timezones ? this.timezones : [],
         selectedItem: this.selectedTimezone,
-        title: 'Select Timezone'
+        title: 'SELECT_TIMEZONE',
       }
     });
 
