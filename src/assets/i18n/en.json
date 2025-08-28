@@ -338,6 +338,7 @@
     "START_DATE":"Start date",
     "END_DATE":"End date",
     "MY_CONNECTIONS": "My connections",
+    "SELECT_TIMEZONE": "Select Timezone",
     "SEARCH_RESULTS_NOT_FOUND": "Search results not found",
     "NO_RESULT_SUB_HEADER": "Looks like we couldn’t find what you were looking for, try searching for something else.",
     "MULTIPLE_MESSAGE_REQ":"You cannot send any more messages till your message request is accepted.",

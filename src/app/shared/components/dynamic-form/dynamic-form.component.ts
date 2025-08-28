@@ -17,6 +17,8 @@ import { MatDatepicker } from '@angular/material/datepicker';
 import { debounceTime } from 'rxjs/operators';
 import { SearchAndSelectComponent } from '../search-and-select/search-and-select.component';
 import { OWL_DATE_TIME_FORMATS } from '@danielmoncada/angular-datetime-picker';
+import * as moment from 'moment-timezone';
+
 interface JsonFormValidators {
   min?: number;
   max?: number;
@@ -102,9 +104,11 @@ export class DynamicFormComponent implements OnInit {
   @Input() jsonFormData: any;
   @Input() existingData : any;
   @Input() readonly: any = false;
+  @Input()  selectedDynamicValue: string;
   @Output() formValid = new EventEmitter()
   @Output() onEnter = new EventEmitter()
   @Output() formValueChanged = new EventEmitter()
+  @Output() dynamicSelectClicked = new EventEmitter()
   @ViewChild('picker') picker: MatDatepicker<Date>;
   @ViewChildren(SearchAndSelectComponent) searchAndSelectComponents: QueryList<SearchAndSelectComponent>;
   @Output() customEventEmitter = new EventEmitter()
@@ -117,21 +121,22 @@ export class DynamicFormComponent implements OnInit {
   public stepMinute = 1;
   public stepSecond = 1;
   public color: ThemePalette = 'warn';
+  currentDate = moment().startOf('day').toDate();
+  currentTime: string = '';
+  interval: any;
 
 
   public myForm: UntypedFormGroup = this.fb.group({});
   showForm = false;
-  currentDate = new Date();
   maxDate = new Date(new Date().setFullYear(new Date().getFullYear() + 10));
   dependedChild: any;
-  dependedChildDate="";
+  dependedChildDate: any;
   dependedParent: any;
   dependedParentDate: any;
   isMobile = window.innerWidth <= 950;
 
   constructor(private fb: UntypedFormBuilder, private toast: ToastService,
-        private attachment: AttachmentService,
-    
+        private attachment: AttachmentService
   ) {}
   ngOnInit() {
     this.jsonFormData.controls.find((element, index) => {
@@ -232,7 +237,7 @@ export class DynamicFormComponent implements OnInit {
     control.showPasswordIcon = true;
   }
 
-  dateSelected(event, control){
+   dateSelected(event, control){
     if(event.value < this.currentDate) {
       this.myForm.controls[control.name].setValue(this.currentDate);
     }
@@ -244,15 +249,18 @@ export class DynamicFormComponent implements OnInit {
       }
     }    
   }
+    async openDynamicSelectModal() {
+      this.dynamicSelectClicked.emit(); 
+  }
 
   dateInputClick(control, datetimePicker) {
-    this.currentDate = new Date();
     if (this.myForm.get(control.name).value)
       datetimePicker._selected = this.myForm.get(control.name).value;
     setTimeout(()=>{
       datetimePicker.open();
     },500)
   }
+
 
   selectionChanged(control, event){
     const indexToEdit = this.jsonFormData.controls.findIndex(formControl => formControl.name === control.name);

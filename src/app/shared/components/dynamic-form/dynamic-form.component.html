@@ -86,6 +86,10 @@
         ></ion-icon>
         <ion-icon slot="end" [name]="control.options.icon"></ion-icon>
       </ion-range>
+      <div *ngIf="control.type === 'search-select'"  (click)="openDynamicSelectModal()">
+        <ion-input type="text" [readonly]="true" [value]="selectedDynamicValue">
+        </ion-input>
+      </div>
       <div class="date-input-container" *ngIf="control.type === 'date'">
         <input matInput class="date-input" [owlDateTimeTrigger]="dt" [owlDateTime]="dt" #dateInput
           [formControlName]="control.name"
