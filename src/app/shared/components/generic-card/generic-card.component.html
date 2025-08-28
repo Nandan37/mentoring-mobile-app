@@ -58,7 +58,11 @@
         @for(item of cardConfig.body; track item.name) {
           <div class="d-flex flex-align-items-center">
             <p class="card-text wrap-text">
-              {{ item.type === 'array' && data?.[item.name]?.length ? data?.[item.name][0]?.label : data?.[item.name] }}
+          {{ 
+          item.type === 'array' && data?.[item.name]?.length 
+          ? data[item.name][0]?.label + (data[item.name].length > 1 ? ' +' + (data[item.name].length - 1) : '') 
+          : data?.[item.name] ? data[item.name] + ' ' + (item.subText | translate) : '' 
+          }}
             </p>
             @if(item.children) {
             @for(child of item.children; track child.name) {
@@ -84,6 +88,9 @@
             size="small"
               *ngIf="showButton(button, data)"
               [color]="button?.color"
+              [style.background]="button?.bgColor"
+              [style.color]="button?.textColor"
+
               (click)="
                 handleButtonClick(button?.action, data);
                 $event.stopPropagation()

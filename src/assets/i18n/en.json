@@ -270,6 +270,7 @@
     "LAST_LOGIN_AT": "Last login at",
     "YOUR_CURRENT_DEVICE": "Your current device ",
     "LOGGED_IN": "Logged in",
+    "NOT_UPDATED_MSG": "Yet to be updated.",
     "SESSION_MENTEE_LIMIT": "Session limit reached!",
     "SESSION_MENTEE_LIMIT_SUB_TEXT": "You will not be able to add more than {{count}} number of mentees for this session",
     "LOGGED_OUT_AT": "Logged out at",
@@ -409,5 +410,12 @@
     "DISTRICT":"District",
     "BLOCK":"Block",
     "SCHOOL":"School",
-    "YOU_HAVE" :"You have"
+    "YOU_HAVE" :"You have",
+    "BLOCKED_USERS":"Blocked Users",
+    "CONFIRM_UNBLOCK_HEADER": "Are you sure you want to unblock?",
+    "CONFIRM_UNBLOCK_MESSAGE": "You can continue conversations with {{name}} once they send you a connection request again.",
+    "UNBLOCK": "Unblock",
+    "UNBLOCK_TOAST_MESSAGE" : "You have unblocked successfully!"
+
+
 }

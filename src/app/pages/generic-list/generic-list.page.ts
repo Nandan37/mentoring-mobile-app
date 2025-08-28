@@ -253,6 +253,9 @@ export class GenericListPage implements OnInit {
       case 'requestSession':
         this.router.navigate([CommonRoutes.SESSION_REQUEST], {queryParams: {data: event.data}});
         break;
+        case 'unblock':
+        this.onUnblock(event)
+        break;
     }
   }
 
@@ -268,5 +271,28 @@ export class GenericListPage implements OnInit {
     this.searchText ='';
     this.getData();
     }
-  
+
+    async onUnblock(user: any) {
+    const userId = user.data;
+    const result = await this.utilService.alertPopup({
+    header: "CONFIRM_UNBLOCK_HEADER",   
+    message: "CONFIRM_UNBLOCK_MESSAGE", 
+    cancel: "CANCEL",
+    submit: "UNBLOCK",
+  },
+   {name: user.name}
+  );
+
+  if (result) {
+    // const payload = {
+    //       url:,
+    //       payload: {user_id: userId},
+    //       };
+    //     this.httpService.post(payload)
+        this.toast.showToast("UNBLOCK_TOAST_MESSAGE", "success")
+        this.router.navigate([CommonRoutes.MENTOR_DETAILS, userId]);
+            }  else {
+                    console.log("User cancelled unblock.");
+                    }
+}  
 }

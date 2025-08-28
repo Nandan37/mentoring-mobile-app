@@ -116,6 +116,13 @@ export class PrivatePage implements OnInit {
       pageId: PAGE_IDS.language,
     },
     {
+      title: 'BLOCKED_USERS',
+      action: 'blocked-users',
+      icon: 'ban',
+      url: CommonRoutes.BLOCKED_USERS,
+      pageId: PAGE_IDS.blockedUsers,
+    },
+    {
       title: 'CHANGE_PASSWORD',
       action: 'change-password',
       icon: 'key',
