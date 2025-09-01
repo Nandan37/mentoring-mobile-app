@@ -373,7 +373,11 @@ export class CreateSessionPage implements OnInit {
         }
       }
         if(this.formData.controls[i]?.name === "mentees" && this.sessionType ==='PUBLIC') {
+          const { isCreator } = this.route.snapshot.queryParams;
           this.formData.controls[i].disabled = true;
+          if(isCreator === 'true') {
+          this.formData.controls[i].showField = false;
+          }
         }
       this.formData.controls[i].options = _.unionBy(
         this.formData.controls[i].options,
