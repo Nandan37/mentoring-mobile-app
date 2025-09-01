@@ -59,6 +59,7 @@ interface JsonFormControls {
   position: string;
   required?: boolean;
   disabled?: boolean;
+  showField?: boolean;
   options?: Array<object>;
   validators: JsonFormValidators;
   numberOfStars?:number;

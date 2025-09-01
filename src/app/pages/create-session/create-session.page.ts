@@ -440,12 +440,16 @@ export class CreateSessionPage implements OnInit {
     return o1 === o2;
   };
 
-  formValueChanged(event){
+ formValueChanged(event){
     const formRawValue = this.form1.myForm.getRawValue();
     let dependedControlIndex = this.formData.controls.findIndex(formControl => formControl.name === event.dependedChild)
     let dependedControl = this.form1.myForm.get(event.dependedChild)
     this.sessionType = event?.value;
     if(event.value === "PUBLIC") {
+      if(this.isHome) {
+        this.setControlValidity(dependedControlIndex, dependedControl, false, true, false);
+        return;
+      }
       if((typeof formRawValue?.mentor_id === 'string' && formRawValue?.mentor_id)) {
       this.setControlValidity(dependedControlIndex, dependedControl, false, false);
       return;
@@ -466,9 +470,10 @@ export class CreateSessionPage implements OnInit {
 
   }
   
-  setControlValidity(index, control, required, disabled) {
+  setControlValidity(index, control, required, disabled, showField = true) {
     this.formData.controls[index].validators['required'] = required;
     this.formData.controls[index].disabled = disabled;
+    this.formData.controls[index].showField = showField;
     control.setValidators(required ? [Validators.required] : null);
     control.updateValueAndValidity();
   }

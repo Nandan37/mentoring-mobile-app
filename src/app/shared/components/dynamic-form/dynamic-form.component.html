@@ -1,6 +1,7 @@
 <form [formGroup]="myForm" *ngIf="showForm">
   <div class="fields" *ngFor="let control of jsonFormData?.controls; let i=index">
     <ion-item
+      *ngIf="control?.showField != false"
       class="ion-no-padding"
       [class]="control.class"
       [ngClass]="{
@@ -135,7 +136,7 @@
         [validators]="control.validators"
         [allowCustomEntities]="control.meta.allow_custom_entities"
       ></app-input-chip>
-      <app-search-and-select 
+      <app-search-and-select
         *ngIf="control.type === 'search'"
         [formControlName]="control.name"
         [control]="control"
@@ -158,7 +159,7 @@
         [numberOfStars]="control.no_of_stars"
       ></app-star-rating>
     </ion-item>
-    <small class="error-msg d-flex error-msg flex-align-items-center" >
+    <small class="error-msg d-flex error-msg flex-align-items-center" *ngIf="control?.showField != false" >
       <div *ngIf="myForm.get(control.name)?.touched && myForm.get(control.name)?.invalid ">
         <ion-icon name="alert-circle-outline"></ion-icon>
          <span *ngIf="control?.errorMessage[(myForm.get(control.name).errors | keyvalue)[0].key]" class="mx-10">
