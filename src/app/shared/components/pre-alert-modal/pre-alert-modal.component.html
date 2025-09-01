@@ -17,7 +17,7 @@
       <ion-label position="stacked">  {{"NAME" | translate}}</ion-label>
       <ion-input
         [(ngModel)]="name"
-        [placeholder]="'ENTER_NAME' | translate"
+        [placeholder]="'ADD_NAME' | translate"
         maxlength="50"
       >
       </ion-input>
@@ -27,7 +27,7 @@
       <ion-label position="stacked">  {{"LINK" | translate}}</ion-label>
       <ion-input
         [(ngModel)]="link"
-        [placeholder]="'ENTER_LINK' | translate"
+        [placeholder]="'ADD_URL' | translate"
         maxlength="50"
         (ionInput)="onLinkInput()"
         [debounce]="500"
@@ -45,7 +45,7 @@
       (click)="openFilePicker()"
         >
       <ion-icon name="add-circle-outline" style="margin-right: 8px;"></ion-icon>
-      {{"ATTACH_FILE" | translate}}
+      {{"FILE_UPLOAD" | translate}}
         </ion-button>
     @if (uploadedFile) {
       <ng-container >
@@ -65,7 +65,7 @@
       <ion-button
         color="primary"
         fill="solid"
-        [disabled]="!name || (type === 'link' && (!link || showLinkError)) || (type === 'file' && !uploadedFile)"
+        [disabled]="(type === 'link' && (!link || showLinkError)) || (type === 'file' && !uploadedFile)"
         (click)="saveLink()"
       >
         {{ "ADD" | translate }}

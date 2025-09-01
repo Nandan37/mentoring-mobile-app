@@ -70,7 +70,9 @@ export class SessionRequestDetailsPage implements OnInit {
   }
 
   getAllUpdatedSession() {
-    this.sessionService.requestSessionUserAvailability().then((res) => {
+    const currentEpoch = Math.floor(Date.now() / 1000); 
+    const thirtyDaysLaterEpoch = Math.floor((Date.now() + 30 * 24 * 60 * 60 * 1000) / 1000);
+    this.sessionService.requestSessionUserAvailability(currentEpoch, thirtyDaysLaterEpoch).then((res) => {
       this.scheduledSessionDetals = res.result;
     });
   }

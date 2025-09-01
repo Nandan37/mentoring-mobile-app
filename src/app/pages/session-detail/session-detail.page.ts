@@ -177,7 +177,7 @@ export class SessionDetailPage implements OnInit, OnDestroy {
           ...response,
           start_date: readableStartDate,
           meeting_info: response.meeting_info?.platform,
-          mentee_count: response.seats_limit - response.seats_remaining,
+          mentee_count: response?.mentees?.length,
           mentor_designation: response?.mentor_designation?.length
           ? response.mentor_designation.map((d: any) => d?.label).join(', ')
           : []
@@ -187,8 +187,7 @@ export class SessionDetailPage implements OnInit, OnDestroy {
       this.startDate = (response.start_date>0)?new Date(response.start_date * 1000):this.startDate;
       this.endDate = (response.end_date>0)?new Date(response.end_date * 1000):this.endDate;
       this.platformOff = (response?.meeting_info?.platform == 'OFF') ? true : false;
-     
-      if((!this.isConductor && !this.detailData.form.some(obj => obj.title === 'MENTOR'))){
+      if((!this.detailData.form.some(obj => obj.title === 'MENTOR'))){
         this.detailData.form.push(
           {
             title: 'MENTOR',
@@ -287,7 +286,7 @@ export class SessionDetailPage implements OnInit, OnDestroy {
 
   editSession() {
     this.activeUrl = this.router.url;
-    (this.sessionDatas?.status?.value=='LIVE') ? this.router.navigate([CommonRoutes.CREATE_SESSION], { queryParams: { id: this.id , type: 'segment'} }) : this.router.navigate([CommonRoutes.CREATE_SESSION], { queryParams: { id: this.id, isCreator: this.isCreator } });
+    (this.sessionDatas?.status?.value=='LIVE') ? this.router.navigate([CommonRoutes.CREATE_SESSION], { queryParams: { id: this.id , type: 'segment'} }) : this.router.navigate([CommonRoutes.CREATE_SESSION], { queryParams: { id: this.id, isCreator: this.isConductor } });
   }
 
   deleteSession() {

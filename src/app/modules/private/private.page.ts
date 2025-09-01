@@ -62,6 +62,7 @@ export class PrivatePage implements OnInit {
       icon: 'mail',
       url: CommonRoutes.TABS + '/' + CommonRoutes.REQUESTS,
       pageId: PAGE_IDS.requests,
+      badge: false,
     },
     {
       title: 'MY_CONNECTIONS',
@@ -173,22 +174,39 @@ export class PrivatePage implements OnInit {
 
   async ngOnInit() {
     await this.initializeApp();
-    await this.rocketChatService.initializeWebSocketAndCheckUnread();
+    if(this.isMentor) {
+      const { result } = await this.profile.getRequestCount();
+      const { sessionRequestCount = 0, connectionRequestCount = 0 } = result || {};
+      if (sessionRequestCount > 0 || connectionRequestCount > 0) {
+      const page = this.appPages.find(
+        (page: any) => page.pageId === PAGE_IDS.requests
+      );
+      if (page) {
+        page.badge = true;
+      }}
+      this.updateBadgeFlag();
+    }
+    await this.rocketChatService.initializeWebSocketAndCheckUnread();    
     if (this.chatService.initialBadge) {
       let page = this.appPages.find(
         (page: any) => page.pageId == PAGE_IDS.messages
       );
       page.badge = this.chatService.initialBadge;
     }
-
-
+    this.updateBadgeFlag();
     this.chatService.showBadge.subscribe((resp: boolean) => {
       let page = this.appPages.find(
         (page: any) => page.pageId == PAGE_IDS.messages
       );
       page.badge = resp;
+      this.updateBadgeFlag();
     });
   }
+
+  updateBadgeFlag() {
+  const hasBadge = this.appPages.some(p => p.badge);
+  this.utilService.setHasBadge(hasBadge);
+}
 
   subscribeBackButton() {
     this.backButtonSubscription =

@@ -3,6 +3,7 @@ import { Component, Input, OnInit, Output, EventEmitter } from '@angular/core';
 import { Router } from '@angular/router';
 import { NavController } from '@ionic/angular';
 import { PAGE_IDS } from 'src/app/core/constants/page.ids';
+import { UtilService } from 'src/app/core/services';
 import { environment } from 'src/environments/environment';
 import { CommonRoutes } from 'src/global.routes';
 @Component({
@@ -13,9 +14,11 @@ import { CommonRoutes } from 'src/global.routes';
 export class PageHeaderComponent implements OnInit {
   @Input() config: any;
   @Output() actionEvent = new EventEmitter();
+  hasBadge: boolean;
 
   constructor(private location:NavController,
-    private router : Router
+    private router : Router,
+    private utilService: UtilService
   ) {}
 
   routes =[
@@ -29,7 +32,11 @@ export class PageHeaderComponent implements OnInit {
      { title: 'LOGIN_ACTIVITY', action: 'login-activity', icon: 'time', url: CommonRoutes.LOGIN_ACTIVITY, pageId: PAGE_IDS.loginActivity},
      {title: 'ADMIN_WORKSPACE', action: "admin", icon: 'briefcase' ,class:'', url: CommonRoutes.ADMIN+'/'+CommonRoutes.ADMIN_DASHBOARD, pageId: PAGE_IDS.adminWorkspace}
    ];
-  ngOnInit() {}
+  ngOnInit() {
+      this.utilService.hasBadge$.subscribe((flag) => {
+      this.hasBadge = flag;
+    });
+  }
   onAction(event) {
     this.actionEvent.next(event);
   }

@@ -5,7 +5,7 @@
     <p style="font-size: larger;font-weight: 700;">{{'AGENDA_FOR_SESSION' | translate}}</p>
   </ion-title>
   <div style="padding: 5%;" *ngIf="formData">
-    <app-dynamic-form [jsonFormData]="formData" #form1></app-dynamic-form>
+    <app-dynamic-form [jsonFormData]="formData" (dynamicSelectClicked)="onDynamicSelectClicked()" [selectedDynamicValue]="selectedTimezone" #form1></app-dynamic-form>
   </div>
 </ion-content>
 

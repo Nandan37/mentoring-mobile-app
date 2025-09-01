@@ -1,10 +1,14 @@
 import { Component, OnInit } from '@angular/core';
 import { urlConstants } from 'src/app/core/constants/urlConstants';
-import { HttpService } from 'src/app/core/services';
 import { ActivatedRoute } from '@angular/router';
 import { Router } from '@angular/router';
 import { CommonRoutes } from 'src/global.routes';
+import { MENTOR_REQ_CARD_FORM } from 'src/app/core/constants/formConstant';
+import * as _ from 'lodash';
+//service
 import { SessionService } from 'src/app/core/services/session/session.service';
+import { FormService } from 'src/app/core/services/form/form.service';
+import { HttpService } from 'src/app/core/services';
 
 @Component({
   selector: 'app-requests',
@@ -25,15 +29,23 @@ export class RequestsPage implements OnInit {
   routeData: any;
   slotBtnConfig: any;
   slotRequests: any;
+  mentorForm:any
+  expiryTag = {
+    label: 'EXPIRED',
+    cssClass: 'expired-tag'
+  }
 
   constructor(
     private httpService: HttpService,
     private route: ActivatedRoute,
     private router: Router,
-    private sessionService: SessionService
+    private sessionService: SessionService,
+    private form: FormService,
   ) {}
 
   async ionViewWillEnter(){
+    const result = await this.form.getForm(MENTOR_REQ_CARD_FORM);
+    this.mentorForm = _.get(result, 'data.fields.controls');
     this.route.data.subscribe((data) => {
       this.routeData = data;
       this.buttonConfig = this.routeData?.button_config;
@@ -44,7 +56,6 @@ export class RequestsPage implements OnInit {
   } else {
     await this.pendingRequest();
   }
-   
 
   }
   ngOnInit() {
@@ -76,18 +87,43 @@ async segmentChanged(event: any) {
     }
   }
 
-  async slotRequestData() {
-     this.sessionService.requestSessionList().then((res) => {
-        this.slotRequests = res?.result?.data ?? [];
-        if (!this.slotRequests.length) {
-          this.noResult = { subHeader: this.routeData?.noDataFound.noSession };
-        }
-      })
-      .catch((error) => {
-        console.error('Error fetching session list:', error);
-      });
-  }
+ async slotRequestData() {
+  try {
+    const res = await this.sessionService.requestSessionList();
+    const data = res?.result?.data ?? [];
 
+    if (data.length === 0) {
+      this.noResult = { subHeader: this.routeData?.noDataFound?.noSession };
+    }
+
+    this.slotRequests = data.map(value => ({
+      ...value,
+      meta: this.getMeta(value),
+      showTag: this.isSessionExpired(value) ? this.expiryTag : '',
+      disableButton: this.isSessionExpired(value)
+    }));
+
+  } catch (error) {
+    console.error('Error fetching session list:', error);
+  }
+}
+
+
+  getMeta(value: any) {
+  return {
+    isSent: value?.requestee_id === value?.user_details?.user_id,
+    message: value?.meta?.message,
+    timeStamp: '',
+    resp: value
+  };
+}
+
+  isSessionExpired(meta): boolean {
+  const endDate = meta?.end_date;
+  if (!endDate) return false; 
+  return Date.now() > endDate * 1000;
+  }
+  
   onCardClick(event, data?) {
     switch (event.type) {
       case 'viewMessage':

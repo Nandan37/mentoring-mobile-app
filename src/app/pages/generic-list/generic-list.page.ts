@@ -2,7 +2,8 @@ import { Component, Input, OnInit, ViewChild, ViewEncapsulation } from '@angular
 import { MatPaginator } from '@angular/material/paginator';
 import { ActivatedRoute, Router } from '@angular/router';
 import { ModalController } from '@ionic/angular';
-import { FILTER_ROLES } from 'src/app/core/constants/formConstant';
+import * as _ from 'lodash';
+import { FILTER_ROLES, MENTOR_CONNECTION_CARD_FORM } from 'src/app/core/constants/formConstant';
 import {
   NO_RESULT_FOUND_FOR_MENTEE,
   NO_RESULT_FOUND_FOR_MENTOR,
@@ -58,6 +59,7 @@ export class GenericListPage implements OnInit {
   filterIcon: boolean = false;
   filterChipsSelected: boolean = false;
   selectedCriteria: any;
+  mentorForm: any
 
   constructor(
     private route: ActivatedRoute,
@@ -73,8 +75,10 @@ export class GenericListPage implements OnInit {
 
   ngOnInit() {}
 
-  ionViewWillEnter() {
+  async ionViewWillEnter() {
     this.isMentor = this.profileService.isMentor;
+    const result = await this.formService.getForm(MENTOR_CONNECTION_CARD_FORM);
+    this.mentorForm = _.get(result, 'data.fields.controls');
     this.route.data.subscribe((data) => {
       this.routeData = data;
       this.action(this.routeData);

@@ -13,6 +13,9 @@ export class PreAlertModalComponent {
   @Input() data: any;
   @Input() type: 'link' | 'file' = 'link';
   @Input() heading: string = '';
+  @Input() allowedFileTypes : any;
+  @Input() maxSize : any;
+  @Input() errorMsg : any;
 
   name: string = '';
   link: string = '';
@@ -46,7 +49,7 @@ export class PreAlertModalComponent {
   saveLink() {
     if (this.type === 'file') {
         const obj = {
-          name: this.name, 
+          name: this.name ? this.name : this.uploadedFile.name,
           file: this.uploadedFile
         };
         this.modalController.dismiss({
@@ -55,7 +58,7 @@ export class PreAlertModalComponent {
         });
     } else if(this.type === 'link') {
         const obj = {
-          name: this.name,
+          name: this.name ? this.name : this.link,
           link: this.link,
           type: this.data.name,
           isLink: true,
@@ -69,7 +72,7 @@ export class PreAlertModalComponent {
       } 
   }
   selectFile() {
-   this.utilService.uploadFile().then((file: File) => {
+  this.utilService.uploadFile(this.allowedFileTypes,this.maxSize,this.errorMsg).then((file: File) => {
      this.uploadedFile = file;
    }).catch((error) => {
      console.error('File upload failed:', error);

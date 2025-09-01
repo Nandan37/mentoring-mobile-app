@@ -173,9 +173,20 @@ body{
 .padding-top-10 {
   padding-top: 15px !important;
 }
+.min-h-100 {
+  min-height: 100%;
+}
 
 .header-md::after {
   background-image: none;
+}
+
+.p-1 {
+  padding: 4px;
+}
+
+.gap-3 {
+  gap: 12px;
 }
 
 .header-bottom-border {
@@ -560,6 +571,9 @@ ion-searchbar {
   padding-left: 0.5rem;
   padding-right: 0.5rem;
 }
+.w-100 {
+  width: 100%;
+}
 
 // chat page from lib
 
@@ -728,4 +742,14 @@ ion-textarea textarea {
   font-size: 24px;
   cursor: pointer;
   color: #000;
+}
+
+.toast-title {
+  font-weight: bold;
+  font-size: 14px;
+}
+
+.toast-subtext {
+  font-size: 12px;
+  opacity: 0.8;
 }

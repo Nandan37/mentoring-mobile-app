@@ -13,7 +13,6 @@ export class FormService {
     //Check if form is available in local DB
     let form = await this.db.getItem(this.getUniqueKey(formBody))
     let dbForm = JSON.parse(form);
-
     // Check if local form is expired; return the form if not expired
     if (form && !this.checkIfexpired(dbForm?.ttl)) {
       return dbForm;

@@ -700,7 +700,13 @@
                       "position": "",
                       "disabled": false,
                       "validators": {
-                        "required": false
+                        "required": false,
+                        "allowedFileTypes": ["pdf", "docx", "pptx", "doc"],
+                        "maxSize":"50"
+                      },
+                      "errorMessage": {
+                        "invalidFormatError": "Unsupported file format. Please upload files in [e.g., PDF, DOCX, PPTX, URLs] format.",
+                        "maxSizeError" :"File too large. Maximum allowed size is 50 MB."
                       },
                       "meta": {
                         "showSelectAll": true,
@@ -713,11 +719,11 @@
                         "allow_filtering": false,
                         "addPopupType": "file",
                         "add_link":true,
-                        "labelForAddButton": "Add resource"
+                        "labelForAddButton": "Attach Files"
                       },
                       "info": [
                         {
-                           "message": "Supported formats: PDF, WORD, PPT, IMAGES, and inks to online resources (websites, articles, audio, video)"
+                           "message": "Supported formats: PDF, DOCX, PPTX, URL"
                         }
                       ]
                     },
@@ -730,7 +736,13 @@
                       "position": "",
                       "disabled": true,
                       "validators": {
-                        "required": false
+                        "required": false,
+                         "allowedFileTypes": ["pdf", "docx", "pptx", "doc"],
+                         "maxSize":"50"
+                      },
+                      "errorMessage": {
+                        "invalidFormatError": "Unsupported file format. Please upload files in [e.g., PDF, DOCX, PPTX, URLs] format.",
+                        "maxSizeError" :"File too large. Maximum allowed size is 50 MB."
                       },
                       "meta": {
                         "showSelectAll": true,
@@ -743,11 +755,11 @@
                         "allow_filtering": false,
                         "addPopupType": "file",
                         "add_link":true,
-                        "labelForAddButton": "Add resource"
+                        "labelForAddButton": "Attach Files"
                       },
                       "info": [
                         {
-                          "message": "Supported formats: PDF, WORD, PPT, IMAGES, and inks to online resources (websites, articles, audio, video)"
+                          "message": "Supported formats: PDF, DOCX, PPTX, URL"
                         }
                       ]
                     }
@@ -1535,66 +1547,79 @@
               "labelForAddButton": "Select Medium"
             },
             "multiple": true
-          },{
-            "name": "pre",
-            "label": "Pre  session resources",
-            "class": "ion-no-margin",
-            "value": [],
-            "type": "search",
-            "position": "",
-            "disabled": false,
-            "validators": {
-              "required": false
-            },
-            "meta": {
-              "showSelectAll": true,
-              "multiSelect": true,
-              "showAddOption": {
-                "showAddButton": true,
-                "addChipLabel": ""
-              },
-              "allow_custom_entities": false,
-              "allow_filtering": false,
-              "addPopupType": "file",
-              "add_link":true,
-              "labelForAddButton": "Add resource"
-            },
-            "info": [
-              {
-                 "message": "Supported formats: PDF, WORD, PPT, IMAGES, and inks to online resources (websites, articles, audio, video)"
-              }
-            ]
           },
           {
-            "name": "post",
-            "label": "Post  session resources",
-            "class": "ion-no-margin",
-            "value": [],
-            "type": "search",
-            "position": "",
-            "disabled": true,
-            "validators": {
-              "required": false
-            },
-            "meta": {
-              "showSelectAll": true,
-              "multiSelect": true,
-              "showAddOption": {
-                "showAddButton": true,
-                "addChipLabel": ""
-              },
-              "allow_custom_entities": false,
-              "allow_filtering": false,
-              "addPopupType": "file",
-              "add_link":true,
-              "labelForAddButton": "Add resource"
-            },
-            "info": [
-              {
-                "message": "Supported formats: PDF, WORD, PPT, IMAGES, and inks to online resources (websites, articles, audio, video)"
-              }
-            ]
-          }
+                      "name": "pre",
+                      "label": "Pre  session resources",
+                      "class": "ion-no-margin",
+                      "value": [],
+                      "type": "search",
+                      "position": "",
+                      "disabled": false,
+                      "validators": {
+                        "required": false,
+                        "allowedFileTypes": ["pdf", "docx", "pptx", "doc"],
+                        "maxSize":"50"
+                      },
+                      "errorMessage": {
+                        "invalidFormatError": "Unsupported file format. Please upload files in [e.g., PDF, DOCX, PPTX, URLs] format.",
+                        "maxSizeError" :"File too large. Maximum allowed size is 50 MB."
+                      },
+                      "meta": {
+                        "showSelectAll": true,
+                        "multiSelect": true,
+                        "showAddOption": {
+                          "showAddButton": true,
+                          "addChipLabel": ""
+                        },
+                        "allow_custom_entities": false,
+                        "allow_filtering": false,
+                        "addPopupType": "file",
+                        "add_link":true,
+                        "labelForAddButton": "Attach Files"
+                      },
+                      "info": [
+                        {
+                           "message": "Supported formats: PDF, DOCX, PPTX, URL"
+                        }
+                      ]
+                    },
+                    {
+                      "name": "post",
+                      "label": "Post  session resources",
+                      "class": "ion-no-margin",
+                      "value": [],
+                      "type": "search",
+                      "position": "",
+                      "disabled": true,
+                      "validators": {
+                        "required": false,
+                         "allowedFileTypes": ["pdf", "docx", "pptx", "doc"],
+                         "maxSize":"50"
+                      },
+                      "errorMessage": {
+                        "invalidFormatError": "Unsupported file format. Please upload files in [e.g., PDF, DOCX, PPTX, URLs] format.",
+                        "maxSizeError" :"File too large. Maximum allowed size is 50 MB."
+                      },
+                      "meta": {
+                        "showSelectAll": true,
+                        "multiSelect": true,
+                        "showAddOption": {
+                          "showAddButton": true,
+                          "addChipLabel": ""
+                        },
+                        "allow_custom_entities": false,
+                        "allow_filtering": false,
+                        "addPopupType": "file",
+                        "add_link":true,
+                        "labelForAddButton": "Attach Files"
+                      },
+                      "info": [
+                        {
+                          "message": "Supported formats: PDF, DOCX, PPTX, URL"
+                        }
+                      ]
+                    }
         ]
       }
     }
@@ -2562,6 +2587,21 @@
                   }
               },
               {
+                "name": "timezone",
+                "label": "Timezone",
+                "class": "ion-no-margin",
+                "value": "",
+                "type": "search-select",
+                "position": "floating",
+                "disabled": false,
+                "errorMessage": {
+                    "required": "Enter timezone"
+                },
+                "validators": {
+                    "required": false
+                }
+              },
+              {
                   "name": "start_date",
                   "label": "Start date",
                   "class": "ion-no-margin",
@@ -2614,6 +2654,87 @@
               }
           ]
       }
+  }
+},
+{
+  "type": "mentorDirectoryCard",
+  "sub_type": "mentorDirectoryCardForm",
+  "action": "update",
+  "data": {
+    "template_name": "defaultTemplate",
+    "fields": {
+    "controls" : {
+        "header": {
+              "image":"image",
+              "title":"name"
+            },
+        "body": [
+            {
+              "name": "designation",
+              "type": "array"
+            },
+            {
+              "name": "experience",
+              "subText": "YEARS",
+              "type": "text"
+            }
+          ]
+      }
+    }
+  }
+},
+{
+  "type": "mentorRequestCard",
+  "sub_type": "mentorRequestCardForm",
+  "action": "update",
+  "data": {
+    "template_name": "defaultTemplate",
+    "fields": {
+      "controls": {
+          "header": {
+            "image": "image",
+            "title": "name"
+          },
+          "body": [
+            {
+              "name": "designation",
+              "type": "array"
+            },
+            {
+              "name": "experience",
+              "subText": "YEARS",
+              "type": "text"
+            }
+          ]
+        }
+    }
+  }
+},
+{
+  "type": "mentorConnectionCard",
+  "sub_type": "mentorConnectionCardForm",
+  "action": "update",
+  "data": {
+    "template_name": "defaultTemplate",
+    "fields": {
+      "controls": {
+          "header": {
+            "image": "image",
+            "title": "name"
+          },
+          "body": [
+            {
+              "name": "designation",
+              "type": "array"
+            },
+            {
+              "name": "experience",
+              "subText": "YEARS",
+              "type": "text"
+            }
+          ]
+        }
+    }
   }
 }
 ]

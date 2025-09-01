@@ -5,12 +5,13 @@ import { TranslateService } from '@ngx-translate/core';
 import { ISocialSharing } from '../../interface/soical-sharing-interface';
 import { ModelComponent } from 'src/app/shared/components/model/model.component';
 import * as Bowser from 'bowser';
-import { BehaviorSubject, Subject } from 'rxjs';
+import { BehaviorSubject, Observable, Subject } from 'rxjs';
 import * as Papa from 'papaparse';
 import { LocalStorageService } from '../localstorage.service';
 import { environment } from 'src/environments/environment';
 
 import { ToastService } from '../toast.service';
+import * as moment from 'moment-timezone';
 
 
 @Injectable({
@@ -24,6 +25,8 @@ export class UtilService {
   private criteriaChipSource = new BehaviorSubject<string>('');
   currentSearchText = this.searchTextSource.asObservable();
   currentCriteriaChip = this.criteriaChipSource.asObservable();
+  private hasBadgeSubject = new BehaviorSubject<boolean>(false);
+  hasBadge$: Observable<boolean> = this.hasBadgeSubject.asObservable();
 
   ionMenuShow(data: boolean) {
     this.canIonMenuShow.next(data);
@@ -308,41 +311,102 @@ export class UtilService {
     this.messageBadge.next(false);
   }
 
-  uploadFile(): Promise<File | null> {
+ uploadFile(allowedExtensions?: string[], maxSizeMB?: number, errorMsgs?:any): Promise<File | null> {
     return new Promise((resolve) => {
       const input = document.createElement('input');
       input.type = 'file';
-      input.accept = '*/*';
-  
+      const extensions = allowedExtensions && allowedExtensions.length > 0
+        ? allowedExtensions.map(ext => `.${ext}`).join(',')
+        : '*/*';
+      input.accept = extensions;
       input.addEventListener('change', (fileEvent: Event) => {
         const target = fileEvent.target as HTMLInputElement;
         const file = target.files?.[0];
   
         if (!file) {
-          this.toast.showToast(
-            this.translate.instant('No file selected'),
-            'danger'
-          );
+          this.toast.showToast('No file selected', 'danger');
           return resolve(null);
         }
+        if (allowedExtensions && allowedExtensions.length > 0) {
+          const fileName = file.name;
+          const fileExt = fileName.split('.').pop()?.toLowerCase();
   
-        if (!file.type || file.type.trim() === '') {
-          this.toast.showToast(
-            this.translate.instant('Cannot upload file: File type is not detected. Please try a different file.'),
-            'danger'
-          );
-          return resolve(null);
+          if (!fileExt || !allowedExtensions.includes(fileExt)) {
+            this.toast.showToast(
+              errorMsgs?.invalidFormatError,
+              'danger'
+            );
+            return resolve(null);
+          }
         }
-  
-        if (!file.name || file.name.trim() === '') {
-          return resolve(null);
+        if (maxSizeMB) {
+          const maxSizeBytes = maxSizeMB * 1024 * 1024;
+          if (file.size > maxSizeBytes) {
+            this.toast.showToast(
+              errorMsgs?.maxSizeError,
+              'danger'
+            );
+            return resolve(null);
+          }
         }
-  
         return resolve(file);
       });
-  
       input.click();
     });
   }
 
+  isSessionExpired(meta): boolean {
+  const endDate = meta?.resp?.end_date;
+  if (!endDate) return false; 
+  return Date.now() > endDate * 1000;
+  }
+
+  setHasBadge(value: boolean): void {
+    this.hasBadgeSubject.next(value);
+  }
+
+
+  convertDatesToTimezone(startDate, endDate, selectedTimezone) {
+  // Guess user's current timezone
+  const userTimezone = moment.tz.guess();
+  
+  // Parse dates in user's timezone
+  const startDateTimezoned = moment.tz(startDate, userTimezone);
+  const endDateTimezoned = moment.tz(endDate, userTimezone);
+  
+  // Get current time in selected timezone
+  const currentTimeInSelectedTZ = moment.tz(selectedTimezone);
+  const currentEpochInSelectedTZ = currentTimeInSelectedTZ.valueOf();
+  
+  // Extract time components from original dates
+  const startDatehours = startDateTimezoned.hours();
+  const startDateminutes = startDateTimezoned.minutes();
+  const startDateseconds = startDateTimezoned.seconds();
+  const endDatehours = endDateTimezoned.hours();
+  const endDateminutes = endDateTimezoned.minutes();
+  const endDateseconds = endDateTimezoned.seconds();
+  
+  // Create new dates with the SAME TIME but in the selected timezone
+  const eventStartDateInSelectedTZ = moment.tz(selectedTimezone)
+    .hours(startDatehours)
+    .minutes(startDateminutes)
+    .seconds(startDateseconds)
+    .milliseconds(0);
+  
+  const eventEndDateInSelectedTZ = moment.tz(selectedTimezone)
+    .hours(endDatehours)
+    .minutes(endDateminutes)
+    .seconds(endDateseconds)
+    .milliseconds(0);
+  
+  // Get the epoch milliseconds
+  const eventStartEpochInSelectedTZ = eventStartDateInSelectedTZ.valueOf();
+  const eventEndEpochInSelectedTZ = eventEndDateInSelectedTZ.valueOf();
+  
+  return {
+    eventStartEpochInSelectedTZ,
+    eventEndEpochInSelectedTZ,
+  };
+}
+  
 }

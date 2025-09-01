@@ -46,30 +46,16 @@ ion-chip{
   }
   .resource-content{
     display: flex;
-    flex-direction: column;
     align-items: center;
-    justify-content: center;
     margin: 10px 10px;
-    box-shadow: 1px 4px 5px 2px #ccc;
-    border-radius: 14px;
-    width: 180px;
-    height: 180px;
-    img{
-        width: 170px;
-              height: 150px;
-              border-radius: 14px;
-              object-fit: cover;
-              padding: 5px;
-    }
+    gap: 5px;
+    border-radius: 10px;
+    width: 240px;
+    padding: 5px 0px 5px 5px;
+    background-color: var(--light-gray);
+    text-decoration: none;
   }
-  .clickable-image {
-    cursor: pointer;
-    max-width: 100%;
-    height: auto;
-    border-radius: 4px;
-    transition: transform 0.2s;
-  }
-  
+
   .resource-content:hover {
     transform: scale(1.05);
   }
@@ -90,4 +76,14 @@ ion-chip{
       width: 22px;
       height: 22px;
       margin: 4px;
+  }
+  .my-text {
+    color: var(--text-color );
+    flex:1
+  }
+  .icon-size {
+    width: 20px;
+    height: 20px; 
+    vertical-align: middle;
+    flex-shrink: 0; 
   }

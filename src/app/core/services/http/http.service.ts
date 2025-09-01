@@ -101,9 +101,6 @@ export class HttpService {
           this.isFeedbackTriggered = true;
           this.openModal(result?.meta?.data[0]);
         }
-        if(options.url.includes("interface/v1/profile/get") && result?.responseCode) {
-          return result;
-        }else
         if (result.responseCode === "OK") {
           return result;
         } else {
@@ -168,7 +165,7 @@ export class HttpService {
   }
 
 
-  async getToken() {
+async getToken() {
     let token = localStorage.getItem('accToken');
     if (!token) {
       return null;
@@ -217,6 +214,9 @@ export class HttpService {
     if (result.url.includes(urlConstants.API_URLS.GET_CHAT_TOKEN)) {
       return;
     }
+    if(result.url.includes("interface/v1/profile/get")) {
+      throw result;
+    }
     switch (result.status) {
       case 400:
       case 406:
@@ -231,7 +231,7 @@ export class HttpService {
         } else {
           localStorage.clear();
           auth.clearLocalData();
-          location.href = environment.unauthorizedRedirectUrl;
+          location.href = window.location.origin;
         }
         break;
       default:
@@ -285,7 +285,7 @@ export class HttpService {
         if(environment.isAuthBypassed) {
           let auth = this.injector.get(AuthService);
           auth.clearLocalData();
-          location.href = environment.unauthorizedRedirectUrl
+          location.href = window.location.origin
         } else {
           let auth = this.injector.get(AuthService);
           auth.logoutAccount(true);
