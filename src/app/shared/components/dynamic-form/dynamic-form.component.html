@@ -72,7 +72,12 @@
         *ngIf="control.type === 'toggle'"
         [formControlName]="control.name"
         [checked]="control.value"
+        [slot]="control.slot"
       ></ion-toggle>
+      
+      <div *ngIf="control.type === 'toggle'" class="placeholder">
+      {{ myForm.get(control.name)?.value ? control.placeholderOn : control.placeholderOff }}
+      </div>
       <ion-range
         *ngIf="control.type === 'range'"
         [min]="control.options.min"
