@@ -2736,5 +2736,34 @@
         }
     }
   }
+},
+{
+  "type": "blockedUsersCard",
+  "sub_type": "blockedUsersCardForm",
+  "action": "create",
+  "data": {
+    "template_name": "defaultTemplate",
+    "fields": {
+      "controls": {
+          "header": {
+            "image": "image",
+            "title": "name"
+          },
+          "body": [
+            {
+              "name": "designation",
+              "type": "string",
+              "subText": ""
+            },
+
+            {
+              "name": "organization",
+              "type": "string",
+              "subText": ""
+            }
+          ]
+        }
+    }
+  }
 }
 ]

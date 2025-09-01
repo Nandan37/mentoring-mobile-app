@@ -123,7 +123,7 @@ const routes: Routes = [
         data: {
           pageId: PAGE_IDS.language,
         },
-      },
+      },  
       {
         path: CommonRoutes.HELP_VIDEOS,
         loadChildren: () =>
@@ -185,6 +185,23 @@ const routes: Routes = [
           pageId: PAGE_IDS.mentorSearchDirectory,
           placeholder: 'Search for mentors',
           button_config: CHAT_MESSAGES.GENERIC_CARD_MENTOR_DIRECTORY_BTN_CONFIG,
+        },
+      },
+      {
+        path: CommonRoutes.BLOCKED_USERS,
+        loadChildren: () =>
+          import('../../pages/generic-list/generic-list.module').then(
+            (m) => m.GenericListPageModule
+          ),
+        canActivate: [PrivateGuard, AllowPageAccess],
+        data: {
+          pageId: PAGE_IDS.blockedUsers,
+          placeholder: 'Search blocked users',
+          filterType: 'blocked',
+          // url: urlConstants.API_URLS.BLOCKED_USERS,      
+          button_config: CHAT_MESSAGES.GENERIC_CARD_BLOCKED_USERS_BTN_CONFIG,
+          explore_button: true,
+          noDataFound: "No blocked users found",
         },
       },
       {
