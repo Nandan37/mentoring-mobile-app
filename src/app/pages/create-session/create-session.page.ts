@@ -697,4 +697,9 @@ async updateFormConfig() {
     this.formConfig = CREATE_SESSION_FORM;
   }
 }
+
+ionViewWillLeave() {
+  this.formData = null;
+  this.sessionType = '';
+}
 }
