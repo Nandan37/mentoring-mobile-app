@@ -38,7 +38,7 @@ export class EditProfilePage implements OnInit, isDeactivatable {
     type: 'profile',
   };
   public headerConfig: any = {
-    backButton: false,
+    backButton: true,
     label: 'PROFILE_DETAILS',
     notification: false,
   };
@@ -96,7 +96,7 @@ export class EditProfilePage implements OnInit, isDeactivatable {
       this.showForm = true;
     }
     if(this.userDetails?.profile_mandatory_fields?.length || !this.userDetails?.about){
-    this.headerConfig.backButton = true;
+    this.headerConfig.backButton = false;
     let msg = {
         header: 'SETUP_PROFILE',
         message: 'SETUP_PROFILE_MESSAGE',
@@ -104,7 +104,7 @@ export class EditProfilePage implements OnInit, isDeactivatable {
         }
         this.utilService.profileUpdatePopup(msg)
     }else{
-        this.headerConfig.backButton = false;
+        this.headerConfig.backButton = true;
     }
   }
 
