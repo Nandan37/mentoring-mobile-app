@@ -25,6 +25,7 @@ import { PreAlertModalComponent } from 'src/app/shared/components/pre-alert-moda
 import { localKeys } from 'src/app/core/constants/localStorage.keys';
 import * as moment from 'moment-timezone';
 import { DynamicSelectModalComponent } from 'src/app/dynamic-select-modal/dynamic-select-modal.component';
+import { UtilService } from '../../core/services/util/util.service';
 
 @Component({
   selector: 'app-create-session',
@@ -93,7 +94,8 @@ export class CreateSessionPage implements OnInit {
     private route:ActivatedRoute,
     private modalCtrl:ModalController,
     private permissionService:PermissionService,
-    private actionSheetController: ActionSheetController
+    private actionSheetController: ActionSheetController,
+    private utilService: UtilService
   ) {
   }
   ngOnInit() {
@@ -230,11 +232,15 @@ export class CreateSessionPage implements OnInit {
     if (this.form1.myForm.valid) {
       await this.handleFileUploads();
       const form = Object.assign({}, { ...this.form1.myForm.getRawValue(), ...this.form1.myForm.value });
-      form.start_date = (Math.floor((new Date(form.start_date).getTime() / 1000) / 60) * 60).toString();
-      form.end_date = (Math.floor((new Date(form.end_date).getTime() / 1000) / 60) * 60).toString();
+      const convertedTimezones = this.utilService.convertDatesToTimezone(
+          form.start_date,
+          form.end_date,
+          this.selectedTimezone
+          );
+          form.start_date = convertedTimezones.eventStartEpochInSelectedTZ /1000;
+          form.end_date = convertedTimezones.eventEndEpochInSelectedTZ / 1000;
       const timezone = Intl.DateTimeFormat().resolvedOptions().timeZone;
       form.time_zone = timezone;
-
       _.forEach(this.entityNames, (entityKey) => {
         const control = this.formData.controls.find(obj => obj.name === entityKey);
         if (control) {
