@@ -77,8 +77,7 @@ export class SessionRequestPage implements OnInit {
           );
           form.start_date = result.eventStartEpochInSelectedTZ /1000;
           form.end_date = result.eventEndEpochInSelectedTZ / 1000;
-          const timezone = Intl.DateTimeFormat().resolvedOptions().timeZone;
-          form.time_zone = timezone;
+          form.time_zone = this.selectedTimezone;
           this.form1.myForm.markAsPristine();
           this.sessionService.requestSession(form).then((res) => {
             if (res) {

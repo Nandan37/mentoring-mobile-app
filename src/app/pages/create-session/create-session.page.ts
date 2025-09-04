@@ -239,8 +239,7 @@ export class CreateSessionPage implements OnInit {
           );
           form.start_date = convertedTimezones.eventStartEpochInSelectedTZ /1000;
           form.end_date = convertedTimezones.eventEndEpochInSelectedTZ / 1000;
-      const timezone = Intl.DateTimeFormat().resolvedOptions().timeZone;
-      form.time_zone = timezone;
+      form.time_zone = this.selectedTimezone;
       _.forEach(this.entityNames, (entityKey) => {
         const control = this.formData.controls.find(obj => obj.name === entityKey);
         if (control) {

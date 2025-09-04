@@ -62,12 +62,16 @@ export class HttpService {
 
   async post(requestParam: RequestParams) {
     if (!(await this.checkNetworkAvailability())) {
+      
   throw Error(null);
 }
 
     let defaultHeaders = await this.setHeaders();
     const headers = requestParam.headers ?  { ...requestParam.headers, ...defaultHeaders } : defaultHeaders;
     let body = requestParam.payload ? requestParam.payload : {};
+    if (body?.time_zone) {
+    headers.timeZone = body.time_zone;        
+  }
     const options = {
       url: this.baseUrl + requestParam.url,
       headers: headers,
