@@ -110,6 +110,9 @@ export class EditProfilePage implements OnInit, isDeactivatable {
 
   async canPageLeave() {
     if (this.form1 && !this.form1.myForm.pristine || !this.profileImageData.isUploaded) {
+        if(this.headerConfig.backButton === false) {
+        this.toast.showToast('UPDATE_PROFILE_MSG', 'danger');
+      }
       let texts: any;
       this.translate
         .get(['PROFILE_FORM_UNSAVED_DATA', 'DONOT_SAVE', 'SAVE', 'PROFILE_EXIT_HEADER_LABEL'])
@@ -136,11 +139,15 @@ export class EditProfilePage implements OnInit, isDeactivatable {
       });
       await alert.present();
       let data = await alert.onDidDismiss();
-      if (data.role == 'exit') {
+      if (data.role == 'exit' && this.headerConfig.backButton) {
         return true;
       }
       return false;
     } else {
+      if(this.headerConfig.backButton === false) {
+        this.toast.showToast('UPDATE_PROFILE_MSG', 'danger');
+        return false;
+      }
       return true;
     }
   }

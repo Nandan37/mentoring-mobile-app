@@ -411,5 +411,6 @@
     "DISTRICT":"District",
     "BLOCK":"Block",
     "SCHOOL":"School",
-    "YOU_HAVE" :"You have"
+    "YOU_HAVE" :"You have",
+    "UPDATE_PROFILE_MSG": "You need to update your profile before moving forward."
 }
