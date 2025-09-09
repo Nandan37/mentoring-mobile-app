@@ -31,7 +31,7 @@
     <ion-chip *ngIf="i < 5 && (data.name || data.label) && control.meta.addPopupType != 'file'" class="color-red" [disabled]="control?.disabled">
       <ion-icon class="icon" [name]="icon.name" [color]="icon.color"
         (click)="handleCloseIconClick($event, data)"></ion-icon>
-      <ion-label [ngClass]="data?.isLink ? 'capitalize' :''">{{data.name || data.label}}</ion-label>
+      <ion-label [ngClass]="data?.isLink ? 'capitalize' :''" class="word-break">{{data.name || data.label}}</ion-label>
     </ion-chip>
   </ng-container>
   <ng-container *ngIf="control.meta.addPopupType == 'file'">
