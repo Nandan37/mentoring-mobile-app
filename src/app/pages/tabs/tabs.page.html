@@ -1,7 +1,7 @@
-<ion-tabs #tabs (ionTabsDidChange)="tabChange(tabs)">
+<ion-tabs #tabs (ionTabsDidChange)="tabChange(tabs)" >
 
 
-  <ion-tab-bar slot="bottom" class="tab-item hide-on-large-screen">
+  <ion-tab-bar slot="bottom" class="tab-item hide-on-large-screen" [ngClass]="{'disable-div': user?.profile_mandatory_fields.length || !user?.about}" >
     <ion-tab-button tab="home" *allowTemplateView="PAGE_IDS.home">
       <ion-icon name="home-sharp" size="large"></ion-icon>
       <ion-label>{{'HOME' | translate}}</ion-label>

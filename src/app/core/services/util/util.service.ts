@@ -382,23 +382,37 @@ export class UtilService {
   const startDatehours = startDateTimezoned.hours();
   const startDateminutes = startDateTimezoned.minutes();
   const startDateseconds = startDateTimezoned.seconds();
+  const startDay = startDateTimezoned.date(); 
+  const startMonth = startDateTimezoned.month(); 
+  const startYear = startDateTimezoned.year(); 
+
+  const endDay = endDateTimezoned.date();
+  const endMonth = endDateTimezoned.month();
+  const endYear = endDateTimezoned.year();
   const endDatehours = endDateTimezoned.hours();
   const endDateminutes = endDateTimezoned.minutes();
   const endDateseconds = endDateTimezoned.seconds();
   
   // Create new dates with the SAME TIME but in the selected timezone
-  const eventStartDateInSelectedTZ = moment.tz(selectedTimezone)
+ const eventStartDateInSelectedTZ = moment.tz(selectedTimezone)
+    .year(startYear)
+    .month(startMonth)
+    .date(startDay)
     .hours(startDatehours)
     .minutes(startDateminutes)
     .seconds(startDateseconds)
     .milliseconds(0);
-  
-  const eventEndDateInSelectedTZ = moment.tz(selectedTimezone)
+
+const eventEndDateInSelectedTZ = moment.tz(selectedTimezone)
+    .year(endYear)
+    .month(endMonth)
+    .date(endDay)
     .hours(endDatehours)
     .minutes(endDateminutes)
     .seconds(endDateseconds)
     .milliseconds(0);
-  
+
+
   // Get the epoch milliseconds
   const eventStartEpochInSelectedTZ = eventStartDateInSelectedTZ.valueOf();
   const eventEndEpochInSelectedTZ = eventEndDateInSelectedTZ.valueOf();

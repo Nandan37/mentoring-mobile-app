@@ -109,7 +109,6 @@ export class EditProfilePage implements OnInit, isDeactivatable {
   }
 
   async canPageLeave() {
-    if (this.form1 && !this.form1.myForm.pristine || !this.profileImageData.isUploaded) {
       let texts: any;
       this.translate
         .get(['PROFILE_FORM_UNSAVED_DATA', 'DONOT_SAVE', 'SAVE', 'PROFILE_EXIT_HEADER_LABEL'])
@@ -134,13 +133,18 @@ export class EditProfilePage implements OnInit, isDeactivatable {
           },
         ],
       });
+    if (this.form1 && !this.form1.myForm.pristine || !this.profileImageData.isUploaded) {
       await alert.present();
       let data = await alert.onDidDismiss();
-      if (data.role == 'exit') {
+      if (data.role == 'exit' && this.headerConfig.backButton) {
         return true;
       }
       return false;
     } else {
+      if(this.headerConfig.backButton === false) {
+        await alert.present();
+        return false;
+      }
       return true;
     }
   }
@@ -154,7 +158,7 @@ export class EditProfilePage implements OnInit, isDeactivatable {
         const form = Object.assign({}, this.form1.myForm.value);
         _.forEach(this.entityNames, (entityKey) => {
           let control = this.formData.controls.find(obj => 
-           obj.name === entityKey
+          obj.name === entityKey
           );  
             if (['state', 'cluster', 'block', 'district', 'school', 'professional_role'].includes(entityKey)) {
               form[entityKey] = control.value?.value || '';
