@@ -111,14 +111,21 @@ export class EditProfilePage implements OnInit, isDeactivatable {
   async canPageLeave() {
       let texts: any;
       this.translate
-        .get(['PROFILE_FORM_UNSAVED_DATA', 'DONOT_SAVE', 'SAVE', 'PROFILE_EXIT_HEADER_LABEL'])
+        .get(['PROFILE_FORM_UNSAVED_DATA', 'DONOT_SAVE', 'SAVE', 'PROFILE_EXIT_HEADER_LABEL', 'SETUP_PROFILE','SETUP_PROFILE_MESSAGE', 'CONTINUE'])
         .subscribe((text) => {
           texts = text;
         });
+        let header = this.userDetails?.profile_mandatory_fields?.length ? texts['SETUP_PROFILE'] : texts['PROFILE_EXIT_HEADER_LABEL'];
+        console.log("header", header);
       const alert = await this.alert.create({
-        header: texts['PROFILE_EXIT_HEADER_LABEL'],
-        message: texts['PROFILE_FORM_UNSAVED_DATA'],
-        buttons: [
+        header: this.userDetails?.profile_mandatory_fields?.length ? texts['SETUP_PROFILE'] : texts['PROFILE_EXIT_HEADER_LABEL'] , 
+        message: this.userDetails?.profile_mandatory_fields?.length ? texts['SETUP_PROFILE_MESSAGE'] : texts['PROFILE_FORM_UNSAVED_DATA'],
+        buttons:  this.userDetails?.profile_mandatory_fields?.length ? [ {
+          text: texts['CONTINUE'],
+          role: 'cancel',
+          cssClass: 'alert-button-red',
+          handler: () => { },
+        }] : [
           {
             text: texts['DONOT_SAVE'],
             cssClass: 'alert-button-bg-white',
@@ -133,6 +140,7 @@ export class EditProfilePage implements OnInit, isDeactivatable {
           },
         ],
       });
+     
     if (this.form1 && !this.form1.myForm.pristine || !this.profileImageData.isUploaded) {
       await alert.present();
       let data = await alert.onDidDismiss();
@@ -170,6 +178,8 @@ export class EditProfilePage implements OnInit, isDeactivatable {
         });
         this.form1.myForm.markAsPristine();
         const updated = await this.profileService.profileUpdate(form);
+        // if profile updated then update userDetails.profile_mandatory_fields
+        // this.userDetails.profile_mandatory_fields =[];
         if(updated && this.redirectUrl){ 
           this.router.navigate([this.redirectUrl], { replaceUrl: true })
         }else{
