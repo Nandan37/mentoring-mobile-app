@@ -33,6 +33,7 @@ import { PlatformLocation, Location } from '@angular/common';
 })
 export class EditProfilePage implements OnInit, isDeactivatable {
   private win: any = window;
+  updated: boolean;
   @ViewChild('form1') form1: DynamicFormComponent;
   profileImageData: any = {
     type: 'profile',
@@ -109,6 +110,7 @@ export class EditProfilePage implements OnInit, isDeactivatable {
   }
 
   async canPageLeave() {
+    if(!this.updated) {
       let texts: any;
       this.translate
         .get(['PROFILE_FORM_UNSAVED_DATA', 'DONOT_SAVE', 'SAVE', 'PROFILE_EXIT_HEADER_LABEL', 'SETUP_PROFILE','SETUP_PROFILE_MESSAGE', 'CONTINUE'])
@@ -116,7 +118,6 @@ export class EditProfilePage implements OnInit, isDeactivatable {
           texts = text;
         });
         let header = this.userDetails?.profile_mandatory_fields?.length ? texts['SETUP_PROFILE'] : texts['PROFILE_EXIT_HEADER_LABEL'];
-        console.log("header", header);
       const alert = await this.alert.create({
         header: this.userDetails?.profile_mandatory_fields?.length ? texts['SETUP_PROFILE'] : texts['PROFILE_EXIT_HEADER_LABEL'] , 
         message: this.userDetails?.profile_mandatory_fields?.length ? texts['SETUP_PROFILE_MESSAGE'] : texts['PROFILE_FORM_UNSAVED_DATA'],
@@ -140,8 +141,7 @@ export class EditProfilePage implements OnInit, isDeactivatable {
           },
         ],
       });
-     
-    if (this.form1 && !this.form1.myForm.pristine || !this.profileImageData.isUploaded) {
+      if (this.form1 && !this.form1.myForm.pristine || !this.profileImageData.isUploaded) {
       await alert.present();
       let data = await alert.onDidDismiss();
       if (data.role == 'exit' && this.headerConfig.backButton) {
@@ -154,6 +154,7 @@ export class EditProfilePage implements OnInit, isDeactivatable {
         return false;
       }
       return true;
+    }
     }
   }
 
@@ -177,10 +178,9 @@ export class EditProfilePage implements OnInit, isDeactivatable {
             }
         });
         this.form1.myForm.markAsPristine();
-        const updated = await this.profileService.profileUpdate(form);
-        // if profile updated then update userDetails.profile_mandatory_fields
-        // this.userDetails.profile_mandatory_fields =[];
-        if(updated && this.redirectUrl){ 
+        this.updated = await this.profileService.profileUpdate(form);
+        this.userDetails.profile_mandatory_fields =[];
+        if(this.updated && this.redirectUrl){ 
           this.router.navigate([this.redirectUrl], { replaceUrl: true })
         }else{
         this.router.navigate([`/${CommonRoutes.TABS}/${CommonRoutes.HOME}`], { replaceUrl: true });
