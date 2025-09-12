@@ -367,8 +367,8 @@ export class CreateSessionPage implements OnInit {
         }
       }
       let dependedChildIndex = this.formData.controls.findIndex(formControl => formControl.name === this.formData.controls[i].dependedChild)
-      if(this.formData.controls[i].name === 'mentor_id') {
-        this.mentor_id = existingData[this.formData.controls[i].name];
+      if(existingData['mentor_id']) {
+        this.mentor_id = existingData['mentor_id'];
       }
       if(this.formData.controls[i].dependedChild && this.formData.controls[i].name === 'type'){
         if(existingData[this.formData.controls[i].name].value){
@@ -377,11 +377,12 @@ export class CreateSessionPage implements OnInit {
           this.formData.controls[dependedChildIndex].validators['required']= existingData[this.formData.controls[i].name].value=='PUBLIC' ? false : true
         }
       }
-        if(this.formData.controls[i]?.name === "mentees" && this.sessionType ==='PUBLIC') {
+        if(this.formData.controls[i]?.name === "mentees") {
           const { isCreator } = this.route.snapshot.queryParams;
-          if(!this.mentor_id)
+          if(!this.mentor_id) {
           this.formData.controls[i].disabled = true;
-          if(isCreator === 'true') {
+          }
+          if(isCreator === 'true' && this.sessionType ==='PUBLIC') {
           this.formData.controls[i].showField = false;
           }
         }
