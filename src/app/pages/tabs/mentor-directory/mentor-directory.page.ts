@@ -8,6 +8,7 @@ import { urlConstants } from 'src/app/core/constants/urlConstants';
 import { HttpService, LoaderService, ToastService } from 'src/app/core/services';
 import { FormService } from 'src/app/core/services/form/form.service';
 import { CommonRoutes } from 'src/global.routes';
+import { ProfileService } from 'src/app/core/services/profile/profile.service';
 
 @Component({
   selector: 'app-mentor-directory',
@@ -46,6 +47,7 @@ export class MentorDirectoryPage implements OnInit {
   selectedChips: boolean = false;
   data: any;
   buttonConfig: any;
+  currentUserId: any;
 
   constructor(
     private router: Router,
@@ -54,6 +56,7 @@ export class MentorDirectoryPage implements OnInit {
     private route: ActivatedRoute,
     private toast: ToastService,
     private form: FormService,
+    private profileService: ProfileService
   ) {}
 
   ngOnInit() {
@@ -69,6 +72,8 @@ export class MentorDirectoryPage implements OnInit {
     this.mentors = [];
     this.getMentors();
     this.gotToTop();
+    let user = await this.profileService.getProfileDetailsFromAPI();
+    this.currentUserId = user?.id; 
   }
 
   gotToTop() {

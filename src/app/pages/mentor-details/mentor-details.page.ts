@@ -14,6 +14,7 @@ import {
 import { Clipboard } from '@capacitor/clipboard';
 import { SessionService } from 'src/app/core/services/session/session.service';
 import { CommonRoutes } from 'src/global.routes';
+import { ProfileService } from 'src/app/core/services/profile/profile.service';
 
 @Component({
   selector: 'app-mentor-details',
@@ -23,6 +24,7 @@ import { CommonRoutes } from 'src/global.routes';
 export class MentorDetailsPage implements OnInit {
   mentorId;
   public isMobile: any;
+  currentUserId: any;
   public headerConfig: any = {
     backButton: false,
     headerColor: "primary"
@@ -33,15 +35,15 @@ export class MentorDetailsPage implements OnInit {
       id: null,
     },
     buttons: [
-      {
-        label: 'CHAT',
-        action: 'chat',
-      },
-      {
-        label: 'REQUEST_SESSION',
-        action: 'requestSession',
-      },
-    ],
+    {
+      label: 'CHAT',
+      action: 'chat',
+    },
+          {
+            label: 'REQUEST_SESSION',
+            action: 'requestSession',
+          },
+  ],
   };
 
   detailData: any = {
@@ -99,7 +101,8 @@ export class MentorDetailsPage implements OnInit {
     private userService: UserService,
     private localStorage: LocalStorageService,
     private toast: ToastService,
-    private utilService: UtilService
+    private utilService: UtilService,
+    private profileService: ProfileService
   ) {
     
   }
@@ -111,6 +114,9 @@ export class MentorDetailsPage implements OnInit {
       this.mentorId = this.buttonConfig.meta.id = params.id;
       this.getMentor();
     })
+    let user = await this.profileService.getProfileDetailsFromAPI();
+    this.currentUserId = user?.id;   
+    this.updateButtonConfig();
   }
 
   async getMentor() {
@@ -231,5 +237,8 @@ async getMentorDetails() {
             action: 'requestSession',
           },
         ];
+        if (String(this.mentorProfileData?.result?.id) === String(this.currentUserId)) {
+            this.buttonConfig.buttons = [];
+           }
   }
 }
