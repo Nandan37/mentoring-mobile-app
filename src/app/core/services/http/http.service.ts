@@ -171,20 +171,25 @@ export class HttpService {
 
 async getToken() {
     let token = localStorage.getItem('accToken');
-    if (!token) {
+    let isValidToken = this.userService.validateToken(token);
+    //need to verify token validity
+    if (!token || token && !isValidToken) {
+      localStorage.clear();
+      location.href = window.location.origin;
       return null;
     }
-    let isValidToken = this.userService.validateToken(token);
-    if (!isValidToken) {
-      let data: any = await this.getAccessToken();
-      let access_token = _.get(data, 'access_token');
-      if (!access_token) {
-        let authService = this.injector.get(AuthService);
-        await authService.logoutAccount();
-      }
-      this.userService.token['access_token'] = access_token;
-      await this.localStorage.setLocalData(localKeys.TOKEN, this.userService.token);
-    }
+
+    // these are commented because of old mentor flow changes
+    // if (!isValidToken) {
+    //   let data: any = await this.getAccessToken();
+    //   let access_token = _.get(data, 'access_token');
+    //   if (!access_token) {
+    //       let authService = this.injector.get(AuthService);
+    //     await authService.logoutAccount();
+    //   }
+    //   this.userService.token['access_token'] = access_token;
+    //   await this.localStorage.setLocalData(localKeys.TOKEN, this.userService.token);
+    // }
     let userToken = token;
     return userToken;
   }
