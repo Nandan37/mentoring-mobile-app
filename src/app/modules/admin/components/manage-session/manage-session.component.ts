@@ -161,6 +161,13 @@ export class ManageSessionComponent implements OnInit {
     this.fetchSessionList()
   }
 
+  searchResults(event) {
+    this.searchText= event.searchText;
+    this.page = 1;
+    this.setPaginatorToFirstpage = true
+    this.fetchSessionList()
+  }
+
   async onClickFilter() {
     let modal = await this.modalCtrl.create({
       component: FilterPopupComponent,
@@ -215,4 +222,9 @@ export class ManageSessionComponent implements OnInit {
   segmentChanged(event){
     this.segmentType = event.target.value;
   }
+
+    onClearSearch($event: string) {
+    this.searchText ='';
+    this.fetchSessionList()
+    }
 }
