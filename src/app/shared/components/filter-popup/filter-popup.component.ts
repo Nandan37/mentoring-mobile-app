@@ -17,16 +17,27 @@ export class FilterPopupComponent implements OnInit {
       this.selectedFilters = data;
   }
   closePopup(){
-    this.modalCtrl.dismiss({});
+    this.modalCtrl.dismiss({
+      data: 'closed'
+    });
   }
 
   onClickApply(){
-    if (!this.selectedFilters || Object.keys(this.selectedFilters).length === 0) {
-      this.modalCtrl.dismiss({});
-      return;
-    }
+    const selectedOptionsByCategory = {};
+    this.filterData.forEach(category => {
+      const selectedOptions = category.options.filter(option => option.selected);
+      if (selectedOptions.length > 0) {
+        const optionsWithCategory = selectedOptions.map(option => ({ ...option, categoryName: category.name }));
+        selectedOptionsByCategory[category.name] = selectedOptionsByCategory[category.name] || [];
+        selectedOptionsByCategory[category.name].push(...optionsWithCategory);
+      }
+    });
     const dataToSendBack = {
-      selectedFilters: this.selectedFilters
+      selectedFilters: (
+      this.selectedFilters &&                     
+      typeof this.selectedFilters === 'object' && 
+      Object.keys(this.selectedFilters).length > 0
+    ) ? this.selectedFilters : selectedOptionsByCategory
     };
     this.modalCtrl.dismiss({
       data: dataToSendBack

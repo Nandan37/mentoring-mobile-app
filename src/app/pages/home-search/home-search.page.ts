@@ -40,7 +40,7 @@ export class HomeSearchPage implements OnInit {
   type:any;
   filterData: any;
   filteredDatas = []
-  filterIcon: boolean;
+  filterIcon:boolean;
   page = 1;
   setPaginatorToFirstpage:any = false;
   totalCount: any;
@@ -131,6 +131,14 @@ searchAndCriterias: any;
 
     modal.onDidDismiss().then(async (dataReturned) => {
       this.filteredDatas = []
+        if(dataReturned?.data?.data === 'closed'){
+        return;
+      }
+        if(Object.keys(dataReturned?.data).length === 0){
+            this.chips = [];
+            this.filteredDatas = [];
+            this.urlQueryData = null;
+      }
       if (dataReturned.data && dataReturned.data.data) {
         if (dataReturned.data.data.selectedFilters) {
           for (let key in dataReturned.data.data.selectedFilters) {
@@ -150,8 +158,6 @@ searchAndCriterias: any;
   async fetchSessionList() {
     var obj={page: this.page, limit: this.pageSize, type: this.type, searchText : this.searchText, selectedChip : this.criteriaChip?.name, filterData : this.urlQueryData}
     var response = await this.sessionService.getSessionsList(obj);
-    this.results = response.result.data;
-
     if(response.result.data.length){
       this.filterIcon = true;
     } else {
@@ -159,6 +165,7 @@ searchAndCriterias: any;
         this.filterIcon = false;
       }
     }
+    this.results = response.result.data;
     this.totalCount = response.result.count;
     this.noDataMessage = obj.searchText ? "SEARCH_RESULT_NOT_FOUND" : "THIS_SPACE_LOOKS_EMPTY"
   }
