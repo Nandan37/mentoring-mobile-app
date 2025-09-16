@@ -27,11 +27,13 @@ export class UserService {
       .catch((error) => { });
   }
 
-  validateToken(token){
-    const tokenDecoded: any = jwt_decode(token);
-    const tokenExpiryTime = new Date(tokenDecoded.exp * 1000); 
-    const currentTime = new Date(); 
-    return currentTime < tokenExpiryTime;
+ validateToken(token: string): boolean {
+  try {
+    const decoded: any = jwt_decode(token);
+    const expiry = new Date(decoded.exp * 1000);
+    return new Date() < expiry;
+  } catch (err) {
+    return false;
   }
-  
+}
 }
