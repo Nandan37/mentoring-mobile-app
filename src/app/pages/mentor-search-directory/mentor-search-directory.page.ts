@@ -35,7 +35,7 @@ export class MentorSearchDirectoryPage implements OnInit {
   overlayChips = [];
   filterData: any;
   filteredDatas: any[];
-  filterIcon = true;
+  filterIcon: boolean;
   selectedChips: boolean;
   urlQueryData: string;
   setPaginatorToFirstpage: boolean;
@@ -267,11 +267,13 @@ async ionViewWillEnter() {
       this.isOpen = false;
       this.data = data.result.data;
       this.totalCount = data.result.count;
+      this.filterIcon = true;
     } else {
-       
       this.data = [];
       this.totalCount = [];
-     
+      if (Object.keys(this.filteredDatas || {}).length === 0 && !this.searchAndCriterias.headerData.criterias?.name) {
+        this.filterIcon = false;
+      }
     }
   }
 
