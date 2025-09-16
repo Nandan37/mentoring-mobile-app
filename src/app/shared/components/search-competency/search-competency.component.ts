@@ -54,13 +54,14 @@ export class SearchCompetencyComponent implements OnInit {
   async clearAll(){
     this.selectedOptions = this.selectedOptions.filter(option => option.type === 'other');
     this.searchText = '';
-    this.entities = await this.getEntityList()
     this.page = 1;
+    this.entities = await this.getEntityList();
   }
 
   async clearText(){
     this.searchText = '';
-    this.entities = await this.getEntityList()
+    this.page = 1;
+    this.entities = await this.getEntityList();
   }
 
   closePopover() {
