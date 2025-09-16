@@ -352,7 +352,7 @@
     "REJECTED_MESSAGE_REQ":"You have rejected this message request.",
     "REJECTED_MESSAGE_REQ_INFO_TITLE":"You have rejected this request",
     "REJECTED_MESSAGE_REQ_INFO_SUB_TITLE":"You can no longer send messages to {{name}}",
-    "RECIEVED_MESSAGE_REQ_INFO_TITLE":"{{name}} wants to send you a message",
+    "RECIEVED_MESSAGE_REQ_INFO_TITLE":"{{name}} has sent you a message.",
     "RECIEVED_MESSAGE_REQ_INFO_SUB_TITLE":"If you accept, {{name}} will also be added to your connections.",
     "REQUESTS": "Requests",
     "SLOT_REQUESTS": "Session requests",
