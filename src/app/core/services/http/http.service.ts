@@ -43,6 +43,9 @@ export class HttpService {
 
   async setHeaders() {
     let token = await this.getToken();
+    if(!token) {
+      return null;
+    } 
     const timezone = Intl.DateTimeFormat().resolvedOptions().timeZone;
     const acceptLanguage = await this.localStorage.getLocalData(localKeys.SELECTED_LANGUAGE);
     const headers = {
