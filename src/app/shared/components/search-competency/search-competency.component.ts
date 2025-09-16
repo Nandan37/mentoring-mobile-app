@@ -55,6 +55,7 @@ export class SearchCompetencyComponent implements OnInit {
     this.selectedOptions = this.selectedOptions.filter(option => option.type === 'other');
     this.searchText = '';
     this.entities = await this.getEntityList()
+    this.page = 1;
   }
 
   async clearText(){
