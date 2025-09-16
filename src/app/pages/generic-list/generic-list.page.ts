@@ -285,9 +285,11 @@ export class GenericListPage implements OnInit {
     this.router.navigate([CommonRoutes.HOME]);
   }
 
-  onClearSearch($event: string) {
-    this.searchText ='';
-    this.getData();
-    }
+    async onClearSearch($event: string) {
+    this.searchText = '';
+    this.searchAndCriterias.headerData.searchText = '';
+    this.searchAndCriterias.headerData.criterias = undefined;
+    await  this.getData();
+  }
   
 }
