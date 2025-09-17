@@ -12,6 +12,8 @@ import { PermissionService } from 'src/app/core/services/permission/permission.s
 import { ProfileService } from 'src/app/core/services/profile/profile.service';
 import { FilterPopupComponent } from 'src/app/shared/components/filter-popup/filter-popup.component';
 import { CommonRoutes } from 'src/global.routes';
+import { LocalStorageService } from 'src/app/core/services';
+import { localKeys } from 'src/app/core/constants/localStorage.keys';
 
 @Component({
   selector: 'app-mentor-search-directory',
@@ -57,6 +59,7 @@ export class MentorSearchDirectoryPage implements OnInit {
   };
   valueFromChipAndFilter: string;
   mentorForm: any
+  currentUserId: any;
 
 
   constructor(
@@ -67,7 +70,8 @@ export class MentorSearchDirectoryPage implements OnInit {
     private formService: FormService,
     private utilService: UtilService,
     private toast: ToastService,
-    private route: ActivatedRoute
+    private route: ActivatedRoute,
+    private localStorage: LocalStorageService,
   ) { }
 
   ngOnInit() {
@@ -77,6 +81,8 @@ export class MentorSearchDirectoryPage implements OnInit {
    }
 
 async ionViewWillEnter() {
+  let user = await this.localStorage.getLocalData(localKeys.USER_DETAILS)
+  this.currentUserId= user.id
   const result = await this.formService.getForm(MENTOR_DIR_CARD_FORM);
   this.mentorForm = _.get(result, 'data.fields.controls');
   const queryParams = this.route.snapshot.queryParams;
@@ -259,6 +265,13 @@ async ionViewWillEnter() {
       this.isOpen = false;
       this.data = data.result.data;
       this.totalCount = data.result.count;
+      this.data.forEach(mentor => {
+      if (mentor.id === this.currentUserId) {
+        mentor.buttonConfig = this.buttonConfig.map(btn => ({ ...btn, isHide: true }));
+      } else {
+        mentor.buttonConfig = this.buttonConfig.map(btn => ({ ...btn }));
+      }
+    });
     } else {
        
       this.data = [];

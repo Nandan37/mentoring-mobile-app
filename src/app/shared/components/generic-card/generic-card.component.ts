@@ -18,7 +18,6 @@ export class GenericCardComponent implements OnInit {
   @Input() cardConfig: any;
   @Input() disableButton: boolean;
   @Input() showTag: any;
-  @Input() currentUserId: any;
 
   constructor(private router: Router, private localStorage: LocalStorageService) {}
 
@@ -41,9 +40,6 @@ export class GenericCardComponent implements OnInit {
     this.onClickEvent.emit(value);
   }
   showButton(event, data) {
-    if (data?.id && String(data.id) === String(this.currentUserId)) {
-    return false;
-      }
     if (event.action === 'chat' && this.chatConfig != 'true') {
       return false;
       }

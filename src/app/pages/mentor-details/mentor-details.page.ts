@@ -14,7 +14,6 @@ import {
 import { Clipboard } from '@capacitor/clipboard';
 import { SessionService } from 'src/app/core/services/session/session.service';
 import { CommonRoutes } from 'src/global.routes';
-import { ProfileService } from 'src/app/core/services/profile/profile.service';
 
 @Component({
   selector: 'app-mentor-details',
@@ -102,7 +101,6 @@ export class MentorDetailsPage implements OnInit {
     private localStorage: LocalStorageService,
     private toast: ToastService,
     private utilService: UtilService,
-    private profileService: ProfileService
   ) {
     
   }
@@ -114,8 +112,8 @@ export class MentorDetailsPage implements OnInit {
       this.mentorId = this.buttonConfig.meta.id = params.id;
       this.getMentor();
     })
-    let user = await this.profileService.getProfileDetailsFromAPI();
-    this.currentUserId = user?.id;   
+    let user = await this.localStorage.getLocalData(localKeys.USER_DETAILS)
+    this.currentUserId= user.id
     this.updateButtonConfig();
   }
 
