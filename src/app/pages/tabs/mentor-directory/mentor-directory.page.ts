@@ -118,16 +118,19 @@ export class MentorDirectoryPage implements OnInit {
       }
       this.infinitescroll.disabled = this.mentorsCount == 0 ? true : false;
       this.mentorsCount = data.result.count;
+      
+  for (const group of this.mentors) {
+  group.values.forEach(mentor => {
+    mentor.buttonConfig = this.buttonConfig.map(btn => ({ ...btn }));
 
-    this.mentors.forEach(group => {
-    group.values.forEach(mentor => {
-      if (mentor.id === this.currentUserId) {
-        mentor.buttonConfig = this.buttonConfig.map(btn => ({ ...btn, isHide: true }));
-      } else {
-        mentor.buttonConfig = this.buttonConfig.map(btn => ({ ...btn }));
-      }
-    });
+    if (mentor.id === this.currentUserId) {
+      mentor.buttonConfig = this.buttonConfig.map(btn => ({
+        ...btn,
+        isHide: true  
+      }));
+    }
   });
+}
 
     } catch (error) {
       this.isLoaded = true;

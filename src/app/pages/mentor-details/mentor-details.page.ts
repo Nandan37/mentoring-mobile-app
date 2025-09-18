@@ -37,10 +37,12 @@ export class MentorDetailsPage implements OnInit {
     {
       label: 'CHAT',
       action: 'chat',
+      isHide: false
     },
           {
             label: 'REQUEST_SESSION',
             action: 'requestSession',
+             isHide: false
           },
   ],
   };
@@ -223,20 +225,25 @@ async getMentorDetails() {
           {
             label: 'CHAT',
             action: 'chat',
+             isHide: false
           },
         ]
       : [
           {
             label: 'CHAT',
             action: 'chat',
+             isHide: false
           },
           {
             label: 'REQUEST_SESSION',
             action: 'requestSession',
+             isHide: false
           },
         ];
         if (String(this.mentorProfileData?.result?.id) === String(this.currentUserId)) {
-            this.buttonConfig.buttons = [];
+            this.buttonConfig.buttons = this.buttonConfig.buttons.map(btn => ({
+                   ...btn,isHide: true
+            }));
            }
   }
 }
