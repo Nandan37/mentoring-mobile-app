@@ -286,6 +286,7 @@ export class GenericListPage implements OnInit {
   }
 
     async onClearSearch($event: string) {
+    this.page = 1;
     this.searchText = '';
     this.searchAndCriterias.headerData.searchText = '';
     this.searchAndCriterias.headerData.criterias = undefined;

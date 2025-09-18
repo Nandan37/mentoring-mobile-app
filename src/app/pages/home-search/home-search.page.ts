@@ -117,6 +117,7 @@ searchAndCriterias: any;
   }
 
   async onClearSearch($event: string) {
+    this.page = 1;
     this.searchAndCriterias.headerData.searchText = '';
     this.searchText = '';
     this.searchAndCriterias.headerData.criterias = undefined;
