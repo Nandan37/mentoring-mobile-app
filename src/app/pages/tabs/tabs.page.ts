@@ -34,28 +34,19 @@ export class TabsPage {
     this.propagateToActiveTab('ionViewDidLeave');
   }
 
-  ngOnInit(): void {
-    console.log('NgOnInit triggered')
-    this.localStorage.getLocalData(localKeys.USER_DETAILS).then((userDetails)=>{
-      if(userDetails) {
-        this.user = userDetails;
-        console.log('user details in ngonit tab', userDetails)
-        this.profile.getUserRole(userDetails)
-      }
-    })
+async ionViewWillEnter() {
+  const userDetails = await this.localStorage.getLocalData(localKeys.USER_DETAILS);
+  if (userDetails) {
+    this.user = userDetails;
+    this.profile.getUserRole(userDetails);
+  } else {
+    const profileDetails = await this.profile.getProfileDetailsFromAPI();
+    this.user = profileDetails;
+    this.profile.getUserRole(profileDetails);
   }
+  this.propagateToActiveTab('ionViewWillEnter');
+}
 
-  ionViewWillEnter() {
-    console.log('ion View Will Enter')
-    this.localStorage.getLocalData(localKeys.USER_DETAILS).then((userDetails)=>{
-      if(userDetails) {
-        this.user = userDetails;
-        console.log('user details in ionViewWillEnter', userDetails)
-        this.profile.getUserRole(userDetails)
-      }
-    })
-    this.propagateToActiveTab('ionViewWillEnter');
-  }
 
   ionViewDidEnter() {
     this.propagateToActiveTab('ionViewDidEnter');

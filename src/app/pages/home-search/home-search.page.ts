@@ -116,11 +116,13 @@ searchAndCriterias: any;
     this.criteriaChip = event;
   }
 
-  onClearSearch($event: string) {
+  async onClearSearch($event: string) {
+    this.page = 1;
+    this.searchAndCriterias.headerData.searchText = '';
     this.searchText = '';
-    this.isOpen = false;
-    this.fetchSessionList();
-    }
+    this.searchAndCriterias.headerData.criterias = undefined;
+    await this.fetchSessionList();
+  }
 
   async onClickFilter() {
     let modal = await this.modalCtrl.create({
