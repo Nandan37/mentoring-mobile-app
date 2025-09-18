@@ -44,6 +44,7 @@ async ionViewWillEnter() {
     this.user = profileDetails;
     this.profile.getUserRole(profileDetails);
   }
+  this.propagateToActiveTab('ionViewWillEnter');
 }
 
 
