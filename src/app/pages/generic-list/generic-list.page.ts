@@ -56,7 +56,7 @@ export class GenericListPage implements OnInit {
   buttonConfig: any;
   noResult: any;
   isMentor: boolean;
-  filterIcon: boolean = false;
+  filterIcon: boolean;
   filterChipsSelected: boolean = false;
   selectedCriteria: any;
   mentorForm: any
@@ -136,8 +136,6 @@ export class GenericListPage implements OnInit {
         this.filterIcon = false;
       } 
     }
-      
-    
   }
 
   async onClickFilter() {
@@ -149,6 +147,14 @@ export class GenericListPage implements OnInit {
 
     modal.onDidDismiss().then(async (dataReturned) => {
       this.filteredDatas = [];
+        if(dataReturned?.data?.data === 'closed'){
+        return;
+      }
+       if(Object.keys(dataReturned?.data).length === 0){
+            this.chips = [];
+            this.filteredDatas = [];
+            this.urlQueryData = ''; 
+      }
       if (dataReturned.data && dataReturned.data.data) {
         if (dataReturned.data.data.selectedFilters) {
           for (let key in dataReturned.data.data.selectedFilters) {
@@ -169,11 +175,10 @@ export class GenericListPage implements OnInit {
         }
         this.extractLabels(dataReturned.data.data.selectedFilters);
         this.getUrlQueryData();
+      }
         this.page = 1;
         this.setPaginatorToFirstpage = true;
         this.getData();
-        this.filterIcon = true;
-      }
     });
     modal.present();
   }
@@ -210,18 +215,34 @@ export class GenericListPage implements OnInit {
     this.getData();
   }
 
-  removeFilteredData(chip: string) {
-    Object.keys(this.filteredDatas).forEach((key) => {
-      let values = this.filteredDatas[key].split(',');
-      let chipIndex = values.indexOf(chip);
+    removeFilteredData(chip){
+      this.filterData.map((filter) => {
+        filter.options.map((option) => {
+          if (option.value === chip) {
+            option.selected = false;
+          }
+        });
+        return filter;
+      })
+    for (let key in this.filteredDatas) {
+      if (this.filteredDatas.hasOwnProperty(key)) {
 
-      if (chipIndex > -1) {
-        values.splice(chipIndex, 1);
-        this.filteredDatas[key] = values.length
-          ? values.join(',')
-          : delete this.filteredDatas[key];
+          let values = this.filteredDatas[key].split(',');
+          let chipIndex = values.indexOf(chip);
+
+          if (chipIndex > -1) {
+              values.splice(chipIndex, 1);
+
+              let newValue = values.join(',');
+
+              if (newValue === '') {
+                delete this.filteredDatas[key];
+            } else {
+                this.filteredDatas[key] = newValue;
+            }
+          }
       }
-    });
+    }
   }
 
   onPageChange(event) {
@@ -264,9 +285,12 @@ export class GenericListPage implements OnInit {
     this.router.navigate([CommonRoutes.HOME]);
   }
 
-  onClearSearch($event: string) {
-    this.searchText ='';
-    this.getData();
-    }
+    async onClearSearch($event: string) {
+    this.page = 1;
+    this.searchText = '';
+    this.searchAndCriterias.headerData.searchText = '';
+    this.searchAndCriterias.headerData.criterias = undefined;
+    await  this.getData();
+  }
   
 }

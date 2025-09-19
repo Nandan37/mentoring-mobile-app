@@ -34,15 +34,19 @@ export class TabsPage {
     this.propagateToActiveTab('ionViewDidLeave');
   }
 
-  ionViewWillEnter() {
-    this.localStorage.getLocalData(localKeys.USER_DETAILS).then((userDetails)=>{
-      if(userDetails) {
-        this.user = userDetails;
-        this.profile.getUserRole(userDetails)
-       }
-    })
-    this.propagateToActiveTab('ionViewWillEnter');
+async ionViewWillEnter() {
+  const userDetails = await this.localStorage.getLocalData(localKeys.USER_DETAILS);
+  if (userDetails) {
+    this.user = userDetails;
+    this.profile.getUserRole(userDetails);
+  } else {
+    const profileDetails = await this.profile.getProfileDetailsFromAPI();
+    this.user = profileDetails;
+    this.profile.getUserRole(profileDetails);
   }
+  this.propagateToActiveTab('ionViewWillEnter');
+}
+
 
   ionViewDidEnter() {
     this.propagateToActiveTab('ionViewDidEnter');

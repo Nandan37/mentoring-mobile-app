@@ -43,6 +43,11 @@ export class HttpService {
 
   async setHeaders() {
     let token = await this.getToken();
+    if(!token) {
+      localStorage.clear();
+      location.href = window.location.origin;
+      return null;
+    } 
     const timezone = Intl.DateTimeFormat().resolvedOptions().timeZone;
     const acceptLanguage = await this.localStorage.getLocalData(localKeys.SELECTED_LANGUAGE);
     const headers = {
@@ -67,6 +72,7 @@ export class HttpService {
 }
 
     let defaultHeaders = await this.setHeaders();
+    if(!defaultHeaders) return;
     const headers = requestParam.headers ?  { ...requestParam.headers, ...defaultHeaders } : defaultHeaders;
     let body = requestParam.payload ? requestParam.payload : {};
     if (body?.time_zone) {
@@ -93,6 +99,7 @@ export class HttpService {
   throw Error(null);
 }
     const headers = requestParam.headers ? requestParam.headers : await this.setHeaders();
+    if(!headers) return;
     const options = {
       url: this.baseUrl + requestParam.url,
       headers: headers,
@@ -119,6 +126,7 @@ export class HttpService {
   throw Error(null);
 }
     const headers = requestParam.headers ? requestParam.headers : await this.setHeaders();
+    if(!headers) return;
     const options = {
       url: this.baseUrl + requestParam.url,
       headers: headers,
@@ -141,6 +149,7 @@ export class HttpService {
 }
     let body = requestParam.payload ? requestParam.payload : {};
     const headers = requestParam.headers ? requestParam.headers : await this.setHeaders();
+    if(!headers) return;
     const options = {
       url: this.baseUrl + requestParam.url,
       headers: headers,
@@ -171,20 +180,23 @@ export class HttpService {
 
 async getToken() {
     let token = localStorage.getItem('accToken');
-    if (!token) {
+    let isValidToken = this.userService.validateToken(token);
+    //need to verify token validity
+    if (!token || token && !isValidToken) {
       return null;
     }
-    let isValidToken = this.userService.validateToken(token);
-    if (!isValidToken) {
-      let data: any = await this.getAccessToken();
-      let access_token = _.get(data, 'access_token');
-      if (!access_token) {
-        let authService = this.injector.get(AuthService);
-        await authService.logoutAccount();
-      }
-      this.userService.token['access_token'] = access_token;
-      await this.localStorage.setLocalData(localKeys.TOKEN, this.userService.token);
-    }
+
+    // these are commented because of old mentor flow changes
+    // if (!isValidToken) {
+    //   let data: any = await this.getAccessToken();
+    //   let access_token = _.get(data, 'access_token');
+    //   if (!access_token) {
+    //       let authService = this.injector.get(AuthService);
+    //     await authService.logoutAccount();
+    //   }
+    //   this.userService.token['access_token'] = access_token;
+    //   await this.localStorage.setLocalData(localKeys.TOKEN, this.userService.token);
+    // }
     let userToken = token;
     return userToken;
   }
@@ -304,6 +316,7 @@ async getToken() {
  async getFile(requestParam: RequestParams){
     
     const headers = requestParam.headers ? requestParam.headers : await this.setHeaders();
+    if(!headers) return;
     const options = {
       url: this.baseUrl + requestParam.url,
       headers: headers,

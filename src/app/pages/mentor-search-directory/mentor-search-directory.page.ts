@@ -160,8 +160,16 @@ async ionViewWillEnter() {
       componentProps: { filterData: this.filterData }
     });
 
-    modal.onDidDismiss().then(async (dataReturned) => {
-      this.filteredDatas = []
+    modal.onDidDismiss().then(async (dataReturned) => { 
+      this.filteredDatas = [];
+      if(dataReturned?.data?.data === 'closed'){
+        return;
+      }
+      if(Object.keys(dataReturned?.data).length === 0){
+            this.chips = [];
+            this.filteredDatas = [];
+            this.urlQueryData = null;
+      }
       if (dataReturned.data && dataReturned.data.data) {
         if (dataReturned.data.data.selectedFilters) {
           for (let key in dataReturned.data.data.selectedFilters) {
@@ -171,7 +179,7 @@ async ionViewWillEnter() {
         }
         this.extractLabels(dataReturned.data.data.selectedFilters);
         this.getUrlQueryData();
-      }
+      } 
       this.page = 1;
       this.setPaginatorToFirstpage = true;
       this.getMentors()
@@ -272,16 +280,14 @@ async ionViewWillEnter() {
         mentor.buttonConfig = this.buttonConfig.map(btn => ({ ...btn }));
       }
     });
+      this.filterIcon = true;
     } else {
-       
       this.data = [];
       this.totalCount = [];
-     
       if (Object.keys(this.filteredDatas || {}).length === 0 && !this.searchAndCriterias.headerData.criterias?.name) {
         this.filterIcon = false;
       }
     }
-    this.filterIcon = !!obj.searchText?.trim();
   }
 
   removeChip(event) {
@@ -300,7 +306,6 @@ async ionViewWillEnter() {
         }
       }
     };
-    this.filterIcon = false;
     this.chips = [];
     this.urlQueryData = null;
   }

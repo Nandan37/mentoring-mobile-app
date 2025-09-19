@@ -14,6 +14,7 @@ import {
 import { Clipboard } from '@capacitor/clipboard';
 import { SessionService } from 'src/app/core/services/session/session.service';
 import { CommonRoutes } from 'src/global.routes';
+import { Location } from '@angular/common';
 
 @Component({
   selector: 'app-mentor-details',
@@ -102,10 +103,9 @@ export class MentorDetailsPage implements OnInit {
     private userService: UserService,
     private localStorage: LocalStorageService,
     private toast: ToastService,
-    private utilService: UtilService,
-  ) {
-    
-  }
+    private utilService: UtilService, 
+    private location: Location,
+  ) {}
 
   ngOnInit() {}
   async ionViewWillEnter() {
@@ -142,11 +142,21 @@ async getMentorDetails() {
     }
     return data;
   } catch (error: any) {
-    if (error?.status === 404) {
+    switch (error?.status) {
+     
+    case 404:
       this.userNotFound = true;
-    } else {
+      break;
+
+    case 403:
       this.userCantAccess = true;
-    }
+      break;
+
+    default:
+      this.toast.showToast('SOMETHING_WENT_WRONG', 'danger');
+      this.location.back();
+      break;
+  }
   }
 }
 
