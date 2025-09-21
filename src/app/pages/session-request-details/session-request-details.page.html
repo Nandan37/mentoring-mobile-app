@@ -35,21 +35,21 @@
       ? (apiResponse?.user_details?.name | titlecase) 
       : ("YOU_HAVE" | translate)
       }}
-      is requesting a slot at<strong style="padding-left: 5px;">
+      {{"REQUESTING_SLOT" | translate}}<strong style="padding-left: 5px;">
         {{
           formatUnixTime(apiResponse.start_date)
         }} -
         {{
           formatUnixTime(apiResponse.end_date)
         }} 
-        on
+        {{"ON" | translate}}
          {{ apiResponse.start_date * 1000 | date : "EEEE (dd MMM yyyy)" }}
       </strong>
     </p>
 
     <p *ngIf="apiResponse.status === 'ACCEPTED'" class="request-info text-left">
       
-      Slot booked with {{
+       {{"SLOT_BOOKED" | translate}} {{
         apiResponse?.created_by == apiResponse?.user_details?.user_id 
       ? (apiResponse?.user_details?.name | titlecase) 
       : ("YOU_HAVE" | translate)
@@ -61,7 +61,7 @@
         {{
           formatUnixTime(apiResponse.end_date)
         }} 
-        on
+         {{"ON" | translate}}
          {{ apiResponse.start_date * 1000 | date : "EEEE (dd MMM yyyy)" }}
       </strong>
     </p>
