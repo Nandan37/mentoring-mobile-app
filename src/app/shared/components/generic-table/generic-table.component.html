@@ -11,7 +11,7 @@
   <table mat-table [dataSource]="dataSource" class="mat-elevation-z8">
     <ng-container *ngFor="let column of columnData" [matColumnDef]="column.name">
       <ng-container>
-        <th mat-header-cell *matHeaderCellDef>
+        <th mat-header-cell *matHeaderCellDef style="background-color: #f2f2f2;">
           <div class="column-header"
             [ngClass]="(column.name == 'title' || column.name == 'name') ? 'column-name':'column-header'">
             {{ column.displayName }} <div class="sorting-icon" *ngIf="column.sortingData">
