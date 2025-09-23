@@ -33,11 +33,13 @@ export const CHAT_MESSAGES = {
             label: 'CHAT',
             action: 'chat',
             color: 'light',
+            isHide: false
         },
         {
             label: 'REQUEST_SESSION',
             action: 'requestSession',
             color: 'primary',
+            isHide: false
         },
     ],
     GENERIC_CARD_MY_CONNECTION_BTN_CONFIG: [
