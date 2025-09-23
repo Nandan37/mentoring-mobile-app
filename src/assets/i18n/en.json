@@ -386,7 +386,7 @@
     "BOOK_AGAIN": "Book again",
     "ROLE": "Role",
     "SCHEDULE": "Your schedule",
-    "SLOT_REJECT": "You have rejected the slot request",
+    "SLOT_REJECT": "You have rejected this slot request",
     "START_BTN_ENABLE": "Start button will get enabled 10 min before schedule time",
     "SLOT_AVAILABLE": "You have a slot available at this time",
     "AGENDA": "Agenda",

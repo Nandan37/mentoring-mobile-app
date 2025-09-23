@@ -44,8 +44,6 @@ export class HttpService {
   async setHeaders() {
     let token = await this.getToken();
     if(!token) {
-      localStorage.clear();
-      location.href = window.location.origin;
       return null;
     } 
     const timezone = Intl.DateTimeFormat().resolvedOptions().timeZone;
@@ -72,7 +70,6 @@ export class HttpService {
 }
 
     let defaultHeaders = await this.setHeaders();
-    if(!defaultHeaders) return;
     const headers = requestParam.headers ?  { ...requestParam.headers, ...defaultHeaders } : defaultHeaders;
     let body = requestParam.payload ? requestParam.payload : {};
     if (body?.time_zone) {
@@ -99,7 +96,6 @@ export class HttpService {
   throw Error(null);
 }
     const headers = requestParam.headers ? requestParam.headers : await this.setHeaders();
-    if(!headers) return;
     const options = {
       url: this.baseUrl + requestParam.url,
       headers: headers,
@@ -126,7 +122,6 @@ export class HttpService {
   throw Error(null);
 }
     const headers = requestParam.headers ? requestParam.headers : await this.setHeaders();
-    if(!headers) return;
     const options = {
       url: this.baseUrl + requestParam.url,
       headers: headers,
@@ -149,7 +144,6 @@ export class HttpService {
 }
     let body = requestParam.payload ? requestParam.payload : {};
     const headers = requestParam.headers ? requestParam.headers : await this.setHeaders();
-    if(!headers) return;
     const options = {
       url: this.baseUrl + requestParam.url,
       headers: headers,
@@ -179,10 +173,9 @@ export class HttpService {
 
 
 async getToken() {
-    let token = localStorage.getItem('accToken');
-    let isValidToken = this.userService.validateToken(token);
+    const token = await this.userService.getUserValue();
     //need to verify token validity
-    if (!token || token && !isValidToken) {
+    if (!token) {
       return null;
     }
 
@@ -197,8 +190,7 @@ async getToken() {
     //   this.userService.token['access_token'] = access_token;
     //   await this.localStorage.setLocalData(localKeys.TOKEN, this.userService.token);
     // }
-    let userToken = token;
-    return userToken;
+    return token;
   }
 
   async getAccessToken() {
@@ -316,7 +308,6 @@ async getToken() {
  async getFile(requestParam: RequestParams){
     
     const headers = requestParam.headers ? requestParam.headers : await this.setHeaders();
-    if(!headers) return;
     const options = {
       url: this.baseUrl + requestParam.url,
       headers: headers,
