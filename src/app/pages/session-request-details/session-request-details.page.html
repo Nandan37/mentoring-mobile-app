@@ -29,13 +29,13 @@
       {{ showFullText ? 'View Less' : 'View More' }}
     </ion-label>    
 
-    <p *ngIf="!isAccepted && apiResponse.status === 'REQUESTED'" class="request-info text-left">
+    <p *ngIf="apiResponse.status !== 'ACCEPTED'" class="request-info text-left">
       {{
         apiResponse?.created_by == apiResponse?.user_details?.user_id 
-      ? (apiResponse?.user_details?.name | titlecase) 
+      ? (apiResponse?.user_details?.name | titlecase)  + ' ' + ("IS_REQUESTING" | translate)
       : ("YOU_HAVE" | translate)
       }}
-      {{"REQUESTING_SLOT" | translate}}<strong style="padding-left: 5px;">
+      {{"A_SLOT" | translate}}<strong style="padding-left: 5px;">
         {{
           formatUnixTime(apiResponse.start_date)
         }} -

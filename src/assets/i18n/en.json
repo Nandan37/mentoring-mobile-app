@@ -411,8 +411,10 @@
     "DISTRICT":"District",
     "BLOCK":"Block",
     "SCHOOL":"School",
-    "YOU_HAVE" :"You have",
+    "YOU_HAVE" :"You have requested",
     "REQUESTING_SLOT": "is requesting a slot at",
+    "A_SLOT": "a slot at",
+    "IS_REQUESTING": "is requesting",
     "ON": "on",
     "SLOT_BOOKED": " Slot booked with"
 
