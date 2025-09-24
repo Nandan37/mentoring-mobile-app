@@ -111,6 +111,7 @@ export class HomePage implements OnInit {
   }
 
   async ionViewWillEnter() {
+    this.getSessions();
     await this.getUser();
     this.gotToTop();
     let isRoleRequested = await this.localStorage.getLocalData(localKeys.IS_ROLE_REQUESTED)
