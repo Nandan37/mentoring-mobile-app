@@ -15,7 +15,7 @@ import { Capacitor } from '@capacitor/core';
 import { PermissionService } from 'src/app/core/services/permission/permission.service';
 import { environment } from 'src/environments/environment';
 import { FormBuilder, FormGroup } from '@angular/forms';
-import { MANAGERS_CREATE_SESSION_FORM } from 'src/app/core/constants/formConstant';
+import { CdkConnectedOverlay } from '@angular/cdk/overlay';
 
 @Component({
   selector: 'app-home',
@@ -35,6 +35,7 @@ export class HomePage implements OnInit {
   status = "PUBLISHED,LIVE";
   showBecomeMentorCard = false;
   @ViewChild(IonContent) content: IonContent;
+  @ViewChild(CdkConnectedOverlay) connectedOverlay: CdkConnectedOverlay;
   sessionForm: FormGroup;
 
   public headerConfig: any = {
@@ -237,6 +238,10 @@ export class HomePage implements OnInit {
   }
 
   ionViewDidLeave(){
+    this.isOpen = false;
+    if (this.connectedOverlay && this.connectedOverlay.overlayRef) {
+    this.connectedOverlay.overlayRef.detach();
+    }
     this.criteriaChip = '';
     this.searchText = '';
   }
