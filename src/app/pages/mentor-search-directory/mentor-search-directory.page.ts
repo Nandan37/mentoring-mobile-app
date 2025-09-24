@@ -162,7 +162,8 @@ async ionViewWillEnter() {
 
     modal.onDidDismiss().then(async (dataReturned) => { 
       this.filteredDatas = [];
-      if(dataReturned?.data?.data === 'closed'){
+      if(dataReturned?.data?.role === 'closed'){
+        this.filterData = dataReturned?.data?.data;
         return;
       }
       if(Object.keys(dataReturned?.data).length === 0){
