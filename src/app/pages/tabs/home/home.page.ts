@@ -237,11 +237,14 @@ export class HomePage implements OnInit {
     }
   }
 
-  ionViewDidLeave(){
+  ionViewWillLeave(){
     this.isOpen = false;
     if (this.connectedOverlay && this.connectedOverlay.overlayRef) {
     this.connectedOverlay.overlayRef.detach();
     }
+  }
+
+  ionViewDidLeave(){
     this.criteriaChip = '';
     this.searchText = '';
   }
