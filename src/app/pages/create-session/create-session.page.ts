@@ -705,8 +705,16 @@ async updateFormConfig() {
   }
 }
 
+async modalDismiss(){
+  const topModal = await this.modalCtrl.getTop();
+  if(topModal){
+    this.modalCtrl.dismiss();
+  }
+}
+
 ionViewWillLeave() {
   this.formData = null;
   this.sessionType = '';
+  this.modalDismiss();
 }
 }
