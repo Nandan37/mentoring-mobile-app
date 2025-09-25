@@ -708,5 +708,6 @@ async updateFormConfig() {
 ionViewWillLeave() {
   this.formData = null;
   this.sessionType = '';
+  this.modalCtrl.dismiss();
 }
 }
