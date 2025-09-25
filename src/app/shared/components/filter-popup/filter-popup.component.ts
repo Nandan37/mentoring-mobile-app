@@ -1,4 +1,4 @@
-import { Component, Input, OnInit } from '@angular/core';
+import { Component, Input, OnInit} from '@angular/core';
 import { ModalController } from '@ionic/angular';
 
 @Component({
@@ -8,21 +8,30 @@ import { ModalController } from '@ionic/angular';
 })
 export class FilterPopupComponent implements OnInit {
   @Input() filterData: any;
-  selectedFilters:any;
+  selectedFilters: any;
+  initialFilterData: any;
+
+
   constructor(private modalCtrl: ModalController) { }
 
-  ngOnInit() {}
-  
-  filtersChanged(data:any){
-      this.selectedFilters = data;
+  ngOnInit() {
+    if (this.filterData) {
+      this.initialFilterData = JSON.parse(JSON.stringify(this.filterData));
+    }
   }
-  closePopup(){
+  
+  filtersChanged(data: any) {
+    this.selectedFilters = data;
+  }
+
+  closePopup() {
     this.modalCtrl.dismiss({
-      data: 'closed'
+      role: 'closed',
+      data: this.initialFilterData
     });
   }
 
-  onClickApply(){
+  onClickApply() {
     const selectedOptionsByCategory = {};
     this.filterData.forEach(category => {
       const selectedOptions = category.options.filter(option => option.selected);
@@ -34,13 +43,17 @@ export class FilterPopupComponent implements OnInit {
     });
     const dataToSendBack = {
       selectedFilters: (
-      this.selectedFilters &&                     
-      typeof this.selectedFilters === 'object' && 
-      Object.keys(this.selectedFilters).length > 0
-    ) ? this.selectedFilters : selectedOptionsByCategory
+        this.selectedFilters &&                     
+        typeof this.selectedFilters === 'object' && 
+        Object.keys(this.selectedFilters).length > 0
+      ) ? this.selectedFilters : selectedOptionsByCategory
     };
     this.modalCtrl.dismiss({
       data: dataToSendBack
     });
+  }
+
+  ionViewWillLeave() {
+    this.selectedFilters = null;
   }
 }
