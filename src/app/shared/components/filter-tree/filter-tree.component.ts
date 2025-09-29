@@ -53,13 +53,6 @@ export class FilterTreeComponent implements OnInit {
     this.filtersChanged.emit(selectedOptionsByCategory);
   }
   isCheckboxDisabled(filter: any, sessionType: string): boolean {
-    if (filter.name === 'type' && filter.isEnabled) {
-      if (sessionType === 'PUBLIC') {
-        return true; 
-      } else {
-        return !filter.isConnectionEnabled;
-      }
-    }
     return false;
   }
 }

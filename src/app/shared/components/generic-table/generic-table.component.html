@@ -15,7 +15,7 @@
           <div class="column-header"
             [ngClass]="(column.name == 'title' || column.name == 'name') ? 'column-name':'column-header'">
             {{ column.displayName }} <div class="sorting-icon" *ngIf="column.sortingData">
-              <img class="img" [id]="column.displayName" src="../../../../assets/images/swap-vertical.svg" />
+              <img class="img" [id]="column.displayName" src="assets/images/swap-vertical.svg" />
               <ion-popover [trigger]="column.displayName" triggerAction="click">
                 <ng-template class="popover-container">
                   <ion-content class="ion-padding popover-container">
