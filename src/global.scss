@@ -365,9 +365,18 @@ ion-searchbar {
   .searchbar-input-container {
     input {
       font-size: 16px !important;
-      padding: 5px 14px 5px 45px !important;
+      padding: 5px 40px 5px 45px !important;
     }
   }
+}
+
+ion-searchbar.custom {
+    --border-radius:25px;
+    --icon-color:var(--ion-color-primary);
+    font-size:16px;
+    height: 36px;
+    max-width: 600px;
+    display: inline-block;
 }
 
 ::-webkit-scrollbar {
