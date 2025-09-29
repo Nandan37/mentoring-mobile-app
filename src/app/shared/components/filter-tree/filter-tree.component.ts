@@ -18,7 +18,7 @@ export class FilterTreeComponent implements OnInit {
   constructor() { }
 
   ngOnInit() {
-    if (this.eventData?.control?.validators?.required) {
+    if (this.eventData?.sessionType) {
       this.filterData?.forEach(filter => { 
         if (filter.name === "type" ) {
           filter.options.forEach(option => {
