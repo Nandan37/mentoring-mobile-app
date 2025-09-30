@@ -188,9 +188,7 @@ export class SearchPopoverComponent implements OnInit {
             let addedData = data.element
             this.selectedList.push(addedData)
           } else {
-            this.translate.get('SESSION_MENTEE_LIMIT_SUB_TEXT', { count: this.maxCount }).subscribe(subText => {
-            this.toast.showToast('SESSION_MENTEE_LIMIT', 'danger', 5000, [], subText);
-            });
+              this.toast.showToast('SESSION_MENTEE_LIMIT', 'danger');
           }
         }
         break;
