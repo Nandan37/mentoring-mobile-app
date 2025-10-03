@@ -377,6 +377,7 @@
   "NO_UPCOMING_SESSIONS_PLANNED": "कोई सत्र योजना नहीं है।",
   "MESSAGE_SEARCH_PLACEHOLDER": "नाम से खोजें",
   "SEARCH_RESULT_MESSGAGE_NOT_FOUND": "कोई संदेश नहीं मिला.",
-  "ROLES": "भूमिकाएँ"
+  "ROLES": "भूमिकाएँ",
+  "SCROLL_TO_EXPLORE_CHART":"सत्रवार डेटा देखने के लिए स्क्रॉल करें।"
 
 }

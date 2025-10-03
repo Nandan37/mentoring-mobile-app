@@ -421,5 +421,5 @@
     "SEARCH_CONNECTIONS": "Search connections",
     "MESSAGE_SEARCH_PLACEHOLDER": "Search by name",
     "SEARCH_RESULT_MESSGAGE_NOT_FOUND": "No messages found.",
-    "SCROLL_TO_EXPLORE_MONTHLY":"Scroll to explore monthly sessions by date"
+    "SCROLL_TO_EXPLORE_CHART":"Scroll to view session-wise data."
 }
