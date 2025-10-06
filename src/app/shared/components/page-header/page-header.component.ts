@@ -6,6 +6,8 @@ import { PAGE_IDS } from 'src/app/core/constants/page.ids';
 import { UtilService } from 'src/app/core/services';
 import { environment } from 'src/environments/environment';
 import { CommonRoutes } from 'src/global.routes';
+import { PopoverController } from '@ionic/angular';
+import { PopoverMenuComponent } from 'src/app/popover-menu/popover-menu.component';
 @Component({
   selector: 'app-page-header',
   templateUrl: './page-header.component.html',
@@ -18,7 +20,8 @@ export class PageHeaderComponent implements OnInit {
 
   constructor(private location:NavController,
     private router : Router,
-    private utilService: UtilService
+    private utilService: UtilService,
+    private popoverCtrl: PopoverController
   ) {}
 
   routes =[
@@ -49,6 +52,39 @@ export class PageHeaderComponent implements OnInit {
       window.location.href = `${baseUrl}/home`;
     } else {
       this.location.pop();
+    }
+  }
+  async openPopover(ev: Event) {
+    const popover = await this.popoverCtrl.create({
+      component: PopoverMenuComponent,
+      event: ev,
+      translucent: true,
+       componentProps: {
+        actions: this.config?.actions || []
+      },
+    });
+
+    await popover.present();
+
+    const { data } = await popover.onDidDismiss();
+    if (data) {
+      console.log('Selected action:', data);
+      this.handleAction(data);
+    }
+  }
+
+  handleAction(event: string) {
+    switch(event) {
+
+      case "block":
+        this.actionEvent.next(event);
+        console.log("block selected")
+        break;
+
+      case "share":
+        this.actionEvent.next(event);
+        console.log("share selected")
+        break;
     }
   }
 }

@@ -14,6 +14,7 @@ import {
 import { Clipboard } from '@capacitor/clipboard';
 import { SessionService } from 'src/app/core/services/session/session.service';
 import { CommonRoutes } from 'src/global.routes';
+import { TitleCasePipe } from '@angular/common';
 
 @Component({
   selector: 'app-mentor-details',
@@ -21,11 +22,16 @@ import { CommonRoutes } from 'src/global.routes';
   styleUrls: ['./mentor-details.page.scss'],
 })
 export class MentorDetailsPage implements OnInit {
+  mentorName;
   mentorId;
+  isdisabled:boolean=true;
+  connected;
   public isMobile: any;
   public headerConfig: any = {
     backButton: false,
-    headerColor: "primary"
+    headerColor: "primary",
+    popOver: true,
+    actions : []
   };
 
   public buttonConfig = {
@@ -90,6 +96,7 @@ export class MentorDetailsPage implements OnInit {
   mentorProfileData: any;
   userNotFound: boolean = false;
   userCanAccess: boolean;
+  showDetails: boolean = true;
   SKELETON = SKELETON;
   constructor(
     private routerParams: ActivatedRoute,
@@ -119,11 +126,14 @@ export class MentorDetailsPage implements OnInit {
     this.updateButtonConfig();
     this.isloaded = true;
     this.detailData.data = this.mentorProfileData?.result;
+    console.log(this.detailData.data, "data at 128")
     this.detailData.data.organizationName =
       this.mentorProfileData?.result?.organization?.name || '';
-    this.headerConfig.share = this.detailData.data?.is_mentor;
+    // this.headerConfig.share = this.detailData.data?.is_mentor;
+     this.mentorName = new TitleCasePipe().transform(this.mentorProfileData.result.username);
+     this.mentorProfileData.result.is_connected ?  this.headerConfig.actions.push("block", "share") : this.headerConfig.actions.push("share");
   }
-
+  
 async getMentorDetails() {
   const config = {
     url: urlConstants.API_URLS.GET_PROFILE_DATA + this.mentorId,
@@ -163,6 +173,11 @@ async getMentorDetails() {
       case 'share':
         this.share();
         break;
+
+      case 'block':
+        this.block(this.mentorId);
+        console.log("block received 170");
+        break;
     }
   }
   async share() {
@@ -178,8 +193,37 @@ async getMentorDetails() {
         } else {
           await this.copyToClipBoard(window.location.href);
           this.toast.showToast('PROFILE_LINK_COPIED', 'success');
-        }
+        }     
   }
+   async block(mentorId) {
+    const userId = mentorId;
+
+    console.log(userId, "userId id value line 195")
+    const result = await this.utilService.alertPopup({
+    header: "CONFIRM_BLOCK_HEADER",   
+    message: "CONFIRM_BLOCK_MESSAGE", 
+    submit: "BLOCK",
+    cancel: "CANCEL",
+    swapButtons: true
+  },
+   {name: this.mentorName}
+  );
+
+  if (result) {
+    console.log( "funtion triggered!!!", userId);
+    // const payload = {
+    //       url:urlConstants.block,
+    //       payload: {user_id: userId},
+    //       };
+    //     this.httpService.post(payload)
+    
+        this.toast.showToast("BLOCK_TOAST_MESSAGE","success", 5000,[],undefined, {name:this.mentorName})
+        this.isdisabled=false;
+       this.showDetails= false;
+            }  else {
+                    console.log("User cancelled unblock.");
+                    }
+}  
   copyToClipBoard = async (copyData: any) => {
     await Clipboard.write({
       string: copyData,
@@ -231,5 +275,9 @@ async getMentorDetails() {
             action: 'requestSession',
           },
         ];
+  }
+  unblock(){
+    console.log("unblock button working");
+    // implement the api function
   }
 }
