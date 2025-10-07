@@ -271,8 +271,7 @@
     "YOUR_CURRENT_DEVICE": "Your current device ",
     "LOGGED_IN": "Logged in",
     "NOT_UPDATED_MSG": "Yet to be updated.",
-    "SESSION_MENTEE_LIMIT": "Session limit reached!",
-    "SESSION_MENTEE_LIMIT_SUB_TEXT": "You will not be able to add more than {{count}} number of mentees for this session",
+    "SESSION_MENTEE_LIMIT": "Session limit reached – maximum mentees added.",
     "LOGGED_OUT_AT": "Logged out at",
     "EXPIRED": "Expired",
     "GENERATE_OTP":"Generate OTP",
@@ -386,7 +385,7 @@
     "BOOK_AGAIN": "Book again",
     "ROLE": "Role",
     "SCHEDULE": "Your schedule",
-    "SLOT_REJECT": "You have rejected the slot request",
+    "SLOT_REJECT": "You have rejected this slot request",
     "START_BTN_ENABLE": "Start button will get enabled 10 min before schedule time",
     "SLOT_AVAILABLE": "You have a slot available at this time",
     "AGENDA": "Agenda",
@@ -411,5 +410,11 @@
     "DISTRICT":"District",
     "BLOCK":"Block",
     "SCHOOL":"School",
-    "YOU_HAVE" :"You have"
+    "YOU_HAVE" :"You have requested",
+    "REQUESTING_SLOT": "is requesting a slot at",
+    "A_SLOT": "a slot at",
+    "IS_REQUESTING": "is requesting",
+    "ON": "on",
+    "SLOT_BOOKED": " Slot booked with"
+
 }

@@ -141,6 +141,7 @@ export class SessionDetailPage implements OnInit, OnDestroy {
   async fetchSessionDetails() { 
     let entityList = await this.form.getEntities({}, 'SESSION')
     var response = await this.sessionService.getSessionDetailsAPI(this.id);
+
     if(response && entityList.result.length){
       entityList.result.forEach(entity => {
         Object.entries(response?.result).forEach(([key, value]) => {
@@ -177,7 +178,7 @@ export class SessionDetailPage implements OnInit, OnDestroy {
           ...response,
           start_date: readableStartDate,
           meeting_info: response.meeting_info?.platform,
-          mentee_count: response?.mentees?.length,
+          mentee_count: response.seats_limit - response.seats_remaining,
           mentor_designation: response?.mentor_designation?.length
           ? response.mentor_designation.map((d: any) => d?.label).join(', ')
           : []

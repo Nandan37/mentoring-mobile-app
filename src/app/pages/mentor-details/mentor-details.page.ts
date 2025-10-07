@@ -24,6 +24,7 @@ import { Location } from '@angular/common';
 export class MentorDetailsPage implements OnInit {
   mentorId;
   public isMobile: any;
+  currentUserId: any;
   public headerConfig: any = {
     backButton: false,
     headerColor: "primary"
@@ -34,15 +35,17 @@ export class MentorDetailsPage implements OnInit {
       id: null,
     },
     buttons: [
-      {
-        label: 'CHAT',
-        action: 'chat',
-      },
-      {
-        label: 'REQUEST_SESSION',
-        action: 'requestSession',
-      },
-    ],
+    {
+      label: 'CHAT',
+      action: 'chat',
+      isHide: false
+    },
+          {
+            label: 'REQUEST_SESSION',
+            action: 'requestSession',
+             isHide: false
+          },
+  ],
   };
 
   detailData: any = {
@@ -111,6 +114,9 @@ export class MentorDetailsPage implements OnInit {
       this.mentorId = this.buttonConfig.meta.id = params.id;
       this.getMentor();
     })
+    let user = await this.localStorage.getLocalData(localKeys.USER_DETAILS)
+    this.currentUserId= user.id
+    this.updateButtonConfig();
   }
 
   async getMentor() {
@@ -229,17 +235,25 @@ async getMentorDetails() {
           {
             label: 'CHAT',
             action: 'chat',
+             isHide: false
           },
         ]
       : [
           {
             label: 'CHAT',
             action: 'chat',
+             isHide: false
           },
           {
             label: 'REQUEST_SESSION',
             action: 'requestSession',
+             isHide: false
           },
         ];
+        if (String(this.mentorProfileData?.result?.id) === String(this.currentUserId)) {
+            this.buttonConfig.buttons = this.buttonConfig.buttons.map(btn => ({
+                   ...btn,isHide: true
+            }));
+           }
   }
 }

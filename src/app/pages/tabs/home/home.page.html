@@ -7,7 +7,7 @@
     <ion-col size="6" class="ion-no-padding"> -->
       <!-- <p class="welcome-note hide-on-small-screen">{{'WELCOME_NOTE'| translate}}!</p> -->
       <div class="d-flex flex-justify-center my-8">
-        <ion-searchbar class="search-bar" placeholder="{{'HOME_SEARCH_PLACEHOLDER' | translate}}"
+        <ion-searchbar class="custom" placeholder="{{'HOME_SEARCH_PLACEHOLDER' | translate}}"
          cdkOverlayOrigin #trigger="cdkOverlayOrigin" (click)="isOpen = !isOpen"
          [(ngModel)]="searchText"
          type="search"

@@ -8,6 +8,8 @@ import { urlConstants } from 'src/app/core/constants/urlConstants';
 import { HttpService, LoaderService, ToastService } from 'src/app/core/services';
 import { FormService } from 'src/app/core/services/form/form.service';
 import { CommonRoutes } from 'src/global.routes';
+import { LocalStorageService } from 'src/app/core/services';
+import { localKeys } from 'src/app/core/constants/localStorage.keys';
 
 @Component({
   selector: 'app-mentor-directory',
@@ -46,6 +48,7 @@ export class MentorDirectoryPage implements OnInit {
   selectedChips: boolean = false;
   data: any;
   buttonConfig: any;
+  currentUserId:any;
 
   constructor(
     private router: Router,
@@ -54,6 +57,7 @@ export class MentorDirectoryPage implements OnInit {
     private route: ActivatedRoute,
     private toast: ToastService,
     private form: FormService,
+    private localStorage: LocalStorageService,
   ) {}
 
   ngOnInit() {
@@ -63,6 +67,8 @@ export class MentorDirectoryPage implements OnInit {
   }
 
   async ionViewWillEnter() {
+    let user = await this.localStorage.getLocalData(localKeys.USER_DETAILS)
+    this.currentUserId= user.id
     const result = await this.form.getForm(MENTOR_DIR_CARD_FORM);
     this.mentorForm = _.get(result, 'data.fields.controls');
     this.page = 1;
@@ -112,6 +118,20 @@ export class MentorDirectoryPage implements OnInit {
       }
       this.infinitescroll.disabled = this.mentorsCount == 0 ? true : false;
       this.mentorsCount = data.result.count;
+      
+  for (const group of this.mentors) {
+  group.values.forEach(mentor => {
+    mentor.buttonConfig = this.buttonConfig.map(btn => ({ ...btn }));
+
+    if (mentor.id === this.currentUserId) {
+      mentor.buttonConfig = this.buttonConfig.map(btn => ({
+        ...btn,
+        isHide: true  
+      }));
+    }
+  });
+}
+
     } catch (error) {
       this.isLoaded = true;
       showLoader ? await this.loaderService.stopLoader() : '';

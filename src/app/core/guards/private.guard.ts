@@ -1,36 +1,28 @@
 import { Injectable } from '@angular/core';
 import { ActivatedRouteSnapshot, CanActivate, RouterStateSnapshot, UrlTree } from '@angular/router';
-import { Observable } from 'rxjs';
 import { Router } from '@angular/router';
-import { CommonRoutes } from 'src/global.routes';
 import { UserService } from '../services/user/user.service';
 import { UtilService } from '../services';
-import { environment } from 'src/environments/environment';
+
 
 @Injectable({
   providedIn: 'root'
 })
 export class PrivateGuard implements CanActivate {
   constructor(private userService:UserService,private router: Router, private utilService: UtilService){}
-  canActivate(
-    route: ActivatedRouteSnapshot,
-    state: RouterStateSnapshot): Observable<boolean | UrlTree> | Promise<boolean | UrlTree> | boolean | UrlTree {
-    
-    return this.userService.getUserValue().then((result) => {
-      if (result) {
+ async canActivate(): Promise<boolean> {
+    try {
+      const token = await this.userService.getUserValue();
+      if (token) {
         this.utilService?.alertClose();
         return true;
-      } else if(environment['isAuthBypassed']) {
-        return true;
-      } else {
-        this.router.navigate([`/${CommonRoutes.AUTH}/${CommonRoutes.LANDING_PAGE}`]);
-        return false;
       }
-    }).catch(error => {
-      this.router.navigate([`/${CommonRoutes.AUTH}/${CommonRoutes.LANDING_PAGE}`]);
-        return false;
-    });
-  
+      location.href = window.location.origin;
+      return false;
+    } catch (err) {
+      location.href = window.location.origin;
+      return false;
+    }
   }
   
 }

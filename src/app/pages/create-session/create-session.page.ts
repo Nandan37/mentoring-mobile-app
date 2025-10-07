@@ -75,6 +75,7 @@ export class CreateSessionPage implements OnInit {
   formConfig: any;
   mentor_id: any;
   isHome: boolean;
+  isManagePage: boolean;
   user: any;
 
   constructor(
@@ -261,6 +262,9 @@ export class CreateSessionPage implements OnInit {
       form.mentor_id = form?.mentor_id ?? this.user.id;
       form.resources= this.updatedFiles;
       this.form1.myForm.markAsPristine();
+      if(this.isManagePage) {
+        form.managerFlow = true;
+      }
       const result = await this.sessionService.createSession(form, this.id);
       if (result) {
         this.sessionDetails = _.isEmpty(result) ? this.sessionDetails : result;
@@ -689,14 +693,14 @@ handleSelectedFile(file) {
 async updateFormConfig() {
   const { source, isCreator } = this.route.snapshot.queryParams;
   this.isHome = source === 'home';
-  const isManagePage = source === 'manage';
+  this.isManagePage = source === 'manage';
 
   const hasPermission = await this.permissionService.hasPermission({
     module: permissions.MANAGE_SESSION,
     action: manageSessionAction.SESSION_ACTIONS,
   });
   if (
-    (isManagePage && hasPermission) ||
+    (this.isManagePage && hasPermission) ||
     (!this.isHome && isCreator != 'true' && hasPermission)
   ) {
     this.formConfig = MANAGERS_CREATE_SESSION_FORM;
@@ -705,8 +709,16 @@ async updateFormConfig() {
   }
 }
 
+async modalDismiss(){
+  const topModal = await this.modalCtrl.getTop();
+  if(topModal){
+    this.modalCtrl.dismiss();
+  }
+}
+
 ionViewWillLeave() {
   this.formData = null;
   this.sessionType = '';
+  this.modalDismiss();
 }
 }
