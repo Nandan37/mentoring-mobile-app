@@ -1,4 +1,4 @@
-import { NgModule, CUSTOM_ELEMENTS_SCHEMA } from '@angular/core';
+import { NgModule, CUSTOM_ELEMENTS_SCHEMA, APP_INITIALIZER } from '@angular/core';
 import { BrowserModule } from '@angular/platform-browser';
 import { RouteReuseStrategy } from '@angular/router';
 import { IonicModule, IonicRouteStrategy } from '@ionic/angular';
@@ -25,6 +25,8 @@ import { MatPaginatorModule } from '@angular/material/paginator';
 import { RecaptchaModule } from 'ng-recaptcha';
 import { FrontendChatLibraryModule } from 'sl-chat-library';
 import { MatToolbarModule } from '@angular/material/toolbar';
+import { translateFactory } from './shared/components/translationFactory';
+import { LocalStorageService } from './core/services';
 export const translateHttpLoaderFactory = (httpClient: HttpClient) =>
   new TranslateHttpLoader(httpClient, './assets/i18n/', '.json');
 
@@ -68,6 +70,12 @@ export const translateHttpLoaderFactory = (httpClient: HttpClient) =>
     { provide: RouteReuseStrategy, useClass: IonicRouteStrategy },
     TitleCasePipe,
     SwUpdate,
+      {
+      provide: APP_INITIALIZER,
+      useFactory: translateFactory,
+      deps: [TranslateService, LocalStorageService],
+      multi: true
+    }
   ],
   bootstrap: [AppComponent],
 })

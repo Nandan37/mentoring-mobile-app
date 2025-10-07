@@ -14,24 +14,31 @@ export class UserService {
   userEvent = new Subject<any>();
   userEventEmitted$ = this.userEvent.asObservable();
   constructor(
-    private localStorage: LocalStorageService,
+
     ) {}
+  async getUserValue(): Promise<string | null> {
+    try {
+    const data = localStorage.getItem('accToken'); 
+    this.token = data;
+    if (!this.validateToken(data)) { 
+    return null;
+    }
 
-  async getUserValue() {
-    return this.localStorage
-      .getLocalData(localKeys.TOKEN)
-      .then((data: any) => {
-        this.token=data;
-        return data;
-      })
-      .catch((error) => { });
+    this.token = data;
+    return data;
+    } catch (error) {
+      return null;
+    }
   }
 
-  validateToken(token){
-    const tokenDecoded: any = jwt_decode(token);
-    const tokenExpiryTime = new Date(tokenDecoded.exp * 1000); 
-    const currentTime = new Date(); 
-    return currentTime < tokenExpiryTime;
+
+  validateToken(token: string): boolean {
+  try {
+    const decoded: any = jwt_decode(token);
+    const expiry = new Date(decoded.exp * 1000);
+    return new Date() < expiry;
+  } catch (err) {
+    return false;
   }
-  
+}
 }

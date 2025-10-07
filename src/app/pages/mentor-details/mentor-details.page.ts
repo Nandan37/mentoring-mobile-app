@@ -14,6 +14,7 @@ import {
 import { Clipboard } from '@capacitor/clipboard';
 import { SessionService } from 'src/app/core/services/session/session.service';
 import { CommonRoutes } from 'src/global.routes';
+import { Location } from '@angular/common';
 
 @Component({
   selector: 'app-mentor-details',
@@ -23,6 +24,7 @@ import { CommonRoutes } from 'src/global.routes';
 export class MentorDetailsPage implements OnInit {
   mentorId;
   public isMobile: any;
+  currentUserId: any;
   public headerConfig: any = {
     backButton: false,
     headerColor: "primary"
@@ -33,15 +35,17 @@ export class MentorDetailsPage implements OnInit {
       id: null,
     },
     buttons: [
-      {
-        label: 'CHAT',
-        action: 'chat',
-      },
-      {
-        label: 'REQUEST_SESSION',
-        action: 'requestSession',
-      },
-    ],
+    {
+      label: 'CHAT',
+      action: 'chat',
+      isHide: false
+    },
+          {
+            label: 'REQUEST_SESSION',
+            action: 'requestSession',
+             isHide: false
+          },
+  ],
   };
 
   detailData: any = {
@@ -99,10 +103,9 @@ export class MentorDetailsPage implements OnInit {
     private userService: UserService,
     private localStorage: LocalStorageService,
     private toast: ToastService,
-    private utilService: UtilService
-  ) {
-    
-  }
+    private utilService: UtilService, 
+    private location: Location,
+  ) {}
 
   ngOnInit() {}
   async ionViewWillEnter() {
@@ -111,6 +114,9 @@ export class MentorDetailsPage implements OnInit {
       this.mentorId = this.buttonConfig.meta.id = params.id;
       this.getMentor();
     })
+    let user = await this.localStorage.getLocalData(localKeys.USER_DETAILS)
+    this.currentUserId= user.id
+    this.updateButtonConfig();
   }
 
   async getMentor() {
@@ -136,11 +142,21 @@ async getMentorDetails() {
     }
     return data;
   } catch (error: any) {
-    if (error?.status === 404) {
+    switch (error?.status) {
+     
+    case 404:
       this.userNotFound = true;
-    } else {
+      break;
+
+    case 403:
       this.userCantAccess = true;
-    }
+      break;
+
+    default:
+      this.toast.showToast('SOMETHING_WENT_WRONG', 'danger');
+      this.location.back();
+      break;
+  }
   }
 }
 
@@ -219,17 +235,25 @@ async getMentorDetails() {
           {
             label: 'CHAT',
             action: 'chat',
+             isHide: false
           },
         ]
       : [
           {
             label: 'CHAT',
             action: 'chat',
+             isHide: false
           },
           {
             label: 'REQUEST_SESSION',
             action: 'requestSession',
+             isHide: false
           },
         ];
+        if (String(this.mentorProfileData?.result?.id) === String(this.currentUserId)) {
+            this.buttonConfig.buttons = this.buttonConfig.buttons.map(btn => ({
+                   ...btn,isHide: true
+            }));
+           }
   }
 }

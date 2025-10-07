@@ -101,7 +101,7 @@
       <div *ngIf="buttonConfig" class="flex flex-justify-start mt-4 wrap">
         <div *ngFor="let button of buttonConfig.buttons">
         <ion-button
-          *ngIf="(button.action === 'chat' && chatConfig == 'true') || button.action !== 'chat'"
+          *ngIf="((button.action === 'chat' && chatConfig == 'true') || button.action !== 'chat') && !button.isHide"
           color="light"
           expand="block"
           (click)="action(button?.action)"

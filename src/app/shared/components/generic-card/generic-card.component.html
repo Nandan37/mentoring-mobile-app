@@ -86,7 +86,7 @@
           <ng-container *ngFor="let button of buttonConfig">
             <ion-button
             size="small"
-              *ngIf="showButton(button, data)"
+              *ngIf="!button?.isHide && showButton(button, data)"
               [color]="button?.color"
               [style.background]="button?.bgColor"
               [style.color]="button?.textColor"

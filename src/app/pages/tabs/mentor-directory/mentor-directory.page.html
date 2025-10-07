@@ -1,6 +1,6 @@
 <app-page-header [config]="headerConfig">
-  <div class="d-flex flex-justify-center">
-    <ion-searchbar class="top-padding search-style" type="search" inputmode="search"  debounce="1000" placeholder="{{'MENTOR_SEARCH_PLACEHOLDER' | translate}}"(click)="onSearch()"></ion-searchbar>
+ <div class="d-flex flex-justify-center my-8 ">
+    <ion-searchbar class="custom" type="search" inputmode="search"  debounce="1000" placeholder="{{'MENTOR_SEARCH_PLACEHOLDER' | translate}}"(click)="onSearch()"></ion-searchbar>
   </div>
 </app-page-header>
 <ion-content >
@@ -12,7 +12,7 @@
       <ion-grid >
         <ion-row class="d-flex ">
           <ion-col *ngFor="let value of mentor.values" padding size-xs="12" size-sm="12" size-md="6" size-lg="6" size-xl="4" align-self-stretch>
-            <app-generic-card [data]="value" (onClickEvent)="eventAction($event)" [buttonConfig]="buttonConfig" [cardConfig]="mentorForm"></app-generic-card>
+            <app-generic-card [data]="value" (onClickEvent)="eventAction($event)" [buttonConfig]="value.buttonConfig"[cardConfig]="mentorForm"></app-generic-card>
           </ion-col>
         </ion-row>
       </ion-grid>
