@@ -18,7 +18,7 @@ export class FilterTreeComponent implements OnInit {
   constructor() { }
 
   ngOnInit() {
-    if (this.eventData?.control?.validators?.required) {
+    if (this.eventData?.sessionType) {
       this.filterData?.forEach(filter => { 
         if (filter.name === "type" ) {
           filter.options.forEach(option => {
@@ -53,13 +53,6 @@ export class FilterTreeComponent implements OnInit {
     this.filtersChanged.emit(selectedOptionsByCategory);
   }
   isCheckboxDisabled(filter: any, sessionType: string): boolean {
-    if (filter.name === 'type' && filter.isEnabled) {
-      if (sessionType === 'PUBLIC') {
-        return true; 
-      } else {
-        return !filter.isConnectionEnabled;
-      }
-    }
     return false;
   }
 }

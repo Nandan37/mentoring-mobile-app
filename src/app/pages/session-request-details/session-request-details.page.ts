@@ -3,7 +3,7 @@ import { ActivatedRoute, Router } from '@angular/router';
 import { IonModal } from '@ionic/angular';
 import * as moment from 'moment';
 import { PLATFORMS } from 'src/app/core/constants/formConstant';
-import { ToastService, UtilService } from 'src/app/core/services';
+import { HttpService, ToastService, UtilService } from 'src/app/core/services';
 import { FormService } from 'src/app/core/services/form/form.service';
 import { SessionService } from 'src/app/core/services/session/session.service';
 import { DynamicFormComponent } from 'src/app/shared/components';
@@ -41,7 +41,8 @@ export class SessionRequestDetailsPage implements OnInit {
     private toast: ToastService,
     private utilService: UtilService,
     private activateRoute: ActivatedRoute,
-    private router: Router
+    private router: Router,
+    private http: HttpService
   ) { }
   public headerConfig: any = {
     backButton: true,
@@ -114,6 +115,9 @@ export class SessionRequestDetailsPage implements OnInit {
         }
       ]
     };
+    if (!(await this.http.checkNetworkAvailability())) {
+      return;
+    }
     const response:any = await this.utilService.alertPopup(msg);
     if (response) {
       this.sessionService.requestSessionReject(id, response?.reason).then((res) => {

@@ -6,7 +6,7 @@
     <ion-buttons slot="start">
       <div class="flex-box" (click)="goToProfile()">
         <img
-          [src]="info?.user_details?.image || '../../../../assets/prof-img/user.png'"
+          [src]="info?.user_details?.image || 'assets/prof-img/user.png'"
           alt="Profile Picture"
           class="profile-pic"
         />
@@ -28,7 +28,7 @@
         *ngIf="info?.status == 'REQUESTED'"
       >
       <img
-      [src]="info?.user_details?.image || '../../../../assets/prof-img/user.png'"
+      [src]="info?.user_details?.image || 'assets/prof-img/user.png'"
       alt="Profile Picture"
       class="chat-pic"
     />

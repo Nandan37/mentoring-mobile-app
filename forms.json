@@ -1984,11 +1984,11 @@
             "chartConfig": [
               {
                 "private_session_enrolled": "PRIVATE_SESSION_ENROLLED",
-                "backgroundColor": "#832215"
+                "backgroundColor": "#572E91"
               },
               {
                 "public_session_enrolled": "PUBLIC_SESSION_ENROLLED",
-                "backgroundColor": "#b94a3b"
+                "backgroundColor": "#7958A7"
               },
               {
                 "private_session_attended": "PRIVATE_SESSION_ATTENDED",
@@ -1996,7 +1996,7 @@
               },
               {
                 "public_session_attended": "PUBLIC_SESSION_ATTENDED",
-                "backgroundColor": "#858585"
+                "backgroundColor": "#787878"
               }
             ]
           },
@@ -2036,7 +2036,7 @@
             "chartConfig": [
               {
                 "public_session_enrolled": "SESSION_ENROLLED",
-                "backgroundColor": "#832215"
+                "backgroundColor": "#572E91"
               },
               {
                 "public_session_attended": "SESSIONS_ATTENDED",
@@ -2080,7 +2080,7 @@
             "chartConfig": [
               {
                 "private_session_attended": "SESSIONS_CREATED_ASSIGNED",
-                "backgroundColor": "#832215"
+                "backgroundColor": "#572E91"
               },
               {
                 "private_session_enrolled": "SESSIONS_CONDUCTED",
@@ -2211,11 +2211,11 @@
             "chartConfig": [
               {
                 "private_sessions_created": "PRIVATE_SESSIONS_CREATED_ASSIGNED",
-                "backgroundColor": "#832215"
+                "backgroundColor": "#572E91"
               },
               {
                 "public_sessions_created": "PUBLIC_SESSIONS_CREATED_ASSIGNED",
-                "backgroundColor": "#b94a3b"
+                "backgroundColor": "#7958A7"
               },
               {
                 "private_sessions_conducted": "PRIVATE_SESSIONS_CONDUCTED",
@@ -2223,7 +2223,7 @@
               },
               {
                 "public_sessions_conducted": "PUBLIC_SESSIONS_CONDUCTED",
-                "backgroundColor": "#858585"
+                "backgroundColor": "#787878"
               }
             ]
           },
@@ -2263,7 +2263,7 @@
             "chartConfig": [
               {
                 "public_sessions_created": "SESSIONS_CREATED_ASSIGNED",
-                "backgroundColor": "#832215"
+                "backgroundColor": "#572E91"
               },
               {
                 "public_sessions_conducted": "SESSIONS_CONDUCTED",
@@ -2307,7 +2307,7 @@
             "chartConfig": [
               {
                 "private_sessions_created": "SESSIONS_CREATED_ASSIGNED",
-                "backgroundColor": "#832215"
+                "backgroundColor": "#572E91"
               },
               {
                 "private_sessions_conducted": "SESSIONS_CONDUCTED",
@@ -2438,11 +2438,11 @@
             "chartConfig": [
               {
                 "private_sessions_created": "PRIVATE_SESSIONS_CREATED",
-                "backgroundColor": "#832215"
+                "backgroundColor": "#572E91"
               },
               {
                 "public_sessions_created": "PUBLIC_SESSIONS_CREATED",
-                "backgroundColor": "#b94a3b"
+                "backgroundColor": "#7958A7"
               },
               {
                 "private_sessions_conducted": "PRIVATE_SESSIONS_CONDUCTED",
@@ -2450,7 +2450,7 @@
               },
               {
                 "public_sessions_conducted": "PUBLIC_SESSIONS_CONDUCTED",
-                "backgroundColor": "#858585"
+                "backgroundColor": "#787878"
               }
             ]
           },
@@ -2490,7 +2490,7 @@
             "chartConfig": [
               {
                 "public_sessions_created": "SESSIONS_CREATED_ASSIGNED",
-                "backgroundColor": "#832215"
+                "backgroundColor": "#572E91"
               },
               {
                 "public_sessions_conducted": "SESSIONS_CONDUCTED",
@@ -2534,7 +2534,7 @@
             "chartConfig": [
               {
                 "private_sessions_created": "SESSIONS_CREATED_ASSIGNED",
-                "backgroundColor": "#832215"
+                "backgroundColor": "#572E91"
               },
               {
                 "private_sessions_conducted": "SESSIONS_CONDUCTED",
@@ -2616,21 +2616,6 @@
                       "maxLength": 255,
                       "pattern": "^[a-zA-Z0-9-.,s ]+$"
                   }
-              },
-              {
-                "name": "timezone",
-                "label": "Timezone",
-                "class": "ion-no-margin",
-                "value": "",
-                "type": "search-select",
-                "position": "floating",
-                "disabled": false,
-                "errorMessage": {
-                    "required": "Enter timezone"
-                },
-                "validators": {
-                    "required": false
-                }
               },
               {
                   "name": "start_date",

@@ -25,6 +25,7 @@ import { PreAlertModalComponent } from 'src/app/shared/components/pre-alert-moda
 import { localKeys } from 'src/app/core/constants/localStorage.keys';
 import * as moment from 'moment-timezone';
 import { DynamicSelectModalComponent } from 'src/app/dynamic-select-modal/dynamic-select-modal.component';
+import { UtilService } from '../../core/services/util/util.service';
 
 @Component({
   selector: 'app-create-session',
@@ -74,6 +75,7 @@ export class CreateSessionPage implements OnInit {
   formConfig: any;
   mentor_id: any;
   isHome: boolean;
+  isManagePage: boolean;
   user: any;
 
   constructor(
@@ -93,7 +95,8 @@ export class CreateSessionPage implements OnInit {
     private route:ActivatedRoute,
     private modalCtrl:ModalController,
     private permissionService:PermissionService,
-    private actionSheetController: ActionSheetController
+    private actionSheetController: ActionSheetController,
+    private utilService: UtilService
   ) {
   }
   ngOnInit() {
@@ -230,11 +233,14 @@ export class CreateSessionPage implements OnInit {
     if (this.form1.myForm.valid) {
       await this.handleFileUploads();
       const form = Object.assign({}, { ...this.form1.myForm.getRawValue(), ...this.form1.myForm.value });
-      form.start_date = (Math.floor((new Date(form.start_date).getTime() / 1000) / 60) * 60).toString();
-      form.end_date = (Math.floor((new Date(form.end_date).getTime() / 1000) / 60) * 60).toString();
-      const timezone = Intl.DateTimeFormat().resolvedOptions().timeZone;
-      form.time_zone = timezone;
-
+      const convertedTimezones = this.utilService.convertDatesToTimezone(
+          form.start_date,
+          form.end_date,
+          this.selectedTimezone
+          );
+          form.start_date = convertedTimezones.eventStartEpochInSelectedTZ /1000;
+          form.end_date = convertedTimezones.eventEndEpochInSelectedTZ / 1000;
+      form.time_zone = this.selectedTimezone;
       _.forEach(this.entityNames, (entityKey) => {
         const control = this.formData.controls.find(obj => obj.name === entityKey);
         if (control) {
@@ -256,6 +262,9 @@ export class CreateSessionPage implements OnInit {
       form.mentor_id = form?.mentor_id ?? this.user.id;
       form.resources= this.updatedFiles;
       this.form1.myForm.markAsPristine();
+      if(this.isManagePage) {
+        form.managerFlow = true;
+      }
       const result = await this.sessionService.createSession(form, this.id);
       if (result) {
         this.sessionDetails = _.isEmpty(result) ? this.sessionDetails : result;
@@ -362,8 +371,8 @@ export class CreateSessionPage implements OnInit {
         }
       }
       let dependedChildIndex = this.formData.controls.findIndex(formControl => formControl.name === this.formData.controls[i].dependedChild)
-      if(this.formData.controls[i].name === 'mentor_id') {
-        this.mentor_id = existingData[this.formData.controls[i].name];
+      if(existingData['mentor_id']) {
+        this.mentor_id = existingData['mentor_id'];
       }
       if(this.formData.controls[i].dependedChild && this.formData.controls[i].name === 'type'){
         if(existingData[this.formData.controls[i].name].value){
@@ -372,8 +381,14 @@ export class CreateSessionPage implements OnInit {
           this.formData.controls[dependedChildIndex].validators['required']= existingData[this.formData.controls[i].name].value=='PUBLIC' ? false : true
         }
       }
-        if(this.formData.controls[i]?.name === "mentees" && this.sessionType ==='PUBLIC') {
+        if(this.formData.controls[i]?.name === "mentees") {
+          const { isCreator } = this.route.snapshot.queryParams;
+          if(!this.mentor_id) {
           this.formData.controls[i].disabled = true;
+          }
+          if(isCreator === 'true' && this.sessionType ==='PUBLIC') {
+          this.formData.controls[i].showField = false;
+          }
         }
       this.formData.controls[i].options = _.unionBy(
         this.formData.controls[i].options,
@@ -440,12 +455,16 @@ export class CreateSessionPage implements OnInit {
     return o1 === o2;
   };
 
-  formValueChanged(event){
+ formValueChanged(event){
     const formRawValue = this.form1.myForm.getRawValue();
     let dependedControlIndex = this.formData.controls.findIndex(formControl => formControl.name === event.dependedChild)
     let dependedControl = this.form1.myForm.get(event.dependedChild)
     this.sessionType = event?.value;
     if(event.value === "PUBLIC") {
+      if(this.isHome) {
+        this.setControlValidity(dependedControlIndex, dependedControl, false, true, false);
+        return;
+      }
       if((typeof formRawValue?.mentor_id === 'string' && formRawValue?.mentor_id)) {
       this.setControlValidity(dependedControlIndex, dependedControl, false, false);
       return;
@@ -466,9 +485,10 @@ export class CreateSessionPage implements OnInit {
 
   }
   
-  setControlValidity(index, control, required, disabled) {
+  setControlValidity(index, control, required, disabled, showField = true) {
     this.formData.controls[index].validators['required'] = required;
     this.formData.controls[index].disabled = disabled;
+    this.formData.controls[index].showField = showField;
     control.setValidators(required ? [Validators.required] : null);
     control.updateValueAndValidity();
   }
@@ -673,19 +693,32 @@ handleSelectedFile(file) {
 async updateFormConfig() {
   const { source, isCreator } = this.route.snapshot.queryParams;
   this.isHome = source === 'home';
-  const isManagePage = source === 'manage';
+  this.isManagePage = source === 'manage';
 
   const hasPermission = await this.permissionService.hasPermission({
     module: permissions.MANAGE_SESSION,
     action: manageSessionAction.SESSION_ACTIONS,
   });
   if (
-    (isManagePage && hasPermission) ||
+    (this.isManagePage && hasPermission) ||
     (!this.isHome && isCreator != 'true' && hasPermission)
   ) {
     this.formConfig = MANAGERS_CREATE_SESSION_FORM;
   } else {
     this.formConfig = CREATE_SESSION_FORM;
   }
+}
+
+async modalDismiss(){
+  const topModal = await this.modalCtrl.getTop();
+  if(topModal){
+    this.modalCtrl.dismiss();
+  }
+}
+
+ionViewWillLeave() {
+  this.formData = null;
+  this.sessionType = '';
+  this.modalDismiss();
 }
 }

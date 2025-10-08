@@ -43,6 +43,9 @@ export class HttpService {
 
   async setHeaders() {
     let token = await this.getToken();
+    if(!token) {
+      return null;
+    } 
     const timezone = Intl.DateTimeFormat().resolvedOptions().timeZone;
     const acceptLanguage = await this.localStorage.getLocalData(localKeys.SELECTED_LANGUAGE);
     const headers = {
@@ -62,12 +65,16 @@ export class HttpService {
 
   async post(requestParam: RequestParams) {
     if (!(await this.checkNetworkAvailability())) {
+      
   throw Error(null);
 }
 
     let defaultHeaders = await this.setHeaders();
     const headers = requestParam.headers ?  { ...requestParam.headers, ...defaultHeaders } : defaultHeaders;
     let body = requestParam.payload ? requestParam.payload : {};
+    if (body?.time_zone) {
+    headers.timeZone = body.time_zone;        
+  }
     const options = {
       url: this.baseUrl + requestParam.url,
       headers: headers,
@@ -166,23 +173,24 @@ export class HttpService {
 
 
 async getToken() {
-    let token = localStorage.getItem('accToken');
+    const token = await this.userService.getUserValue();
+    //need to verify token validity
     if (!token) {
       return null;
     }
-    let isValidToken = this.userService.validateToken(token);
-    if (!isValidToken) {
-      let data: any = await this.getAccessToken();
-      let access_token = _.get(data, 'access_token');
-      if (!access_token) {
-        let authService = this.injector.get(AuthService);
-        await authService.logoutAccount();
-      }
-      this.userService.token['access_token'] = access_token;
-      await this.localStorage.setLocalData(localKeys.TOKEN, this.userService.token);
-    }
-    let userToken = token;
-    return userToken;
+
+    // these are commented because of old mentor flow changes
+    // if (!isValidToken) {
+    //   let data: any = await this.getAccessToken();
+    //   let access_token = _.get(data, 'access_token');
+    //   if (!access_token) {
+    //       let authService = this.injector.get(AuthService);
+    //     await authService.logoutAccount();
+    //   }
+    //   this.userService.token['access_token'] = access_token;
+    //   await this.localStorage.setLocalData(localKeys.TOKEN, this.userService.token);
+    // }
+    return token;
   }
 
   async getAccessToken() {

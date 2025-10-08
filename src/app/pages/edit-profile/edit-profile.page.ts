@@ -33,6 +33,7 @@ import { PlatformLocation, Location } from '@angular/common';
 })
 export class EditProfilePage implements OnInit, isDeactivatable {
   private win: any = window;
+  updated: boolean;
   @ViewChild('form1') form1: DynamicFormComponent;
   profileImageData: any = {
     type: 'profile',
@@ -109,17 +110,23 @@ export class EditProfilePage implements OnInit, isDeactivatable {
   }
 
   async canPageLeave() {
-    if (this.form1 && !this.form1.myForm.pristine || !this.profileImageData.isUploaded) {
+    if(!this.updated) {
       let texts: any;
       this.translate
-        .get(['PROFILE_FORM_UNSAVED_DATA', 'DONOT_SAVE', 'SAVE', 'PROFILE_EXIT_HEADER_LABEL'])
+        .get(['PROFILE_FORM_UNSAVED_DATA', 'DONOT_SAVE', 'SAVE', 'PROFILE_EXIT_HEADER_LABEL', 'SETUP_PROFILE','SETUP_PROFILE_MESSAGE', 'CONTINUE'])
         .subscribe((text) => {
           texts = text;
         });
+        let header = this.userDetails?.profile_mandatory_fields?.length ? texts['SETUP_PROFILE'] : texts['PROFILE_EXIT_HEADER_LABEL'];
       const alert = await this.alert.create({
-        header: texts['PROFILE_EXIT_HEADER_LABEL'],
-        message: texts['PROFILE_FORM_UNSAVED_DATA'],
-        buttons: [
+        header: this.userDetails?.profile_mandatory_fields?.length ? texts['SETUP_PROFILE'] : texts['PROFILE_EXIT_HEADER_LABEL'] , 
+        message: this.userDetails?.profile_mandatory_fields?.length ? texts['SETUP_PROFILE_MESSAGE'] : texts['PROFILE_FORM_UNSAVED_DATA'],
+        buttons:  this.userDetails?.profile_mandatory_fields?.length ? [ {
+          text: texts['CONTINUE'],
+          role: 'cancel',
+          cssClass: 'alert-button-red',
+          handler: () => { },
+        }] : [
           {
             text: texts['DONOT_SAVE'],
             cssClass: 'alert-button-bg-white',
@@ -134,14 +141,20 @@ export class EditProfilePage implements OnInit, isDeactivatable {
           },
         ],
       });
+      if (this.form1 && !this.form1.myForm.pristine || !this.profileImageData.isUploaded) {
       await alert.present();
       let data = await alert.onDidDismiss();
-      if (data.role == 'exit') {
+      if (data.role == 'exit' && this.headerConfig.backButton) {
         return true;
       }
       return false;
     } else {
+      if(this.headerConfig.backButton === false) {
+        await alert.present();
+        return false;
+      }
       return true;
+    }
     }
   }
 
@@ -154,7 +167,7 @@ export class EditProfilePage implements OnInit, isDeactivatable {
         const form = Object.assign({}, this.form1.myForm.value);
         _.forEach(this.entityNames, (entityKey) => {
           let control = this.formData.controls.find(obj => 
-           obj.name === entityKey
+          obj.name === entityKey
           );  
             if (['state', 'cluster', 'block', 'district', 'school', 'professional_role'].includes(entityKey)) {
               form[entityKey] = control.value?.value || '';
@@ -165,8 +178,9 @@ export class EditProfilePage implements OnInit, isDeactivatable {
             }
         });
         this.form1.myForm.markAsPristine();
-        const updated = await this.profileService.profileUpdate(form);
-        if(updated && this.redirectUrl){ 
+        this.updated = await this.profileService.profileUpdate(form);
+        this.userDetails.profile_mandatory_fields =[];
+        if(this.updated && this.redirectUrl){ 
           this.router.navigate([this.redirectUrl], { replaceUrl: true })
         }else{
         this.router.navigate([`/${CommonRoutes.TABS}/${CommonRoutes.HOME}`], { replaceUrl: true });
