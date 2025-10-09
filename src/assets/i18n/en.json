@@ -420,7 +420,8 @@
     "CONFIRM_UNBLOCK_HEADER": "Are you sure you want to unblock?",
     "CONFIRM_UNBLOCK_MESSAGE": "You can continue conversations with {{name}} once they send you a connection request again.",
     "UNBLOCK": "Unblock",
-    "UNBLOCK_TOAST_MESSAGE" : "You have unblocked successfully!"
-
-
+    "UNBLOCK_TOAST_MESSAGE" : "You have unblocked successfully!",
+    "CONFIRM_BLOCK_HEADER": "Are you sure you want to block {{name}}?",
+    "CONFIRM_BLOCK_MESSAGE":"Blocking {{name}} will remove them from your connection and prevent them from messaging you",
+    "BLOCK_TOAST_MESSAGE" :"You have blocked {{name}} successfully!"
 }

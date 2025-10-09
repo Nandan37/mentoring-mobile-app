@@ -52,6 +52,7 @@ import { OwlDateTimeModule, OwlNativeDateTimeModule } from '@danielmoncada/angul
 import {MatExpansionModule} from '@angular/material/expansion';
 import { PreAlertModalComponent } from './components/pre-alert-modal/pre-alert-modal.component';
 import { DynamicSelectModalComponent } from '../dynamic-select-modal/dynamic-select-modal.component';
+import { PopoverMenuComponent } from '../popover-menu/popover-menu.component';
 
 @NgModule({
   declarations: [
@@ -93,7 +94,8 @@ import { DynamicSelectModalComponent } from '../dynamic-select-modal/dynamic-sel
     ChipsAndFilterComponent,
     GenericCardComponent,
     PreAlertModalComponent,
-    DynamicSelectModalComponent
+    DynamicSelectModalComponent,
+    PopoverMenuComponent
   ],
   imports: [
     CommonModule,
@@ -150,8 +152,8 @@ import { DynamicSelectModalComponent } from '../dynamic-select-modal/dynamic-sel
     ChipsAndFilterComponent,
     GenericCardComponent,
     PreAlertModalComponent,
-    DynamicSelectModalComponent
-    
+    DynamicSelectModalComponent,
+    PopoverMenuComponent
   ],
 })
 export class SharedModule {}

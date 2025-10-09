@@ -33,14 +33,14 @@ export class ToastService {
     }
   }
 
-  async showToast(msg, color, duration = 5000, toastButton = [], subText?: string) {
+  async showToast(msg, color, duration = 5000, toastButton = [], subText?: string, params?: any) {
     try {
       if (this.activeToast) {
         await this.activeToast.dismiss();
         this.activeToast = null;
       }
-
-      const texts = await this.translate.get([msg]).toPromise();
+  
+      const texts = await this.translate.get([msg],params).toPromise();
       const toast = await this.toastCtrl.create({
         message: subText ? '' : texts[msg], 
         color: color,

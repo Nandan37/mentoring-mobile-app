@@ -40,6 +40,11 @@
             </ion-buttons>
           </div>
         </ion-col>
+       <ion-col size="12"  *ngIf="config?.popOver" class="wrap" >
+         <ion-button fill="clear" (click)="openPopover($event)">
+        <ion-icon name="ellipsis-vertical" color="light" ></ion-icon>
+      </ion-button>
+        </ion-col>
       </ion-row>
       <ion-row>
         <ion-col size="2" *ngIf="config?.edit">
