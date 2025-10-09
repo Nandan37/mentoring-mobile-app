@@ -50,7 +50,6 @@ export class MenteeListPopupComponent implements OnInit {
       });
     }
     this.enrolledMenteeList = data;
-    console.log(data, "mentee list data 53")
   }
 
   closePopup(){

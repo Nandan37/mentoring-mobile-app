@@ -33,7 +33,7 @@
           <div class="profile-img">
             <ion-icon
               name="people-outline"
-              *ngIf="headerData?.is_connected && isblocked"
+              *ngIf="headerData?.is_connected && !isblocked"
             ></ion-icon>
             <ng-container *ngIf="headerData?.image && headerData?.image !== ''; else DefaultImg">
             <img [src]="headerData?.image" />
@@ -60,7 +60,7 @@
         </div>
     
         
-        <div *ngIf="(headerData?.district || headerData?.state) && isblocked" class="location-info">
+        <div *ngIf="(headerData?.district || headerData?.state) && !isblocked" class="location-info">
           <ion-label class="location">
              <ion-icon name="location"></ion-icon>
             <ng-container *ngIf="headerData.district?.label as district">
@@ -90,7 +90,7 @@
       </ion-label>
     </div>
       <div class="d-inline-flex flex-align-items-center my-4">
-        <ion-label class="location" *ngIf="headerData?.is_mentor && isblocked"
+        <ion-label class="location" *ngIf="headerData?.is_mentor && !isblocked"
           >{{ "SESSIONS_CONDUCTED" | translate }} :
           {{ headerData?.sessions_hosted || 0 }}</ion-label
         >
@@ -99,7 +99,7 @@
           {{ headerData?.sessions_attended || 0 }}</ion-label
         >
       </div>
-      <div *ngIf="buttonConfig && isblocked" class="flex flex-justify-start mt-4 wrap">
+      <div *ngIf="buttonConfig && !isblocked" class="flex flex-justify-start mt-4 wrap">
         <div *ngFor="let button of buttonConfig.buttons">
         <ion-button
           *ngIf="((button.action === 'chat' && chatConfig == 'true') || button.action !== 'chat') && !button.isHide"

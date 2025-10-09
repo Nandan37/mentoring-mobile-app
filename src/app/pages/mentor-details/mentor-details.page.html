@@ -9,7 +9,7 @@
   [showRole]="false"
 >
 </app-generic-profile-header>
-  <div *ngIf="userCanAccess && isloaded && detailData.data.is_mentor && showDetails">
+  <div *ngIf="userCanAccess && isloaded && detailData.data.is_mentor && !isdisabled">
   <ion-segment [value]="segmentValue" (ionChange)="segmentChanged($event)">
     <ion-segment-button value="about">
       <ion-label class="segment-lbl">{{"ABOUT"|translate}}</ion-label>
@@ -21,7 +21,7 @@
     </ion-segment-button>
   </ion-segment>
 </div>
-<ion-content *ngIf="!this.userCantAccess && isloaded && showDetails " >
+<ion-content *ngIf="!this.userCantAccess && isloaded && !isdisabled " >
  
   <div [ngSwitch]="segmentValue">
     <ion-grid>
@@ -77,7 +77,7 @@
     </ion-list>
   </div>
 </ion-content>
- <ion-content *ngIf="!this.userCantAccess && isloaded && !showDetails " >
+ <ion-content *ngIf="!this.userCantAccess && isloaded && isdisabled " >
   <div class="block-header">
   <ion-icon name="information-circle" class="info-icon"></ion-icon>  <p> You have blocked {{mentorName| titlecase}}</p>
    </div>

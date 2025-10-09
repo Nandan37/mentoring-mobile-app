@@ -68,7 +68,7 @@ export class UtilService {
     return new Promise(async (resolve) => {
       let texts: any;
       this.translate
-        .get([msg.header, msg.message, msg.cancel, msg.submit,], parameters)
+        .get([msg.header, msg.message, msg.cancel, msg.submit], parameters)
         .subscribe((text) => {
           texts = text;
         });

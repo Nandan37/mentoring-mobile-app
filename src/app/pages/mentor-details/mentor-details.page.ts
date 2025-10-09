@@ -25,7 +25,7 @@ import { TitleCasePipe } from '@angular/common';
 export class MentorDetailsPage implements OnInit {
   mentorName;
   mentorId;
-  isdisabled:boolean=true;
+  isdisabled:boolean;
   connected;
   public isMobile: any;
   currentUserId: any;
@@ -100,7 +100,6 @@ export class MentorDetailsPage implements OnInit {
   mentorProfileData: any;
   userNotFound: boolean = false;
   userCanAccess: boolean;
-  showDetails: boolean = true;
   SKELETON = SKELETON;
   constructor(
     private routerParams: ActivatedRoute,
@@ -132,12 +131,17 @@ export class MentorDetailsPage implements OnInit {
     this.updateButtonConfig();
     this.isloaded = true;
     this.detailData.data = this.mentorProfileData?.result;
-    console.log(this.detailData.data, "data at 128")
     this.detailData.data.organizationName =
       this.mentorProfileData?.result?.organization?.name || '';
     // this.headerConfig.share = this.detailData.data?.is_mentor;
      this.mentorName = new TitleCasePipe().transform(this.mentorProfileData.result.username);
-     this.mentorProfileData.result.is_connected ?  this.headerConfig.actions.push("block", "share") : this.headerConfig.actions.push("share");
+    this.headerConfig.actions = []; 
+
+    if (this.mentorProfileData.result.is_connected) {
+        this.headerConfig.actions.push("block", "share");
+    } else {
+        this.headerConfig.actions.push("share");
+           }
   }
   
 async getMentorDetails() {
@@ -192,7 +196,6 @@ async getMentorDetails() {
 
       case 'block':
         this.block(this.mentorId);
-        console.log("block received 170");
         break;
     }
   }
@@ -214,7 +217,6 @@ async getMentorDetails() {
    async block(mentorId) {
     const userId = mentorId;
 
-    console.log(userId, "userId id value line 195")
     const result = await this.utilService.alertPopup({
     header: "CONFIRM_BLOCK_HEADER",   
     message: "CONFIRM_BLOCK_MESSAGE", 
@@ -226,7 +228,6 @@ async getMentorDetails() {
   );
 
   if (result) {
-    console.log( "funtion triggered!!!", userId);
     // const payload = {
     //       url:urlConstants.block,
     //       payload: {user_id: userId},
@@ -234,11 +235,8 @@ async getMentorDetails() {
     //     this.httpService.post(payload)
     
         this.toast.showToast("BLOCK_TOAST_MESSAGE","success", 5000,[],undefined, {name:this.mentorName})
-        this.isdisabled=false;
-       this.showDetails= false;
-            }  else {
-                    console.log("User cancelled unblock.");
-                    }
+        this.isdisabled=true;
+             }           
 }  
   copyToClipBoard = async (copyData: any) => {
     await Clipboard.write({
@@ -302,7 +300,7 @@ async getMentorDetails() {
   }
 
   unblock(){
-    console.log("unblock button working");
+    this.isdisabled=false;
     // implement the api function
   }
 }

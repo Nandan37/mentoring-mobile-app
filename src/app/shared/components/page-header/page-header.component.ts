@@ -53,6 +53,7 @@ export class PageHeaderComponent implements OnInit {
     } else {
       this.location.pop();
     }
+    
   }
   async openPopover(ev: Event) {
     const popover = await this.popoverCtrl.create({
@@ -68,7 +69,6 @@ export class PageHeaderComponent implements OnInit {
 
     const { data } = await popover.onDidDismiss();
     if (data) {
-      console.log('Selected action:', data);
       this.handleAction(data);
     }
   }
@@ -78,12 +78,10 @@ export class PageHeaderComponent implements OnInit {
 
       case "block":
         this.actionEvent.next(event);
-        console.log("block selected")
         break;
 
       case "share":
         this.actionEvent.next(event);
-        console.log("share selected")
         break;
     }
   }
