@@ -2721,5 +2721,29 @@
         }
     }
   }
+},
+{
+  "type": "profileDetails",
+  "sub_type": "profileDetailsForm",
+  "action": "update",
+  "data": {
+    "templateName": "defaultTemplate",
+    "fields": {
+      "controls": [
+        { "title": "ABOUT", "key": "about" },
+        { "title": "DESIGNATION", "key": "designation" },
+        { "title": "ORGANIZATION", "key": "organizationName" },
+        { "title": "YEAR_OF_EXPERIENCE", "key": "experience" },
+        { "title": "KEY_AREAS_OF_EXPERTISE", "key": "area_of_expertise" },
+        { "title": "EDUCATION_QUALIFICATION", "key": "education_qualification" },
+        { "title": "LANGUAGES", "key": "languages" }
+      ],
+      "data": {
+        "rating": { "average": 0 },
+        "sessions_hosted": 0,
+        "organizationName": ""
+      }
+    }
+  }
 }
 ]

@@ -1,6 +1,6 @@
 import * as _ from 'lodash';
 import { BIG_NUMBER_DASHBOARD_FORM, DASHBOARD_TABLE_META_KEYS } from 'src/app/core/constants/formConstant';
-import { HttpService } from 'src/app/core/services';
+import { HttpService, UtilService } from 'src/app/core/services';
 import { FormService } from 'src/app/core/services/form/form.service';
 import * as moment from 'moment';
 import { urlConstants } from 'src/app/core/constants/urlConstants';
@@ -15,7 +15,6 @@ import { TranslateService } from '@ngx-translate/core';
   styleUrls: ['dashboard.page.scss'],
 })
 export class DashboardPage implements OnInit {
-
   user: any;
   sessions: any;
   filteredCards: any = [];
@@ -56,7 +55,8 @@ export class DashboardPage implements OnInit {
     private profile: ProfileService,
     private apiService: HttpService,
     private form: FormService,
-    public translate: TranslateService) { }
+    public translate: TranslateService,
+    private utilService: UtilService) { }
 
   
   ionViewWillEnter() {
@@ -94,7 +94,7 @@ export class DashboardPage implements OnInit {
 
   async initialDuration(){
     const today = moment();
-    this.startDate = today.clone().startOf('month').add(1, 'day');
+    this.startDate = today.clone().startOf('month').add(1, 'second');
     this.endDate = today.clone().endOf('month');
     this.groupBy = 'day';
     const startDateEpoch = this.startDate ? this.startDate.unix() : null;
@@ -115,22 +115,23 @@ export class DashboardPage implements OnInit {
   
     switch (this.selectedDuration) {
       case 'week':
-        this.startDate = today.clone().startOf('week').add(1, 'day');
+        this.startDate = today.clone().startOf('week').add(1, 'second');
         this.endDate = today.clone().endOf('week');
         this.groupBy = 'day';
         break;
       case 'month':
-        this.startDate = today.clone().startOf('month').add(1, 'day');
+        this.startDate = today.clone().startOf('month').add(1, 'second');
         this.endDate = today.clone().endOf('month');
         this.groupBy = 'day';
         break;
       case 'quarter':
-        this.startDate = today.clone().startOf('quarter').add(1, 'day');
+        this.startDate = today.clone().startOf('quarter').add(1, 'second');
         this.endDate = today.clone().endOf('quarter');
         this.groupBy = 'month';
+        console.log(this.startDate, 'start date', this.endDate, 'end date', today, 'todayy')
         break;
       case 'year':
-        this.startDate = firstDayOfYear.clone().date(1).add(1, 'day');
+        this.startDate = firstDayOfYear.clone().date(1).add(1, 'second');
         this.endDate = lastDayOfYear.clone();
         this.groupBy = 'month';
         break;
@@ -300,7 +301,7 @@ export class DashboardPage implements OnInit {
       `&session_type=${this.session_type}` +
       `&start_date=${this.startDateEpoch || ''}` +
       `&end_date=${this.endDateEpoch || ''}` +
-      `&groupBy=${this.groupBy}`;
+      `&group_by=${this.groupBy}`;
     const params = `${urlConstants.API_URLS.DASHBOARD_REPORT_DATA}` +
       `report_code=${this.report_code}${queryParams}`;
     this.chartBodyPayload =  this.entityTypes ? { entityTypes: this.entityTypes}: {};
@@ -327,13 +328,21 @@ export class DashboardPage implements OnInit {
     `&session_type=${this.session_type}` +
     `&start_date=${this.startDateEpoch || ''}` +
     `&end_date=${this.endDateEpoch || ''}` +
-    `&groupBy=${this.groupBy}`;
+    `&group_by=${this.groupBy}`;
   this.chartBody.chartUrl = this.chartBodyConfig.chartUrl;
   this.chartBodyPayload = this.entityTypes ? { entityTypes: this.entityTypes} : {};
   setTimeout(() => {
   this.chartBody.chartUrl = `${environment.baseUrl}${urlConstants.API_URLS.DASHBOARD_REPORT_DATA}` + 'report_code='+ this.chartBody.report_code + queryParams;
   }, 10);
   this.chartBody.headers = await this.apiService.setHeaders();
+  }
+
+ downloadCSV(data: { url: string; fileName: string }) {
+    let fileName = data.fileName?.toLowerCase().endsWith('.csv')
+      ? data.fileName.slice(0, -4)
+      : data.fileName;
+    console.log(data.url, "104 --->", fileName);
+    this.utilService.parseAndDownloadCSV(data.url, fileName + ".csv");
   }
 }
 
