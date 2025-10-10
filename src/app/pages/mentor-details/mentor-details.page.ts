@@ -15,6 +15,9 @@ import { Clipboard } from '@capacitor/clipboard';
 import { SessionService } from 'src/app/core/services/session/session.service';
 import { CommonRoutes } from 'src/global.routes';
 import { Location } from '@angular/common';
+import { FormService } from 'src/app/core/services/form/form.service';
+import { PROFILE_DETAILS_FORM } from 'src/app/core/constants/formConstant';
+import * as _ from 'lodash';
 
 @Component({
   selector: 'app-mentor-details',
@@ -48,45 +51,8 @@ export class MentorDetailsPage implements OnInit {
   ],
   };
 
-  detailData: any = {
-    form: [
-      {
-        title: 'ABOUT',
-        key: 'about',
-      },
-      {
-        title: 'DESIGNATION',
-        key: 'designation',
-      },
-      {
-        title: 'ORGANIZATION',
-        key: 'organizationName',
-      },
-      {
-        title: 'YEAR_OF_EXPERIENCE',
-        key: 'experience',
-      },
-      {
-        title: 'KEY_AREAS_OF_EXPERTISE',
-        key: 'area_of_expertise',
-      },
-      {
-        title: 'EDUCATION_QUALIFICATION',
-        key: 'education_qualification',
-      },
-      {
-        title: 'LANGUAGES',
-        key: 'languages',
-      },
-    ],
-    data: {
-      rating: {
-        average: 0,
-      },
-      sessions_hosted: 0,
-      organizationName: '',
-    },
-  };
+  detailData: any;
+
   userCantAccess?: boolean = false;
   isloaded: boolean = false;
   segmentValue = 'about';
@@ -105,16 +71,19 @@ export class MentorDetailsPage implements OnInit {
     private toast: ToastService,
     private utilService: UtilService, 
     private location: Location,
+    private form: FormService
   ) {}
 
   ngOnInit() {}
   async ionViewWillEnter() {
     this.isMobile = this.utilService.isMobile();
+    let user = await this.localStorage.getLocalData(localKeys.USER_DETAILS)
+    const result = await this.form.getForm(PROFILE_DETAILS_FORM);
+    this.detailData = _.get(result, 'data.fields');
     this.routerParams.params.subscribe((params) => {
       this.mentorId = this.buttonConfig.meta.id = params.id;
       this.getMentor();
     })
-    let user = await this.localStorage.getLocalData(localKeys.USER_DETAILS)
     this.currentUserId= user.id
     this.updateButtonConfig();
   }

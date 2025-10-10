@@ -18,7 +18,7 @@ import { EDIT_PROFILE_FORM } from 'src/app/core/constants/formConstant';
 export class ProfilePage implements OnInit {
   @ViewChild(IonContent) content: IonContent;
   formData: any = {
-    form: [
+    controls: [
       { title: 'SESSIONS_ATTENDED',
         key: 'sessions_attended',
       },
@@ -123,8 +123,8 @@ public buttonConfig = {
     var result = await this.profileService.getProfileDetailsFromAPI();
     response.data.fields.controls.forEach(entity => {
       Object.entries(result).forEach(([key, value]) => {
-        if(entity.type=='chip' &&  entity.name == key && !this.formData.form.some(obj => obj.key === entity.name)){
-          this.formData.form.push(
+        if(entity.type=='chip' &&  entity.name == key && !this.formData.controls.some(obj => obj.key === entity.name)){
+          this.formData.controls.push(
             {
               title: entity.label,
               key: entity.name
@@ -156,8 +156,8 @@ public buttonConfig = {
     }
   ];
   extraDataForm.forEach(field => {
-    if (!this.formData.form.some(existingField => existingField.key === field.key)) {
-      this.formData.form.push(field);
+    if (!this.formData.controls.some(existingField => existingField.key === field.key)) {
+      this.formData.controls.push(field);
     }
   });
     if(result){

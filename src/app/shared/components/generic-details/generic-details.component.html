@@ -1,4 +1,4 @@
-<div class="field-wrapper" *ngFor="let item of sessionData.form">
+<div class="field-wrapper" *ngFor="let item of sessionData.controls">
   <div
     *ngIf="!sessionData?.menteeForm?.includes(item.title) || (sessionData?.menteeForm?.includes(item.title)&&!isMentor)">
     <p class="session-detail-heading">{{item.title | translate }}</p>

@@ -63,7 +63,7 @@ export class SessionDetailPage implements OnInit, OnDestroy {
   }
 
   async ionViewWillEnter() {
-    this.detailData.form = JSON.parse(JSON.stringify(this.defaultUiForm));
+    this.detailData.controls = JSON.parse(JSON.stringify(this.defaultUiForm));
     await this.user.getUserValue();
     this.userDetails = await this.localStorage.getLocalData(localKeys.USER_DETAILS);
      await this.fetchSessionDetails();
@@ -75,7 +75,7 @@ export class SessionDetailPage implements OnInit, OnDestroy {
     share: false
   };
   detailData = {
-    form: [
+    controls: [
       
     ],
     data: {
@@ -145,8 +145,8 @@ export class SessionDetailPage implements OnInit, OnDestroy {
     if(response && entityList.result.length){
       entityList.result.forEach(entity => {
         Object.entries(response?.result).forEach(([key, value]) => {
-          if(Array.isArray(value) &&   entity.value == key && !this.detailData.form.some(obj => obj.key === entity.value) ){
-            this.detailData.form.push(
+          if(Array.isArray(value) &&   entity.value == key && !this.detailData.controls.some(obj => obj.key === entity.value) ){
+            this.detailData.controls.push(
               {
                   title: entity.label,
                   key: entity.value,
@@ -183,22 +183,22 @@ export class SessionDetailPage implements OnInit, OnDestroy {
           ? response.mentor_designation.map((d: any) => d?.label).join(', ')
           : []
           },
-          form: [...this.detailData.form]
+          controls: [...this.detailData.controls]
         };
       this.startDate = (response.start_date>0)?new Date(response.start_date * 1000):this.startDate;
       this.endDate = (response.end_date>0)?new Date(response.end_date * 1000):this.endDate;
       this.platformOff = (response?.meeting_info?.platform == 'OFF') ? true : false;
-      if((!this.detailData.form.some(obj => obj.title === 'MENTOR'))){
-        this.detailData.form.push(
+      if((!this.detailData.controls.some(obj => obj.title === 'MENTOR'))){
+        this.detailData.controls.push(
           {
             title: 'MENTOR',
             key: 'mentor_name',
           },
         );
       } 
-      if((this.isCreator || this.isConductor) && !this.detailData.form.some(obj => obj.title === 'MENTEE_COUNT')){
+      if((this.isCreator || this.isConductor) && !this.detailData.controls.some(obj => obj.title === 'MENTEE_COUNT')){
         
-        this.detailData.form.push(
+        this.detailData.controls.push(
           {
             title: 'MENTEE_COUNT',
             key: 'mentee_count',
