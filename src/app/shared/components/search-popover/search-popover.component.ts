@@ -70,7 +70,7 @@ export class SearchPopoverComponent implements OnInit {
     if (this.data.viewListMode) {
       this.selectedList.forEach((ele) => {
         ele.organization = (typeof ele.organization === 'object' && ele.organization !== null) ? ele.organization.name : ele.organization;
-        ele.action = ele.type=='ENROLLED' ? [{ name: 'REMOVE', cssColor: 'primary-color' , isDisabled: false}] : this.actionButtons.REMOVE;
+        ele.action = ele.type=='ENROLLED' ? [{ name: 'REMOVE', cssColor: 'primary-color' , isDisabled: true}] : this.actionButtons.REMOVE;
       });
       this.tableData = this.selectedList
       this.filterData = [];
