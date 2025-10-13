@@ -55,7 +55,10 @@
                 <ion-row class="d-flex flex-justify-center">
                   <div *ngFor="let buttonName of element[column.name]">
                     <ion-button *ngIf="buttonName.name" [class]="buttonName.cssColor"
-                      (click)="onCellClick(buttonName.name,column,element)">
+                      (click)="onCellClick(buttonName.name,column,element)"
+                      [disabled] = "buttonName.isDisabled"
+                      >
+
                       {{ buttonName.name | translate }}
                     </ion-button>
                     <ion-button *ngIf="buttonName.icon" [class]="buttonName.cssColor"

@@ -37,8 +37,9 @@ export class SearchPopoverComponent implements OnInit {
   sortingData;
   setPaginatorToFirstpage:any = false;
   actionButtons = {
-    'ADD': [{ name: 'ADD', cssColor: 'white-color' }],
-    'REMOVE': [{ name: 'REMOVE', cssColor: 'primary-color' }],
+    'ADD': [{ name: 'ADD', cssColor: 'white-color', isDisabled: false }],
+    'REMOVE': [{ name: 'REMOVE', cssColor: 'primary-color' , isDisabled: false}],
+
   }
   selectedFilters:any = {};
   selectedList: any=[];
@@ -69,7 +70,7 @@ export class SearchPopoverComponent implements OnInit {
     if (this.data.viewListMode) {
       this.selectedList.forEach((ele) => {
         ele.organization = (typeof ele.organization === 'object' && ele.organization !== null) ? ele.organization.name : ele.organization;
-        ele.action = ele.type=='ENROLLED' ? [] : this.actionButtons.REMOVE;
+        ele.action = ele.type=='ENROLLED' ? [{ name: 'REMOVE', cssColor: 'primary-color' , isDisabled: false}] : this.actionButtons.REMOVE;
       });
       this.tableData = this.selectedList
       this.filterData = [];
@@ -137,7 +138,7 @@ export class SearchPopoverComponent implements OnInit {
       this.noDataMessage = this.searchText ? "SEARCH_RESULT_NOT_FOUND" : "THIS_SPACE_LOOKS_EMPTY"
       let selectedIds =  _.map(this.selectedList, 'id');
       data.result.data.forEach((ele) => {
-        ele.action = _.includes(selectedIds, ele.id) ? (ele.enrolled_type === 'ENROLLED' ? [] : this.actionButtons.REMOVE) : this.actionButtons.ADD;
+        ele.action = _.includes(selectedIds, ele.id) ? (ele.enrolled_type === 'ENROLLED' ? [{ name: 'REMOVE', cssColor: 'primary-color' , isDisabled: true}] : this.actionButtons.REMOVE) : this.actionButtons.ADD;
         ele.type = ele?.enrolled_type
         ele.organization = ele?.organization?.name;
       });
