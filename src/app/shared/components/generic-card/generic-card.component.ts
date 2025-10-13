@@ -36,6 +36,7 @@ export class GenericCardComponent implements OnInit {
       data: data.id || data.user_id,
       type: action,
       rid: data?.connection_meta?.room_id,
+      element: data
     };
     this.onClickEvent.emit(value);
   }
