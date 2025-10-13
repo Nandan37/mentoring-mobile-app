@@ -9,8 +9,8 @@
         <div class="download"  (click)="onClickDownload()">{{ download | translate}}</div>
       </div>
       <div class="card-wrapper" *ngFor="let data of enrolledMenteeList">
-        <ion-header class="card-header d-flex flex-justify-center">{{data.name}}, {{data.organization}}</ion-header>
-        <ion-label class="card-data d-flex flex-justify-center">{{data.email}}</ion-label>
+        <div class="card-header d-flex flex-justify-center">{{data.name}}, {{data.organization}}</div>
+        <div class="card-data d-flex flex-justify-center">{{data.email}}</div>
       </div>
     </div>
     <div *ngIf="!enrolledMenteeList?.length">
