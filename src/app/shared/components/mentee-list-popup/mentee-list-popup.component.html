@@ -9,7 +9,7 @@
         <div class="download"  (click)="onClickDownload()">{{ download | translate}}</div>
       </div>
       <div class="card-wrapper" *ngFor="let data of enrolledMenteeList">
-        <div class="card-header d-flex flex-justify-center">{{data.name}}, {{data.organization}}</div>
+        <div class="card-header d-flex flex-justify-center">{{data.name}}{{data.organization ? ', ' + data.organization : ''}}</div>
         <div class="card-data d-flex flex-justify-center">{{data.email}}</div>
       </div>
     </div>
