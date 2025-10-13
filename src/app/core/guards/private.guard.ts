@@ -17,11 +17,9 @@ export class PrivateGuard implements CanActivate {
         this.utilService?.alertClose();
         return true;
       }
-      this.toastService.showToast('SOMETHING_WENT_WRONG', 'danger')
       location.href = window.location.origin;
       return false;
     } catch (err) {
-      this.toastService.showToast('SOMETHING_WENT_WRONG', 'danger')
       location.href = window.location.origin;
       return false;
     }
