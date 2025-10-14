@@ -218,7 +218,7 @@ export class SessionService {
 
   async getUpcomingSessions(id) {
     const config = {
-      url: urlConstants.API_URLS.UPCOMING_SESSIONS + id + "?page=1&limit=100&type=PUBLIC",
+      url: urlConstants.API_URLS.UPCOMING_SESSIONS + id + "?page=1&limit=100",
       payload: {}
     };
     try {
