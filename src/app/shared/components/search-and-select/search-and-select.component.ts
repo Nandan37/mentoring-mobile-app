@@ -30,6 +30,7 @@ export class SearchAndSelectComponent implements OnInit, ControlValueAccessor {
   @Input() sessionId: any;
   private static menteeControlRef: any;
   disabled;
+  isDisabled: boolean;
   touched = false;
   selectedChips;
   _selectAll;
