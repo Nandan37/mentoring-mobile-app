@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component } from '@angular/core';
 import { TranslateService } from '@ngx-translate/core';
 import { localKeys } from 'src/app/core/constants/localStorage.keys';
 import { LocalStorageService, ToastService } from 'src/app/core/services';
@@ -9,7 +9,7 @@ import { ProfileService } from 'src/app/core/services/profile/profile.service';
   templateUrl: './language.page.html',
   styleUrls: ['./language.page.scss'],
 })
-export class LanguagePage implements OnInit {
+export class LanguagePage  {
   public headerConfig: any = {
     // backButton: {
     //   label: 'LANGUAGE',
@@ -26,7 +26,7 @@ export class LanguagePage implements OnInit {
               private translate: TranslateService,
               private toast: ToastService,
               private profile: ProfileService) { }
-  ngOnInit() {
+  ionViewWillEnter() {
     this.localStorage.getLocalData(localKeys.SELECTED_LANGUAGE).then(data =>{
       this.selectedLanguage = data;
     })
