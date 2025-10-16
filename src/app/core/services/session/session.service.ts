@@ -281,9 +281,9 @@ export class SessionService {
     }
   }
 
-  async requestSessionList() {
+  async requestSessionList(page: number) {
     const config = {
-      url: urlConstants.API_URLS.REQUEST_SESSION_LIST + '?pageNo=1&pageSize=100' + '&status=REQUESTED,EXPIRED',
+      url: urlConstants.API_URLS.REQUEST_SESSION_LIST + '?pageNo=' + page + '&pageSize=100' + '&status=REQUESTED,EXPIRED',
     };
     try {
       let data: any = await this.httpService.get(config);

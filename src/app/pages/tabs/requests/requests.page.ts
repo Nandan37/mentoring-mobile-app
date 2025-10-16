@@ -28,12 +28,14 @@ export class RequestsPage implements OnInit {
   noResult: any;
   routeData: any;
   slotBtnConfig: any;
-  slotRequests: any;
-  mentorForm:any
+  slotRequests: any[] = [];
+  mentorForm:any;
   expiryTag = {
     label: 'EXPIRED',
     cssClass: 'expired-tag'
-  }
+  };
+  page = 1;
+  isInfiniteScrollDisabled = false;
 
   constructor(
     private httpService: HttpService,
@@ -51,25 +53,32 @@ export class RequestsPage implements OnInit {
       this.buttonConfig = this.routeData?.button_config;
       this.slotBtnConfig = this.routeData.slotButtonConfig;
     });
+    
+    this.page = 1;
+    this.slotRequests = [];
+    this.data = [];
+    this.isInfiniteScrollDisabled = false;
+    
     if (this.segmentType === 'slot-requests') {
-    await this.slotRequestData();
-  } else {
-    await this.pendingRequest();
-  }
-
+      await this.slotRequestData();
+    } else {
+      await this.pendingRequest();
+    }
   }
   ngOnInit() {
   }
 
-async segmentChanged(event: any) {
-  this.segmentType = event.target.value;
-  if (this.segmentType === 'slot-requests') {
-    await this.slotRequestData();
-  } else {
-    await this.pendingRequest();
+  async segmentChanged(event: any) {
+    this.segmentType = event.target.value;
+    this.page = 1;
+    this.isInfiniteScrollDisabled = false;
+    
+    if (this.segmentType === 'slot-requests') {
+      await this.slotRequestData();
+    } else {
+      await this.pendingRequest();
+    }
   }
-}
-
 
   async pendingRequest() {
     const config = {
@@ -77,51 +86,56 @@ async segmentChanged(event: any) {
     };
     try {
       let data: any = await this.httpService.get(config);
-      this.data = data ? data.result.data : '';
+      this.data = data ? data.result.data : [];
       if (!this.data?.length) {
-      this.noResult = { subHeader: this.routeData?.noDataFound.noMessage };
-    }
+        this.noResult = { subHeader: this.routeData?.noDataFound.noMessage };
+      }
       return data;
     } catch (error) {
       return error;
     }
   }
 
- async slotRequestData() {
-  try {
-    const res = await this.sessionService.requestSessionList();
-    const data = res?.result?.data ?? [];
+  async slotRequestData() {
+    try {
+      const res = await this.sessionService.requestSessionList(this.page);
+      const data = res?.result?.data ?? [];
+      if (data.length === 0) {
+        this.isInfiniteScrollDisabled = true;
+        if (this.page === 1) {
+          this.noResult = { subHeader: this.routeData?.noDataFound?.noSession };
+        }
+        return;
+      }
 
-    if (data.length === 0) {
-      this.noResult = { subHeader: this.routeData?.noDataFound?.noSession };
+      const formattedData = data.map(value => ({
+        ...value,
+        meta: this.getMeta(value),
+        showTag: this.isSessionExpired(value) ? this.expiryTag : '',
+        disableButton: this.isSessionExpired(value)
+      }));
+
+      this.slotRequests = [...this.slotRequests, ...formattedData];
+
+    } catch (error) {
+      console.error('Error fetching session list:', error);
+      this.isInfiniteScrollDisabled = true;
     }
-
-    this.slotRequests = data.map(value => ({
-      ...value,
-      meta: this.getMeta(value),
-      showTag: this.isSessionExpired(value) ? this.expiryTag : '',
-      disableButton: this.isSessionExpired(value)
-    }));
-
-  } catch (error) {
-    console.error('Error fetching session list:', error);
   }
-}
-
 
   getMeta(value: any) {
-  return {
-    isSent: value?.requestee_id === value?.user_details?.user_id,
-    message: value?.meta?.message,
-    timeStamp: '',
-    resp: value
-  };
-}
+    return {
+      isSent: value?.requestee_id === value?.user_details?.user_id,
+      message: value?.meta?.message,
+      timeStamp: '',
+      resp: value
+    };
+  }
 
   isSessionExpired(meta): boolean {
-  const endDate = meta?.end_date;
-  if (!endDate) return false; 
-  return Date.now() > endDate * 1000;
+    const endDate = meta?.end_date;
+    if (!endDate) return false; 
+    return Date.now() > endDate * 1000;
   }
   
   onCardClick(event, data?) {
@@ -135,4 +149,11 @@ async segmentChanged(event: any) {
     }
   }
 
+  async loadMore($event: any) {
+    if (this.segmentType === 'slot-requests') {
+      this.page = this.page + 1;
+      await this.slotRequestData();
+    }
+    $event.target.complete();
+  }
 }

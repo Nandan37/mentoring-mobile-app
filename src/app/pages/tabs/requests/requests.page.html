@@ -1,6 +1,6 @@
 <app-page-header [config]="headerConfig"></app-page-header>
 
-<ion-content>
+<ion-content scrollEvents="true">
   <div class="d-flex flex-justify-center">
     <ion-header>
       <ion-segment (ionChange)="segmentChanged($event)" [value]="segmentType">
@@ -18,20 +18,28 @@
       <ion-grid >
         <ion-row class="d-flex ">
           <ion-col *ngFor="let value of slotRequests" padding size-xs="12" size-sm="12" size-md="6" size-lg="6" size-xl="4" align-self-stretch>
-          <app-generic-card
-            [data]="value.user_details"
-            [meta]="value.meta"
-            [showTag]="value.showTag"
-            [buttonConfig]="slotBtnConfig"
-            (onClickEvent)="onCardClick($event, value.id)"
-            [cardConfig]="mentorForm"
-            [disableButton]="value.disableButton">
-          </app-generic-card>
-
+            <app-generic-card
+              [data]="value.user_details"
+              [meta]="value.meta"
+              [showTag]="value.showTag"
+              [buttonConfig]="slotBtnConfig"
+              (onClickEvent)="onCardClick($event, value.id)"
+              [cardConfig]="mentorForm"
+              [disableButton]="value.disableButton">
+            </app-generic-card>
           </ion-col>
         </ion-row>
       </ion-grid>
+      <ion-infinite-scroll 
+        #infinitescroll 
+        [disabled]="isInfiniteScrollDisabled" 
+        (ionInfinite)="loadMore($event)"
+        threshold="100px">
+        <ion-infinite-scroll-content loadingSpinner="bubbles">
+        </ion-infinite-scroll-content>
+      </ion-infinite-scroll>
     </div>
+    
     <div *ngSwitchCase="'message-requests'">
       <ion-grid >
         <ion-row class="d-flex ">
@@ -46,8 +54,8 @@
       </ion-grid>
     </div>
   </div>
-  <div *ngIf="segmentType === 'slot-requests' && !slotRequests?.length">
-    <app-no-data-found [noResult]="noResult"> </app-no-data-found>
+  <div *ngIf="segmentType === 'slot-requests' && !slotRequests?.length && !isInfiniteScrollDisabled">
+    <app-no-data-found [noResult]="noResult"></app-no-data-found>
   </div>
   <div *ngIf="segmentType === 'message-requests' && !data?.length" >
     <app-no-data-found [noResult]="noResult"> </app-no-data-found>
