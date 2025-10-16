@@ -10,7 +10,6 @@ import { ProfileService } from 'src/app/core/services/profile/profile.service';
 import { HttpService, LoaderService, LocalStorageService, ToastService, UserService, UtilService } from 'src/app/core/services';
 import { SessionService } from 'src/app/core/services/session/session.service';
 import { TermsAndConditionsPage } from '../../terms-and-conditions/terms-and-conditions.page';
-import { App, AppState } from '@capacitor/app';
 import { Capacitor } from '@capacitor/core';
 import { PermissionService } from 'src/app/core/services/permission/permission.service';
 import { environment } from 'src/environments/environment';
@@ -22,9 +21,10 @@ import { CdkConnectedOverlay } from '@angular/cdk/overlay';
   templateUrl: 'home.page.html',
   styleUrls: ['home.page.scss'],
 })
-export class HomePage implements OnInit {
+export class HomePage  {
   public formData: JsonFormData;
   user;
+  private isLoading: boolean = false;
   SESSIONS: string = CommonRoutes.SESSIONS;
   SKELETON = SKELETON;
   page = 1;
@@ -75,52 +75,41 @@ export class HomePage implements OnInit {
   }
  
 
-  async ngOnInit() {
-    await this.getUser();
-    if(this.user && !this.user.profile_mandatory_fields.length){
-      this.getSessions();
-    }
-    App.addListener('appStateChange', (state: AppState) => {
-      this.localStorage.getLocalData(localKeys.USER_DETAILS).then(data => {
-        if (state.isActive == true && data && !data.profile_mandatory_fields.length) {
-          this.getSessions();
-          if(this.profileService.isMentor){
-            this.getCreatedSessionDetails();
-          }
-        }
-      })
-    });
-    let isRoleRequested = await this.localStorage.getLocalData(localKeys.IS_ROLE_REQUESTED)
-    let isBecomeMentorTileClosed = await this.localStorage.getLocalData(localKeys.IS_BECOME_MENTOR_TILE_CLOSED);
-    this.showBecomeMentorCard = (isRoleRequested || this.profileService.isMentor || isBecomeMentorTileClosed) ? false : true;
-    if(this.profileService.isMentor){
-      this.getCreatedSessionDetails();
-    }
-    this.userEventSubscription = this.userService.userEventEmitted$.subscribe(data => {
-      if (data) {
-        this.isMentor = this.profileService.isMentor
-        this.user = data;
-      }
-    })
-    this.user = await this.localStorage.getLocalData(localKeys.USER_DETAILS)
-    this.permissionService.getPlatformConfig().then((config)=>{
-      this.chips = config.result.search_config.search.session.fields;
-    })
-  }
+  
   gotToTop() {
     this.content.scrollToTop(1000);
   }
-
-  async ionViewWillEnter() {
-    this.getSessions();
+async ionViewWillEnter() {
+    if (this.isLoading) return;
+    this.isLoading = true;
     await this.getUser();
     this.gotToTop();
-    let isRoleRequested = await this.localStorage.getLocalData(localKeys.IS_ROLE_REQUESTED)
+    let isRoleRequested = await this.localStorage.getLocalData(localKeys.IS_ROLE_REQUESTED);
     let isBecomeMentorTileClosed =await this.localStorage.getLocalData(localKeys.IS_BECOME_MENTOR_TILE_CLOSED);
     this.showBecomeMentorCard = (isRoleRequested || this.profileService.isMentor || isBecomeMentorTileClosed) ? false : true;
-    var obj = { page: this.page, limit: this.limit, searchText: "" };
-    this.createdSessions = this.isMentor ? await this.sessionService.getAllSessionsAPI(obj) : []
-  }
+    if (this.user && !this.user.profile_mandatory_fields.length) {
+        this.getSessions();
+    }
+    if (this.profileService.isMentor) {
+        var obj = { page: this.page, limit: this.limit, searchText: "" };
+        this.createdSessions = await this.sessionService.getAllSessionsAPI(obj);
+    } else {
+        this.createdSessions = [];
+    }
+    if (!this.userEventSubscription) {
+        this.userEventSubscription = this.userService.userEventEmitted$.subscribe(data => {
+            if (data) {
+                this.isMentor = this.profileService.isMentor;
+                this.user = data;
+            }
+        });
+    }
+    if (!this.chips) {
+        this.permissionService.getPlatformConfig().then((config) => {
+            this.chips = config.result.search_config.search.session.fields;
+        });
+    }
+}
   async eventAction(event) {
     if (this.user.about || environment['isAuthBypassed']) {
       switch (event.type) {
@@ -240,6 +229,7 @@ export class HomePage implements OnInit {
 
   ionViewWillLeave(){
     this.isOpen = false;
+    this.isLoading = false;
     if (this.connectedOverlay && this.connectedOverlay.overlayRef) {
     this.connectedOverlay.overlayRef.detach();
     }
