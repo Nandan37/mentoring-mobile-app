@@ -104,7 +104,7 @@ async ionViewWillEnter() {
             }
         });
     }
-    if (this.chips.length == 0) {
+   if (this.chips.length == 0) {
         this.permissionService.getPlatformConfig().then((config) => {
             this.chips = config.result.search_config.search.session.fields;
         });
