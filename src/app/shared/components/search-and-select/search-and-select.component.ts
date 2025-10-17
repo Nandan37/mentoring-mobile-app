@@ -191,7 +191,7 @@ export class SearchAndSelectComponent implements OnInit, ControlValueAccessor {
       componentProps: {
         data: data, 
         type: 'link',
-        heading: 'ADD_LINK'
+        heading: 'ADD_LINK_POPUP'
       },
       backdropDismiss: false
     });

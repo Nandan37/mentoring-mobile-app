@@ -372,6 +372,7 @@
     "USER_GUIDE_VIDEOS":"User Guide Videos",
     "HELP_SIDEMENU":"Report an Issue",
     "ADD_LINK": "Add link",
+    "ADD_LINK_POPUP": "Add link",
     "ADD_URL": "Add URL",
     "POST_RESOURCES": "Post resources",
     "PRE_RESOURCES": "Pre resources",
@@ -415,6 +416,7 @@
     "A_SLOT": "a slot at",
     "IS_REQUESTING": "is requesting",
     "ON": "on",
-    "SLOT_BOOKED": " Slot booked with"
+    "SLOT_BOOKED": " Slot booked with",
+    "SEARCH_CONNECTIONS": "Search connections"
 
 }
