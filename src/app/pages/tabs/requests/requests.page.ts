@@ -88,7 +88,7 @@ export class RequestsPage implements OnInit {
       let data: any = await this.httpService.get(config);
       this.data = data ? data.result.data : [];
       if (!this.data?.length) {
-        this.noResult = { subHeader: this.routeData?.noDataFound.noMessage };
+        this.noResult = this.routeData?.noDataFound.noMessage;
       }
       return data;
     } catch (error) {
@@ -103,7 +103,7 @@ export class RequestsPage implements OnInit {
       if (data.length === 0) {
         this.isInfiniteScrollDisabled = true;
         if (this.page === 1) {
-          this.noResult = { subHeader: this.routeData?.noDataFound?.noSession };
+          this.noResult =this.routeData?.noDataFound?.noSession;
         }
         return;
       }

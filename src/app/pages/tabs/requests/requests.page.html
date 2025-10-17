@@ -54,10 +54,10 @@
       </ion-grid>
     </div>
   </div>
-  <div *ngIf="segmentType === 'slot-requests' && !slotRequests?.length && !isInfiniteScrollDisabled">
-    <app-no-data-found [noResult]="noResult"></app-no-data-found>
+  <div *ngIf="segmentType === 'slot-requests' && !slotRequests?.length && isInfiniteScrollDisabled">
+    <app-no-data-found [messageHeader]="noResult"></app-no-data-found>
   </div>
   <div *ngIf="segmentType === 'message-requests' && !data?.length" >
-    <app-no-data-found [noResult]="noResult"> </app-no-data-found>
+    <app-no-data-found [messageHeader]="noResult"> </app-no-data-found>
   </div>
 </ion-content>
