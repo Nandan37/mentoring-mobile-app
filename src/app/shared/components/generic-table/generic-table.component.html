@@ -58,7 +58,6 @@
                       (click)="onCellClick(buttonName.name,column,element)"
                       [disabled] = "buttonName.isDisabled"
                       >
-
                       {{ buttonName.name | translate }}
                     </ion-button>
                     <ion-button *ngIf="buttonName.icon" [class]="buttonName.cssColor"

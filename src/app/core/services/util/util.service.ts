@@ -182,7 +182,7 @@ export class UtilService {
         const options = filterData[key].map((item) => ({
           id: item.id,
           label: item.name,
-          value: item.code,
+          value: item.id,
         }));
         const type = formData.filters[key].find((obj) => obj.key === name).type;
         result.push({ title, name, options, type });
@@ -206,7 +206,7 @@ export class UtilService {
     }
     return result;
   }
-
+  
   parseAndDownloadCSV(rawCSVData: string, fileName: string): void {
     Papa.parse(rawCSVData, {
       complete: (result) => {
