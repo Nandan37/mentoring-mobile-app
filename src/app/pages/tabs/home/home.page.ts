@@ -207,7 +207,7 @@ export class HomePage{
       } else {
         this.sessions = data.result;
       }
-      this.enrolledSessionsCount = data.result.allSessions_count || 0;
+      this.enrolledSessionsCount = data.result.my_sessions_count || 0;
     }
   }
 
@@ -264,7 +264,6 @@ export class HomePage{
       case 'my-sessions':
         const enrolledSessionsLength = this.sessions?.my_sessions?.length || 0;
         return enrolledSessionsLength >= this.enrolledSessionsCount || enrolledSessionsLength === 0;
-      
       default:
         return true;
     }

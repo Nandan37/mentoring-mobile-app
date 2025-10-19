@@ -155,7 +155,7 @@
   <div *ngIf="!sessions && selectedSegment === 'my-sessions'">
     <app-skeleton [type]="SKELETON.HOME_SKELETON" [repetition]="4"></app-skeleton>
   </div>
-  <ion-infinite-scroll 
+  <ion-infinite-scroll   threshold="100px" 
     #infiniteScroll 
     [disabled]="isInfiniteScrollDisabled" 
     (ionInfinite)="loadMore($event)">
