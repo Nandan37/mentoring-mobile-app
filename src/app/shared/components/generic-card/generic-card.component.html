@@ -58,11 +58,16 @@
         @for(item of cardConfig.body; track item.name) {
           <div class="d-flex flex-align-items-center">
             <p class="card-text wrap-text">
-          {{ 
-          item.type === 'array' && data?.[item.name]?.length 
-          ? data[item.name][0]?.label + (data[item.name].length > 1 ? ' +' + (data[item.name].length - 1) : '') 
-          : data?.[item.name] ? data[item.name] + ' ' + (item.subText | translate) : '' 
-          }}
+                       {{
+  item.type === 'array' && data?.[item.name]?.length
+    ? data[item.name][0]?.label +
+      (data[item.name].length > 1 ? ' +' + (data[item.name].length - 1) : '')
+    : data?.[item.name]?.name
+    ? data[item.name].name + ' ' + (item.subText | translate)
+    : data?.[item.name]
+    ? data[item.name] 
+    : ''
+}}
             </p>
             @if(item.children) {
             @for(child of item.children; track child.name) {

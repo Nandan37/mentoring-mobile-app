@@ -42,7 +42,7 @@
       <ion-grid >
         <ion-row class="d-flex ">
           <ion-col *ngFor="let value of tableData" padding size-xs="12" size-sm="12"  align-self-stretch>
-            <app-generic-card [data]="value" [disableButton]="value?.action?.[0].isDisabled" (onClickEvent)="onButtonCLick($event)" [buttonConfig]="value?.action  "[cardConfig]="mentorForm"></app-generic-card>
+            <app-generic-card [data]="value" [disableButton]="value?.action?.[0].isDisabled" (onClickEvent)="onButtonCLick($event)" [buttonConfig]="value?.action  "[cardConfig]="mentorForm" [disableNavigation]="disableNavigation"></app-generic-card>
           </ion-col>
         </ion-row>
       </ion-grid>

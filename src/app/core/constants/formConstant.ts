@@ -120,3 +120,8 @@ export const CHAT_LIB_META_KEYS = {
 	"cantSendMsg": "CANT_SEND_MESSAGE",
 	"cantSendMsgToMentor": "CANT_SEND_MESSAGE_TO_MENTOR",
 }
+
+export const MENTEE_CARD_FORM: IFORM = {
+	"type": "menteeCard",
+	"sub_type": "menteeCardForm"
+}
