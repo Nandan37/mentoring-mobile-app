@@ -72,7 +72,7 @@ export class RequestsPage implements OnInit {
     this.segmentType = event.target.value;
     this.page = 1;
     this.isInfiniteScrollDisabled = false;
-    
+    this.noResult = '';
     if (this.segmentType === 'slot-requests') {
       await this.slotRequestData();
     } else {
@@ -96,12 +96,17 @@ export class RequestsPage implements OnInit {
     }
   }
 
-  async slotRequestData() {
+  async slotRequestData(isLoadMore: boolean = false) {
     try {
       const res = await this.sessionService.requestSessionList(this.page);
-      const data = res?.result?.data ?? [];
+      let data = [];
+      if (isLoadMore && data) {
+        data = [...data, ...(res?.result?.data || [])];
+      } else {
+        data = res?.result?.data;
+      }
+      this.isInfiniteScrollDisabled = res?.result?.count === data;
       if (data.length === 0) {
-        this.isInfiniteScrollDisabled = true;
         if (this.page === 1) {
           this.noResult =this.routeData?.noDataFound?.noSession;
         }
@@ -152,7 +157,7 @@ export class RequestsPage implements OnInit {
   async loadMore($event: any) {
     if (this.segmentType === 'slot-requests') {
       this.page = this.page + 1;
-      await this.slotRequestData();
+      await this.slotRequestData(true);
     }
     $event.target.complete();
   }

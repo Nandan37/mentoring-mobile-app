@@ -30,14 +30,7 @@
           </ion-col>
         </ion-row>
       </ion-grid>
-      <ion-infinite-scroll 
-        #infinitescroll 
-        [disabled]="isInfiniteScrollDisabled" 
-        (ionInfinite)="loadMore($event)"
-        threshold="100px">
-        <ion-infinite-scroll-content loadingSpinner="bubbles">
-        </ion-infinite-scroll-content>
-      </ion-infinite-scroll>
+    
     </div>
     
     <div *ngSwitchCase="'message-requests'">
@@ -54,10 +47,15 @@
       </ion-grid>
     </div>
   </div>
-  <div *ngIf="segmentType === 'slot-requests' && !slotRequests?.length && isInfiniteScrollDisabled">
+    <ion-infinite-scroll 
+        #infinitescroll 
+        [disabled]="isInfiniteScrollDisabled" 
+        (ionInfinite)="loadMore($event)"
+        threshold="100px">
+        <ion-infinite-scroll-content loadingSpinner="bubbles"  loadingText="{{'LOADING' | translate}}">
+        </ion-infinite-scroll-content>
+      </ion-infinite-scroll>
+  <div *ngIf="(segmentType === 'slot-requests' && !slotRequests?.length) || (segmentType === 'message-requests' && !data?.length)">
     <app-no-data-found [messageHeader]="noResult"></app-no-data-found>
-  </div>
-  <div *ngIf="segmentType === 'message-requests' && !data?.length" >
-    <app-no-data-found [messageHeader]="noResult"> </app-no-data-found>
   </div>
 </ion-content>
