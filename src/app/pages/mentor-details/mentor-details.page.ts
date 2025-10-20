@@ -61,7 +61,7 @@ export class MentorDetailsPage implements OnInit {
   userCantAccess?: boolean = false;
   isloaded: boolean = false;
   segmentValue = 'about';
-  upcomingSessions;
+  upcomingSessions = [];
   mentorProfileData: any;
   userNotFound: boolean = false;
   userCanAccess: boolean;
@@ -93,11 +93,12 @@ export class MentorDetailsPage implements OnInit {
       this.mentorId = this.buttonConfig.meta.id = params.id;
       this.getMentor();
     })
-    this.currentUserId= user.id
+    this.currentUserId = user.id
     this.updateButtonConfig();
-     this.page = 1;
+    this.page = 1;
     this.upcomingSessions = [];
-    this.getUpcomingSessions();
+    await this.getUpcomingSessions();
+    this.isLoading = false;
   }
 
   async getMentor() {
@@ -111,50 +112,64 @@ export class MentorDetailsPage implements OnInit {
     this.headerConfig.share = this.detailData.data?.is_mentor;
   }
 
-  async getUpcomingSessions() {
+  async getUpcomingSessions(isLoadMore: boolean = false) {
     const config = {
-      url: urlConstants.API_URLS.UPCOMING_SESSIONS + this.mentorId + "?page="+this.page + '&limit='+this.limit,
+      url: urlConstants.API_URLS.UPCOMING_SESSIONS + this.mentorId + "?page=" + this.page + '&limit=' + this.limit,
       payload: {}
     };
     try {
       let data = await this.httpService.get(config);
-      this.upcomingSessions = this.upcomingSessions.concat(data.result.data);
-      this.totalCount = data.result.count;
-      this.infiniteScroll.disabled = (this.upcomingSessions.length === this.totalCount) ? true : false;
+      const newSessions = data?.result?.data || [];
+      
+      if (isLoadMore) {
+        this.upcomingSessions = [...this.upcomingSessions, ...newSessions];
+      } else {
+        this.upcomingSessions = newSessions;
+      }
+      
+      this.totalCount = data?.result?.count || 0;
+      
+      if (this.infiniteScroll) {
+        this.infiniteScroll.disabled = this.upcomingSessions.length >= this.totalCount;
+      }
     }
     catch (error) {
+      console.error('Error fetching upcoming sessions:', error);
+      if (this.infiniteScroll) {
+        this.infiniteScroll.disabled = true;
+      }
     }
   }
 
-async getMentorDetails() {
-  const config = {
-    url: urlConstants.API_URLS.GET_PROFILE_DATA + this.mentorId,
-    payload: {},
-  };
-  try {
-    const data = await this.httpService.get(config);
-    if (data) {
-      this.userCanAccess = true;
+  async getMentorDetails() {
+    const config = {
+      url: urlConstants.API_URLS.GET_PROFILE_DATA + this.mentorId,
+      payload: {},
+    };
+    try {
+      const data = await this.httpService.get(config);
+      if (data) {
+        this.userCanAccess = true;
+      }
+      return data;
+    } catch (error: any) {
+      switch (error?.status) {
+       
+      case 404:
+        this.userNotFound = true;
+        break;
+
+      case 403:
+        this.userCantAccess = true;
+        break;
+
+      default:
+        this.toast.showToast('SOMETHING_WENT_WRONG', 'danger');
+        this.location.back();
+        break;
     }
-    return data;
-  } catch (error: any) {
-    switch (error?.status) {
-     
-    case 404:
-      this.userNotFound = true;
-      break;
-
-    case 403:
-      this.userCantAccess = true;
-      break;
-
-    default:
-      this.toast.showToast('SOMETHING_WENT_WRONG', 'danger');
-      this.location.back();
-      break;
+    }
   }
-  }
-}
 
 
   goToHome() {
@@ -166,9 +181,10 @@ async getMentorDetails() {
     if(this.segmentValue == 'upcoming'){
       this.page = 1;
       this.upcomingSessions = [];
-      this.getUpcomingSessions();
+      await this.getUpcomingSessions();
     }
   }
+  
   action(event) {
     switch (event) {
       case 'share':
@@ -176,6 +192,7 @@ async getMentorDetails() {
         break;
     }
   }
+  
   async share() {
     if(this.isMobile && navigator.share){
           let url = `/mentoring/${CommonRoutes.MENTOR_DETAILS}/${this.buttonConfig.meta.id}`;
@@ -191,6 +208,7 @@ async getMentorDetails() {
           this.toast.showToast('PROFILE_LINK_COPIED', 'success');
         }
   }
+  
   copyToClipBoard = async (copyData: any) => {
     await Clipboard.write({
       string: copyData,
@@ -198,6 +216,7 @@ async getMentorDetails() {
       this.toast.showToast('COPIED', 'success');
     });
   };
+  
   async onAction(event) {
     switch (event.type) {
       case 'cardSelect':
@@ -208,16 +227,16 @@ async getMentorDetails() {
         await this.sessionService.joinSession(event.data);
         this.page = 1;
         this.upcomingSessions = [];
-        this.getUpcomingSessions();
+        await this.getUpcomingSessions();
         break;
 
-        case 'enrollAction':
+      case 'enrollAction':
         let enrollResult = await this.sessionService.enrollSession(event.data.id);
         if(enrollResult.result){
           this.toast.showToast(enrollResult.message, "success")
           this.page = 1;
           this.upcomingSessions = [];
-          this.getUpcomingSessions();
+          await this.getUpcomingSessions();
         }
         break;
     }
@@ -251,11 +270,9 @@ async getMentorDetails() {
            }
   }
 
-  loadMore(event){
-    setTimeout(() => {
-      this.page += 1;
-      this.getUpcomingSessions();
-      event.target.complete();
-    }, 1000);
+  async loadMore(event) {
+    this.page += 1;
+    await this.getUpcomingSessions(true);
+    event.target.complete();
   }
 }
