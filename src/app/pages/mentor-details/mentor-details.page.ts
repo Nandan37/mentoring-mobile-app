@@ -65,6 +65,7 @@ export class MentorDetailsPage implements OnInit {
   mentorProfileData: any;
   userNotFound: boolean = false;
   userCanAccess: boolean;
+  isLoading = false;
   SKELETON = SKELETON;
   constructor(
     private routerParams: ActivatedRoute,
@@ -82,6 +83,9 @@ export class MentorDetailsPage implements OnInit {
   ngOnInit() {}
   async ionViewWillEnter() {
     this.isMobile = this.utilService.isMobile();
+    if(this.isLoading)
+      return;
+    this.isLoading = true;
     let user = await this.localStorage.getLocalData(localKeys.USER_DETAILS)
     const result = await this.form.getForm(PROFILE_DETAILS_FORM);
     this.detailData = _.get(result, 'data.fields');

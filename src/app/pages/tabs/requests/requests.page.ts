@@ -36,7 +36,7 @@ export class RequestsPage implements OnInit {
   };
   page = 1;
   isInfiniteScrollDisabled = false;
-
+  isLoading: boolean =false;
   constructor(
     private httpService: HttpService,
     private route: ActivatedRoute,
@@ -46,6 +46,9 @@ export class RequestsPage implements OnInit {
   ) {}
 
   async ionViewWillEnter(){
+    if(this.isLoading)
+      return;
+    this.isLoading = true;
     const result = await this.form.getForm(MENTOR_REQ_CARD_FORM);
     this.mentorForm = _.get(result, 'data.fields.controls');
     this.route.data.subscribe((data) => {
