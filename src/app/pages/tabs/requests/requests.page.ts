@@ -24,7 +24,7 @@ export class RequestsPage implements OnInit {
   };
   segmentType = 'slot-requests';
   buttonConfig: any;
-  data: any;
+  data: any[] = [];
   noResult: any;
   routeData: any;
   slotBtnConfig: any;
@@ -36,7 +36,8 @@ export class RequestsPage implements OnInit {
   };
   page = 1;
   isInfiniteScrollDisabled = false;
-  isLoading: boolean =false;
+  isLoading: boolean = false;
+  
   constructor(
     private httpService: HttpService,
     private route: ActivatedRoute,
@@ -67,7 +68,9 @@ export class RequestsPage implements OnInit {
     } else {
       await this.pendingRequest();
     }
+    this.isLoading = false;
   }
+  
   ngOnInit() {
   }
 
@@ -76,6 +79,9 @@ export class RequestsPage implements OnInit {
     this.page = 1;
     this.isInfiniteScrollDisabled = false;
     this.noResult = '';
+    this.slotRequests = [];
+    this.data = [];
+    
     if (this.segmentType === 'slot-requests') {
       await this.slotRequestData();
     } else {
@@ -83,18 +89,38 @@ export class RequestsPage implements OnInit {
     }
   }
 
-  async pendingRequest() {
+  async pendingRequest(isLoadMore: boolean = false) {
     const config = {
       url: urlConstants.API_URLS.CONNECTION_REQUEST,
-    };
-    try {
-      let data: any = await this.httpService.get(config);
-      this.data = data ? data.result.data : [];
-      if (!this.data?.length) {
-        this.noResult = this.routeData?.noDataFound.noMessage;
+      params: {
+        page: this.page,
+        pageSize: 100
       }
-      return data;
+    };
+    
+    try {
+      let response: any = await this.httpService.get(config);
+      let newData = response?.result?.data || [];
+      
+      if (isLoadMore) {
+        this.data = [...this.data, ...newData];
+      } else {
+        this.data = newData;
+      }
+      
+      const totalCount = response?.result?.count || 0;
+      this.isInfiniteScrollDisabled = this.data.length >= totalCount;
+      
+      if (this.data.length === 0 && this.page === 1) {
+        this.noResult = this.routeData?.noDataFound?.noMessage;
+      } else {
+        this.noResult = '';
+      }
+      
+      return response;
     } catch (error) {
+      console.error('Error fetching pending requests:', error);
+      this.isInfiniteScrollDisabled = true;
       return error;
     }
   }
@@ -103,16 +129,18 @@ export class RequestsPage implements OnInit {
     try {
       const res = await this.sessionService.requestSessionList(this.page);
       let data = [];
-      if (isLoadMore && data) {
-        data = [...data, ...(res?.result?.data || [])];
+      
+      if (isLoadMore) {
+        data = [...this.slotRequests, ...(res?.result?.data || [])];
       } else {
-        data = res?.result?.data;
+        data = res?.result?.data || [];
       }
-      this.isInfiniteScrollDisabled = res?.result?.count === data;
-      if (data.length === 0) {
-        if (this.page === 1) {
-          this.noResult =this.routeData?.noDataFound?.noSession;
-        }
+      
+      const totalCount = res?.result?.count || 0;
+      this.isInfiniteScrollDisabled = data.length >= totalCount;
+      
+      if (data.length === 0 && this.page === 1) {
+        this.noResult = this.routeData?.noDataFound?.noSession;
         return;
       }
 
@@ -123,7 +151,7 @@ export class RequestsPage implements OnInit {
         disableButton: this.isSessionExpired(value)
       }));
 
-      this.slotRequests = [...this.slotRequests, ...formattedData];
+      this.slotRequests = formattedData;
 
     } catch (error) {
       console.error('Error fetching session list:', error);
@@ -158,10 +186,14 @@ export class RequestsPage implements OnInit {
   }
 
   async loadMore($event: any) {
+    this.page = this.page + 1;
+    
     if (this.segmentType === 'slot-requests') {
-      this.page = this.page + 1;
       await this.slotRequestData(true);
+    } else {
+      await this.pendingRequest(true);
     }
+    
     $event.target.complete();
   }
 }
