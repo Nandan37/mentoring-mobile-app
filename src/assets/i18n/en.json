@@ -411,6 +411,7 @@
     "DISTRICT":"District",
     "BLOCK":"Block",
     "SCHOOL":"School",
+    "LOADING": "Loading more data...",
     "YOU_HAVE" :"You have requested",
     "REQUESTING_SLOT": "is requesting a slot at",
     "A_SLOT": "a slot at",

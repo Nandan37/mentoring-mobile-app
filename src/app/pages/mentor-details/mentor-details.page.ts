@@ -1,6 +1,7 @@
 import { DataSource } from '@angular/cdk/collections';
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ViewChild } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
+import { IonInfiniteScroll } from '@ionic/angular';
 import { localKeys } from 'src/app/core/constants/localStorage.keys';
 import { urlConstants } from 'src/app/core/constants/urlConstants';
 import { SKELETON } from 'src/app/core/constants/skeleton.constant';
@@ -25,7 +26,11 @@ import * as _ from 'lodash';
   styleUrls: ['./mentor-details.page.scss'],
 })
 export class MentorDetailsPage implements OnInit {
+  @ViewChild(IonInfiniteScroll) infiniteScroll: IonInfiniteScroll;
   mentorId;
+  page = 1;
+  limit = 100;
+  totalCount = 0;
   public isMobile: any;
   currentUserId: any;
   public headerConfig: any = {
@@ -86,6 +91,9 @@ export class MentorDetailsPage implements OnInit {
     })
     this.currentUserId= user.id
     this.updateButtonConfig();
+     this.page = 1;
+    this.upcomingSessions = [];
+    this.getUpcomingSessions();
   }
 
   async getMentor() {
@@ -97,6 +105,21 @@ export class MentorDetailsPage implements OnInit {
     this.detailData.data.organizationName =
       this.mentorProfileData?.result?.organization?.name || '';
     this.headerConfig.share = this.detailData.data?.is_mentor;
+  }
+
+  async getUpcomingSessions() {
+    const config = {
+      url: urlConstants.API_URLS.UPCOMING_SESSIONS + this.mentorId + "?page="+this.page + '&limit='+this.limit,
+      payload: {}
+    };
+    try {
+      let data = await this.httpService.get(config);
+      this.upcomingSessions = this.upcomingSessions.concat(data.result.data);
+      this.totalCount = data.result.count;
+      this.infiniteScroll.disabled = (this.upcomingSessions.length === this.totalCount) ? true : false;
+    }
+    catch (error) {
+    }
   }
 
 async getMentorDetails() {
@@ -135,14 +158,13 @@ async getMentorDetails() {
   }
 
   async segmentChanged(ev: any) {
-       this.segmentValue = ev.detail.value;
-    if(this.upcomingSessions) return;
-    this.upcomingSessions =
-      this.segmentValue == 'upcoming'
-        ? await this.sessionService.getUpcomingSessions(this.mentorId)
-        : [];
+    this.segmentValue = ev.detail.value;
+    if(this.segmentValue == 'upcoming'){
+      this.page = 1;
+      this.upcomingSessions = [];
+      this.getUpcomingSessions();
+    }
   }
-
   action(event) {
     switch (event) {
       case 'share':
@@ -180,24 +202,23 @@ async getMentorDetails() {
 
       case 'joinAction':
         await this.sessionService.joinSession(event.data);
-        this.upcomingSessions = await this.sessionService.getUpcomingSessions(
-          this.mentorId
-        );
+        this.page = 1;
+        this.upcomingSessions = [];
+        this.getUpcomingSessions();
         break;
 
-      case 'enrollAction':
-        let enrollResult = await this.sessionService.enrollSession(
-          event.data.id
-        );
-        if (enrollResult.result) {
-          this.toast.showToast(enrollResult.message, 'success');
-          this.upcomingSessions = await this.sessionService.getUpcomingSessions(
-            this.mentorId
-          );
+        case 'enrollAction':
+        let enrollResult = await this.sessionService.enrollSession(event.data.id);
+        if(enrollResult.result){
+          this.toast.showToast(enrollResult.message, "success")
+          this.page = 1;
+          this.upcomingSessions = [];
+          this.getUpcomingSessions();
         }
         break;
     }
   }
+  
   private updateButtonConfig() {
     this.buttonConfig.buttons = !this.mentorProfileData?.result?.is_mentor
       ? [
@@ -224,5 +245,13 @@ async getMentorDetails() {
                    ...btn,isHide: true
             }));
            }
+  }
+
+  loadMore(event){
+    setTimeout(() => {
+      this.page += 1;
+      this.getUpcomingSessions();
+      event.target.complete();
+    }, 1000);
   }
 }
