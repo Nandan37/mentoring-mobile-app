@@ -89,11 +89,13 @@ async ionViewWillEnter() {
     this.page = 1;
     this.sessions = null;
     this.createdSessions = null;
+    let roles = await this.localStorage.getLocalData(localKeys.USER_ROLES);
+    this.isMentor = roles.includes('mentor')?true:false;
     await this.getUser();
     this.gotToTop();
     let isRoleRequested = await this.localStorage.getLocalData(localKeys.IS_ROLE_REQUESTED);;
     let isBecomeMentorTileClosed = await this.localStorage.getLocalData(localKeys.IS_BECOME_MENTOR_TILE_CLOSED);
-    this.showBecomeMentorCard = (isRoleRequested || this.profileService.isMentor || isBecomeMentorTileClosed) ? false : true;
+    this.showBecomeMentorCard = (isRoleRequested || this.isMentor || isBecomeMentorTileClosed) ? false : true;
     
     if (this.user && !this.user.profile_mandatory_fields.length) {
       await this.loadSegmentData(this.selectedSegment);
@@ -102,7 +104,6 @@ async ionViewWillEnter() {
     if (!this.userEventSubscription) {
       this.userEventSubscription = this.userService.userEventEmitted$.subscribe(data => {
         if (data) {
-          this.isMentor = this.profileService.isMentor;
           this.user = data;
         }
       });
@@ -123,7 +124,7 @@ async ionViewWillEnter() {
         await this.getSessions('all', isLoadMore);
         break;
       case 'created-sessions':
-        if (this.profileService.isMentor) {
+        if (this.isMentor) {
           var obj = { page: this.page, limit: this.limit, searchText: "" };
           let data = await this.sessionService.getAllSessionsAPI(obj);
           
@@ -193,7 +194,6 @@ async ionViewWillEnter() {
   }
   async getUser() {
     let data = await this.profileService.getProfileDetailsFromAPI();
-    this.isMentor = this.profileService.isMentor;
     this.user = data;
     if (!this.user?.terms_and_conditions) {
       // this.openModal();
@@ -230,7 +230,7 @@ async ionViewWillEnter() {
   }
   async segmentChanged(event) {
     this.selectedSegment = event.name;
-    this.page = 1; 
+    this.page = 1;
     await this.loadSegmentData(this.selectedSegment);
   }
   async createSession() {
