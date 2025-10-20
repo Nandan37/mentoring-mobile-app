@@ -91,11 +91,9 @@ export class RequestsPage implements OnInit {
 
   async pendingRequest(isLoadMore: boolean = false) {
     const config = {
-      url: urlConstants.API_URLS.CONNECTION_REQUEST,
-      params: {
-        page: this.page,
-        pageSize: 100
-      }
+      url: urlConstants.API_URLS.CONNECTION_REQUEST +
+      '?pageNo=' + this.page +
+      '&pageSize=100',
     };
     
     try {
