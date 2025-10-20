@@ -2745,5 +2745,30 @@
       }
     }
   }
+},
+{
+  "type": "menteeCard",
+  "sub_type": "menteeCardForm",
+  "action": "update",
+  "data": {
+    "template_name": "defaultTemplate",
+    "fields": {
+    "controls" : {
+        "header": {
+              "image":"image",
+              "title":"name"
+            },
+        "body": [
+            {
+              "name": "designation",
+              "type": "array"
+            },
+            {
+              "name": "organization"
+            }
+          ]
+      }
+    }
+  }
 }
 ]
