@@ -72,10 +72,6 @@ export const DASHBOARD: IFORM = {
 	"sub_type": "dashboardForm",
 }
 
-export const PROFILE_DETAILS_FORM: IFORM = {
-	"type": "profileDetails",
-	"sub_type": "profileDetailsForm",
-}
 export const FILTER_ROLES = {
 	"title": "Roles",
 	"name": "roles",
