@@ -89,9 +89,10 @@ async ionViewWillEnter() {
     this.page = 1;
     this.sessions = null;
     this.createdSessions = null;
+    await this.getUser();
     let roles = await this.localStorage.getLocalData(localKeys.USER_ROLES);
     this.isMentor = roles.includes('mentor')?true:false;
-    await this.getUser();
+ 
     this.gotToTop();
     let isRoleRequested = await this.localStorage.getLocalData(localKeys.IS_ROLE_REQUESTED);;
     let isBecomeMentorTileClosed = await this.localStorage.getLocalData(localKeys.IS_BECOME_MENTOR_TILE_CLOSED);
@@ -109,9 +110,6 @@ async ionViewWillEnter() {
       console.log(this.user,"this.user 102");
       await this.loadSegmentData(this.selectedSegment);
     }
-    
-   
-    
     if (this.chips.length == 0) {
       this.permissionService.getPlatformConfig().then((config) => {
         this.chips = config.result.search_config.search.session.fields;
