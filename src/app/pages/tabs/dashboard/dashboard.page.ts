@@ -49,17 +49,21 @@ export class DashboardPage {
   chartBodyConfig :any= {}
   chartBodyPayload: any;
   translatedChartConfig : any;
-  metaKeys =DASHBOARD_TABLE_META_KEYS
+ metaKeys = _.cloneDeep(DASHBOARD_TABLE_META_KEYS);
 
   constructor(
     private profile: ProfileService,
     private apiService: HttpService,
     private form: FormService,
     public translate: TranslateService,
-    private utilService: UtilService) { }
+    private utilService: UtilService,
+  ) {this.translate.onLangChange.subscribe(() => {
+      this.getTranslatedLabel();
+    }); }
 
   
   async ionViewWillEnter() {
+    await this.getTranslatedLabel();
     this.isMentor = this.profile.isMentor;
     this.segment = this.isMentor ? "mentor" : "mentee";
     this.dataAvailable = true;
@@ -74,7 +78,6 @@ export class DashboardPage {
     this.session_type = 'ALL';
     this.chartBodyConfig = this.filteredFormData;
     this.chartBody = this.chartBodyConfig;
-    await this.getTranslatedLabel();
     if(this.user){
       this.initialDuration();
     }
