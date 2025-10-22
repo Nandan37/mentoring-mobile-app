@@ -16,8 +16,6 @@ import { Clipboard } from '@capacitor/clipboard';
 import { SessionService } from 'src/app/core/services/session/session.service';
 import { CommonRoutes } from 'src/global.routes';
 import { Location } from '@angular/common';
-import { FormService } from 'src/app/core/services/form/form.service';
-import { PROFILE_DETAILS_FORM } from 'src/app/core/constants/formConstant';
 import * as _ from 'lodash';
 
 @Component({
@@ -56,7 +54,11 @@ export class MentorDetailsPage implements OnInit {
   ],
   };
 
-  detailData: any;
+  detailData: any = {
+    controls: [],
+    data:  {
+    }
+  };
 
   userCantAccess?: boolean = false;
   isloaded: boolean = false;
@@ -77,7 +79,6 @@ export class MentorDetailsPage implements OnInit {
     private toast: ToastService,
     private utilService: UtilService, 
     private location: Location,
-    private form: FormService
   ) {}
 
   ngOnInit() {}
@@ -87,8 +88,6 @@ export class MentorDetailsPage implements OnInit {
       return;
     this.isLoading = true;
     let user = await this.localStorage.getLocalData(localKeys.USER_DETAILS)
-    const result = await this.form.getForm(PROFILE_DETAILS_FORM);
-    this.detailData = _.get(result, 'data.fields');
     this.routerParams.params.subscribe((params) => {
       this.mentorId = this.buttonConfig.meta.id = params.id;
       this.getMentor();
@@ -106,6 +105,7 @@ export class MentorDetailsPage implements OnInit {
     this.mentorProfileData = await this.getMentorDetails();
     this.updateButtonConfig();
     this.isloaded = true;
+    this.detailData.controls = this.mentorProfileData?.result?.displayProperties;
     this.detailData.data = this.mentorProfileData?.result;
     this.detailData.data.organizationName =
       this.mentorProfileData?.result?.organization?.name || '';

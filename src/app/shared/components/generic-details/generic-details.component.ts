@@ -20,6 +20,11 @@ selectedImageUrl: string | null = null;
  }
 
   ngOnInit() {
+    if (this.sessionData?.controls) {
+    this.sessionData.controls = this.sessionData.controls.sort((a, b) => 
+      (a.sequence ?? Infinity) - (b.sequence ?? Infinity)
+    );
+  }
     const resources = this.sessionData?.data?.resources || [];
     this.preResources = resources.filter(res => res.type === 'pre');
     this.postResources = resources.filter(res => res.type === 'post');
