@@ -3,6 +3,7 @@ import {  ModalController, Platform } from '@ionic/angular';
 import { TranslateService } from '@ngx-translate/core';
 import * as _ from 'lodash-es';
 import { MENTOR_DIR_CARD_FORM } from 'src/app/core/constants/formConstant';
+import { MENTEE_CARD_FORM } from 'src/app/core/constants/formConstant';
 import { localKeys } from 'src/app/core/constants/localStorage.keys';
 import { urlConstants } from 'src/app/core/constants/urlConstants';
 import { HttpService, LocalStorageService, ToastService, UtilService } from 'src/app/core/services';
@@ -54,6 +55,7 @@ export class SearchPopoverComponent implements OnInit {
   mentorForm: any;
   chips : any[] = [];
   disableInfiniteScroll = false; 
+  disableNavigation= true;
 
   constructor(private platform: Platform, private modalController: ModalController, private toast: ToastService,private translate: TranslateService, private localStorage: LocalStorageService, private util: UtilService, private httpService: HttpService, private form: FormService) { 
     this.platform.backButton.subscribeWithPriority(10, () => {
@@ -78,7 +80,7 @@ export class SearchPopoverComponent implements OnInit {
     this.maxCount = await this.localStorage.getLocalData(localKeys[this.data.control.meta.maxCount])
     this.user = await this.localStorage.getLocalData(localKeys.USER_DETAILS)
     this.roles = await this.localStorage.getLocalData(localKeys.USER_ROLES);
-    const result = await this.form.getForm(MENTOR_DIR_CARD_FORM);
+    const result = await this.form.getForm(MENTEE_CARD_FORM);
     this.mentorForm = _.get(result, 'data.fields.controls');
     this.headerConfig.label = this.data?.control?.name === "mentees" ? "MENTEE_LIST" : "MENTOR_LIST";
     this.selectedList = this.data.selectedData ? this.data.selectedData : this.selectedList
