@@ -89,15 +89,13 @@ async ionViewWillEnter() {
     this.page = 1;
     this.sessions = null;
     this.createdSessions = null;
-    let roles = await this.localStorage.getLocalData(localKeys.USER_ROLES);
-    this.isMentor = roles.includes('mentor')?true:false;
     await this.getUser();
+    let roles = await this.localStorage.getLocalData(localKeys.USER_ROLES);
+    this.isMentor = roles?.includes('mentor')?true:false;
     this.gotToTop();
     let isRoleRequested = await this.localStorage.getLocalData(localKeys.IS_ROLE_REQUESTED);;
     let isBecomeMentorTileClosed = await this.localStorage.getLocalData(localKeys.IS_BECOME_MENTOR_TILE_CLOSED);
     this.showBecomeMentorCard = (isRoleRequested || this.isMentor || isBecomeMentorTileClosed) ? false : true;
-    console.log(this.user,"this.user");
-      
      if (!this.userEventSubscription) {
       this.userEventSubscription = this.userService.userEventEmitted$.subscribe(data => {
         if (data) {
@@ -106,7 +104,6 @@ async ionViewWillEnter() {
       });
     }
     if (this.user && !this.user.profile_mandatory_fields.length) {
-      console.log(this.user,"this.user 102");
       await this.loadSegmentData(this.selectedSegment);
     }
     
@@ -122,7 +119,6 @@ async ionViewWillEnter() {
   }
 
   async loadSegmentData(segmentName: string, isLoadMore: boolean = false) {
-    console.log("in segment 124", segmentName,isLoadMore);
     switch(segmentName) {
       case 'all-sessions':
         await this.getSessions('all', isLoadMore);
@@ -205,7 +201,6 @@ async ionViewWillEnter() {
   }
 
   async getSessions(scope: string = 'all', isLoadMore: boolean = false) {
-    console.log("in getsessions", scope);
     var obj = {page: this.page, limit: this.limit, scope: scope};
     let data = await this.sessionService.getSessions(obj);
     
