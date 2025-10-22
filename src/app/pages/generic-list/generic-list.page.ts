@@ -8,8 +8,9 @@ import {
   NO_RESULT_FOUND_FOR_MENTEE,
   NO_RESULT_FOUND_FOR_MENTOR,
 } from 'src/app/core/constants/genericConstants';
+import { localKeys } from 'src/app/core/constants/localStorage.keys';
 import { paginatorConstants } from 'src/app/core/constants/paginatorConstants';
-import { HttpService, ToastService, UtilService } from 'src/app/core/services';
+import { HttpService, LocalStorageService, ToastService, UtilService } from 'src/app/core/services';
 import { FormService } from 'src/app/core/services/form/form.service';
 import { PermissionService } from 'src/app/core/services/permission/permission.service';
 import { ProfileService } from 'src/app/core/services/profile/profile.service';
@@ -68,6 +69,7 @@ export class GenericListPage implements OnInit {
     private utilService: UtilService,
     private formService: FormService,
     private permissionService: PermissionService,
+    private localStorage: LocalStorageService,
     private router: Router,
     private profileService: ProfileService,
     private toast: ToastService,
@@ -76,7 +78,8 @@ export class GenericListPage implements OnInit {
   ngOnInit() {}
 
   async ionViewWillEnter() {
-    this.isMentor = this.profileService.isMentor;
+    let roles = await this.localStorage.getLocalData(localKeys.USER_ROLES);
+    this.isMentor = roles.includes('mentor')?true:false;
     const result = await this.formService.getForm(MENTOR_CONNECTION_CARD_FORM);
     this.mentorForm = _.get(result, 'data.fields.controls');
     this.route.data.subscribe((data) => {

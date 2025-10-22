@@ -196,7 +196,7 @@ const routes: Routes = [
         canActivate: [PrivateGuard, AllowPageAccess],
         data: {
           pageId: PAGE_IDS.myConnections,
-          placeholder: 'Search connections',
+          placeholder: 'SEARCH_CONNECTIONS',
           filterType: 'mentor',
           url: urlConstants.API_URLS.MENTOR_AND_MENTEE_CONNECTIONS,
           button_config: CHAT_MESSAGES.GENERIC_CARD_MY_CONNECTION_BTN_CONFIG,

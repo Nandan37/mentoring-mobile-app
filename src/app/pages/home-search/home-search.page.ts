@@ -54,6 +54,7 @@ export class HomeSearchPage implements OnInit {
   isOpen = false;
   urlQueryData: string;
   pageSize: any =5;
+  isMentor: boolean;
   searchTextSubscription: Subscription;
   criteriaChipSubscription: Subscription;
   showSelectedCriteria: any;
@@ -69,7 +70,7 @@ searchAndCriterias: any;
     private utilService: UtilService,
   ) { }
 
-   ngOnInit() {
+   async ngOnInit() {
     this.searchTextSubscription = this.utilService.currentSearchText.subscribe(searchText => {
       this.searchText = searchText;
     });
@@ -86,6 +87,8 @@ searchAndCriterias: any;
       
     });
     this.user = this.localStorage.getLocalData(localKeys.USER_DETAILS)
+    let roles = await this.localStorage.getLocalData(localKeys.USER_ROLES);
+    this.isMentor = roles.includes('mentor')?true:false;
     this.fetchSessionList()
     this.permissionService.getPlatformConfig().then((config)=>{
       this.overlayChips = config?.result?.search_config?.search?.session?.fields;
@@ -203,7 +206,7 @@ searchAndCriterias: any;
         case 'startAction':
           this.sessionService.startSession(event.data.id).then(async () => {
             var obj = { page: this.page, limit: this.pageSize, searchText: "" };
-            if(this.profileService.isMentor){
+            if(this.isMentor){
               this.createdSessions = await this.sessionService.getAllSessionsAPI(obj);
             }
           })

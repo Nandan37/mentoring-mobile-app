@@ -85,17 +85,18 @@ public buttonConfig = {
   }
   async ionViewWillEnter() {
     this.user = await this.localStorage.getLocalData(localKeys.USER_DETAILS)
+    let roles = await this.localStorage.getLocalData(localKeys.USER_ROLES);
+    this.isMentor = roles.includes('mentor')?true:false;
     if(this.user){
       await this.profileService.getUserRole(this.user)
     }
-    if(!this.profileService.isMentor&&!await this.localStorage.getLocalData(localKeys.IS_ROLE_REQUESTED)&&!this.isMentorButtonPushed) {
+    if(!this.isMentor&&!await this.localStorage.getLocalData(localKeys.IS_ROLE_REQUESTED)&&!this.isMentorButtonPushed) {
       this.buttonConfig.buttons.push(this.becomeAMentorButton)
       this.isMentorButtonPushed = true;
     }
     this.formData.data = this.user;
     this.formData.data.emailId = this.user.email.address;
     this.formData.data.organizationName = this.user?.organization?.name;
-    this.isMentor = this.profileService.isMentor;
     if (!this.formData?.data?.about) {
       (!this.visited && !this.formData.data.deleted)?this.router.navigate([CommonRoutes.EDIT_PROFILE],{replaceUrl:true}):null;
       this.visited=true;

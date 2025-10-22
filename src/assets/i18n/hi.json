@@ -315,6 +315,7 @@
     "START_DATE": "प्रारंभ तिथि",
     "END_DATE": "समाप्ति तिथि",
     "SELECT":"चुनें",
+    "LOADING": "अधिक डेटा लोड हो रहा है...",
     "MY_CONNECTIONS": "मेरे संपर्क",
   "SEARCH_RESULTS_NOT_FOUND": "खोज परिणाम नहीं मिले",
   "NO_RESULT_SUB_HEADER": "लगता है कि हम वह नहीं ढूंढ पाए जो आप खोज रहे थे, कृपया कुछ और खोजें।",
@@ -354,5 +355,17 @@
   "IS_REQUESTING": "अनुरोध कर रहा है",
   "ON": "पर",
   "SLOT_BOOKED": " स्लॉट बुक हो गया है साथ",
-  "SESSION_MENTEE_LIMIT": "सत्र सीमा पहुँच गई – अधिकतम मेंटी जोड़ दिए गए हैं।"
+  "SESSION_MENTEE_LIMIT": "सत्र सीमा पहुँच गई – अधिकतम मेंटी जोड़ दिए गए हैं।",
+  "CREATE_SESSIONS": "सत्र बनाएँ",
+  "SEARCH_CONNECTIONS": "संपर्क खोजें",
+  "NO_SESSION_MESSAGE_DESCRIPTION": "ऐसा लगता है कि हम वह नहीं ढूंढ पाए जो आप खोज रहे थे, कुछ और खोजने की कोशिश करें।",
+  "VIEW_DETAILS": "विवरण देखें",
+  "ADD_FILE": "फ़ाइल जोड़ें",
+  "ADD_NAME": "नाम जोड़ें",
+  "FILE_UPLOAD": "फ़ाइल अपलोड करें",
+  "ADD_LINK_POPUP": "लिंक जोड़ें",
+  "ADD_URL": "यूआरएल जोड़ें",
+  "LINK":"लिंक यूआरएल",
+  "NO_SESSION_REQUEST":"कोई सत्र अनुरोध नहीं।",
+  "NO_MESSAGE_REQUEST": "कोई संदेश अनुरोध नहीं।"
 }

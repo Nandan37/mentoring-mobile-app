@@ -14,7 +14,7 @@ import { TranslateService } from '@ngx-translate/core';
   templateUrl: 'dashboard.page.html',
   styleUrls: ['dashboard.page.scss'],
 })
-export class DashboardPage implements OnInit {
+export class DashboardPage {
   user: any;
   sessions: any;
   filteredCards: any = [];
@@ -59,13 +59,10 @@ export class DashboardPage implements OnInit {
     private utilService: UtilService) { }
 
   
-  ionViewWillEnter() {
+  async ionViewWillEnter() {
     this.isMentor = this.profile.isMentor;
     this.segment = this.isMentor ? "mentor" : "mentee";
     this.dataAvailable = true;
-  }
-
-  async ngOnInit() {
     this.result = await this.reportFilterListApi();
     this.user = await this.getUserRole(this.result);
     const bigNumberResult = await this.form.getForm(BIG_NUMBER_DASHBOARD_FORM);
@@ -216,7 +213,7 @@ export class DashboardPage implements OnInit {
       this.dynamicFormControls = firstObject.form.controls;
   }
   
-  getTranslatedLabel() {
+getTranslatedLabel() {
     const rawConfig = this.chartBody?.[this.session_type]?.chartConfig;
     if (rawConfig) {
       this.translatedChartConfig = rawConfig.map(item => {
