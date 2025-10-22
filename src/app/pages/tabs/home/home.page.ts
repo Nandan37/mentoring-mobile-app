@@ -96,20 +96,21 @@ async ionViewWillEnter() {
     let isRoleRequested = await this.localStorage.getLocalData(localKeys.IS_ROLE_REQUESTED);;
     let isBecomeMentorTileClosed = await this.localStorage.getLocalData(localKeys.IS_BECOME_MENTOR_TILE_CLOSED);
     this.showBecomeMentorCard = (isRoleRequested || this.isMentor || isBecomeMentorTileClosed) ? false : true;
-    console.log(this.user,"this.user);
-                
-    if (this.user && !this.user.profile_mandatory_fields.length) {
-      console.log(this.user,"this.user 102);
-      await this.loadSegmentData(this.selectedSegment);
-    }
-    
-    if (!this.userEventSubscription) {
+    console.log(this.user,"this.user");
+      
+     if (!this.userEventSubscription) {
       this.userEventSubscription = this.userService.userEventEmitted$.subscribe(data => {
         if (data) {
           this.user = data;
         }
       });
     }
+    if (this.user && !this.user.profile_mandatory_fields.length) {
+      console.log(this.user,"this.user 102");
+      await this.loadSegmentData(this.selectedSegment);
+    }
+    
+   
     
     if (this.chips.length == 0) {
       this.permissionService.getPlatformConfig().then((config) => {
