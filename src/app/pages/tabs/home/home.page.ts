@@ -90,6 +90,7 @@ async ionViewWillEnter() {
     this.sessions = null;
     this.createdSessions = null;
     await this.getUser();
+    await this.getUser();
     let roles = await this.localStorage.getLocalData(localKeys.USER_ROLES);
     this.isMentor = roles?.includes('mentor')?true:false;
     this.gotToTop();
@@ -106,9 +107,6 @@ async ionViewWillEnter() {
     if (this.user && !this.user.profile_mandatory_fields.length) {
       await this.loadSegmentData(this.selectedSegment);
     }
-    
-   
-    
     if (this.chips.length == 0) {
       this.permissionService.getPlatformConfig().then((config) => {
         this.chips = config.result.search_config.search.session.fields;
