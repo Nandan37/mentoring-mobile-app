@@ -2740,7 +2740,8 @@
               "type": "array"
             },
             {
-              "name": "organization"
+              "name": "organization",
+              "type": "object"
             }
           ]
       }
