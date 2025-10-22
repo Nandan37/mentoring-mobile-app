@@ -4,7 +4,7 @@ import { HttpService, UtilService } from 'src/app/core/services';
 import { FormService } from 'src/app/core/services/form/form.service';
 import * as moment from 'moment';
 import { urlConstants } from 'src/app/core/constants/urlConstants';
-import { Component, OnInit } from '@angular/core';
+import { Component } from '@angular/core';
 import { ProfileService } from 'src/app/core/services/profile/profile.service';
 import { environment } from 'src/environments/environment';
 import { TranslateService } from '@ngx-translate/core';
@@ -14,7 +14,7 @@ import { TranslateService } from '@ngx-translate/core';
   templateUrl: 'dashboard.page.html',
   styleUrls: ['dashboard.page.scss'],
 })
-export class DashboardPage {
+export class DashboardPage  {
   user: any;
   sessions: any;
   filteredCards: any = [];
@@ -49,21 +49,21 @@ export class DashboardPage {
   chartBodyConfig :any= {}
   chartBodyPayload: any;
   translatedChartConfig : any;
- metaKeys = _.cloneDeep(DASHBOARD_TABLE_META_KEYS);
+   metaKeys = _.cloneDeep(DASHBOARD_TABLE_META_KEYS);
 
   constructor(
     private profile: ProfileService,
     private apiService: HttpService,
     private form: FormService,
     public translate: TranslateService,
-    private utilService: UtilService,
-  ) {this.translate.onLangChange.subscribe(() => {
+    private utilService: UtilService)
+     {this.translate.onLangChange.subscribe(() => {
       this.getTranslatedLabel();
     }); }
 
   
   async ionViewWillEnter() {
-    await this.getTranslatedLabel();
+   
     this.isMentor = this.profile.isMentor;
     this.segment = this.isMentor ? "mentor" : "mentee";
     this.dataAvailable = true;
@@ -78,6 +78,7 @@ export class DashboardPage {
     this.session_type = 'ALL';
     this.chartBodyConfig = this.filteredFormData;
     this.chartBody = this.chartBodyConfig;
+    await this.getTranslatedLabel();
     if(this.user){
       this.initialDuration();
     }
@@ -216,7 +217,7 @@ export class DashboardPage {
       this.dynamicFormControls = firstObject.form.controls;
   }
   
-getTranslatedLabel() {
+  getTranslatedLabel() {
     const rawConfig = this.chartBody?.[this.session_type]?.chartConfig;
     if (rawConfig) {
       this.translatedChartConfig = rawConfig.map(item => {
