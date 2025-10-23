@@ -81,7 +81,7 @@ export class MentorDirectoryPage implements OnInit {
     this.content.scrollToTop(1000);
   }
 
-  async getMentors(showLoader = true) {
+  async getMentors(showLoader = true, isLoadMore: boolean = false) {
     showLoader ? await this.loaderService.startLoader() : '';
     const config = {
       url:
@@ -104,15 +104,8 @@ export class MentorDirectoryPage implements OnInit {
       this.data = data.result.data;
       this.isLoaded = true;
       showLoader ? await this.loaderService.stopLoader() : '';
-      if (
-        this.mentors.length &&
-        this.mentors[this.mentors.length - 1].key == data.result.data[0]?.key
-      ) {
-        this.mentors[this.mentors.length - 1].values = this.mentors[
-          this.mentors.length - 1
-        ].values.concat(data.result.data[0].values);
-        data.result.data.shift();
-        this.mentors = this.mentors.concat(data.result.data);
+      if (isLoadMore) {
+        this.mentors = [...this.mentors, ...data.result.data];
       } else {
         this.mentors = data.result.data;
         this.mentorsCount = data.result.count;
@@ -155,7 +148,7 @@ export class MentorDirectoryPage implements OnInit {
   async loadMore(event) {
     if (this.data && !this.isInfiniteScrollDisabled) {
       this.page = this.page + 1;
-      await this.getMentors(false);
+      await this.getMentors(false, true);
     }
     event.target.complete();
   }
