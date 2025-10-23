@@ -43,7 +43,7 @@ export class SessionDetailPage implements OnInit, OnDestroy {
  isNotInvited: any;
  defaultUiForm = [
   {
-    title: "MEETING_PLATFORM",
+    title: "Meeting Platform",
     key: "meeting_info",
   }
  ];
@@ -141,7 +141,6 @@ export class SessionDetailPage implements OnInit, OnDestroy {
   async fetchSessionDetails() { 
     let entityList = await this.form.getEntities({}, 'SESSION')
     var response = await this.sessionService.getSessionDetailsAPI(this.id);
-
     if(response && entityList.result.length){
       entityList.result.forEach(entity => {
         Object.entries(response?.result).forEach(([key, value]) => {
@@ -191,7 +190,7 @@ export class SessionDetailPage implements OnInit, OnDestroy {
       if((!this.detailData.controls.some(obj => obj.title === 'MENTOR'))){
         this.detailData.controls.push(
           {
-            title: 'MENTOR',
+            title: 'Mentor',
             key: 'mentor_name',
           },
         );
@@ -200,7 +199,7 @@ export class SessionDetailPage implements OnInit, OnDestroy {
         
         this.detailData.controls.push(
           {
-            title: 'MENTEE_COUNT',
+            title: 'Mentee Count',
             key: 'mentee_count',
           },
         );

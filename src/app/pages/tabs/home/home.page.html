@@ -113,7 +113,7 @@
       </ion-grid>
 
     </div>
-    <div *ngIf="!createdSessions?.data?.length">
+    <div *ngIf="!createdSessions?.data?.length && isCreatedSessions">
       <app-no-data-found [messageHeader]="'NO_SESSIONS_CREATED'" [messageDescription]="'START_CREATING_SESSION'">
       </app-no-data-found>
       <div class="d-flex flex-justify-center">
