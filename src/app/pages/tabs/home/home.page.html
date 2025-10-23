@@ -139,7 +139,7 @@
       </ion-grid>
 
     </div>
-    <div *ngIf="sessions && !sessions?.my_sessions?.length">
+    <div *ngIf="sessions && !sessions?.my_sessions?.length && isEnrolledSession">
       <app-no-data-found [messageHeader]="'NO_SESSIONS_ENROLLED'" [messageDescription]="'CHECK_ALLSESSION_TO_ENROLL'">
       </app-no-data-found>
     </div>

@@ -55,6 +55,7 @@ export class HomePage{
   criteriaChip: any;
   searchText: string;
   isCreatedSessions: boolean;
+  isEnrolledSession: boolean;
 
   allSessionsCount = 0;
   createdSessionsCount = 0;
@@ -88,6 +89,7 @@ async ionViewWillEnter() {
     if (this.isLoading) return;
     this.isLoading = true;
     this.isCreatedSessions = false;
+    this.isEnrolledSession = false;
     this.page = 1;
     this.sessions = null;
     this.createdSessions = null;
@@ -119,6 +121,8 @@ async ionViewWillEnter() {
   }
 
   async loadSegmentData(segmentName: string, isLoadMore: boolean = false) {
+    this.isCreatedSessions =false;
+    this.isEnrolledSession =false;
     switch(segmentName) {
       case 'all-sessions':
         await this.getSessions('all', isLoadMore);
@@ -127,7 +131,9 @@ async ionViewWillEnter() {
         if (this.isMentor) {
           var obj = { page: this.page, limit: this.limit, searchText: "" };
           let data = await this.sessionService.getAllSessionsAPI(obj);
+          if (!data || data.length === 0) {
           this.isCreatedSessions = true;
+        }
           
           if (isLoadMore && this.createdSessions?.data) {
             this.createdSessions.data = [...this.createdSessions.data, ...data.data];
@@ -218,6 +224,9 @@ async ionViewWillEnter() {
       } else {
         this.sessions = data.result;
       }
+      if (!this.sessions.my_sessions || this.sessions.my_sessions.length === 0) {
+      this.isEnrolledSession = true;
+    }
       this.enrolledSessionsCount = data.result.my_sessions_count || 0;
     }
   }
