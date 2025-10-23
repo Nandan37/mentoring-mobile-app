@@ -55,7 +55,7 @@
         <ion-infinite-scroll-content loadingSpinner="bubbles"  loadingText="{{'LOADING' | translate}}">
         </ion-infinite-scroll-content>
       </ion-infinite-scroll>
-  <div *ngIf="(segmentType === 'slot-requests' && !slotRequests?.length) || (segmentType === 'message-requests' && !data?.length)">
+  <div *ngIf="(segmentType === 'slot-requests' && !slotRequests?.length &&  isDataAvailable) || (segmentType === 'message-requests' && !data?.length && isDataAvailable) ">
     <app-no-data-found [messageHeader]="noResult"></app-no-data-found>
   </div>
 </ion-content>

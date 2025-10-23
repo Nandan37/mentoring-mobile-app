@@ -37,6 +37,7 @@ export class RequestsPage implements OnInit {
   page = 1;
   isInfiniteScrollDisabled = false;
   isLoading: boolean = false;
+  isDataAvailable: boolean;
   
   constructor(
     private httpService: HttpService,
@@ -49,6 +50,7 @@ export class RequestsPage implements OnInit {
   async ionViewWillEnter(){
     if(this.isLoading)
       return;
+    this.isDataAvailable = false;
     this.isLoading = true;
     const result = await this.form.getForm(MENTOR_REQ_CARD_FORM);
     this.mentorForm = _.get(result, 'data.fields.controls');
@@ -81,7 +83,7 @@ export class RequestsPage implements OnInit {
     this.noResult = '';
     this.slotRequests = [];
     this.data = [];
-    
+    this.isDataAvailable = false;
     if (this.segmentType === 'slot-requests') {
       await this.slotRequestData();
     } else {
@@ -98,6 +100,7 @@ export class RequestsPage implements OnInit {
     
     try {
       let response: any = await this.httpService.get(config);
+       this.isDataAvailable = true;
       let newData = response?.result?.data || [];
       
       if (isLoadMore) {
@@ -126,6 +129,7 @@ export class RequestsPage implements OnInit {
   async slotRequestData(isLoadMore: boolean = false) {
     try {
       const res = await this.sessionService.requestSessionList(this.page);
+       this.isDataAvailable = true;
       let data = [];
       
       if (isLoadMore) {

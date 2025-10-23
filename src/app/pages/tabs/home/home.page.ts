@@ -54,7 +54,8 @@ export class HomePage{
   chips= [];
   criteriaChip: any;
   searchText: string;
-  
+  isCreatedSessions: boolean;
+
   allSessionsCount = 0;
   createdSessionsCount = 0;
   enrolledSessionsCount = 0;
@@ -86,6 +87,7 @@ export class HomePage{
 async ionViewWillEnter() {
     if (this.isLoading) return;
     this.isLoading = true;
+    this.isCreatedSessions = false;
     this.page = 1;
     this.sessions = null;
     this.createdSessions = null;
@@ -125,6 +127,7 @@ async ionViewWillEnter() {
         if (this.isMentor) {
           var obj = { page: this.page, limit: this.limit, searchText: "" };
           let data = await this.sessionService.getAllSessionsAPI(obj);
+          this.isCreatedSessions = true;
           
           if (isLoadMore && this.createdSessions?.data) {
             this.createdSessions.data = [...this.createdSessions.data, ...data.data];

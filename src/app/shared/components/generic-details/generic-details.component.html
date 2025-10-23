@@ -1,7 +1,7 @@
 <div class="field-wrapper" *ngFor="let item of sessionData.controls">
   <div 
     *ngIf="(!sessionData?.menteeForm?.includes(item.title) || (sessionData?.menteeForm?.includes(item.title) && !isMentor)) && (item?.visible !== undefined ? item.visible : true) && (item?.visibility === 'main' || !item?.visibility)">
-    <p class="session-detail-heading">{{ item.title || item?.label | translate }}</p>
+    <p class="session-detail-heading">{{ item.title || item?.label }}</p>
     
     <!-- Handle Array type data -->
     <div *ngIf="isArray(sessionData.data[item.key]); else nonArrayBlock">
@@ -21,8 +21,8 @@
         
         <!-- Duration field -->
         <p *ngSwitchCase="'duration'" class="value">
-          {{ sessionData.data.duration.hours }} {{ "HOURS" | translate }} 
-          {{ sessionData.data.duration.minutes }} {{ "MINUTES" | translate }}
+          {{ sessionData.data.duration.hours }} hr
+          {{ sessionData.data.duration.minutes }} minutes
         </p>
 
         <!-- Date fields -->
@@ -37,7 +37,7 @@
         <div *ngSwitchCase="'mentee_count'" class="d-flex">
           <p class="mentee-count">{{ sessionData.data[item.key] }}</p>
           <ion-button class="view-mentee-list" color="white" (click)="onClickViewList()">
-            {{ "VIEW_LIST" | translate }}
+            View List
           </ion-button>
         </div>
 
@@ -70,7 +70,7 @@
   </div>
 </div>
 <div *ngIf="preResources.length > 0">
-  <p class="session-detail-heading" style="margin: 0 10px;">{{ 'PRE_RESOURCES' | translate }}</p>
+  <p class="session-detail-heading" style="margin: 0 10px;">Pre resources</p>
       <div style="display: flex; flex-direction: column; flex-wrap: wrap;">
             <div *ngFor="let resource of preResources" >
               <a 
@@ -89,7 +89,7 @@
     </div>
 </div>
 <div *ngIf="postResources.length > 0 && sessionData?.data?.status?.value === 'COMPLETED'">
-  <p class="session-detail-heading" style="margin: 0 10px;">{{ 'POST_RESOURCES' | translate }}</p>
+  <p class="session-detail-heading" style="margin: 0 10px;">Post resources</p>
       <div>
             <div *ngFor="let resource of postResources" style="display: flex; flex-direction: column; flex-wrap: wrap;">
                 <a 

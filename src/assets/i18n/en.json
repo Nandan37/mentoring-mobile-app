@@ -418,6 +418,8 @@
     "IS_REQUESTING": "is requesting",
     "ON": "on",
     "SLOT_BOOKED": " Slot booked with",
-    "SEARCH_CONNECTIONS": "Search connections"
+    "SEARCH_CONNECTIONS": "Search connections",
+    "MESSAGE_SEARCH_PLACEHOLDER": "Search by name",
+    "SEARCH_RESULT_MESSGAGE_NOT_FOUND": "No messages found."
 
 }

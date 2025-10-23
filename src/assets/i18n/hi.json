@@ -268,7 +268,7 @@
     "YOUR_CURRENT_DEVICE": "आपका वर्तमान उपकरण",
     "LOGGED_IN": "लोग्ड इन/ लॉग इन",
     "LOGGED_OUT_AT": "लॉग आउट/ लोग्ड आउट",
-    "EXPIRED": "आपका सत्र समाप्त हो गया है",
+    "EXPIRED": "समाप्त",
     "ROLE": "भूमिका",
     "DURATION": "अवधि",
     "TYPE": "प्रकार",
@@ -367,5 +367,16 @@
   "ADD_URL": "यूआरएल जोड़ें",
   "LINK":"लिंक यूआरएल",
   "NO_SESSION_REQUEST":"कोई सत्र अनुरोध नहीं।",
-  "NO_MESSAGE_REQUEST": "कोई संदेश अनुरोध नहीं।"
+  "NO_MESSAGE_REQUEST": "कोई संदेश अनुरोध नहीं।",
+  "PROFILE_FORM_UNSAVED_DATA": "आपके पास बिना सहेजा गया डेटा है, क्या आप बाहर निकलने से पहले इसे सहेजना चाहेंगे?",
+  "DONOT_SAVE": "सहेजें नहीं",
+  "PROFILE_EXIT_HEADER_LABEL": "डेटा सहेजें?",
+  "SETUP_PROFILE": "प्रोफ़ाइल सेटअप करें",
+  "SETUP_PROFILE_MESSAGE": "शुरू करने के लिए अपनी प्रोफ़ाइल सेटअप करना पूरा करें।",
+  "VIEW_ROLES": "भूमिकाएँ देखें",
+  "NO_UPCOMING_SESSIONS_PLANNED": "कोई सत्र योजना नहीं है।",
+  "MESSAGE_SEARCH_PLACEHOLDER": "नाम से खोजें",
+  "SEARCH_RESULT_MESSGAGE_NOT_FOUND": "कोई संदेश नहीं मिला.",
+  "ROLES": "भूमिकाएँ"
+
 }
