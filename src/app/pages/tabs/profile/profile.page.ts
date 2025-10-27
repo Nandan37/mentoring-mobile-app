@@ -19,31 +19,31 @@ export class ProfilePage implements OnInit {
   @ViewChild(IonContent) content: IonContent;
   formData: any = {
     controls: [
-      { title: 'SESSIONS_ATTENDED',
+      { title: 'Sessions attended',
         key: 'sessions_attended',
       },
       {
-        title: 'ABOUT',
+        title: 'About',
         key: 'about',
       },
       {
-        title: "ORGANIZATION",
+        title: "Organization",
         key: "organizationName"
       },
       {
-        title: 'YEAR_OF_EXPERIENCE',
+        title: 'Years of experience',
         key: 'experience',
       },
       {
-        title: "EDUCATION_QUALIFICATION",
+        title: "Education qualification",
         key: "education_qualification"
       },
       {
-        title: "EMAIL_ID",
+        title: "Email id",
         key: "emailId"
       },
       {
-        title: "PROFESSIONAL_ROLE",
+        title: "Professional role",
         key: "professional_role"
       }
     ],
@@ -136,23 +136,23 @@ public buttonConfig = {
     });
   let extraDataForm = [
     {
-      title: "STATE",
+      title: "State",
       key: "state"
     },
     {
-      title: "DISTRICT",
+      title: "District",
       key: "district"
     },
     {
-      title: "BLOCK",
+      title: "Block",
       key: "block"
     },
     {
-      title: "CLUSTER",
+      title: "Cluster",
       key: "cluster"
     },
     {
-      title: "SCHOOL",
+      title: "School",
       key: "school"
     }
   ];
