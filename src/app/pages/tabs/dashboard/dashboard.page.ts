@@ -63,7 +63,6 @@ export class DashboardPage  {
 
   
   async ionViewWillEnter() {
-   
     this.isMentor = this.profile.isMentor;
     this.segment = this.isMentor ? "mentor" : "mentee";
     this.dataAvailable = true;
@@ -78,10 +77,10 @@ export class DashboardPage  {
     this.session_type = 'ALL';
     this.chartBodyConfig = this.filteredFormData;
     this.chartBody = this.chartBodyConfig;
-    await this.getTranslatedLabel();
     if(this.user){
       this.initialDuration();
     }
+    await this.getTranslatedLabel();
 }
 
   public headerConfig: any = {
@@ -318,8 +317,7 @@ export class DashboardPage  {
     `&session_type=${this.session_type}` +
     `&end_date=${this.endDateEpoch || ''}`;
   this.chartBody.tableUrl = this.chartBodyConfig.tableUrl;
-  setTimeout(() => {
-  this.chartBody.tableUrl =  `${environment.baseUrl}${urlConstants.API_URLS.DASHBOARD_REPORT_DATA}` +'report_code='+ this.chartBody.table_report_code +queryParams;}, 10);
+  this.chartBody.tableUrl =  `${environment.baseUrl}${urlConstants.API_URLS.DASHBOARD_REPORT_DATA}` +'report_code='+ this.chartBody.table_report_code +queryParams;
   this.chartBody.headers = await this.apiService.setHeaders();
   }
   async prepareChartUrl(){
@@ -337,13 +335,8 @@ export class DashboardPage  {
   }, 10);
   this.chartBody.headers = await this.apiService.setHeaders();
   }
-
- downloadCSV(data: { url: string; fileName: string }) {
-    let fileName = data.fileName?.toLowerCase().endsWith('.csv')
-      ? data.fileName.slice(0, -4)
-      : data.fileName;
-    console.log(data.url, "104 --->", fileName);
-    this.utilService.parseAndDownloadCSV(data.url, fileName + ".csv");
+   downloadCSV(data: { url: string; fileName: string }) {
+    this.utilService.downloadCSVFile(data.url, data.fileName);
   }
 }
 
