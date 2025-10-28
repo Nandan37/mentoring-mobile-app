@@ -52,7 +52,7 @@
         <!-- Experience field -->
         <p *ngSwitchCase="'experience'" class="value">
           {{ sessionData.data[item.key] ? 
-             sessionData.data[item.key] + ' ' + ('YEARS' | translate) : 
+             sessionData.data[item.key] + ' ' + "Years": 
              ('NOT_UPDATED_MSG' | translate) }}
         </p>
 
