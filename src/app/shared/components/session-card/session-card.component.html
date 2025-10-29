@@ -26,7 +26,7 @@
   </span>
   <img
     *ngIf="showBanner"
-    src="{{ data?.image[0] || 'assets/default-session-img/session-img.png' }}"
+    [src]="data?.image[0] || 'assets/default-session-img/session-img.png'"
     alt="Banner Image"
     class="banner-img"
   />
@@ -34,12 +34,7 @@
     <ion-grid class="ion-no-padding">
       <ion-row>
         <div class="session-image">
-          <img
-            *ngIf="!profileImg"
-            class="thumbnail-image"
-            src="assets/default-session-img/session-img.png"
-          />
-          <img *ngIf="profileImg" class="thumbnail-image" [src]="profileImg" />
+          <img class="thumbnail-image" [src]="data?.image[0] || 'assets/default-session-img/session-img.png'" />
         </div>
         <ion-col padding size-xs="6" size-sm="8" size-md="6" size-lg="8">
           <div class="header">
