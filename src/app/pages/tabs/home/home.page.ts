@@ -194,7 +194,12 @@ async ionViewWillEnter() {
       this.searchText = event ? event : "";
       this.utilService.subscribeSearchText(this.searchText);
       this.utilService.subscribeCriteriaChip(JSON.stringify(this.criteriaChip))
-      this.router.navigate([`/${CommonRoutes.HOME_SEARCH}`]);
+      this.router.navigate([`/${CommonRoutes.HOME_SEARCH}`], {
+        queryParams: {
+          search: this.searchText,
+          chip: this.criteriaChip?.name
+        }
+      });
     }else {
       this.toast.showToast("ENTER_MIN_CHARACTER","danger");
     }

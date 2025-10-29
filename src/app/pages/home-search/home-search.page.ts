@@ -1,5 +1,5 @@
 import { Component, EventEmitter, OnInit, Output, ViewChild } from '@angular/core';
-import {  Router } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
 import { CommonRoutes } from 'src/global.routes';
 import { Location } from '@angular/common';
 import { environment } from 'src/environments/environment';
@@ -68,9 +68,20 @@ searchAndCriterias: any;
     private permissionService: PermissionService,
     private formService: FormService,
     private utilService: UtilService,
+    private route: ActivatedRoute,
   ) { }
 
    async ngOnInit() {
+    this.searchAndCriterias = {
+      headerData: {
+        searchText: '',
+        criterias: {
+          name: undefined,
+          label: undefined
+        }
+      }
+    };
+
     this.searchTextSubscription = this.utilService.currentSearchText.subscribe(searchText => {
       this.searchText = searchText;
     });
@@ -89,7 +100,6 @@ searchAndCriterias: any;
     this.user = this.localStorage.getLocalData(localKeys.USER_DETAILS)
     let roles = await this.localStorage.getLocalData(localKeys.USER_ROLES);
     this.isMentor = roles.includes('mentor')?true:false;
-    this.fetchSessionList()
     this.permissionService.getPlatformConfig().then((config)=>{
       this.overlayChips = config?.result?.search_config?.search?.session?.fields;
     })
@@ -97,7 +107,47 @@ searchAndCriterias: any;
   }
 
   async ionViewWillEnter() {
-    this.showSelectedCriteria = this.criteriaChip? this.criteriaChip : "";
+    const queryParams = this.route.snapshot.queryParams;
+    const search = queryParams['search'];
+    const chip = queryParams['chip'];
+
+    if (search) {
+      this.searchAndCriterias = {
+        ...this.searchAndCriterias,
+        headerData: {
+          ...this.searchAndCriterias.headerData,
+          searchText: search
+        }
+      };
+      this.searchText = search;
+    }
+
+    const config = await this.permissionService.getPlatformConfig();
+    this.overlayChips = config?.result?.search_config?.search?.session?.fields;
+
+    if (chip) {
+      const matchedField = this.overlayChips?.find(d => d.name === chip);
+      if (matchedField && search) {
+        this.searchAndCriterias = {
+          ...this.searchAndCriterias,
+          headerData: {
+            ...this.searchAndCriterias.headerData,
+            criterias: {
+              name: matchedField.name,
+              label: matchedField.label
+            }
+          }
+        };
+        this.criteriaChip = {
+          name: matchedField.name,
+          label: matchedField.label
+        };
+        this.showSelectedCriteria = this.criteriaChip;
+      }
+    }
+
+    this.fetchSessionList();
+
     const obj = {filterType: 'session', org: false};
     let data = await this.formService.filterList(obj);
     this.filterData = await this.utilService.transformToFilterData(data, obj);
@@ -111,6 +161,14 @@ searchAndCriterias: any;
     this.showSelectedCriteria = event.criterias;
     this.criteriaChip = event.criterias;
     this.isOpen = false;
+    this.router.navigate([], {
+      relativeTo: this.route,
+      queryParams: { 
+        search: event.searchText, 
+        chip: event?.criterias?.name 
+      },
+      queryParamsHandling: 'merge',
+    });
     this.fetchSessionList()
    
   }
@@ -124,6 +182,11 @@ searchAndCriterias: any;
     this.searchAndCriterias.headerData.searchText = '';
     this.searchText = '';
     this.searchAndCriterias.headerData.criterias = undefined;
+    this.router.navigate([], {
+      relativeTo: this.route,
+      queryParams: { search: '', chip: '' },
+      queryParamsHandling: 'merge',
+    });
     await this.fetchSessionList();
   }
 
@@ -187,7 +250,7 @@ searchAndCriterias: any;
     if (this.user.about || environment['isAuthBypassed']) {
       switch (event.type) {
         case 'cardSelect':
-          this.router.navigate([`/${CommonRoutes.SESSIONS_DETAILS}/${event.data.id}`],{replaceUrl:true});
+          this.router.navigate([`/${CommonRoutes.SESSIONS_DETAILS}/${event.data.id}`]);
           break;
 
         case 'joinAction':
