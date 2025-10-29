@@ -96,7 +96,9 @@ export class MentorDetailsPage implements OnInit {
     this.updateButtonConfig();
     this.page = 1;
     this.upcomingSessions = [];
+    if(this.mentorProfileData?.result?.is_mentor){
     await this.getUpcomingSessions();
+    }
     this.isLoading = false;
   }
 
