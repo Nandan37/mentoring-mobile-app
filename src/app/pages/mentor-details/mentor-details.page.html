@@ -22,7 +22,7 @@
 </div>
 <ion-content *ngIf="!this.userCantAccess && isloaded" >
   <div [ngSwitch]="segmentValue">
-    <ion-grid>
+    <ion-grid  *ngSwitchCase="'about'">
       <ion-row class="d-flex ion-padding">
         <ion-col
           size-xs="12"
@@ -32,7 +32,6 @@
           align-self-stretch
         >
           <app-generic-details
-            *ngSwitchCase="'about'"
             [sessionData]="detailData"
           ></app-generic-details>
         </ion-col>
