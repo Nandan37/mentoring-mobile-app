@@ -1,24 +1,173 @@
-import { ComponentFixture, TestBed, waitForAsync } from '@angular/core/testing';
-import { IonicModule } from '@ionic/angular';
-
+import { ComponentFixture, TestBed } from '@angular/core/testing';
+import { IonicModule, ModalController } from '@ionic/angular';
 import { HomePage } from './home.page';
-
-describe('HomePage', () => {
+import { FormBuilder } from '@angular/forms';
+import { Router } from '@angular/router';
+import { of, Subject } from 'rxjs';
+import { ProfileService } from 'src/app/core/services/profile/profile.service';
+import { SessionService } from 'src/app/core/services/session/session.service';
+import { LocalStorageService, ToastService, UserService, UtilService } from 'src/app/core/services';
+import { PermissionService } from 'src/app/core/services/permission/permission.service';
+import { NO_ERRORS_SCHEMA } from '@angular/core';
+import { OverlayModule } from '@angular/cdk/overlay';
+import { TranslateModule } from '@ngx-translate/core';
+// --- Minimal mocks ---
+class MockRouter { navigate() {} }
+fdescribe('HomePage - Simple Test', () => {
   let component: HomePage;
   let fixture: ComponentFixture<HomePage>;
+  let mockRouter: jasmine.SpyObj<Router>;
+  let mockProfileService: jasmine.SpyObj<ProfileService>;
+  let mockSessionService: jasmine.SpyObj<SessionService>;
+  let mockModalController: jasmine.SpyObj<ModalController>;
+  let mockUserService: jasmine.SpyObj<UserService>;
+  let mockLocalStorage: jasmine.SpyObj<LocalStorageService>;
+  let mockToast: jasmine.SpyObj<ToastService>;
+  let mockPermissionService: jasmine.SpyObj<PermissionService>;
+  let mockUtilService: jasmine.SpyObj<UtilService>;
+  let userEventSubject: Subject<any>;
 
-  beforeEach(waitForAsync(() => {
-    TestBed.configureTestingModule({
+   const mockUser = {
+    id: '123',
+    about: 'Test user',
+    profile_mandatory_fields: [],
+    terms_and_conditions: true
+  };
+  const mockSessions = {
+      all_sessions: [
+      ],
+      my_sessions: [
+      ],
+      allSessions_count: 2,
+      my_sessions_count: 1
+    };
+
+  const mockCreatedSessions = {
+    data: []
+  }
+
+  const mockPlatformConfig = {
+    result: {
+      search_config: {
+        search: {
+          session: {
+            fields: [
+              { name: 'category', label: 'Category' },
+              { name: 'type', label: 'Type' }
+            ]
+          }
+        }
+      }
+    }
+  };
+
+
+
+
+
+  beforeEach(async () => {
+    userEventSubject = new Subject();
+    mockRouter = jasmine.createSpyObj('Router', ['navigate']);
+    mockProfileService = jasmine.createSpyObj('ProfileService', [
+    'getProfileDetailsFromAPI',
+    'upDateProfilePopup'
+    ]);
+    mockSessionService = jasmine.createSpyObj('SessionService', [
+      'getSessions',
+      'getAllSessionsAPI',
+      'joinSession',
+      'enrollSession',
+      'startSession'
+    ]);
+    mockModalController = jasmine.createSpyObj('ModalController', ['create']);
+    mockUserService = jasmine.createSpyObj('UserService', [], {
+      userEventEmitted$: userEventSubject.asObservable()
+    });
+    mockLocalStorage = jasmine.createSpyObj('LocalStorageService', [
+      'getLocalData',
+      'setLocalData'
+    ]);
+    mockToast = jasmine.createSpyObj('ToastService', ['showToast']);
+    mockPermissionService = jasmine.createSpyObj('PermissionService', ['getPlatformConfig']);
+    mockUtilService = jasmine.createSpyObj('UtilService', [
+      'subscribeSearchText',
+      'subscribeCriteriaChip'
+    ]);
+
+
+    await TestBed.configureTestingModule({
       declarations: [HomePage],
-      imports: [IonicModule.forRoot(), ]
+      imports: [IonicModule.forRoot(), TranslateModule.forRoot(),  OverlayModule],
+      providers: [
+        FormBuilder,
+        { provide: Router, useValue: MockRouter },
+        { provide: ProfileService, useValue: mockProfileService},
+        { provide: SessionService, useValue: mockSessionService},
+        { provide: ModalController, useValue: mockModalController},
+        { provide: UserService, useValue: mockUserService},
+        { provide: LocalStorageService, useValue: mockLocalStorage},
+        { provide: ToastService, useValue: mockToast},
+        { provide: PermissionService, useValue: mockPermissionService},
+        { provide: PermissionService, useValue: mockPermissionService},
+        { provide: UtilService, useValue: mockUtilService},
+      ],
+      schemas: [NO_ERRORS_SCHEMA]
     }).compileComponents();
-
     fixture = TestBed.createComponent(HomePage);
     component = fixture.componentInstance;
     fixture.detectChanges();
-  }));
-
-  it('should create', () => {
-    expect(component).toBeTruthy();
   });
+  afterEach(() => {
+  fixture.destroy();
+  });
+
+  it('should create the HomePage', () => {
+    expect(component).toBeTruthy(); 
+  });
+  it('should initialize with default values"', () => {
+    expect(component.selectedSegment).toBe('all-sessions'); 
+    expect(component.page).toBe(1);
+    expect(component.limit).toBe(100);
+    expect(component.selectedSegment).toBe('all-sessions');
+    expect(component.showBecomeMentorCard).toBe(false);
+    expect(component.chips).toEqual([]);
+    expect(component.isOpen).toBe(false);
+  });
+
+   it('should initialize session form with empty values', () => {
+      expect(component.sessionForm.value).toEqual({
+        date: '',
+        time: '',
+        duration: '',
+        link: ''
+      });
+    });
+
+    it('should have correct header config', () => {
+      expect(component.headerConfig).toEqual({
+        menu: true,
+        notification: true,
+        headerColor: 'primary'
+      });
+    });
+
+
+
+  it('gotToTop should call scrollToTop on content', () => {
+    // mock IonContent
+    component.content = { scrollToTop: jasmine.createSpy() } as any;
+    component.gotToTop();
+    expect(component.content.scrollToTop).toHaveBeenCalledWith(1000);
+  });
+
+  describe('ionViewWillEnter', () => {
+    beforeEach(() => {
+      mockProfileService.getProfileDetailsFromAPI.and.returnValue(
+        Promise.resolve({id: 1, about: 'test', profile_mandatory_field: []})
+      );
+      mockLocalStorage.getLocalData.and.returnValue(
+        Promise.resolve(['mantor'])
+      );
+    })
+  })
 });
