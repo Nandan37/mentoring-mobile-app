@@ -1,7 +1,6 @@
 import { DataSource } from '@angular/cdk/collections';
 import { Component, OnInit, ViewChild } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
-import { IonInfiniteScroll } from '@ionic/angular';
 import { localKeys } from 'src/app/core/constants/localStorage.keys';
 import { urlConstants } from 'src/app/core/constants/urlConstants';
 import { SKELETON } from 'src/app/core/constants/skeleton.constant';
@@ -24,7 +23,6 @@ import * as _ from 'lodash';
   styleUrls: ['./mentor-details.page.scss'],
 })
 export class MentorDetailsPage implements OnInit {
-  @ViewChild(IonInfiniteScroll) infiniteScroll: IonInfiniteScroll;
   mentorId;
   page = 1;
   limit = 100;
@@ -35,6 +33,7 @@ export class MentorDetailsPage implements OnInit {
     backButton: false,
     headerColor: "primary"
   };
+  disableInfiniteScroll: boolean = false;
 
   public buttonConfig = {
     meta: {
@@ -134,15 +133,13 @@ export class MentorDetailsPage implements OnInit {
       
       this.totalCount = data?.result?.count || 0;
       
-      if (this.infiniteScroll) {
-        this.infiniteScroll.disabled = this.upcomingSessions.length >= this.totalCount;
+      if (!this.disableInfiniteScroll) {
+        this.disableInfiniteScroll = this.upcomingSessions.length >= this.totalCount;
       }
     }
     catch (error) {
       console.error('Error fetching upcoming sessions:', error);
-      if (this.infiniteScroll) {
-        this.infiniteScroll.disabled = true;
-      }
+      this.disableInfiniteScroll = true;
     }
   }
 
