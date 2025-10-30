@@ -68,6 +68,7 @@ export class MentorDetailsPage implements OnInit {
   userNotFound: boolean = false;
   userCanAccess: boolean;
   isLoading = false;
+  isUpcomingSession: boolean =false; 
   SKELETON = SKELETON;
   constructor(
     private routerParams: ActivatedRoute,
@@ -87,6 +88,7 @@ export class MentorDetailsPage implements OnInit {
     if(this.isLoading)
       return;
     this.isLoading = true;
+    this.isUpcomingSession = false;
     let user = await this.localStorage.getLocalData(localKeys.USER_DETAILS)
     this.routerParams.params.subscribe((params) => {
       this.mentorId = this.buttonConfig.meta.id = params.id;
@@ -122,12 +124,13 @@ export class MentorDetailsPage implements OnInit {
     try {
       let data = await this.httpService.get(config);
       const newSessions = data?.result?.data || [];
-      
+      this.isUpcomingSession = true;
       if (isLoadMore) {
         this.upcomingSessions = [...this.upcomingSessions, ...newSessions];
       } else {
         this.upcomingSessions = newSessions;
       }
+
       
       this.totalCount = data?.result?.count || 0;
       
@@ -180,6 +183,7 @@ export class MentorDetailsPage implements OnInit {
 
   async segmentChanged(ev: any) {
     this.segmentValue = ev.detail.value;
+    this.isUpcomingSession = false;
     if(this.segmentValue == 'upcoming'){
       this.page = 1;
       this.upcomingSessions = [];
@@ -228,6 +232,7 @@ export class MentorDetailsPage implements OnInit {
       case 'joinAction':
         await this.sessionService.joinSession(event.data);
         this.page = 1;
+        this.isUpcomingSession =false;
         this.upcomingSessions = [];
         await this.getUpcomingSessions();
         break;
@@ -237,6 +242,7 @@ export class MentorDetailsPage implements OnInit {
         if(enrollResult.result){
           this.toast.showToast(enrollResult.message, "success")
           this.page = 1;
+          this.isUpcomingSession =false;
           this.upcomingSessions = [];
           await this.getUpcomingSessions();
         }

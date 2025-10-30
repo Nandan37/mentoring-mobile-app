@@ -47,7 +47,7 @@
       ></app-skeleton>
       </div>
 
-      <div *ngIf="upcomingSessions && upcomingSessions.length === 0">
+      <div *ngIf="upcomingSessions && upcomingSessions.length === 0 && isUpcomingSession">
         <app-no-data-found [messageHeader]="'NO_UPCOMING_SESSIONS_PLANNED'" [messageDescription]="'NO_UPCOMING_SESSIONS'"></app-no-data-found>
       </div>
 
