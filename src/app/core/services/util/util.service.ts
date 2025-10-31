@@ -222,15 +222,26 @@ export class UtilService {
     });
   }
 
-    downloadCSVFile(rawCsvUrl: string, fileName: string): void {
+  async downloadCSVFile(rawCsvUrl: string, fileName: string): Promise<void> {
+  try {
+    const response = await fetch(rawCsvUrl);
+    const blob = await response.blob();
+    
     const link = document.createElement('a');
-    link.href = rawCsvUrl;
+    link.href = URL.createObjectURL(blob);
     link.download = fileName.endsWith('.csv') ? fileName : `${fileName}.csv`;
-
+    
     document.body.appendChild(link);
     link.click();
     document.body.removeChild(link);
+    setTimeout(() => {
+  URL.revokeObjectURL(link.href);
+}, 100);
+  } catch (error) {
+    console.error('Error downloading file:', error);
   }
+}
+
 
 
   async deviceDetails() {
