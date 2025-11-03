@@ -95,7 +95,7 @@ export class DashboardPage  {
   }
 
   async initialDuration(){
-    this.scrollLabelForMonth = this.translate.instant("SCROLL_TO_EXPLORE_MONTHLY");
+    this.scrollLabelForMonth = this.translate.instant("SCROLL_TO_EXPLORE_CHART");
     const today = moment();
     this.startDate = today.clone().startOf('month').add(1, 'second');
     this.endDate = today.clone().endOf('month');

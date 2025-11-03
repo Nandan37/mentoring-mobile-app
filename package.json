@@ -1,6 +1,6 @@
 {
   "name": "MentorED",
-  "version": "3.2.0.34",
+  "version": "3.2.0.42",
   "author": "Ionic Framework",
   "homepage": "https://ionicframework.com/",
   "scripts": {
@@ -58,7 +58,7 @@
     "cordova-plugin-screen-orientation": "^3.0.3",
     "cordova-sqlite-storage": "^6.1.0",
     "es6-promise-plugin": "^4.2.2",
-    "generic-chart": "^1.1.0",
+    "generic-chart": "^1.2.26",
     "ionic-plugin-deeplinks": "^1.0.24",
     "jwt-decode": "^3.1.2",
     "lodash-es": "^4.17.21",
