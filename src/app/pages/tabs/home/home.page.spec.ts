@@ -1,4 +1,4 @@
-import { ComponentFixture, TestBed } from '@angular/core/testing';
+import { ComponentFixture, fakeAsync, TestBed, tick } from '@angular/core/testing';
 import { IonicModule, ModalController } from '@ionic/angular';
 import { HomePage } from './home.page';
 import { FormBuilder } from '@angular/forms';
@@ -11,6 +11,7 @@ import { PermissionService } from 'src/app/core/services/permission/permission.s
 import { NO_ERRORS_SCHEMA } from '@angular/core';
 import { OverlayModule } from '@angular/cdk/overlay';
 import { TranslateModule } from '@ngx-translate/core';
+import { localKeys } from 'src/app/core/constants/localStorage.keys';
 // --- Minimal mocks ---
 class MockRouter { navigate() {} }
 fdescribe('HomePage - Simple Test', () => {
@@ -166,8 +167,37 @@ fdescribe('HomePage - Simple Test', () => {
         Promise.resolve({id: 1, about: 'test', profile_mandatory_field: []})
       );
       mockLocalStorage.getLocalData.and.returnValue(
-        Promise.resolve(['mantor'])
+        Promise.resolve(['mentor'])
+      );
+      mockPermissionService.getPlatformConfig.and.returnValue(
+        Promise.resolve(mockPlatformConfig)
+      );
+      mockSessionService.getSessions.and.returnValue(
+        Promise.resolve(mockSessions)
       );
     })
+
+    it('it should load user data', fakeAsync(() => {
+      component.ionViewWillEnter();
+      tick();
+      expect(mockProfileService.getProfileDetailsFromAPI).toHaveBeenCalledWith();
+    }));
+
+    it('should set isMentor to true when user has mentor role', fakeAsync(() => {
+      mockLocalStorage.getLocalData.and.callFake((key) => {
+        if (key === localKeys.USER_ROLES) return Promise.resolve(['mentor']);
+        return Promise.resolve(null);
+      });
+
+      component.ionViewWillEnter();
+      tick();
+      
+      expect(component.isMentor).toBe(true);
+    }));
+
+
+    it('should not show become mentor card if the role is requested', fakeAsync(() => {
+      
+    }))
   })
 });
