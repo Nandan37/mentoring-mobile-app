@@ -222,21 +222,19 @@ export class UtilService {
     });
   }
 
-  async downloadCSVFile(rawCsvUrl: string, fileName: string): Promise<void> {
+async downloadCSVFile(rawCsvUrl: string, fileName: string): Promise<void> {
   try {
     const response = await fetch(rawCsvUrl);
-    const blob = await response.blob();
-    
+    const text = await response.text();
+    const blob = new Blob([text], { type: 'text/csv;charset=utf-8;' });
+    const url = URL.createObjectURL(blob);
     const link = document.createElement('a');
-    link.href = URL.createObjectURL(blob);
+    link.href = url;
     link.download = fileName.endsWith('.csv') ? fileName : `${fileName}.csv`;
-    
     document.body.appendChild(link);
     link.click();
     document.body.removeChild(link);
-    setTimeout(() => {
-  URL.revokeObjectURL(link.href);
-}, 100);
+    setTimeout(() => URL.revokeObjectURL(url), 1000); // give it a bit more time
   } catch (error) {
     console.error('Error downloading file:', error);
   }
