@@ -642,7 +642,8 @@ handleSelectedFile(file) {
           showFilter: false,
           showSearch: false,
           viewListMode: true,
-          isMobile: this.isMobile
+          isMobile: this.isMobile,
+          disablePaginator: true
         }
       }
     });

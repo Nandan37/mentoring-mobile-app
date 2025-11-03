@@ -56,6 +56,7 @@ export class SearchPopoverComponent implements OnInit {
   chips : any[] = [];
   disableInfiniteScroll = false; 
   disableNavigation= true;
+  showPaginator: boolean= true;
 
   constructor(private platform: Platform, private modalController: ModalController, private toast: ToastService,private translate: TranslateService, private localStorage: LocalStorageService, private util: UtilService, private httpService: HttpService, private form: FormService) { 
     this.platform.backButton.subscribeWithPriority(10, () => {
@@ -97,7 +98,8 @@ export class SearchPopoverComponent implements OnInit {
       this.filterData = await this.util.getFormatedFilterData(this.filterData, this.data.control.meta);
       if(this.data.control.name != "mentor_id")
       this.filterData = [...this.filterData, this.data?.control?.meta?.filters?.type[0]];
-    }    
+    }   
+    this.showPaginator = this.data.disablePaginator ? false : true;
   }
 
   async getFilters() {
