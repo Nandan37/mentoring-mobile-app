@@ -11,7 +11,7 @@
     
 <ion-toolbar position="top">
   <div class="container">
-  <div class="search-col" [ngClass]="{ 'p-1': data.isMobile }">
+  <div class="search-col" [ngClass]="{ 'p-1': data.isMobile }" *ngIf="showPaginator">
         <app-searchbar (outputData)="onSearch($event)"  [placeholder]="data.control.meta.searchLabel" (clearText)="onClearSearch($event)"></app-searchbar>
     </div>
     <div class="close-col" *ngIf="!data.isMobile;">
@@ -31,7 +31,7 @@
       <div class="scrollable-table ">
       <app-generic-table [headingText]="this.data.control.meta.url" [columnData]="columnData" [tableData]="tableData"
         [totalCount]="count" (onClickEvent)='onButtonCLick($event)' (paginatorChanged)="onPaginatorChange($event)" (onSorting)="onSorting($event)" 
-        [noDataMessage]="noDataMessage" [setPaginatorToFirstpage]="setPaginatorToFirstpage" [showPaginator]="true"></app-generic-table>
+        [noDataMessage]="noDataMessage" [setPaginatorToFirstpage]="setPaginatorToFirstpage" [showPaginator]="showPaginator"></app-generic-table>
       </div>
     </ion-col>
   </ion-row>
