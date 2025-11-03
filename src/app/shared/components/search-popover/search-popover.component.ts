@@ -238,10 +238,11 @@ export class SearchPopoverComponent implements OnInit {
       this.page = this.page+1;
 
       let data = await this.getMenteelist();
-      this.tableData = this.tableData.concat(data)
-      if(data.length === 0) {
+        if(data.length === 0) {
           this.disableInfiniteScroll = true;
+          return ;
       }
+    this.tableData = this.tableData.concat(data)
     event.target.complete();
   }
 
