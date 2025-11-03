@@ -50,6 +50,7 @@ export class DashboardPage  {
   chartBodyConfig :any= {}
   chartBodyPayload: any;
   translatedChartConfig : any;
+  scrollLabelForMonth : string;
    metaKeys = _.cloneDeep(DASHBOARD_TABLE_META_KEYS);
 
   constructor(
@@ -94,6 +95,7 @@ export class DashboardPage  {
   }
 
   async initialDuration(){
+    this.scrollLabelForMonth = this.translate.instant("SCROLL_TO_EXPLORE_MONTHLY");
     const today = moment();
     this.startDate = today.clone().startOf('month').add(1, 'second');
     this.endDate = today.clone().endOf('month');
@@ -104,6 +106,7 @@ export class DashboardPage  {
     this.endDateEpoch = endDateEpoch;
     this.prepareTableUrl();
     this.prepareChartUrl();
+
     if( this.filteredCards){
       this.bigNumberCount();
     }
