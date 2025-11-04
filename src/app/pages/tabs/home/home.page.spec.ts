@@ -189,44 +189,44 @@ const mockSessions = {
       tick();
       expect(mockProfileService.getProfileDetailsFromAPI).toHaveBeenCalledWith();
     }));
-    // it('should set isMentor to true when user has mentor role', fakeAsync(() => {
-    //   mockLocalStorage.getLocalData.and.callFake((key) => {
-    //     if (key === localKeys.USER_ROLES) return Promise.resolve(['mentor']);
-    //     return Promise.resolve(null);
-    //   });
+    it('should set isMentor to true when user has mentor role', fakeAsync(() => {
+      mockLocalStorage.getLocalData.and.callFake((key) => {
+        if (key === localKeys.USER_ROLES) return Promise.resolve(['mentor']);
+        return Promise.resolve(null);
+      });
 
-    //   component.ionViewWillEnter();
-    //   tick();
+      component.ionViewWillEnter();
+      tick();
       
-    //   expect(component.isMentor).toBe(true);
-    // }));
+      expect(component.isMentor).toBe(true);
+    }));
 
-    // it('should not show become mentor card if the role is requested', fakeAsync(() => {
-    //   mockLocalStorage.getLocalData.and.callFake((key) => {
-    //       if(key === localKeys.IS_BECOME_MENTOR_TILE_CLOSED) 
-    //         return Promise.resolve(true);
-    //       return Promise.resolve(null);
-    //   })
-    //   component.ionViewWillEnter();
-    //   tick();
+    it('should not show become mentor card if the role is requested', fakeAsync(() => {
+      mockLocalStorage.getLocalData.and.callFake((key) => {
+          if(key === localKeys.IS_BECOME_MENTOR_TILE_CLOSED) 
+            return Promise.resolve(true);
+          return Promise.resolve(null);
+      })
+      component.ionViewWillEnter();
+      tick();
 
-    //   expect(component.showBecomeMentorCard).toBe(false);
-    // }));
+      expect(component.showBecomeMentorCard).toBe(false);
+    }));
 
-    // it('should subscribe to user events', fakeAsync(() => {
-    //   component.ionViewWillEnter();
-    //   tick();
+    it('should subscribe to user events', fakeAsync(() => {
+      component.ionViewWillEnter();
+      tick();
 
-    //   userEventSubject.next(mockUser);
-    //   expect(component.user).toEqual(mockUser)
-    // }));
+      userEventSubject.next(mockUser);
+      expect(component.user).toEqual(mockUser)
+    }));
 
-    // it('should load platform config chips', fakeAsync(() => {
-    //   component.ionViewWillEnter();
-    //   tick();
+    it('should load platform config chips', fakeAsync(() => {
+      component.ionViewWillEnter();
+      tick();
 
-    //   expect(component.chips).toEqual(mockPlatformConfig.result.search_config.search.session.fields)
-    // }));
+      expect(component.chips).toEqual(mockPlatformConfig.result.search_config.search.session.fields)
+    }));
 
   })
 });
