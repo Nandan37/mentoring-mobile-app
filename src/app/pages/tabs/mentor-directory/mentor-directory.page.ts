@@ -20,7 +20,7 @@ export class MentorDirectoryPage implements OnInit {
   @ViewChild(IonContent) content: IonContent;
 
   page = 1;
-  limit = 50;
+  limit = 100;
   searchText: string = '';
   public headerConfig: any = {
     menu: true,
@@ -48,6 +48,7 @@ export class MentorDirectoryPage implements OnInit {
   buttonConfig: any;
   currentUserId: any;
   isInfiniteScrollDisabled: boolean = false;
+  loading: boolean =false;
 
   constructor(
     private router: Router,
@@ -66,6 +67,11 @@ export class MentorDirectoryPage implements OnInit {
   }
 
   async ionViewWillEnter() {
+    if(this.loading) {
+      this.gotToTop();
+      return;
+    }
+    this.loading =true;
     let user = await this.localStorage.getLocalData(localKeys.USER_DETAILS);
     this.currentUserId= user.id;
     const result = await this.form.getForm(MENTOR_DIR_CARD_FORM);
@@ -73,7 +79,7 @@ export class MentorDirectoryPage implements OnInit {
     this.page = 1;
     this.mentors = [];
     this.isInfiniteScrollDisabled = false;
-    this.getMentors();
+    this.getMentors();  
     this.gotToTop();
   }
 
