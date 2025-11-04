@@ -195,7 +195,7 @@ export class SessionDetailPage implements OnInit, OnDestroy {
           },
         );
       } 
-      if((this.isCreator || this.isConductor) && !this.detailData.controls.some(obj => obj.title === 'MENTEE_COUNT')){
+      if((this.isCreator || this.isConductor) && !this.detailData.controls.some(obj => obj.title.toLowerCase() === 'mentee count')){
         
         this.detailData.controls.push(
           {
