@@ -33,17 +33,19 @@ fdescribe('HomePage - Simple Test', () => {
     profile_mandatory_fields: [],
     terms_and_conditions: true
   };
-  const mockSessions = {
-      all_sessions: [
-      ],
-      my_sessions: [
-      ],
-      allSessions_count: 2,
-      my_sessions_count: 1
-    };
+const mockSessions = {
+  result: {  
+    all_sessions: [],
+    my_sessions: [],
+    allSessions_count: 2,
+    my_sessions_count: 1
+  }
+};
 
   const mockCreatedSessions = {
-    data: []
+    data: [],
+    count: 2
+
   }
 
   const mockPlatformConfig = {
@@ -158,6 +160,10 @@ fdescribe('HomePage - Simple Test', () => {
 
   describe('ionViewWillEnter', () => {
     beforeEach(() => {
+        component.content = { 
+      scrollToTop: jasmine.createSpy('scrollToTop').and.returnValue(Promise.resolve()) 
+    } as any;
+
       mockProfileService.getProfileDetailsFromAPI.and.returnValue(
         Promise.resolve({id: 1, about: 'test', profile_mandatory_fields: []})
       );
@@ -171,7 +177,7 @@ fdescribe('HomePage - Simple Test', () => {
         Promise.resolve(mockSessions)
       );
       mockSessionService.getAllSessionsAPI.and.returnValue(
-        Promise.resolve(mockSessions)
+        Promise.resolve(mockCreatedSessions)
       );
   mockUtilService.subscribeSearchText.and.callFake(() => {});
   mockUtilService.subscribeCriteriaChip.and.callFake(() => {});

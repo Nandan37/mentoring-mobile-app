@@ -94,7 +94,6 @@ async ionViewWillEnter() {
     this.sessions = null;
     this.createdSessions = null;
     await this.getUser();
-    await this.getUser();
     let roles = await this.localStorage.getLocalData(localKeys.USER_ROLES);
     this.isMentor = roles?.includes('mentor')?true:false;
     this.gotToTop();
