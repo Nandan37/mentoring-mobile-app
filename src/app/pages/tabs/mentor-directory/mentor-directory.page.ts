@@ -20,7 +20,7 @@ export class MentorDirectoryPage implements OnInit {
   @ViewChild(IonContent) content: IonContent;
 
   page = 1;
-  limit = 50;
+  limit = 100;
   searchText: string = '';
   public headerConfig: any = {
     menu: true,
