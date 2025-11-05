@@ -138,7 +138,7 @@ export class SearchPopoverComponent implements OnInit {
     ? '&' + this.data.control.meta.filters.type[0].key +'=' + this.selectedFilters.type.map(des => des.value).join(',')
     : '';
     let queryString = organizationsQueryParam + designationQueryParam + 
-    ((this.data.sessionType === 'PRIVATE' && (this.data.formConfig || Boolean(this.data.isCreator))) 
+    ((this.data.sessionType === 'PRIVATE' && this.data.showConnectedMentees)
     ? '&connected_mentees=true' 
     : typeQueryParam);
 

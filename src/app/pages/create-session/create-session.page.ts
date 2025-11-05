@@ -77,6 +77,7 @@ export class CreateSessionPage implements OnInit {
   isHome: boolean;
   isManagePage: boolean;
   user: any;
+  showConnectedMentees: boolean = false;
 
   constructor(
     private sessionService: SessionService,
@@ -606,7 +607,8 @@ handleSelectedFile(file) {
           sessionType: this.sessionType,
           mentorId: this.mentor_id,
           formConfig: this.isHome,
-          isCreator: this.route.snapshot.queryParams.isCreator
+          isCreator: this.route.snapshot.queryParams.isCreator,
+          showConnectedMentees : this.showConnectedMentees
         }
       }
     });
@@ -704,8 +706,10 @@ async updateFormConfig() {
     (this.isManagePage && hasPermission) ||
     (!this.isHome && isCreator != 'true' && hasPermission)
   ) {
+    this.showConnectedMentees =false;
     this.formConfig = MANAGERS_CREATE_SESSION_FORM;
   } else {
+    this.showConnectedMentees = true;
     this.formConfig = CREATE_SESSION_FORM;
   }
 }
