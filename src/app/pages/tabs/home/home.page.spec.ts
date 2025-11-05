@@ -228,5 +228,27 @@ const mockSessions = {
       expect(component.chips).toEqual(mockPlatformConfig.result.search_config.search.session.fields)
     }));
 
+    it('should call gotToTop', fakeAsync(() => {
+      component.content = { scrollToTop: jasmine.createSpy() } as any;
+      
+      component.ionViewWillEnter();
+      tick();
+      
+      expect(component.content.scrollToTop).toHaveBeenCalledWith(1000);
+    }));
+
+    // it('should reset pages and sessions', fakeAsync(() => {
+    //   component.page = 5;
+    //   component.sessions = { all_sessions: [{ id: 999 }] };
+    //   component.createdSessions = { data: [{ id: 888 }] };
+
+    //   component.ionViewWillEnter();
+    //   tick();
+
+    //   expect(component.page).toBe(1);
+    //   expect(component.sessions).toBeNull();
+    //   expect(component.createdSessions).toBeNull();
+    // }));
+
   })
 });
