@@ -326,15 +326,29 @@ export class CreateSessionPage implements OnInit {
       if (this.formData.controls[i].type=='search' &&  this.formData.controls[i].meta.addPopupType !== 'file'){
         this.formData.controls[i].id = this.id;
         if(this.formData.controls[i].meta.multiSelect){
-          this.formData.controls[i].meta.searchData = existingData[this.formData.controls[i].name]
-          this.formData.controls[i].value = this.formData.controls[i].meta.searchData ? this.formData.controls[i].meta.searchData.map(obj => obj.id || obj.value) : [];
-        } else {
-          if(existingData[this.formData.controls[i].name]) {
-            this.formData.controls[i].meta.searchData = [{
-            label: `${existingData.mentor_name}, ${existingData.organization}`,
-            id: existingData[this.formData.controls[i].name]
-          }];}
+        this.formData.controls[i] = {
+          ...this.formData.controls[i],
+          meta: {
+            ...this.formData.controls[i].meta,
+            searchData: existingData[this.formData.controls[i].name]
+          }
+        };
+        
+        this.formData.controls[i].value = this.formData.controls[i].meta.searchData ? this.formData.controls[i].meta.searchData.map(obj => obj.id || obj.value) : [];
+      } else {
+        if(existingData[this.formData.controls[i].name]) {
+          this.formData.controls[i] = {
+            ...this.formData.controls[i],
+            meta: {
+              ...this.formData.controls[i].meta,
+              searchData: [{
+                label: `${existingData.mentor_name}, ${existingData.organization}`,
+                id: existingData[this.formData.controls[i].name]
+              }]
+            }
+          };   
         }
+      }
         if(!this.formData.controls[i].meta.disableIfSelected && existingData.status.value  !== "COMPLETED") {
           this.formData.controls[i].disabled = false;
         }
@@ -359,9 +373,16 @@ export class CreateSessionPage implements OnInit {
               })
             );
             if(filteredResources){
-              this.formData.controls[i].value = filteredResources.map(r => r);
-              this.formData.controls[i].meta.searchData = filteredResources;
-            }
+            this.formData.controls[i].value = filteredResources.map(r => r);
+
+            this.formData.controls[i] = {
+              ...this.formData.controls[i],
+              meta: {
+                ...this.formData.controls[i].meta,
+                searchData: filteredResources
+              }
+            };
+          }
         }
         this.formData.controls[i].id = this.id;
         if (!this.formData.controls[i].meta.disableIfSelected && existingData.status.value  !== "COMPLETED" &&  this.formData.controls[i].meta.addPopupType !== 'file') {
@@ -396,6 +417,7 @@ export class CreateSessionPage implements OnInit {
         this.formData.controls[i].value, 'value'
       );
     }
+      this.formData.controls = [...this.formData.controls];
     this.showForm = true;
   }
 
