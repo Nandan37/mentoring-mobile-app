@@ -340,7 +340,7 @@ export class DashboardPage  {
   this.chartBody.headers = await this.apiService.setHeaders();
   }
   async downloadCSV(data: { url: string; fileName: string }) {
-  await this.utilService.downloadCSVFile(data.url, data.fileName);
+  await this.utilService.downloadFile(data.url, data.fileName);
 }
 
 ionViewWillLeave() {

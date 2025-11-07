@@ -222,19 +222,45 @@ export class UtilService {
     });
   }
 
-async downloadCSVFile(rawCsvUrl: string, fileName: string): Promise<void> {
+async downloadFile(fileUrl: string, fileName: string, mimeType?: string): Promise<void> {
   try {
-    const response = await fetch(rawCsvUrl);
-    const text = await response.text();
-    const blob = new Blob([text], { type: 'text/csv;charset=utf-8;' });
-    const url = URL.createObjectURL(blob);
+    const response = await fetch(fileUrl);
+    let contentType: string;
+    let fileExtension: string;
+    
+    if (!mimeType || mimeType.includes('csv') || fileName.endsWith('.csv')) {
+      contentType = 'text/csv;charset=utf-8;';
+      fileExtension = '.csv';
+    }
+    else if (mimeType.includes('pdf')) {
+      contentType = 'application/pdf';
+      fileExtension = '.pdf';
+    }
+    else if (mimeType.includes('word') || mimeType.includes('.document') || mimeType.includes('docx')) {
+      contentType = 'application/vnd.openxmlformats-officedocument.wordprocessingml.document';
+      fileExtension = '.docx';
+    }
+    else if (mimeType.includes('presentation') || mimeType.includes('powerpoint') || mimeType.includes('pptx')) {
+      contentType = 'application/vnd.openxmlformats-officedocument.presentationml.presentation';
+      fileExtension = '.pptx';
+    }
+    else {
+      contentType = 'application/octet-stream';
+      fileExtension = '';
+    }
+    
+    const blob = await response.blob();
+    const typedBlob = new Blob([blob], { type: contentType });
+    const url = URL.createObjectURL(typedBlob);
     const link = document.createElement('a');
     link.href = url;
-    link.download = fileName.endsWith('.csv') ? fileName : `${fileName}.csv`;
+    link.download = fileName.includes('.') ? fileName : `${fileName}${fileExtension}`;
+    
     document.body.appendChild(link);
     link.click();
     document.body.removeChild(link);
-    setTimeout(() => URL.revokeObjectURL(url), 1000); // give it a bit more time
+    
+    setTimeout(() => URL.revokeObjectURL(url), 1000);
   } catch (error) {
     console.error('Error downloading file:', error);
   }
