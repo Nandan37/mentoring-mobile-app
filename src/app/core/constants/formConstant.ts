@@ -113,8 +113,10 @@ export const REQUEST_SESSION_FORM: IFORM = {
 }
 
 export const CHAT_LIB_META_KEYS = {
-	"cantSendMsg": "CANT_SEND_MESSAGE",
-	"cantSendMsgToMentor": "CANT_SEND_MESSAGE_TO_MENTOR",
+    "cantSendMsg": "CANT_SEND_MESSAGE",
+    "cantSendMsgToMentor": "CANT_SEND_MESSAGE_TO_MENTOR",
+    "connectionLost":"CONNECTION_DELETE",
+    "YouCantReachUser":"YOU_CANT_REACH_USER"
 }
 
 export const MENTEE_CARD_FORM: IFORM = {
