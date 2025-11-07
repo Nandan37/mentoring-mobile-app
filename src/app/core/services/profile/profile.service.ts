@@ -291,6 +291,8 @@ export class ProfileService {
           xAuthToken: resp.result.auth_token,
           userId: resp.result.user_id,
           textColor: '#fff',
+          headers :await this.httpService.setHeaders(),
+          appBaseUrl:environment['baseUrl'],
           chatBaseUrl:environment['chatBaseUrl'],
           chatWebSocketUrl:environment['chatWebSocketUrl'],
           bgColor: getComputedStyle(document.documentElement)
