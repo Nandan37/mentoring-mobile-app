@@ -56,7 +56,11 @@ selectedImageUrl: string | null = null;
     return 'other';
   }
 
-  async downloadFile(resource: any) {
+  async downloadFile($event: Event, resource: any) {
+      if (resource?.mime_type ==='link') {
+      return; 
+      }
+    $event.preventDefault()
     await this.utilService.downloadFile(resource.link, resource.name, resource.mime_type);
   }
 

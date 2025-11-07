@@ -74,7 +74,7 @@
       <div style="display: flex; flex-direction: column; flex-wrap: wrap;">
             <div *ngFor="let resource of preResources" >
               <a
-                (click)="downloadFile(resource); $event.preventDefault()"
+                (click)="downloadFile($event, resource);"
                 [href]="resource.link"
                 class="resource-content">
                          <ion-icon *ngIf="resource.mime_type?.includes('image')" name="image" class="icon-size" ></ion-icon>
@@ -93,7 +93,7 @@
       <div>
             <div *ngFor="let resource of postResources" style="display: flex; flex-direction: column; flex-wrap: wrap;">
                 <a 
-                (click)="downloadFile(resource); $event.preventDefault()"
+                (click)="downloadFile($event, resource)"
                 [href]="resource.link"
                 class=" resource-content">
                          <ion-icon *ngIf="resource.mime_type?.includes('image')" name="image" class="icon-size" ></ion-icon>
