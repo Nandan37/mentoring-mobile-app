@@ -1,4 +1,4 @@
-import { ComponentFixture, fakeAsync, TestBed, tick } from '@angular/core/testing';
+import { ComponentFixture, fakeAsync, flushMicrotasks, TestBed, tick } from '@angular/core/testing';
 import { IonicModule, ModalController } from '@ionic/angular';
 import { HomePage } from './home.page';
 import { FormBuilder } from '@angular/forms';
@@ -12,6 +12,9 @@ import { NO_ERRORS_SCHEMA } from '@angular/core';
 import { OverlayModule } from '@angular/cdk/overlay';
 import { TranslateModule } from '@ngx-translate/core';
 import { localKeys } from 'src/app/core/constants/localStorage.keys';
+import { promise } from 'protractor';
+import { count } from 'console';
+import { CommonRoutes } from 'src/global.routes';
 
 fdescribe('HomePage - Simple Test', () => {
   let component: HomePage;
@@ -237,18 +240,187 @@ const mockSessions = {
       expect(component.content.scrollToTop).toHaveBeenCalledWith(1000);
     }));
 
-    // it('should reset pages and sessions', fakeAsync(() => {
-    //   component.page = 5;
-    //   component.sessions = { all_sessions: [{ id: 999 }] };
-    //   component.createdSessions = { data: [{ id: 888 }] };
+      it('should reset pages and sessions', fakeAsync(async () => {
 
-    //   component.ionViewWillEnter();
-    //   tick();
+    component.page = 5;
+    component.sessions = { all_sessions: [{ id: 999 }] };
+    component.createdSessions = { data: [{ id: 888 }] };
+    component.user = { profile_mandatory_fields: [] }; 
 
-    //   expect(component.page).toBe(1);
-    //   expect(component.sessions).toBeNull();
-    //   expect(component.createdSessions).toBeNull();
-    // }));
+    spyOn(component, 'getUser').and.returnValue(Promise.resolve());
+    mockLocalStorage.getLocalData.and.returnValue(Promise.resolve([]));
+    mockPermissionService.getPlatformConfig.and.returnValue(
+      Promise.resolve({
+        result: {
+          search_config: {
+            search: {
+              session: {
+                fields: []
+              }
+            }
+          }
+        }
+      })
+    );
 
-  })
+    spyOn(component, 'loadSegmentData').and.returnValue(Promise.resolve());
+
+
+    mockUserService.userEventEmitted$ = of(null);
+
+
+    await component.ionViewWillEnter();
+    tick(); 
+
+    expect(component.page).toBe(1);
+    expect(component.sessions).toBeNull();
+    expect(component.createdSessions).toBeNull();
+  }));
+
+  
+
+  });
+
+  describe('loadSegment', () => {
+    beforeEach(() => {
+      mockSessionService.getSessions.and.returnValue(Promise.resolve(mockSessions));
+      mockSessionService.getAllSessionsAPI.and.returnValue(Promise.resolve(mockCreatedSessions));
+    });
+    it('should all load allsession', fakeAsync(() => {
+      component.loadSegmentData('all-sessions');
+      tick();
+
+      expect(mockSessionService.getSessions).toHaveBeenCalledWith({page:1, limit:100, scope: 'all'});
+      expect(component.sessions).toEqual(mockSessions.result);
+      expect(component.allSessionsCount).toBe(2);
+    }));
+
+      it('should load created sessions for mentors', fakeAsync(() => {
+      component.isMentor = true;
+      
+      component.loadSegmentData('created-sessions');
+      tick();
+      
+      expect(mockSessionService.getAllSessionsAPI).toHaveBeenCalledWith({
+        page: 1,
+        limit: 100,
+        searchText: ''
+      });
+      expect(component.createdSessions).toEqual(mockCreatedSessions);
+      expect(component.createdSessionsCount).toBe(2);
+    }));
+
+        it('should set empty created sessions for non-mentors', fakeAsync(() => {
+      component.isMentor = false;
+      
+      component.loadSegmentData('created-sessions');
+      tick();
+      
+      expect(component.createdSessions).toEqual({ data: [] });
+      expect(component.createdSessionsCount).toBe(0);
+    }));
+
+     it('should set isCreatedSessions flag when no created sessions', fakeAsync(() => {
+      component.isMentor = true;
+      mockSessionService.getAllSessionsAPI.and.returnValue(
+        Promise.resolve({ data: [], count: 0 })
+      );
+      
+      component.loadSegmentData('created-sessions');
+      tick();
+      
+      expect(component.isCreatedSessions).toBe(true);
+    }));
+
+        it('should load enrolled sessions', fakeAsync(() => {
+      component.loadSegmentData('my-sessions');
+      tick();
+      
+      expect(mockSessionService.getSessions).toHaveBeenCalledWith({
+        page: 1,
+        limit: 100,
+        scope: 'my'
+      });
+      expect(component.enrolledSessionsCount).toBe(1);
+    }));
+
+        it('should set isEnrolledSession flag when no enrolled sessions', fakeAsync(() => {
+      mockSessionService.getSessions.and.returnValue(
+        Promise.resolve({ result: { my_sessions: [], my_sessions_count: 0 } })
+      );
+      
+      component.loadSegmentData('my-sessions');
+      tick();
+      
+      expect(component.isEnrolledSession).toBe(true);
+    }));
+
+        it('should append data when loading more for created sessions', fakeAsync(() => {
+      component.isMentor = true;
+      component.createdSessions = { data: [{ id: 1 }] };
+      mockSessionService.getAllSessionsAPI.and.returnValue(
+        Promise.resolve({ data: [{ id: 2 }], count: 2 })
+      );
+      
+      component.loadSegmentData('created-sessions', true);
+      tick();
+      
+      expect(component.createdSessions.data.length).toBe(2);
+      expect(component.createdSessions.data).toEqual([{ id: 1 }, { id: 2 }]);
+    }));
+
+        it('should append data when loading more for enrolled sessions', fakeAsync(() => {
+      component.sessions = { my_sessions: [{ id: 1 }] };
+      mockSessionService.getSessions.and.returnValue(
+        Promise.resolve({ result: { my_sessions: [{ id: 2 }], my_sessions_count: 2 } })
+      );
+      
+      component.loadSegmentData('my-sessions', true);
+      tick();
+      
+      expect(component.sessions.my_sessions.length).toBe(2);
+      expect(component.sessions.my_sessions).toEqual([{ id: 1 }, { id: 2 }]);
+    }));
+
+
+    describe('eventAction', () => {
+          beforeEach(() => {
+      component.user = mockUser;
+      mockSessionService.joinSession.and.returnValue(Promise.resolve());
+      mockSessionService.enrollSession.and.returnValue(
+        Promise.resolve({ result: true, message: 'Success' })
+      );
+      mockSessionService.startSession.and.returnValue(Promise.resolve(false));
+      mockSessionService.getSessions.and.returnValue(Promise.resolve(mockSessions));
+    });
+
+        it('should navigate to session details on cardSelect', fakeAsync(() => {
+      component.eventAction({ type: 'cardSelect', data: { id: 123 } });
+      tick();
+      
+      expect(mockRouter.navigate).toHaveBeenCalledWith([`/${CommonRoutes.SESSIONS_DETAILS}/123`]);
+    }));
+
+        it('should join session on joinAction', fakeAsync(() => {
+      const mockSession = { id: 123 };
+      
+      component.eventAction({ type: 'joinAction', data: mockSession });
+      tick();
+      
+      expect(mockSessionService.joinSession).toHaveBeenCalledWith(mockSession);
+      expect(component.page).toBe(1);
+    }));
+
+      it('should enroll in session on enrollAction', fakeAsync(() => {
+      component.eventAction({ type: 'enrollAction', data: { id: 123 } });
+      tick();
+      
+      expect(mockSessionService.enrollSession).toHaveBeenCalledWith(123);
+      expect(mockToast.showToast).toHaveBeenCalledWith('Success', 'success');
+      expect(component.page).toBe(1);
+    }));
+
+    
+    })
+  });
 });
