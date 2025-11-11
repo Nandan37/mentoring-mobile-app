@@ -15,6 +15,7 @@ import { localKeys } from 'src/app/core/constants/localStorage.keys';
 import { promise } from 'protractor';
 import { count } from 'console';
 import { CommonRoutes } from 'src/global.routes';
+import { environment } from 'src/environments/environment';
 
 fdescribe('HomePage - Simple Test', () => {
   let component: HomePage;
@@ -420,6 +421,107 @@ const mockSessions = {
       expect(component.page).toBe(1);
     }));
 
+
+ it('should show profile popup if user has no about', fakeAsync(() => {
+    environment['isAuthBypassed'] = false;  // <-- Set to false
+    component.user = { ...mockUser, about: null };
+    
+    component.eventAction({ type: 'cardSelect', data: { id: 123 } });
+    tick();
+    
+    expect(mockProfileService.upDateProfilePopup).toHaveBeenCalled();
+    expect(mockRouter.navigate).not.toHaveBeenCalled();
+  }));
+    
+    })
+
+    describe('search', () => {
+      it('should navigate to search page with valid search text', () => {
+      component.criteriaChip = { name: 'title', label: 'Title' };
+      
+      component.search('test search');
+      
+      expect(component.isOpen).toBe(false);
+      expect(mockUtilService.subscribeSearchText).toHaveBeenCalledWith('test search');
+      expect(mockUtilService.subscribeCriteriaChip).toHaveBeenCalled();
+      expect(mockRouter.navigate).toHaveBeenCalledWith([`/${CommonRoutes.HOME_SEARCH}`], {
+        queryParams: { search: 'test search', chip: 'title' }
+      });
+    });
+      it('should show toast for search text less than 3 characters', () => {
+      component.search('ab');
+      
+      expect(mockToast.showToast).toHaveBeenCalledWith('ENTER_MIN_CHARACTER', 'danger');
+      expect(mockRouter.navigate).not.toHaveBeenCalled();
+    });
+
+    it('should handle empty search text', () => {
+      component.search('');
+      
+      expect(mockToast.showToast).toHaveBeenCalledWith('ENTER_MIN_CHARACTER', 'danger');
+    });
+
+        it('should close overlay on valid search', () => {
+      component.isOpen = true;
+      
+      component.search('test search');
+      
+      expect(component.isOpen).toBe(false);
+    });
+
+    describe('segmentChanged', () => {
+      beforeEach(() => {
+        mockSessionService.getSessions.and.returnValue(Promise.resolve(mockSessions));
+            mockSessionService.getAllSessionsAPI.and.returnValue(Promise.resolve(mockCreatedSessions));
+                it('should change selected segment and reset page', fakeAsync(() => {
+                  component.page = 5;
+                  
+                  component.segmentChanged({ name: 'created-sessions' });
+                  tick();
+                  
+                  expect(component.selectedSegment).toBe('created-sessions');
+                  expect(component.page).toBe(1);
+                }));
+
+          it('should load data for all-sessions segment', fakeAsync(() => {
+          component.segmentChanged({ name: 'all-sessions' });
+          tick();
+          
+          expect(mockSessionService.getSessions).toHaveBeenCalled();
+        }));
+
+            it('should load data for my-sessions segment', fakeAsync(() => {
+      component.segmentChanged({ name: 'my-sessions' });
+      tick();
+      
+      expect(mockSessionService.getSessions).toHaveBeenCalled();
+    }));
+      })
+    });
+
+
+    describe('createSession', ()=> {
+    it('should navigate to create session page if user has about', () => {
+      component.user = mockUser;
+      
+      component.createSession();
+      
+      expect(mockRouter.navigate).toHaveBeenCalledWith([`${CommonRoutes.CREATE_SESSION}`], {
+        queryParams: { source: 'home' }
+      });
+    });
+
+      it('should show profile popup if user has no about', () => {
+      component.user = { ...mockUser, about: null };
+      
+      component.createSession();
+      
+      expect(mockProfileService.upDateProfilePopup).toHaveBeenCalled();
+      expect(mockRouter.navigate).not.toHaveBeenCalled();
+    });
+
+    
+    })
     
     })
   });
