@@ -5,15 +5,20 @@ The Mentor PWA is developed using the Ionic framework. This document provides in
 Contents
 ---------------------
 
- * [Dependencies](#dependencies)
- * [Setting up the CLI](#setting-up-the-cli)
- * [Setting up the Project](#setting-up-the-project)
- * [Building the Application](#building-the-application)
- * [Debugging the Application](#debugging-the-application)
- * [Setting up the HashiCorp® Vault](#setting-up-the-hashicorp-vault)
- * [Creating a Jenkins® Job](#creating-a-jenkins-job)
- * [Deploying the Application Using an Ansible® Script](#deploying-the-application-using-an-ansible-script)
- * [Structure of Environment file, Server.js, and pm2.config.json](#structure-of-environment-file-serverjs-and-pm2configjson)
+- [Customizing the PWA](#customizing-the-pwa)
+  - [Contents](#contents)
+  - [Dependencies](#dependencies)
+  - [Setting up the CLI](#setting-up-the-cli)
+  - [Setting up the Project](#setting-up-the-project)
+  - [Building the Application](#building-the-application)
+  - [Debugging the Application](#debugging-the-application)
+  - [Setting up the HashiCorp Vault](#setting-up-the-hashicorp-vault)
+  - [Creating a Jenkins Job](#creating-a-jenkins-job)
+  - [Deploying the Application Using an Ansible Script](#deploying-the-application-using-an-ansible-script)
+  - [Structure of Environment file, Server.js, and pm2.config.json](#structure-of-environment-file-serverjs-and-pm2configjson)
+    - [Structure of environment.ts File](#structure-of-environmentts-file)
+    - [Structure of pm2.config.json File](#structure-of-pm2configjson-file)
+    - [Structure of Server.js File](#structure-of-serverjs-file)
 
 Dependencies
 ------------
@@ -222,6 +227,11 @@ For deploying your application, you need an Environment file, Server.js, and a p
       staging: true / false,
       dev: true / false,
       baseUrl: "<base-url>",
+      chatBaseUrl: "<chatBase-url>",
+      chatWebSocketUrl: "<chatWebSocket-url>",
+      isAuthBypassed: true / false,
+      restictedPages: [
+      "HELP_VIDEOS_PAGE", "HELP_PAGE", "FAQ_PAGE", "LOGIN_ACTIVITY_PAGE", "CHANGE_PASSWORD_PAGE", "LOGIN_PAGE", "REGISTER_PAGE", "RESET_PASSWORD_PAGE","OTP_PAGE", 'EDIT_PROFILE']
       sqliteDBName: "<db-name> (if you have)",
       deepLinkUrl: "<deeplink-url>",
       privacyPolicyUrl: "<privacy-policy-url>",

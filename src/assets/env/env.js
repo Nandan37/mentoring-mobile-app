@@ -2,6 +2,8 @@ window["env"] = {
   production: false, // Toggle between development (false) and production (true) mode
   name: '<APP_NAME>', // Application name, e.g., "Mentoring App"
   baseUrl: 'https://dev.elevate-apis.shikshalokam.org',
+  chatBaseUrl: "<chatBase-url>",
+  chatWebSocketUrl: "<chatWebSocket-url>",
   sqliteDBName: 'mentoring.db',
   deepLinkUrl: 'https://mentored.shikshalokam.org',
   privacyPolicyUrl:'https://shikshalokam.org/mentoring/privacy-policy',
