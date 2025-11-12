@@ -9,13 +9,14 @@ import { SessionService } from 'src/app/core/services/session/session.service';
 import { LocalStorageService, ToastService, UserService, UtilService } from 'src/app/core/services';
 import { PermissionService } from 'src/app/core/services/permission/permission.service';
 import { NO_ERRORS_SCHEMA } from '@angular/core';
-import { OverlayModule } from '@angular/cdk/overlay';
+import { OverlayModule, OverlayRef } from '@angular/cdk/overlay';
 import { TranslateModule } from '@ngx-translate/core';
 import { localKeys } from 'src/app/core/constants/localStorage.keys';
 import { promise } from 'protractor';
 import { count } from 'console';
 import { CommonRoutes } from 'src/global.routes';
 import { environment } from 'src/environments/environment';
+import { TermsAndConditionsPage } from '../../terms-and-conditions/terms-and-conditions.page';
 
 fdescribe('HomePage - Simple Test', () => {
   let component: HomePage;
@@ -468,6 +469,37 @@ const mockSessions = {
       
       expect(component.isOpen).toBe(false);
     });
+  });
+    describe('openModal', () => {
+  it('should create and present terms and conditions modal', fakeAsync(() => {
+    const mockModal = {
+      present: jasmine.createSpy('present').and.returnValue(Promise.resolve())
+    };
+    mockModalController.create.and.returnValue(Promise.resolve(mockModal as any));
+    
+    component.openModal();
+    tick();
+    
+    expect(mockModalController.create).toHaveBeenCalledWith({
+      component: TermsAndConditionsPage,
+      backdropDismiss: false
+    });
+    expect(mockModal.present).toHaveBeenCalled();
+  }));
+
+  it('should not allow backdrop dismiss', fakeAsync(() => {
+    const mockModal = {
+      present: jasmine.createSpy('present').and.returnValue(Promise.resolve())
+    };
+    mockModalController.create.and.returnValue(Promise.resolve(mockModal as any));
+    
+    component.openModal();
+    tick();
+    
+    const createCall = mockModalController.create.calls.first();
+    expect(createCall.args[0].backdropDismiss).toBe(false);
+  }));
+});
 
     describe('segmentChanged', () => {
       beforeEach(() => {
@@ -513,16 +545,345 @@ const mockSessions = {
 
       it('should show profile popup if user has no about', () => {
       component.user = { ...mockUser, about: null };
-      
+       environment['isAuthBypassed'] = false; 
       component.createSession();
       
       expect(mockProfileService.upDateProfilePopup).toHaveBeenCalled();
       expect(mockRouter.navigate).not.toHaveBeenCalled();
     });
+      describe('becomeMentor', () => {
+            it('should navigate to mentor questionnaire if user has about', () => {
+      component.user = mockUser;
+      
+      component.becomeMentor();
+      
+      expect(mockRouter.navigate).toHaveBeenCalledWith([`/${CommonRoutes.MENTOR_QUESTIONNAIRE}`]);
+    });
+
+        it('should show profile popup if user has no about', () => {
+      component.user = { ...mockUser, about: null };
+      environment['isAuthBypassed'] = false; 
+      
+      component.becomeMentor();
+      
+      expect(mockProfileService.upDateProfilePopup).toHaveBeenCalled();
+      expect(mockRouter.navigate).not.toHaveBeenCalled();
+    });
+      });
 
     
     })
-    
-    })
+
+    describe('closeCard', () => {
+      it('should hide become mentor card', fakeAsync(() => {
+        component.showBecomeMentorCard = true;
+        mockLocalStorage.setLocalData.and.returnValue(Promise.resolve());
+        
+        component.closeCard();
+        tick();
+        
+        expect(component.showBecomeMentorCard).toBe(false);
+      }));
+
+      it('should save closed state to localStorage', fakeAsync(() => {
+        mockLocalStorage.setLocalData.and.returnValue(Promise.resolve());
+        
+        component.closeCard();
+        tick();
+        
+        expect(mockLocalStorage.setLocalData).toHaveBeenCalledWith(
+          localKeys.IS_BECOME_MENTOR_TILE_CLOSED, 
+          true
+        );
+      }));
+});
+    describe('loadMore', () => {
+  beforeEach(() => {
+    mockSessionService.getSessions.and.returnValue(Promise.resolve(mockSessions));
+    mockSessionService.getAllSessionsAPI.and.returnValue(Promise.resolve(mockCreatedSessions));
   });
+
+  it('should increment page number', fakeAsync(() => {
+    component.page = 1;
+    const mockEvent = { target: { complete: jasmine.createSpy() } };
+    
+    component.loadMore(mockEvent);
+    tick();
+    
+    expect(component.page).toBe(2);
+  }));
+
+  it('should load more data for current segment', fakeAsync(() => {
+    component.selectedSegment = 'all-sessions';
+    const mockEvent = { target: { complete: jasmine.createSpy() } };
+    spyOn(component, 'loadSegmentData').and.returnValue(Promise.resolve());
+    
+    component.loadMore(mockEvent);
+    tick();
+    
+    expect(component.loadSegmentData).toHaveBeenCalledWith('all-sessions', true);
+  }));
+
+  it('should complete the infinite scroll event', fakeAsync(() => {
+    const mockEvent = { target: { complete: jasmine.createSpy() } };
+    mockSessionService.getSessions.and.returnValue(Promise.resolve(mockSessions));
+    
+    component.loadMore(mockEvent);
+    tick();
+    
+    expect(mockEvent.target.complete).toHaveBeenCalled();
+  }));
+});
+
+describe('isInfiniteScrollDisabled', () => {
+  describe('all-sessions segment', () => {
+    beforeEach(() => {
+      component.selectedSegment = 'all-sessions';
+    });
+
+     it('should return true when all sessions are loaded', () => {
+      component.sessions = { all_sessions: [{ id: 1 }, { id: 2 }] };
+      component.allSessionsCount = 2;
+      
+      expect(component.isInfiniteScrollDisabled).toBe(true);
+    });
+
+    it('should return false when more sessions available', () => {
+      component.sessions = { all_sessions: [{ id: 1 }] };
+      component.allSessionsCount = 5;
+      
+      expect(component.isInfiniteScrollDisabled).toBe(false);
+    });
+
+    it('should return true when no sessions exist', () => {
+      component.sessions = { all_sessions: [] };
+      component.allSessionsCount = 0;
+      
+      expect(component.isInfiniteScrollDisabled).toBe(true);
+    });
+
+     it('should handle null sessions', () => {
+      component.sessions = null;
+      component.allSessionsCount = 5;
+      
+      expect(component.isInfiniteScrollDisabled).toBe(true);
+    });
+  });
+
+   describe('created-sessions segment', () => {
+    beforeEach(() => {
+      component.selectedSegment = 'created-sessions';
+    });
+
+     it('should return true when all created sessions are loaded', () => {
+      component.createdSessions = { data: [{ id: 1 }, { id: 2 }] };
+      component.createdSessionsCount = 2;
+      
+      expect(component.isInfiniteScrollDisabled).toBe(true);
+    });
+
+        it('should return false when more created sessions available', () => {
+      component.createdSessions = { data: [{ id: 1 }] };
+      component.createdSessionsCount = 3;
+      
+      expect(component.isInfiniteScrollDisabled).toBe(false);
+    });
+
+
+
+     it('should return true when no created sessions exist', () => {
+      component.createdSessions = { data: [] };
+      component.createdSessionsCount = 0;
+      
+      expect(component.isInfiniteScrollDisabled).toBe(true);
+    });
+  });
+
+   describe('my-sessions segment', () => {
+    beforeEach(() => {
+      component.selectedSegment = 'my-sessions';
+    });
+
+    it('should return true when all enrolled sessions are loaded', () => {
+      component.sessions = { my_sessions: [{ id: 1 }] };
+      component.enrolledSessionsCount = 1;
+      
+      expect(component.isInfiniteScrollDisabled).toBe(true);
+    });
+
+     it('should return false when more enrolled sessions available', () => {
+      component.sessions = { my_sessions: [{ id: 1 }] };
+      component.enrolledSessionsCount = 4;
+      
+      expect(component.isInfiniteScrollDisabled).toBe(false);
+    });
+  });
+
+  it('should return true for unknown segment', () => {
+    component.selectedSegment = 'unknown-segment' as any;
+    
+    expect(component.isInfiniteScrollDisabled).toBe(true);
+  });
+});
+
+
+describe('selectChip', () => {
+    it('should set criteriaChip when a chip is selected', () => {
+      const chip = { id: 1, name: 'Test Chip' };
+      
+      component.selectChip(chip);
+      
+      expect(component.criteriaChip).toBe(chip);
+    });
+
+    it('should unselect criteriaChip when the same chip is clicked again', () => {
+      const chip = { id: 1, name: 'Test Chip' };
+      component.criteriaChip = chip;
+      
+      component.selectChip(chip);
+      
+      expect(component.criteriaChip).toBeNull();
+    });
+
+    it('should switch to a different chip when another chip is selected', () => {
+      const chip1 = { id: 1, name: 'Chip 1' };
+      const chip2 = { id: 2, name: 'Chip 2' };
+      component.criteriaChip = chip1;
+      
+      component.selectChip(chip2);
+      
+      expect(component.criteriaChip).toBe(chip2);
+    });
+
+    it('should handle null criteriaChip initially', () => {
+      component.criteriaChip = null;
+      const chip = { id: 1, name: 'Test Chip' };
+      
+      component.selectChip(chip);
+      
+      expect(component.criteriaChip).toBe(chip);
+    });
+  });
+
+describe('ionViewWillLeave', () => {
+  it('should set isOpen to false', () => {
+    component.isOpen = true;
+    
+    component.ionViewWillLeave();
+    
+    expect(component.isOpen).toBe(false);
+  });
+
+  it('should set isLoading to false', () => {
+    component.isLoading = true;
+    
+    component.ionViewWillLeave();
+    
+    expect(component.isLoading).toBe(false);
+  });
+
+  it('should detach overlay when connectedOverlay and overlayRef exist', () => {
+    const mockOverlayRef = jasmine.createSpyObj('OverlayRef', ['detach']);
+    component.connectedOverlay = {
+      overlayRef: mockOverlayRef
+    } as any;
+    
+    component.ionViewWillLeave();
+    
+    expect(mockOverlayRef.detach).toHaveBeenCalled();
+  });
+
+  it('should not throw error when connectedOverlay is undefined', () => {
+    component.connectedOverlay = undefined;
+    
+    expect(() => component.ionViewWillLeave()).not.toThrow();
+  });
+
+  it('should not throw error when connectedOverlay is null', () => {
+    component.connectedOverlay = null as any;
+    
+    expect(() => component.ionViewWillLeave()).not.toThrow();
+  });
+
+  it('should not throw error when overlayRef is null', () => {
+    component.connectedOverlay = {
+      overlayRef: null
+    } as any;
+    
+    expect(() => component.ionViewWillLeave()).not.toThrow();
+  });
+
+  it('should not throw error when overlayRef is undefined', () => {
+    component.connectedOverlay = {
+      overlayRef: undefined
+    } as any;
+    
+    expect(() => component.ionViewWillLeave()).not.toThrow();
+  });
+
+  it('should handle all cleanup operations together', () => {
+    component.isOpen = true;
+    component.isLoading = true;
+    const mockOverlayRef = jasmine.createSpyObj('OverlayRef', ['detach']);
+    component.connectedOverlay = {
+      overlayRef: mockOverlayRef
+    } as any;
+    
+    component.ionViewWillLeave();
+    
+    expect(component.isOpen).toBe(false);
+    expect(component.isLoading).toBe(false);
+    expect(mockOverlayRef.detach).toHaveBeenCalled();
+  });
+
+  it('should only reset flags when overlay does not exist', () => {
+    component.isOpen = true;
+    component.isLoading = true;
+    component.connectedOverlay = undefined;
+    
+    component.ionViewWillLeave();
+    
+    expect(component.isOpen).toBe(false);
+    expect(component.isLoading).toBe(false);
+  });
+});
+ describe('ionViewDidLeave', () => {
+    it('should reset criteriaChip to empty string', () => {
+      component.criteriaChip = { id: 1, name: 'Test' };
+      
+      component.ionViewDidLeave();
+      
+      expect(component.criteriaChip).toBe('');
+    });
+
+    it('should reset searchText to empty string', () => {
+      component.searchText = 'test search';
+      
+      component.ionViewDidLeave();
+      
+      expect(component.searchText).toBe('');
+    });
+
+    it('should reset page to 1', () => {
+      component.page = 5;
+      
+      component.ionViewDidLeave();
+      
+      expect(component.page).toBe(1);
+    });
+
+    it('should reset all properties together', () => {
+      component.criteriaChip = { id: 1, name: 'Test' };
+      component.searchText = 'test search';
+      component.page = 10;
+      
+      component.ionViewDidLeave();
+      
+      expect(component.criteriaChip).toBe('');
+      expect(component.searchText).toBe('');
+      expect(component.page).toBe(1);
+    });
+  });
+    })
+
 });
