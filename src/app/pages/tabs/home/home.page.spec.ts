@@ -18,7 +18,7 @@ import { CommonRoutes } from 'src/global.routes';
 import { environment } from 'src/environments/environment';
 import { TermsAndConditionsPage } from '../../terms-and-conditions/terms-and-conditions.page';
 
-fdescribe('HomePage - Simple Test', () => {
+describe('HomePage - Simple Test', () => {
   let component: HomePage;
   let fixture: ComponentFixture<HomePage>;
   let mockRouter: jasmine.SpyObj<Router>;
@@ -384,7 +384,7 @@ const mockSessions = {
       expect(component.sessions.my_sessions).toEqual([{ id: 1 }, { id: 2 }]);
     }));
 
-
+   });
     describe('eventAction', () => {
           beforeEach(() => {
       component.user = mockUser;
@@ -884,6 +884,6 @@ describe('ionViewWillLeave', () => {
       expect(component.page).toBe(1);
     });
   });
-    })
+ 
 
 });
