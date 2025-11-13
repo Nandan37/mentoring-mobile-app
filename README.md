@@ -239,6 +239,8 @@ For deploying your application, you need an Environment file, Server.js, and a p
    };
 ```
 
+For detailed descriptions of each key, refer to the [Environment Configuration Guide](./assets/env/env.md).
+
 ### Structure of pm2.config.json File
 
 ```json
