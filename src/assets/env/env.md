@@ -21,7 +21,7 @@ These values help the app connect to APIs, manage authentication, and set up env
 | `supportEmail` | `"support@example.com"` | Support email address for user queries. |
 | `recaptchaSiteKey` | `"YOUR_CAPTCHA_KEY"` | Google reCAPTCHA **site key** for CAPTCHA validation. |
 | `restictedPages` | `[]` | Array of page IDs to restrict access. (Refer to `src/app/core/constants/page.ids.ts`) |
-| `isAuthBypassed` | `true` / `false` | Set to **true** to bypass authentication (used for testing). |
+| `isAuthBypassed` | `true` / `false` | Set to **true** to disable the default user authentication service, allowing bypass of login. |
 | `unauthorizedRedirectUrl` | `"/auth/login"` | URL to redirect users to when session expires or is unauthorized. |
 | `password.minLength` | `10` | Minimum password length requirement. |
 | `password.regexPattern` | `^(?=(?:.*[A-Z]){2})(?=(?:.*[0-9]){2})(?=(?:.*[!@#%$&()\-`.+,]){3}).{11,}$` | Regex pattern to validate password strength (requires uppercase, numbers, and special characters). |
