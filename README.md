@@ -59,7 +59,7 @@ Setting up the Project
 
 1. Clone the [repository](https://github.com/ELEVATE-Project/mentoring-mobile-app.git).
 2. Change to the latest GitHub branch (**3.2.0-saaschanges**).
-3. Add environment files into the src/environments folder.
+3. Add environment files into the src/environments folder.[Sample env file](https://github.com/ELEVATE-Project/mentoring-mobile-app/blob/3.2.0-saaschange/README.md#structure-of-environmentts-file) 
 4. Go to the project folder and run `npm i`.
 
 
