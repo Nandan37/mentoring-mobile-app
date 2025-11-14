@@ -222,12 +222,19 @@ For deploying your application, you need an Environment file, Server.js, and a p
       staging: true / false,
       dev: true / false,
       baseUrl: "<base-url>",
+      chatBaseUrl: "<chatBase-url>",
+      chatWebSocketUrl: "<chatWebSocket-url>",
+      isAuthBypassed: true / false,
+      restictedPages: [
+      "HELP_VIDEOS_PAGE", "HELP_PAGE", "FAQ_PAGE", "LOGIN_ACTIVITY_PAGE", "CHANGE_PASSWORD_PAGE", "LOGIN_PAGE", "REGISTER_PAGE", "RESET_PASSWORD_PAGE","OTP_PAGE", 'EDIT_PROFILE']
       sqliteDBName: "<db-name> (if you have)",
       deepLinkUrl: "<deeplink-url>",
       privacyPolicyUrl: "<privacy-policy-url>",
       termsOfServiceUrl: "<term-of-service-url>",
    };
 ```
+
+For detailed descriptions of each key, refer to the [Environment Configuration Guide](./src/assets/env/env.md).
 
 ### Structure of pm2.config.json File
 
