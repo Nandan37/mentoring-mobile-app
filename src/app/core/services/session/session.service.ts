@@ -19,10 +19,6 @@ export class SessionService {
   ) { }
 
   async createSession(formData, queryParams?: string) {
-    this.userDetails = await this.localStorage.getLocalData(localKeys.USER_DETAILS);
-    if (!formData.hasOwnProperty("mentor_id")) {
-      formData.mentor_id = this.userDetails?.id;
-  }
     await this.loaderService.startLoader();
     const config = {
       url: queryParams == null ? urlConstants.API_URLS.CREATE_SESSION : urlConstants.API_URLS.CREATE_SESSION + `/${queryParams}`,
@@ -262,7 +258,7 @@ export class SessionService {
 
   async getSessions(obj) {
     const config = {
-      url: urlConstants.API_URLS.HOME_SESSION + obj.page + '&limit=' + obj.limit,
+      url: urlConstants.API_URLS.HOME_SESSION + obj.page + '&limit=' + obj.limit + (obj.scope ? '&sessionScope=' + obj.scope : ''),
     };
     try {
       let data: any = await this.httpService.get(config);
@@ -285,9 +281,9 @@ export class SessionService {
     }
   }
 
-  async requestSessionList() {
+  async requestSessionList(page: number) {
     const config = {
-      url: urlConstants.API_URLS.REQUEST_SESSION_LIST + '?pageNo=1&pageSize=100' + '&status=REQUESTED',
+      url: urlConstants.API_URLS.REQUEST_SESSION_LIST + '?pageNo=' + page + '&pageSize=100' + '&status=REQUESTED,EXPIRED',
     };
     try {
       let data: any = await this.httpService.get(config);
@@ -309,9 +305,10 @@ export class SessionService {
     }
   }
 
-  async requestSessionUserAvailability(){
+  async requestSessionUserAvailability(startDate: number, endDate: number){
     const config = {
-      url: urlConstants.API_URLS.REQUEST_SESSION_USER_AVAILABILITY + '?pageNo=1&pageSize=5&searchText&status=PUBLISHED',
+      url: urlConstants.API_URLS.REQUEST_SESSION_USER_AVAILABILITY +
+      `?pageNo=1&pageSize=5&searchText=&status=PUBLISHED&start_date=${startDate}&end_date=${endDate}`,
     };
     try {
       let data: any = await this.httpService.get(config);

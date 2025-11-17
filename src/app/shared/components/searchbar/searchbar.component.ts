@@ -1,6 +1,4 @@
-import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
-import { NavigationEnd, Router } from '@angular/router';
-import { filter } from 'rxjs';
+import { Component, EventEmitter, Input, OnInit, Output, SimpleChanges } from '@angular/core';
 import { ToastService } from 'src/app/core/services';
 
 @Component({
@@ -27,20 +25,19 @@ export class SearchbarComponent implements OnInit {
 
   constructor(
     private toast: ToastService,
-    private router: Router
   ) { }
 
   ngOnInit() {
-    if(this.parentSearchText)
-      this.searchText = this.parentSearchText;
-    this.router.events
-      .pipe(filter(event => event instanceof NavigationEnd))
-      .subscribe(() => {
-        this.resetSearch();
-      });
+    if(this.parentSearchText) 
+    this.searchText = this.parentSearchText;
   }
-  ngOnChanges(){
-    this.criteriaChip = this.valueFromParent;
+  ngOnChanges(changes: SimpleChanges){
+    if(this.parentSearchText && !this.searchText) {
+      this.searchText = this.parentSearchText;
+    }if (changes['parentSearchText']) {
+    this.searchText = changes['parentSearchText'].currentValue;
+  } if(changes['valueFromParent'])
+    this.criteriaChip = changes['valueFromParent'].currentValue;
   }
   selectChip(chip) {
     if (this.criteriaChip === chip) {
@@ -50,8 +47,8 @@ export class SearchbarComponent implements OnInit {
     }
   }
 
-  async onSearch(event){
-    if(event.length === 0) {
+   onSearch(){
+    if(this.searchText.length === 0) {
       const emitData = {
         searchText: '',
         criterias: this.criteriaChip
@@ -59,8 +56,8 @@ export class SearchbarComponent implements OnInit {
       this.outputData.emit(emitData);
       return;
     }
-    if (event.length >= 3) {
-      this.searchText = event ? event : "";
+    if (this.searchText.length >= 3) {
+      this.searchText = this.searchText ? this.searchText : "";
       const emitData = {
         searchText: this.searchText.trim(),
         criterias: this.criteriaChip
@@ -70,10 +67,6 @@ export class SearchbarComponent implements OnInit {
       this.toast.showToast("ENTER_MIN_CHARACTER","danger");
     }
     this.isOpen = false;
-  }
-
-  private resetSearch() {
-    this.searchText = null;
   }
 
   onClearSearch() {

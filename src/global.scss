@@ -35,7 +35,7 @@
 :root {
   --ion-default-font: "NotoSans-Regular";
   --ion-font-family: "NotoSans-Regular";
-  --ion-color-primary: #832215;
+  --ion-color-primary: #572E91;
   --ion-color-secondary: #ffffff;
   --red: rgb(255, 0, 0);
   --white: #fff;
@@ -97,9 +97,10 @@ p,
 div,
 ion-label,
 ion-button {
-  font-family: "NotoSans-Bold";
+  // font-family: "NotoSans-Bold";
   // color: var(--text-color);
 }
+
 
 body{
   background-color: var(--background-color);
@@ -173,9 +174,24 @@ body{
 .padding-top-10 {
   padding-top: 15px !important;
 }
+.min-h-100 {
+  min-height: 100%;
+}
 
 .header-md::after {
   background-image: none;
+}
+
+.p-1 {
+  padding: 4px;
+}
+
+.gap-3 {
+  gap: 12px;
+}
+
+.gap-1 {
+  gap: 4px
 }
 
 .header-bottom-border {
@@ -353,9 +369,18 @@ ion-searchbar {
   .searchbar-input-container {
     input {
       font-size: 16px !important;
-      padding: 5px 14px 5px 45px !important;
+      padding: 5px 40px 5px 45px !important;
     }
   }
+}
+
+ion-searchbar.custom {
+    --border-radius:25px;
+    --icon-color:var(--ion-color-primary);
+    font-size:16px;
+    height: 36px;
+    max-width: 600px;
+    display: inline-block;
 }
 
 ::-webkit-scrollbar {
@@ -560,6 +585,9 @@ ion-searchbar {
   padding-left: 0.5rem;
   padding-right: 0.5rem;
 }
+.w-100 {
+  width: 100%;
+}
 
 // chat page from lib
 
@@ -690,4 +718,52 @@ ion-searchbar {
 }
 .height-0 {
   height: auto !important;
+}
+
+.pre-custom-modal {
+  --height: 300px;
+  @media (max-width: 768px) {
+    --height: 300px;
+    padding: 50px;
+  }
+}
+
+ion-item.item-interactive.ion-focused,
+ion-item.item-interactive.item-has-focus {
+  --highlight-color-focused: transparent !important;
+  --highlight-background: transparent !important;
+  box-shadow: none !important;
+
+}
+
+.has-focus.ion-valid.sc-ion-input-md-h {
+  --highlight-color: var(--ion-color-primary);
+}
+
+ion-textarea textarea {
+  font-family: "NotoSans-Regular" !important;
+  font-weight: normal !important;
+}
+
+
+.custom-alert-with-close .alert-header {
+  position: relative;
+}
+.custom-alert-with-close .close-alert-icon {
+  position: absolute;
+  top: 12px;
+  right: 12px;
+  font-size: 24px;
+  cursor: pointer;
+  color: #000;
+}
+
+.toast-title {
+  font-weight: bold;
+  font-size: 14px;
+}
+
+.toast-subtext {
+  font-size: 12px;
+  opacity: 0.8;
 }

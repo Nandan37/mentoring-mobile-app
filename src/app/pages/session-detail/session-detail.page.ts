@@ -43,7 +43,7 @@ export class SessionDetailPage implements OnInit, OnDestroy {
  isNotInvited: any;
  defaultUiForm = [
   {
-    title: "MEETING_PLATFORM",
+    title: "Meeting Platform",
     key: "meeting_info",
   }
  ];
@@ -55,27 +55,27 @@ export class SessionDetailPage implements OnInit, OnDestroy {
     this.isMobile = utilService.isMobile()
   }
   ngOnInit() {
-      App.addListener('appStateChange', (state: AppState) => {
+      App.addListener('appStateChange', async (state: AppState) => {
         if (state.isActive == true && this.id && this.sessionDatas && !this.dismissWhenBack) {
-          this.fetchSessionDetails();
+          await this.fetchSessionDetails();
         }
       });
   }
 
   async ionViewWillEnter() {
-    this.detailData.form = JSON.parse(JSON.stringify(this.defaultUiForm));
+    this.detailData.controls = JSON.parse(JSON.stringify(this.defaultUiForm));
     await this.user.getUserValue();
     this.userDetails = await this.localStorage.getLocalData(localKeys.USER_DETAILS);
-    this.fetchSessionDetails();
+     await this.fetchSessionDetails();
   }
 
   public headerConfig: any = {
-    backButton: true,
+    backButton: false,
     label: "",
     share: false
   };
   detailData = {
-    form: [
+    controls: [
       
     ],
     data: {
@@ -144,8 +144,8 @@ export class SessionDetailPage implements OnInit, OnDestroy {
     if(response && entityList.result.length){
       entityList.result.forEach(entity => {
         Object.entries(response?.result).forEach(([key, value]) => {
-          if(Array.isArray(value) &&   entity.value == key && !this.detailData.form.some(obj => obj.key === entity.value) ){
-            this.detailData.form.push(
+          if(Array.isArray(value) &&   entity.value == key && !this.detailData.controls.some(obj => obj.key === entity.value) ){
+            this.detailData.controls.push(
               {
                   title: entity.label,
                   key: entity.value,
@@ -172,27 +172,34 @@ export class SessionDetailPage implements OnInit, OnDestroy {
       } else {
         this.isEnabled = ((response.start_date-currentTimeInSeconds)<600 || response?.status?.value=='LIVE')?true:false;
       }
-      this.detailData.data = Object.assign({}, response);
-      this.detailData.data.start_date = readableStartDate;
-      this.detailData.data.meeting_info = response.meeting_info?.platform;
-      this.detailData.data.mentee_count = response.seats_limit - response.seats_remaining
+      this.detailData = {
+        data: {
+          ...response,
+          start_date: readableStartDate,
+          meeting_info: response.meeting_info?.platform,
+          mentee_count: response.seats_limit - response.seats_remaining,
+          mentor_designation: response?.mentor_designation?.length
+          ? response.mentor_designation.map((d: any) => d?.label).join(', ')
+          : []
+          },
+          controls: [...this.detailData.controls]
+        };
       this.startDate = (response.start_date>0)?new Date(response.start_date * 1000):this.startDate;
       this.endDate = (response.end_date>0)?new Date(response.end_date * 1000):this.endDate;
       this.platformOff = (response?.meeting_info?.platform == 'OFF') ? true : false;
-      this.detailData.data.mentor_designation = response?.mentor_designation.map(designation => designation?.label).join(', ');
-      if((!this.isConductor && !this.detailData.form.some(obj => obj.title === 'MENTOR'))){
-        this.detailData.form.push(
+      if((!this.detailData.controls.some(obj =>  obj.key === 'mentor_name'))){
+        this.detailData.controls.push(
           {
-            title: 'MENTOR',
+            title: 'Mentor',
             key: 'mentor_name',
           },
         );
       } 
-      if((this.isCreator || this.isConductor) && !this.detailData.form.some(obj => obj.title === 'MENTEE_COUNT')){
+      if((this.isCreator || this.isConductor) && !this.detailData.controls.some(obj => obj.key === 'mentee_count')){
         
-        this.detailData.form.push(
+        this.detailData.controls.push(
           {
-            title: 'MENTEE_COUNT',
+            title: 'Mentee Count',
             key: 'mentee_count',
           },
         );
@@ -233,7 +240,7 @@ export class SessionDetailPage implements OnInit, OnDestroy {
         this.isConductor = this.userDetails.id == response.mentor_id ? true : false;
       }
       let twentyFourHoursInSeconds = 24 * 60 * 60;
-      this.headerConfig.edit = (this.isCreator && response?.status?.value !="COMPLETED" && response.end_date > 0 && (currentTimeInSeconds - response.end_date) <= twentyFourHoursInSeconds);
+      this.headerConfig.edit = (this.isCreator  && response.end_date > 0 && (currentTimeInSeconds - response.end_date) <= twentyFourHoursInSeconds);
       this.headerConfig.delete = (this.isCreator && response?.status?.value !="COMPLETED" && response?.status?.value !="LIVE" &&  ((response.end_date>currentTimeInSeconds)))?true:null;
   }
 
@@ -254,7 +261,7 @@ export class SessionDetailPage implements OnInit, OnDestroy {
   async share() {
     if(this.isMobile && navigator.share){
       if(this.id){
-          let url = `/${CommonRoutes.SESSIONS_DETAILS}/${this.id}`;
+          let url = `/mentoring/${CommonRoutes.SESSIONS_DETAILS}/${this.id}`;
           let link = await this.utilService.getDeepLink(url);
           this.detailData.data.mentor_name = this.detailData.data.mentor_name.trim();
           this.detailData.data.title = this.detailData.data.title.trim();
@@ -279,7 +286,7 @@ export class SessionDetailPage implements OnInit, OnDestroy {
 
   editSession() {
     this.activeUrl = this.router.url;
-    (this.sessionDatas?.status?.value=='LIVE') ? this.router.navigate([CommonRoutes.CREATE_SESSION], { queryParams: { id: this.id , type: 'segment'} }) : this.router.navigate([CommonRoutes.CREATE_SESSION], { queryParams: { id: this.id, isCreator: this.isCreator } });
+    (this.sessionDatas?.status?.value=='LIVE') ? this.router.navigate([CommonRoutes.CREATE_SESSION], { queryParams: { id: this.id , type: 'segment'} }) : this.router.navigate([CommonRoutes.CREATE_SESSION], { queryParams: { id: this.id, isCreator: this.isConductor } });
   }
 
   deleteSession() {

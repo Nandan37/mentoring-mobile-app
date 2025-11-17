@@ -8,7 +8,7 @@
       </div>
     </div>
     <ng-template #Img>
-      <img class="thumbnail-image" src="{{profileImageData?.image}}" />
+      <img class="thumbnail-image" [src]="profileImageData?.image" />
     </ng-template>
   </div>
   <div *ngIf="uploadImage" class="d-flex flex-justify-center">

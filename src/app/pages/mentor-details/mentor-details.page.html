@@ -1,4 +1,5 @@
-@if (userCanAccess) {
+<div class="detail-container">
+  @if (userCanAccess) {
   <app-page-header [config]="headerConfig" (actionEvent)="action($event)" *ngIf="isloaded" ></app-page-header>
   <app-generic-profile-header
   *ngIf="userCanAccess && isloaded"
@@ -19,9 +20,9 @@
     </ion-segment-button>
   </ion-segment>
 </div>
-<ion-content *ngIf="!this.userCantAccess && isloaded">
+<ion-content *ngIf="!this.userCantAccess && isloaded" >
   <div [ngSwitch]="segmentValue">
-    <ion-grid>
+    <ion-grid  *ngSwitchCase="'about'">
       <ion-row class="d-flex ion-padding">
         <ion-col
           size-xs="12"
@@ -31,7 +32,6 @@
           align-self-stretch
         >
           <app-generic-details
-            *ngSwitchCase="'about'"
             [sessionData]="detailData"
           ></app-generic-details>
         </ion-col>
@@ -39,11 +39,17 @@
     </ion-grid>
 
     <ion-list *ngSwitchCase="'upcoming'">
-      <div *ngIf="!upcomingSessions?.length">
-        <p class="no-details-message">
-          {{ "NO_UPCOMING_SESSIONS" | translate }}
-        </p>
+      <div *ngIf="!upcomingSessions">
+          <app-skeleton
+        [type]="SKELETON.SESSION_CARD_SKELETON"
+        [repetition]="4"
+      ></app-skeleton>
       </div>
+
+      <div *ngIf="upcomingSessions && upcomingSessions.length === 0 && isUpcomingSession">
+        <app-no-data-found [messageHeader]="'NO_UPCOMING_SESSIONS_PLANNED'" [messageDescription]="'NO_UPCOMING_SESSIONS'"></app-no-data-found>
+      </div>
+
       <ion-grid>
         <ion-row class="d-flex">
           <ion-col
@@ -65,6 +71,10 @@
           </ion-col>
         </ion-row>
       </ion-grid>
+      <ion-infinite-scroll threshold="100px" (ionInfinite)="loadMore($event)" [disabled]="disableInfiniteScroll">
+        <ion-infinite-scroll-content loadingSpinner="bubbles" loadingText="{{'LOADING' | translate}}"  >
+        </ion-infinite-scroll-content>
+      </ion-infinite-scroll>
     </ion-list>
   </div>
 </ion-content>
@@ -77,7 +87,7 @@
   [showRole]="false"
 >
 </app-generic-profile-header>
-  <div *ngIf="isloaded" class="d-flex flex-justify-center">
+  <div *ngIf="isloaded" class="d-flex flex-justify-center flex-1 flex-align-items-center"  >
   <app-no-data-found
     [messageHeader]="'USER_CANT_ACCESS_THIS_PROFILE'"
     [messageDescription]="'USER_CANT_ACCESS_PROFILE_GO_TO_HOME_PAGE'"
@@ -86,8 +96,6 @@
   </app-no-data-found>
 </div>
 } @else if (userNotFound) {
-  <div style="display: contents;">
-    <div>
       <app-page-header [config]="headerConfig" (actionEvent)="action($event)" *ngIf="isloaded" ></app-page-header>
       <app-generic-profile-header
         *ngIf="isloaded"
@@ -97,10 +105,9 @@
         [userNotFound]="userNotFound"
       >
       </app-generic-profile-header>
-    </div>
     
-    <div class="flex flex-justify-center flex-align-items-center text-center">
-      <div>
+    <div class="d-flex flex-justify-center flex-1 flex-align-items-center" >
+      <div >
         <ion-icon name="information-circle" style="font-size: 24px;"></ion-icon>
         <span style="vertical-align: super; font-size: 16px;">
           {{ "USER_INFO_NOT_FOUND" | translate }}
@@ -110,7 +117,6 @@
         </p>
       </div>
     </div>
-  </div>
 }
 
 <ion-footer *ngIf="isloaded" class="ion-no-border footer-button">
@@ -118,3 +124,4 @@
     >{{"HOME" | translate}}</ion-button
   >
 </ion-footer>
+</div>

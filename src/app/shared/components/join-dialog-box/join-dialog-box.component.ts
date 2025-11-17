@@ -23,7 +23,7 @@ export class JoinDialogBoxComponent implements OnInit {
 
   ngOnInit() {
     this.startDate = (this.sessionData.start_date>0)?new Date(this.sessionData.start_date * 1000):this.startDate;
-    this.endDate = (this.sessionData.end_date>0)?new Date(this.sessionData.start_date * 1000):this.endDate;
+    this.endDate = (this.sessionData.end_date>0)?new Date(this.sessionData.end_date * 1000):this.endDate;
     this.meetingPlatform = (this.sessionData.meeting_info);
   }
   async openBrowser(link) {

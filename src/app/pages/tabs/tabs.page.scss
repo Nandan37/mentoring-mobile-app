@@ -3,6 +3,12 @@ ion-tab-bar{
   --background: var(--white);
 }
 
+.disable-div {
+  pointer-events: none; /* Disable all pointer events (clicks, hovers, etc.) */
+  opacity: 0.5; /* Make the header appear grayed out */
+  background-color: lightgray;
+}
+
 ion-tab-button {
   --color: var(--black);
   --color-selected: var(--ion-color-primary);  

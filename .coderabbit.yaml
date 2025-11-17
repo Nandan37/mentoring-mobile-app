@@ -1,0 +1,5 @@
+reviews:
+  enabled: true
+  branches:
+    include:
+      - '*'

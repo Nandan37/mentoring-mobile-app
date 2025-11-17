@@ -2,13 +2,15 @@ import { Component, Input, OnInit, ViewChild, ViewEncapsulation } from '@angular
 import { MatPaginator } from '@angular/material/paginator';
 import { ActivatedRoute, Router } from '@angular/router';
 import { ModalController } from '@ionic/angular';
-import { FILTER_ROLES } from 'src/app/core/constants/formConstant';
+import * as _ from 'lodash';
+import { FILTER_ROLES, MENTOR_CONNECTION_CARD_FORM } from 'src/app/core/constants/formConstant';
 import {
   NO_RESULT_FOUND_FOR_MENTEE,
   NO_RESULT_FOUND_FOR_MENTOR,
 } from 'src/app/core/constants/genericConstants';
+import { localKeys } from 'src/app/core/constants/localStorage.keys';
 import { paginatorConstants } from 'src/app/core/constants/paginatorConstants';
-import { HttpService, ToastService, UtilService } from 'src/app/core/services';
+import { HttpService, LocalStorageService, ToastService, UtilService } from 'src/app/core/services';
 import { FormService } from 'src/app/core/services/form/form.service';
 import { PermissionService } from 'src/app/core/services/permission/permission.service';
 import { ProfileService } from 'src/app/core/services/profile/profile.service';
@@ -55,9 +57,10 @@ export class GenericListPage implements OnInit {
   buttonConfig: any;
   noResult: any;
   isMentor: boolean;
-  filterIcon: boolean = false;
+  filterIcon: boolean;
   filterChipsSelected: boolean = false;
   selectedCriteria: any;
+  mentorForm: any
 
   constructor(
     private route: ActivatedRoute,
@@ -66,6 +69,7 @@ export class GenericListPage implements OnInit {
     private utilService: UtilService,
     private formService: FormService,
     private permissionService: PermissionService,
+    private localStorage: LocalStorageService,
     private router: Router,
     private profileService: ProfileService,
     private toast: ToastService,
@@ -73,8 +77,11 @@ export class GenericListPage implements OnInit {
 
   ngOnInit() {}
 
-  ionViewWillEnter() {
-    this.isMentor = this.profileService.isMentor;
+  async ionViewWillEnter() {
+    let roles = await this.localStorage.getLocalData(localKeys.USER_ROLES);
+    this.isMentor = roles.includes('mentor')?true:false;
+    const result = await this.formService.getForm(MENTOR_CONNECTION_CARD_FORM);
+    this.mentorForm = _.get(result, 'data.fields.controls');
     this.route.data.subscribe((data) => {
       this.routeData = data;
       this.action(this.routeData);
@@ -132,8 +139,6 @@ export class GenericListPage implements OnInit {
         this.filterIcon = false;
       } 
     }
-      
-    
   }
 
   async onClickFilter() {
@@ -145,6 +150,15 @@ export class GenericListPage implements OnInit {
 
     modal.onDidDismiss().then(async (dataReturned) => {
       this.filteredDatas = [];
+        if(dataReturned?.data?.role === 'closed'){
+        this.filterData = dataReturned?.data?.data;
+        return;
+      }
+       if(Object.keys(dataReturned?.data).length === 0){
+            this.chips = [];
+            this.filteredDatas = [];
+            this.urlQueryData = ''; 
+      }
       if (dataReturned.data && dataReturned.data.data) {
         if (dataReturned.data.data.selectedFilters) {
           for (let key in dataReturned.data.data.selectedFilters) {
@@ -165,11 +179,10 @@ export class GenericListPage implements OnInit {
         }
         this.extractLabels(dataReturned.data.data.selectedFilters);
         this.getUrlQueryData();
+      }
         this.page = 1;
         this.setPaginatorToFirstpage = true;
         this.getData();
-        this.filterIcon = true;
-      }
     });
     modal.present();
   }
@@ -206,18 +219,34 @@ export class GenericListPage implements OnInit {
     this.getData();
   }
 
-  removeFilteredData(chip: string) {
-    Object.keys(this.filteredDatas).forEach((key) => {
-      let values = this.filteredDatas[key].split(',');
-      let chipIndex = values.indexOf(chip);
+    removeFilteredData(chip){
+      this.filterData.map((filter) => {
+        filter.options.map((option) => {
+          if (option.value === chip) {
+            option.selected = false;
+          }
+        });
+        return filter;
+      })
+    for (let key in this.filteredDatas) {
+      if (this.filteredDatas.hasOwnProperty(key)) {
 
-      if (chipIndex > -1) {
-        values.splice(chipIndex, 1);
-        this.filteredDatas[key] = values.length
-          ? values.join(',')
-          : delete this.filteredDatas[key];
+          let values = this.filteredDatas[key].split(',');
+          let chipIndex = values.indexOf(chip);
+
+          if (chipIndex > -1) {
+              values.splice(chipIndex, 1);
+
+              let newValue = values.join(',');
+
+              if (newValue === '') {
+                delete this.filteredDatas[key];
+            } else {
+                this.filteredDatas[key] = newValue;
+            }
+          }
       }
-    });
+    }
   }
 
   onPageChange(event) {
@@ -260,9 +289,12 @@ export class GenericListPage implements OnInit {
     this.router.navigate([CommonRoutes.HOME]);
   }
 
-  onClearSearch($event: string) {
-    this.searchText ='';
-    this.getData();
-    }
+    async onClearSearch($event: string) {
+    this.page = 1;
+    this.searchText = '';
+    this.searchAndCriterias.headerData.searchText = '';
+    this.searchAndCriterias.headerData.criterias = undefined;
+    await  this.getData();
+  }
   
 }

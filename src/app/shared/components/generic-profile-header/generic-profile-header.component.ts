@@ -27,6 +27,7 @@ export class GenericProfileHeaderComponent implements OnInit {
 
   public isMobile: any;
   roles: any;
+  chatConfig: string;
 
   constructor(
     private router: Router,
@@ -40,15 +41,15 @@ export class GenericProfileHeaderComponent implements OnInit {
   }
 
   async ngOnInit() {
-    this.roles = this.headerData?.user_roles;
+     this.chatConfig = await this.localStorage.getLocalData(localKeys['CHAT_CONFIG'])
+    this.roles = this.headerData.organizations?.length && this.headerData?.organizations[0]?.roles.filter((role: any) => role["title"] === "mentor");
+    this.isMentor =this.roles?.length && this.roles .some((role: any) => role.title === 'mentor');
   }
 
   async action(event) {
     switch (event) {
       case 'edit':
-        this.router.navigate([`/${CommonRoutes.EDIT_PROFILE}`],{
-          replaceUrl: true,
-          queryParams: { redirectUrl: `${CommonRoutes.TABS}/${CommonRoutes.PROFILE}` }});
+        this.router.navigate([`/${CommonRoutes.EDIT_PROFILE}`], {replaceUrl:true});
         break;
 
       case 'role':
@@ -62,7 +63,7 @@ export class GenericProfileHeaderComponent implements OnInit {
       case 'share':
         if (this.isMobile && navigator.share && this.buttonConfig.meta) {
           this.translateText();
-          let url = `/${CommonRoutes.MENTOR_DETAILS}/${this.buttonConfig.meta.id}`;
+          let url = `/mentoring/${CommonRoutes.MENTOR_DETAILS}/${this.buttonConfig.meta.id}`;
           let link = await this.utilService.getDeepLink(url);
           this.headerData.name = this.headerData.name.trim();
           let params = {
@@ -110,8 +111,8 @@ export class GenericProfileHeaderComponent implements OnInit {
     });
   };
 
-  async viewRoles() {
-    const titlesArray = this.roles.map((item) => item.title);
+  async viewRoles(){
+    const titlesArray = this.headerData.organizations[0].roles.map(item => item.title);
     this.profileService.viewRolesModal(titlesArray);
   }
 }

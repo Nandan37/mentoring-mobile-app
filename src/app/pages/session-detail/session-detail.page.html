@@ -17,9 +17,9 @@
       <p class="description">{{detailData?.data?.description}}</p>
       <ion-item class="ion-no-padding" lines="none">
         <ion-icon class="calendar-icon" name="calendar-number-outline"></ion-icon>
-        <ion-label *ngIf="startDate && detailData?.data?.status?.value=='PUBLISHED'" class="date-label">{{"STARTS_ON"|translate}} {{startDate|date:'dd/MM/yyyy'}} {{"AT"|translate}} {{startDate|date:'shortTime'}}</ion-label>
-        <ion-label *ngIf="startDate && detailData?.data?.status?.value=='LIVE'" class="date-label">{{"STARTED_ON"|translate}} {{startDate|date:'dd/MM/yyyy'}} {{"AT"|translate}} {{startDate|date:'shortTime'}}</ion-label>
-        <ion-label *ngIf="endDate && detailData?.data?.status?.value=='COMPLETED'" class="date-label">{{"COMPLETED_ON"|translate}} {{endDate|date:'dd/MM/yyyy'}} {{"AT"|translate}} {{endDate|date:'shortTime'}}</ion-label>
+        <ion-label *ngIf="startDate && detailData?.data?.status?.value=='PUBLISHED'" class="date-label">Starts on {{startDate|date:'dd/MM/yyyy'}} at {{startDate|date:'shortTime'}}</ion-label>
+        <ion-label *ngIf="startDate && detailData?.data?.status?.value=='LIVE'" class="date-label">Started on {{startDate|date:'dd/MM/yyyy'}} at {{startDate|date:'shortTime'}}</ion-label>
+        <ion-label *ngIf="endDate && detailData?.data?.status?.value=='COMPLETED'" class="date-label">Completed on {{endDate|date:'dd/MM/yyyy'}} at {{endDate|date:'shortTime'}}</ion-label>
       </ion-item>
       <div class="d-flex ion-no-padding" *ngIf="sessionManagerText && detailData.data.manager_name">
         <ion-icon class="person-container" name="person"></ion-icon>

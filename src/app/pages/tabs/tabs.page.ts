@@ -14,6 +14,7 @@ import { environment } from 'src/environments/environment';
 export class TabsPage {
   private activeTab?: HTMLElement;
   subscription: any;
+  user: any;
   PAGE_IDS = PAGE_IDS;
   customIcon: string ;
   constructor(
@@ -26,11 +27,6 @@ export class TabsPage {
     (tabsRef.outlet.activatedView.stackId == 'requests') ? this.customIcon= '/assets/images/request_icon_solid_color.svg' : this.customIcon = '/assets/images/request_icon_dark.svg';
   }
   ionViewWillLeave() {
-    this.localStorage.getLocalData(localKeys.USER_DETAILS).then((userDetails)=>{
-      if(userDetails) {
-        this.profile.getUserRole(userDetails)
-       }
-    })
     this.propagateToActiveTab('ionViewWillLeave');
   }
 
@@ -38,9 +34,19 @@ export class TabsPage {
     this.propagateToActiveTab('ionViewDidLeave');
   }
 
-  ionViewWillEnter() {
-    this.propagateToActiveTab('ionViewWillEnter');
+async ionViewWillEnter() {
+  const userDetails = await this.localStorage.getLocalData(localKeys.USER_DETAILS);
+  if (userDetails) {
+    this.user = userDetails;
+    this.profile.getUserRole(userDetails);
+  } else {
+    const profileDetails = await this.profile.getProfileDetailsFromAPI();
+    this.user = profileDetails;
+    this.profile.getUserRole(profileDetails);
   }
+  this.propagateToActiveTab('ionViewWillEnter');
+}
+
 
   ionViewDidEnter() {
     this.propagateToActiveTab('ionViewDidEnter');

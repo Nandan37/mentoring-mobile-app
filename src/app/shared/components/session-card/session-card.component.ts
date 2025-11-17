@@ -23,7 +23,6 @@ export class SessionCardComponent implements OnInit {
   @Input() data: any;
   @Input() isEnrolled;
   @Input() showBanner: boolean = false;
-  @Input() profileImg: any;
   @Output() onClickEvent = new EventEmitter();
   @ViewChild(IonModal) modal: IonModal;
 
