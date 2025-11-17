@@ -1,10 +1,15 @@
 import { Component, OnInit, ViewChild } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
-import { IonContent, IonInfiniteScroll } from '@ionic/angular';
+import { IonContent } from '@ionic/angular';
+import * as _ from 'lodash';
 import { CHAT_MESSAGES } from 'src/app/core/constants/chatConstants';
+import { MENTOR_DIR_CARD_FORM } from 'src/app/core/constants/formConstant';
 import { urlConstants } from 'src/app/core/constants/urlConstants';
 import { HttpService, LoaderService, ToastService } from 'src/app/core/services';
+import { FormService } from 'src/app/core/services/form/form.service';
 import { CommonRoutes } from 'src/global.routes';
+import { LocalStorageService } from 'src/app/core/services';
+import { localKeys } from 'src/app/core/constants/localStorage.keys';
 
 @Component({
   selector: 'app-mentor-directory',
@@ -13,19 +18,18 @@ import { CommonRoutes } from 'src/global.routes';
 })
 export class MentorDirectoryPage implements OnInit {
   @ViewChild(IonContent) content: IonContent;
-  @ViewChild(IonContent) infinitescroll: IonInfiniteScroll;
 
-  page = 1; //todo: Enable pagenation
-  limit = 50;
+  page = 1;
+  limit = 100;
   searchText: string = '';
   public headerConfig: any = {
     menu: true,
-    // label: 'MENTORS_DIRECTORY',
     headerColor: 'primary',
     notification: false,
   };
 
   mentors = [];
+  mentorForm: any;
   mentorsCount;
   isLoaded: boolean = false;
   filterData: any;
@@ -42,6 +46,9 @@ export class MentorDirectoryPage implements OnInit {
   selectedChips: boolean = false;
   data: any;
   buttonConfig: any;
+  currentUserId: any;
+  isInfiniteScrollDisabled: boolean = false;
+  loading: boolean =false;
 
   constructor(
     private router: Router,
@@ -49,6 +56,8 @@ export class MentorDirectoryPage implements OnInit {
     private httpService: HttpService,
     private route: ActivatedRoute,
     private toast: ToastService,
+    private form: FormService,
+    private localStorage: LocalStorageService,
   ) {}
 
   ngOnInit() {
@@ -58,9 +67,19 @@ export class MentorDirectoryPage implements OnInit {
   }
 
   async ionViewWillEnter() {
+    if(this.loading) {
+      this.gotToTop();
+      return;
+    }
+    this.loading =true;
+    let user = await this.localStorage.getLocalData(localKeys.USER_DETAILS);
+    this.currentUserId= user.id;
+    const result = await this.form.getForm(MENTOR_DIR_CARD_FORM);
+    this.mentorForm = _.get(result, 'data.fields.controls');
     this.page = 1;
     this.mentors = [];
-    this.getMentors();
+    this.isInfiniteScrollDisabled = false;
+    this.getMentors();  
     this.gotToTop();
   }
 
@@ -68,7 +87,7 @@ export class MentorDirectoryPage implements OnInit {
     this.content.scrollToTop(1000);
   }
 
-  async getMentors(showLoader = true) {
+  async getMentors(showLoader = true, isLoadMore: boolean = false) {
     showLoader ? await this.loaderService.startLoader() : '';
     const config = {
       url:
@@ -91,22 +110,31 @@ export class MentorDirectoryPage implements OnInit {
       this.data = data.result.data;
       this.isLoaded = true;
       showLoader ? await this.loaderService.stopLoader() : '';
-      if (
-        this.mentors.length &&
-        this.mentors[this.mentors.length - 1].key == data.result.data[0]?.key
-      ) {
-        this.mentors[this.mentors.length - 1].values = this.mentors[
-          this.mentors.length - 1
-        ].values.concat(data.result.data[0].values);
-        data.result.data.shift();
-        this.mentors = this.mentors.concat(data.result.data);
+      if (isLoadMore) {
+        this.mentors = [...this.mentors, ...data.result.data];
       } else {
-        this.mentors = this.mentors.concat(data.result.data);
+        this.mentors = data.result.data;
+        this.mentorsCount = data.result.count;
       }
-      this.infinitescroll.disabled = this.mentorsCount == 0 ? true : false;
-      this.mentorsCount = data.result.count;
+      let totalValues = this.mentors.reduce((acc, mentor) => acc + (mentor.values?.length || 0), 0);
+      this.isInfiniteScrollDisabled = (totalValues >= this.mentorsCount) || (data.result.data.length === 0);
+
+      for (const group of this.mentors) {
+        group.values.forEach(mentor => {
+            mentor.buttonConfig = this.buttonConfig.map(btn => ({ ...btn }));
+
+            if (mentor.id === this.currentUserId) {
+              mentor.buttonConfig = this.buttonConfig.map(btn => ({
+                ...btn,
+                isHide: true
+              }));
+          }
+        });
+      }
+
     } catch (error) {
       this.isLoaded = true;
+      this.isInfiniteScrollDisabled = true; 
       showLoader ? await this.loaderService.stopLoader() : '';
     }
   }
@@ -124,9 +152,9 @@ export class MentorDirectoryPage implements OnInit {
     }
   }
   async loadMore(event) {
-    if (this.data) {
-      this.page = this.directory ? this.page + 1 : this.page;
-      await this.getMentors(false);
+    if (this.data && !this.isInfiniteScrollDisabled) {
+      this.page = this.page + 1;
+      await this.getMentors(false, true);
     }
     event.target.complete();
   }

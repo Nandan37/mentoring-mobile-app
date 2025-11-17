@@ -14,6 +14,7 @@ import { FeedbackPage } from 'src/app/pages/feedback/feedback.page';
 import { CapacitorHttp } from '@capacitor/core';
 import { TranslateService } from '@ngx-translate/core';
 import { environment } from 'src/environments/environment';
+import { Router } from '@angular/router';
 
 
 @Injectable({
@@ -35,12 +36,17 @@ export class HttpService {
     private modalController: ModalController,
     private translate: TranslateService,
     private alert: AlertController,
+    private router : Router,
+    private toast: ToastService
   ) {  
     this.baseUrl = environment['baseUrl'];
   }
 
   async setHeaders() {
     let token = await this.getToken();
+    if(!token) {
+      return null;
+    } 
     const timezone = Intl.DateTimeFormat().resolvedOptions().timeZone;
     const acceptLanguage = await this.localStorage.getLocalData(localKeys.SELECTED_LANGUAGE);
     const headers = {
@@ -60,12 +66,16 @@ export class HttpService {
 
   async post(requestParam: RequestParams) {
     if (!(await this.checkNetworkAvailability())) {
+      
   throw Error(null);
 }
 
     let defaultHeaders = await this.setHeaders();
     const headers = requestParam.headers ?  { ...requestParam.headers, ...defaultHeaders } : defaultHeaders;
     let body = requestParam.payload ? requestParam.payload : {};
+    if (body?.time_zone) {
+    headers.timeZone = body.time_zone;        
+  }
     const options = {
       url: this.baseUrl + requestParam.url,
       headers: headers,
@@ -99,9 +109,6 @@ export class HttpService {
           this.isFeedbackTriggered = true;
           this.openModal(result?.meta?.data[0]);
         }
-        if(options.url.includes("interface/v1/profile/get") && result?.responseCode) {
-          return result;
-        }else
         if (result.responseCode === "OK") {
           return result;
         } else {
@@ -165,26 +172,26 @@ export class HttpService {
     }
   }
 
-  //token validation and logout 
 
-  async getToken() {
-    let token = _.get(this.userService.token, 'access_token');
+async getToken() {
+    const token = await this.userService.getUserValue();
+    //need to verify token validity
     if (!token) {
       return null;
     }
-    let isValidToken = this.userService.validateToken(token);
-    if (!isValidToken) {
-      let data: any = await this.getAccessToken();
-      let access_token = _.get(data, 'access_token');
-      if (!access_token) {
-        let authService = this.injector.get(AuthService);
-        await authService.logoutAccount();
-      }
-      this.userService.token['access_token'] = access_token;
-      await this.localStorage.setLocalData(localKeys.TOKEN, this.userService.token);
-    }
-    let userToken = 'bearer ' + _.get(this.userService.token, 'access_token');
-    return userToken;
+
+    // these are commented because of old mentor flow changes
+    // if (!isValidToken) {
+    //   let data: any = await this.getAccessToken();
+    //   let access_token = _.get(data, 'access_token');
+    //   if (!access_token) {
+    //       let authService = this.injector.get(AuthService);
+    //     await authService.logoutAccount();
+    //   }
+    //   this.userService.token['access_token'] = access_token;
+    //   await this.localStorage.setLocalData(localKeys.TOKEN, this.userService.token);
+    // }
+    return token;
   }
 
   async getAccessToken() {
@@ -213,6 +220,12 @@ export class HttpService {
 
   public handleError(result) {
     let msg = result.data.message;
+    if (result.url.includes(urlConstants.API_URLS.GET_CHAT_TOKEN)) {
+      return;
+    }
+    if(result.url.includes("interface/v1/profile/get")) {
+      throw result;
+    }
     switch (result.status) {
       case 400:
       case 406:
@@ -221,9 +234,15 @@ export class HttpService {
         this.toastService.showToast(msg ? msg : 'SOMETHING_WENT_WRONG', 'danger')
         break
       case 401:
-          this.triggerLogoutConfirmationAlert(result)
-
-        break
+        let auth = this.injector.get(AuthService);
+        if (result.data.message && result.data.message.startsWith('Congratulations')) {
+          this.triggerLogoutConfirmationAlert(result);
+        } else {
+          localStorage.clear();
+          auth.clearLocalData();
+          location.href = window.location.origin;
+        }
+        break;
       default:
         this.toastService.showToast(msg ? msg : 'SOMETHING_WENT_WRONG', 'danger')
     }
@@ -243,6 +262,7 @@ export class HttpService {
   }
 
   async triggerLogoutConfirmationAlert(result) {
+    this.toast.setDisableToast(true); 
     if(await this.modalController.getTop()) {
       await this.modalController.dismiss()
     }
@@ -264,6 +284,7 @@ export class HttpService {
             cssClass: 'alert-button-red',
             handler: () => {
               this.isAlertOpen = false;
+              this.toast.setDisableToast(false); 
             },
           },
         ],
@@ -275,7 +296,7 @@ export class HttpService {
         if(environment.isAuthBypassed) {
           let auth = this.injector.get(AuthService);
           auth.clearLocalData();
-          location.href = environment.unauthorizedRedirectUrl
+          location.href = window.location.origin
         } else {
           let auth = this.injector.get(AuthService);
           auth.logoutAccount(true);

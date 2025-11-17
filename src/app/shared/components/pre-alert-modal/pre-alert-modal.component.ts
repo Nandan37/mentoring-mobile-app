@@ -1,7 +1,7 @@
-import { Component, Input } from '@angular/core';
+import { Component, ElementRef, Input, ViewChild } from '@angular/core';
 import { ActionSheetController, ModalController } from '@ionic/angular';
 import { TranslateService } from '@ngx-translate/core';
-import { ToastService } from 'src/app/core/services';
+import { ToastService, UtilService } from 'src/app/core/services';
 
 @Component({
   selector: 'app-add-link-modal',
@@ -9,50 +9,56 @@ import { ToastService } from 'src/app/core/services';
   styleUrls: ['./pre-alert-modal.component.scss'],
 })
 export class PreAlertModalComponent {
-
+  @ViewChild('fileUpload') fileUpload: ElementRef;
   @Input() data: any;
   @Input() type: 'link' | 'file' = 'link';
+  @Input() heading: string = '';
+  @Input() allowedFileTypes : any;
+  @Input() maxSize : any;
+  @Input() errorMsg : any;
 
   name: string = '';
   link: string = '';
+  showLinkError: boolean = false;
   uploadedFile: File;
 
   constructor(
     private modalController: ModalController,
     private translateService: TranslateService,
     private toast: ToastService,
-    private actionSheetController: ActionSheetController
+    private actionSheetController: ActionSheetController,
+    private utilService: UtilService
   ) {}
 
+  onLinkInput() {
+    const trimmed = this.link?.trim() || '';
+    if (!trimmed) {
+      this.showLinkError = false;
+      return;
+    }
+    const urlRegex = /^(https?:\/\/)[\w.-]+(:\d+)?(\/[\w\-./?%&=]*)?$/i;
+    this.showLinkError = !urlRegex.test(trimmed);
+  }
+  
+
   dismissModal() {
+    this.showLinkError = false;
     this.modalController.dismiss();
   }
 
   saveLink() {
     if (this.type === 'file') {
-      if(this.uploadedFile && this.name) {
         const obj = {
-          name: this.name, 
+          name: this.name ? this.name : this.uploadedFile.name,
           file: this.uploadedFile
         };
         this.modalController.dismiss({
           data: obj,
           success: true,
         });
-      } else {
-        this.toast.showToast(
-          this.translateService.instant('INVALID_FILE'),
-          'danger'
-        );
-        return;
-      }
-    } else {
-      if (
-        this.link && this.name &&
-        (this.link.startsWith('http://') || this.link.startsWith('https://'))
-      ) {
+    } else if(this.type === 'link') {
         const obj = {
-          name: this.name,
+          name: this.name ? this.name : this.link,
           link: this.link,
           type: this.data.name,
           isLink: true,
@@ -63,51 +69,14 @@ export class PreAlertModalComponent {
           data: obj,
           success: true,
         });
-      } else {
-        this.toast.showToast(
-          this.translateService.instant('INVALID_LINK'),
-          'danger'
-        );
-        return;
-      }
-    }
+      } 
   }
-  uploadFile() {
-    const input = document.createElement('input');
-    input.type = 'file';
-    input.accept = '*/*';
-    
-    input.addEventListener('change', (fileEvent: any) => {
-      try {
-        if (!fileEvent.target.files || fileEvent.target.files.length === 0) {
-          this.toast.showToast(
-            this.translateService.instant('No file selected'),
-            'danger'
-          );
-          return;
-        }
-        const file = fileEvent.target.files[0];
-        if (!file) {
-          return;
-        }
-        if (!file.type || file.type.trim() === '') {
-          this.toast.showToast(
-            this.translateService.instant('Cannot upload file: File type is not detected. Please try a different file.'),
-            'danger'
-          );
-          return;
-        }
-        if (!file.name || file.name.trim() === '') {
-          return;
-        }
-        this.uploadedFile = file;
-        
-      } catch (error) {
-        console.error('Error during file selection:', error);
-      }
-    });
-    
-    input.click();
+  selectFile() {
+  this.utilService.uploadFile(this.allowedFileTypes,this.maxSize,this.errorMsg).then((file: File) => {
+     this.uploadedFile = file;
+   }).catch((error) => {
+     console.error('File upload failed:', error);
+   });
   }
   async openFilePicker() {
     const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
@@ -117,17 +86,10 @@ export class PreAlertModalComponent {
             header: 'Select Resource',
             buttons: [
                 {
-                    text: 'Camera',
-                    icon: 'camera',
-                    handler: () => {
-                        this.openCamera();
-                    }
-                },
-                {
                     text: 'File',
                     icon: 'folder',
                     handler: () => {
-                        this.uploadFile();
+                        this.selectFile();
                     }
                 },
                 {
@@ -139,14 +101,10 @@ export class PreAlertModalComponent {
         });
         await actionSheet.present();
     } else {
-      this.uploadFile()
+      this.selectFile()
     }
   
   }
-  openCamera() {
-  }
-
-
 
   removeFile() {
     this.uploadedFile = null;

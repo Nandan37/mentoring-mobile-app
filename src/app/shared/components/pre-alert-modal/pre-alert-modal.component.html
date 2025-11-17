@@ -2,7 +2,7 @@
   <div class="custom-pre-toolbar">
     <ion-title>
       {{
-        type === "link" ? ("ADD_LINK" | translate) : ("ADD_FILE" | translate)
+        heading | translate
       }}
     </ion-title>
     <ion-buttons slot="end">
@@ -12,35 +12,41 @@
     </ion-buttons>
   </div>
 
-  <ion-content class="">
+  <ion-content class="custom-content">
     <ion-item class="custom-input">
-      <ion-label position="stacked">Name</ion-label>
+      <ion-label position="stacked">  {{"NAME" | translate}}</ion-label>
       <ion-input
         [(ngModel)]="name"
-        placeholder="Enter Name"
+        [placeholder]="'ADD_NAME' | translate"
         maxlength="50"
       >
       </ion-input>
     </ion-item>
 
     <ion-item *ngIf="type === 'link'" class="custom-input">
-      <ion-label position="stacked">Link</ion-label>
+      <ion-label position="stacked">  {{"LINK" | translate}}</ion-label>
       <ion-input
         [(ngModel)]="link"
-        placeholder="Enter link"
+        [placeholder]="'ADD_URL' | translate"
         maxlength="50"
+        (ionInput)="onLinkInput()"
+        [debounce]="500"
       >
       </ion-input>
+      <ion-text color="danger" *ngIf="showLinkError">
+        {{ "INVALID_LINK" | translate }}
+      </ion-text>
     </ion-item>
     <div class="pre-button-container">
       <ion-button
       fill="outline"
-     *ngIf="type === 'file' && !uploadedFile" 
+      shape="round"
+      *ngIf="type === 'file' && !uploadedFile" 
       (click)="openFilePicker()"
-    >
-      <ion-icon name="add-circle-outline"></ion-icon>
-      Attach File
-    </ion-button>
+        >
+      <ion-icon name="add-circle-outline" style="margin-right: 8px;"></ion-icon>
+      {{"FILE_UPLOAD" | translate}}
+        </ion-button>
     @if (uploadedFile) {
       <ng-container >
         <ion-chip  class="color-red">
@@ -49,17 +55,15 @@
         </ion-chip>
       </ng-container>
     }
-     
     </div>
-  
   </ion-content>
 
   <div class="modal-footer">
     <ion-buttons slot="end">
       <ion-button
         color="primary"
-        class="pre-button"
         fill="solid"
+        [disabled]="(type === 'link' && (!link || showLinkError)) || (type === 'file' && !uploadedFile)"
         (click)="saveLink()"
       >
         {{ "ADD" | translate }}

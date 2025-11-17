@@ -12,6 +12,7 @@
     color: var(--black);
     font-size: 14px !important;
     overflow: visible !important;
+    width: 100%;
  }
 
 .head-label::first-letter{
@@ -20,4 +21,7 @@
  
 .icon{
     font-size: smaller;
+}
+.word-break {
+  word-break: break-word !important;
 }

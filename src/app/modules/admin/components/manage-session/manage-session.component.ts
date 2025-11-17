@@ -124,7 +124,7 @@ export class ManageSessionComponent implements OnInit {
         break;
 
       case "EDIT":
-        (this.receivedEventData?.element?.status=='Live') ? this.router.navigate([CommonRoutes.CREATE_SESSION], { queryParams: { id: this.receivedEventData.element.id , type: 'segment'} }) : this.router.navigate([CommonRoutes.CREATE_SESSION], { queryParams: { id: this.receivedEventData.element.id } });
+        (this.receivedEventData?.element?.status=='Live') ? this.router.navigate([CommonRoutes.CREATE_SESSION], {queryParams: { id: this.receivedEventData.element.id , type: 'segment'} }) : this.router.navigate([CommonRoutes.CREATE_SESSION], { queryParams: { id: this.receivedEventData.element.id } });
         break;
       case 'DELETE':
         await this.adminWorkapceService.deleteSession(this.receivedEventData.element.id)
@@ -161,6 +161,13 @@ export class ManageSessionComponent implements OnInit {
     this.fetchSessionList()
   }
 
+  searchResults(event) {
+    this.searchText= event.searchText;
+    this.page = 1;
+    this.setPaginatorToFirstpage = true
+    this.fetchSessionList()
+  }
+
   async onClickFilter() {
     let modal = await this.modalCtrl.create({
       component: FilterPopupComponent,
@@ -170,6 +177,10 @@ export class ManageSessionComponent implements OnInit {
 
     modal.onDidDismiss().then(async (dataReturned) => {
       this.filteredDatas = []
+       if(dataReturned?.data?.role === 'closed'){
+        this.filterData = dataReturned?.data?.data;
+        return;
+      }
       if (dataReturned.data && dataReturned.data.data) {
         if (dataReturned.data.data.selectedFilters) {
           for (let key in dataReturned.data.data.selectedFilters) {
@@ -215,4 +226,9 @@ export class ManageSessionComponent implements OnInit {
   segmentChanged(event){
     this.segmentType = event.target.value;
   }
+
+    onClearSearch($event: string) {
+    this.searchText ='';
+    this.fetchSessionList()
+    }
 }

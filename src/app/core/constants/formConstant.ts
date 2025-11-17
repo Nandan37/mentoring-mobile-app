@@ -50,6 +50,19 @@ export const MANAGERS_CREATE_SESSION_FORM: IFORM = {
 	"sub_type": "managersSessionForm",
 }
 
+export const MENTOR_DIR_CARD_FORM: IFORM = {
+	"type": "mentorDirectoryCard",
+	"sub_type": "mentorDirectoryCardForm",
+}
+export const MENTOR_REQ_CARD_FORM: IFORM = {
+	"type": "mentorRequestCard",
+	"sub_type": "mentorRequestCardForm",
+}
+export const MENTOR_CONNECTION_CARD_FORM: IFORM = {
+	"type": "mentorConnectionCard",
+	"sub_type": "mentorConnectionCardForm",
+}
+
 export const BIG_NUMBER_DASHBOARD_FORM: IFORM = {
 	"type": "bignumberDashboard",
 	"sub_type": "bignumberDashboardForm"
@@ -58,6 +71,7 @@ export const DASHBOARD: IFORM = {
 	"type": "dashboard",
 	"sub_type": "dashboardForm",
 }
+
 export const FILTER_ROLES = {
 	"title": "Roles",
 	"name": "roles",
@@ -99,6 +113,13 @@ export const REQUEST_SESSION_FORM: IFORM = {
 }
 
 export const CHAT_LIB_META_KEYS = {
-	"cantSendMsg": "CANT_SEND_MESSAGE",
-	"cantSendMsgToMentor": "CANT_SEND_MESSAGE_TO_MENTOR",
+    "cantSendMsg": "CANT_SEND_MESSAGE",
+    "cantSendMsgToMentor": "CANT_SEND_MESSAGE_TO_MENTOR",
+    "connectionLost":"CONNECTION_DELETE",
+    "YouCantReachUser":"YOU_CANT_REACH_USER"
+}
+
+export const MENTEE_CARD_FORM: IFORM = {
+	"type": "menteeCard",
+	"sub_type": "menteeCardForm"
 }

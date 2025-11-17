@@ -5,10 +5,14 @@ import { TranslateService } from '@ngx-translate/core';
 import { ISocialSharing } from '../../interface/soical-sharing-interface';
 import { ModelComponent } from 'src/app/shared/components/model/model.component';
 import * as Bowser from 'bowser';
-import { BehaviorSubject, Subject } from 'rxjs';
+import { BehaviorSubject, Observable, Subject } from 'rxjs';
 import * as Papa from 'papaparse';
 import { LocalStorageService } from '../localstorage.service';
 import { environment } from 'src/environments/environment';
+
+import { ToastService } from '../toast.service';
+import * as moment from 'moment-timezone';
+
 
 @Injectable({
   providedIn: 'root',
@@ -21,6 +25,8 @@ export class UtilService {
   private criteriaChipSource = new BehaviorSubject<string>('');
   currentSearchText = this.searchTextSource.asObservable();
   currentCriteriaChip = this.criteriaChipSource.asObservable();
+  private hasBadgeSubject = new BehaviorSubject<boolean>(false);
+  hasBadge$: Observable<boolean> = this.hasBadgeSubject.asObservable();
 
   ionMenuShow(data: boolean) {
     this.canIonMenuShow.next(data);
@@ -29,13 +35,15 @@ export class UtilService {
     private modalCtrl: ModalController,
     private alert: AlertController,
     private translate: TranslateService,
-    private localstorage: LocalStorageService
+    private localstorage: LocalStorageService,
+    private toast: ToastService,
   ) {
     const browser = Bowser.getParser(window.navigator.userAgent);
   }
 
   getDeepLink(url) {
-    return environment.deepLinkUrl + url;
+    const baseUrl = window.location.origin;
+    return baseUrl + url;
   }
 
   async shareLink(param: ISocialSharing) {
@@ -65,27 +73,38 @@ export class UtilService {
           texts = text;
         });
       const alert = await this.alert.create({
-        cssClass: 'my-custom-class',
+        cssClass: 'custom-alert-with-close',
         header: texts[msg.header],
         message: texts[msg.message],
         inputs: msg.inputs || [],
         buttons: [
-          {
-            text: texts[msg.submit],
-            cssClass: 'alert-button-bg-white',
-            handler: (data) => {
-              resolve(msg.inputs ? data : true);
-            },
-          },
-          {
-            text: texts[msg.cancel],
-            role: 'cancel',
-            cssClass: 'alert-button-red',
-            handler: (blah) => {
-              resolve(false);
-            },
-          },
-        ],
+      {
+        text: texts[msg.submit],
+        cssClass: 'alert-button-bg-white',
+        handler: (data) => {
+          resolve(msg.inputs ? data : true);
+        },
+      },
+      {
+        text: texts[msg.cancel],
+        role: 'cancel',
+        cssClass: 'alert-button-red',
+        handler: () => {
+          resolve(false);
+        },
+      },
+    ],
+      });
+      const headerEl = document.querySelector('.custom-alert-with-close .alert-head');
+      if (headerEl) {
+        const closeBtn = document.createElement('span');
+        closeBtn.innerHTML = '&times;';
+        closeBtn.className = 'close-alert-icon';
+        closeBtn.onclick = () => alert.dismiss();
+        headerEl.appendChild(closeBtn);
+      }
+      document.querySelector('.close-alert-icon')?.addEventListener('click', () => {
+        alert.dismiss();
       });
       await alert.present();
     });
@@ -163,7 +182,7 @@ export class UtilService {
         const options = filterData[key].map((item) => ({
           id: item.id,
           label: item.name,
-          value: item.code,
+          value: item.id,
         }));
         const type = formData.filters[key].find((obj) => obj.key === name).type;
         result.push({ title, name, options, type });
@@ -187,7 +206,7 @@ export class UtilService {
     }
     return result;
   }
-
+  
   parseAndDownloadCSV(rawCSVData: string, fileName: string): void {
     Papa.parse(rawCSVData, {
       complete: (result) => {
@@ -202,6 +221,52 @@ export class UtilService {
       },
     });
   }
+
+async downloadFile(fileUrl: string, fileName: string, mimeType?: string): Promise<void> {
+  try {
+    const response = await fetch(fileUrl);
+    let contentType: string;
+    let fileExtension: string;
+    
+    if (!mimeType || mimeType.includes('csv') || fileName.endsWith('.csv')) {
+      contentType = 'text/csv;charset=utf-8;';
+      fileExtension = '.csv';
+    }
+    else if (mimeType.includes('pdf')) {
+      contentType = 'application/pdf';
+      fileExtension = '.pdf';
+    }
+    else if (mimeType.includes('word') || mimeType.includes('.document') || mimeType.includes('docx')) {
+      contentType = 'application/vnd.openxmlformats-officedocument.wordprocessingml.document';
+      fileExtension = '.docx';
+    }
+    else if (mimeType.includes('presentation') || mimeType.includes('powerpoint') || mimeType.includes('pptx')) {
+      contentType = 'application/vnd.openxmlformats-officedocument.presentationml.presentation';
+      fileExtension = '.pptx';
+    }
+    else {
+      contentType = 'application/octet-stream';
+      fileExtension = '';
+    }
+    
+    const blob = await response.blob();
+    const typedBlob = new Blob([blob], { type: contentType });
+    const url = URL.createObjectURL(typedBlob);
+    const link = document.createElement('a');
+    link.href = url;
+    link.download = fileName.includes('.') ? fileName : `${fileName}${fileExtension}`;
+    
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    
+    setTimeout(() => URL.revokeObjectURL(url), 1000);
+  } catch (error) {
+    console.error('Error downloading file:', error);
+  }
+}
+
+
 
   async deviceDetails() {
     const browser = Bowser.getParser(window.navigator.userAgent);
@@ -291,4 +356,117 @@ export class UtilService {
   removeMessageBadge() {
     this.messageBadge.next(false);
   }
+
+ uploadFile(allowedExtensions?: string[], maxSizeMB?: number, errorMsgs?:any): Promise<File | null> {
+    return new Promise((resolve) => {
+      const input = document.createElement('input');
+      input.type = 'file';
+      const extensions = allowedExtensions && allowedExtensions.length > 0
+        ? allowedExtensions.map(ext => `.${ext}`).join(',')
+        : '*/*';
+      input.accept = extensions;
+      input.addEventListener('change', (fileEvent: Event) => {
+        const target = fileEvent.target as HTMLInputElement;
+        const file = target.files?.[0];
+  
+        if (!file) {
+          this.toast.showToast('No file selected', 'danger');
+          return resolve(null);
+        }
+        if (allowedExtensions && allowedExtensions.length > 0) {
+          const fileName = file.name;
+          const fileExt = fileName.split('.').pop()?.toLowerCase();
+  
+          if (!fileExt || !allowedExtensions.includes(fileExt)) {
+            this.toast.showToast(
+              errorMsgs?.invalidFormatError,
+              'danger'
+            );
+            return resolve(null);
+          }
+        }
+        if (maxSizeMB) {
+          const maxSizeBytes = maxSizeMB * 1024 * 1024;
+          if (file.size > maxSizeBytes) {
+            this.toast.showToast(
+              errorMsgs?.maxSizeError,
+              'danger'
+            );
+            return resolve(null);
+          }
+        }
+        return resolve(file);
+      });
+      input.click();
+    });
+  }
+
+  isSessionExpired(meta): boolean {
+  const endDate = meta?.resp?.end_date;
+  if (!endDate) return false; 
+  return Date.now() > endDate * 1000;
+  }
+
+  setHasBadge(value: boolean): void {
+    this.hasBadgeSubject.next(value);
+  }
+
+
+  convertDatesToTimezone(startDate, endDate, selectedTimezone) {
+  // Guess user's current timezone
+  const userTimezone = moment.tz.guess();
+  
+  // Parse dates in user's timezone
+  const startDateTimezoned = moment.tz(startDate, userTimezone);
+  const endDateTimezoned = moment.tz(endDate, userTimezone);
+  
+  // Get current time in selected timezone
+  const currentTimeInSelectedTZ = moment.tz(selectedTimezone);
+  const currentEpochInSelectedTZ = currentTimeInSelectedTZ.valueOf();
+  
+  // Extract time components from original dates
+  const startDatehours = startDateTimezoned.hours();
+  const startDateminutes = startDateTimezoned.minutes();
+  const startDateseconds = startDateTimezoned.seconds();
+  const startDay = startDateTimezoned.date(); 
+  const startMonth = startDateTimezoned.month(); 
+  const startYear = startDateTimezoned.year(); 
+
+  const endDay = endDateTimezoned.date();
+  const endMonth = endDateTimezoned.month();
+  const endYear = endDateTimezoned.year();
+  const endDatehours = endDateTimezoned.hours();
+  const endDateminutes = endDateTimezoned.minutes();
+  const endDateseconds = endDateTimezoned.seconds();
+  
+  // Create new dates with the SAME TIME but in the selected timezone
+ const eventStartDateInSelectedTZ = moment.tz(selectedTimezone)
+    .year(startYear)
+    .month(startMonth)
+    .date(startDay)
+    .hours(startDatehours)
+    .minutes(startDateminutes)
+    .seconds(startDateseconds)
+    .milliseconds(0);
+
+const eventEndDateInSelectedTZ = moment.tz(selectedTimezone)
+    .year(endYear)
+    .month(endMonth)
+    .date(endDay)
+    .hours(endDatehours)
+    .minutes(endDateminutes)
+    .seconds(endDateseconds)
+    .milliseconds(0);
+
+
+  // Get the epoch milliseconds
+  const eventStartEpochInSelectedTZ = eventStartDateInSelectedTZ.valueOf();
+  const eventEndEpochInSelectedTZ = eventEndDateInSelectedTZ.valueOf();
+  
+  return {
+    eventStartEpochInSelectedTZ,
+    eventEndEpochInSelectedTZ,
+  };
+}
+  
 }

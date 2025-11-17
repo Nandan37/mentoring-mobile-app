@@ -1,6 +1,6 @@
 import { ChangeDetectorRef, Component, OnInit, ViewChild } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
-import { AttachmentService, LoaderService, ToastService } from 'src/app/core/services';
+import { AttachmentService, LoaderService, LocalStorageService, ToastService } from 'src/app/core/services';
 import { HttpService } from 'src/app/core/services/http/http.service';
 import { SessionService } from 'src/app/core/services/session/session.service';
 import {
@@ -22,6 +22,10 @@ import { PermissionService } from 'src/app/core/services/permission/permission.s
 import { SearchPopoverComponent } from 'src/app/shared/components/search-popover/search-popover.component';
 import { SearchCompetencyComponent } from 'src/app/shared/components/search-competency/search-competency.component';
 import { PreAlertModalComponent } from 'src/app/shared/components/pre-alert-modal/pre-alert-modal.component';
+import { localKeys } from 'src/app/core/constants/localStorage.keys';
+import * as moment from 'moment-timezone';
+import { DynamicSelectModalComponent } from 'src/app/dynamic-select-modal/dynamic-select-modal.component';
+import { UtilService } from '../../core/services/util/util.service';
 
 @Component({
   selector: 'app-create-session',
@@ -29,6 +33,9 @@ import { PreAlertModalComponent } from 'src/app/shared/components/pre-alert-moda
   styleUrls: ['./create-session.page.scss'],
 })
 export class CreateSessionPage implements OnInit {
+
+  timezones: string[] = moment.tz.names(); // All timezones
+  selectedTimezone = Intl.DateTimeFormat().resolvedOptions().timeZone;
   lastUploadedImage: boolean;
   private win: any = window;
   @ViewChild('form1') form1: DynamicFormComponent;
@@ -51,6 +58,7 @@ export class CreateSessionPage implements OnInit {
   public formData: JsonFormData;
   showForm: boolean = false;
   isSubmited: boolean;
+  isNotCompleted: boolean = true;
   type: any ;
   selectedLink: any;
   selectedHint: any;
@@ -67,12 +75,16 @@ export class CreateSessionPage implements OnInit {
   formConfig: any;
   mentor_id: any;
   isHome: boolean;
+  isManagePage: boolean;
+  user: any;
+  showConnectedMentees: boolean = false;
 
   constructor(
     private sessionService: SessionService,
     private toast: ToastService,
     private activatedRoute: ActivatedRoute,
     private location: Location,
+    private localStorage: LocalStorageService, 
     private attachment: AttachmentService,
     private api: HttpService,
     private loaderService: LoaderService,
@@ -84,7 +96,8 @@ export class CreateSessionPage implements OnInit {
     private route:ActivatedRoute,
     private modalCtrl:ModalController,
     private permissionService:PermissionService,
-    private actionSheetController: ActionSheetController
+    private actionSheetController: ActionSheetController,
+    private utilService: UtilService
   ) {
   }
   ngOnInit() {
@@ -93,7 +106,7 @@ export class CreateSessionPage implements OnInit {
   async ionViewWillEnter() {
     await this.updateFormConfig();
     this.route.queryParams.subscribe(() => this.updateFormConfig());
-    
+    this.user = await this.localStorage.getLocalData(localKeys.USER_DETAILS)
     const platformForm = await this.getPlatformFormDetails();
     const result = await this.form.getForm(this.formConfig);
     this.formData = _.get(result, 'data.fields');
@@ -113,7 +126,6 @@ export class CreateSessionPage implements OnInit {
         this.showForm = true;
       }
     });
-    this.isSubmited = true; //to be removed
     this.profileImageData.isUploaded = true;
     this.changeDetRef.detectChanges();
   }
@@ -121,7 +133,7 @@ export class CreateSessionPage implements OnInit {
     let data = await this.sessionService.getSessionDetailsAPI(this.id);
     let response = data.result;
         this.sessionDetails= response;
-        this.profileImageData.image = response.image;
+        this.profileImageData.image = response.image[0];
         this.profileImageData.isUploaded = true;
         response.start_date = new Date(response.start_date * 1000).toISOString();
         response.end_date = new Date(response.end_date * 1000).toISOString();
@@ -186,7 +198,7 @@ export class CreateSessionPage implements OnInit {
               "mime_type":"link",
           });
           }else if (file.file instanceof File && file.file.name) {
-              const signedUrl = await this.getSignedUrl(file.file.name);
+              const signedUrl = await this.attachment.getImageUploadUrl(file.file);
               const uploadedFileUrl = await this.uploadFile(file.file, signedUrl);
               this.updatedFiles.push({
                 "name":file.name,
@@ -203,13 +215,7 @@ export class CreateSessionPage implements OnInit {
     }
   }
 
-  async getSignedUrl(fileName: string) {
-    const config = {
-      url: urlConstants.API_URLS.GET_SESSION_IMAGE_UPLOAD_URL + fileName.replace(/[^A-Z0-9]+/ig, "_").toLowerCase()
-    };
-    const data: any = await this.api.get(config);
-    return data.result;
-  }
+ 
 
   async uploadFile(file: File, signedUrl: any) {
     return new Promise((resolve, reject) => {
@@ -227,13 +233,15 @@ export class CreateSessionPage implements OnInit {
     }
     if (this.form1.myForm.valid) {
       await this.handleFileUploads();
-
       const form = Object.assign({}, { ...this.form1.myForm.getRawValue(), ...this.form1.myForm.value });
-      form.start_date = (Math.floor((new Date(form.start_date).getTime() / 1000) / 60) * 60).toString();
-      form.end_date = (Math.floor((new Date(form.end_date).getTime() / 1000) / 60) * 60).toString();
-      const timezone = Intl.DateTimeFormat().resolvedOptions().timeZone;
-      form.time_zone = timezone;
-
+      const convertedTimezones = this.utilService.convertDatesToTimezone(
+          form.start_date,
+          form.end_date,
+          this.selectedTimezone
+          );
+          form.start_date = convertedTimezones.eventStartEpochInSelectedTZ /1000;
+          form.end_date = convertedTimezones.eventEndEpochInSelectedTZ / 1000;
+      form.time_zone = this.selectedTimezone;
       _.forEach(this.entityNames, (entityKey) => {
         const control = this.formData.controls.find(obj => obj.name === entityKey);
         if (control) {
@@ -242,11 +250,22 @@ export class CreateSessionPage implements OnInit {
             : form[entityKey];
         }
       });
+       if (this.profileImageData.image && !this.profileImageData.isUploaded) {
+        const signedUrl = await this.attachment.getImageUploadUrl(this.localImage);
+        const updatedUrl = await this.uploadFile(this.localImage, signedUrl);
+        this.profileImageData.image = updatedUrl;
+        form.image = [ updatedUrl ];
+        this.profileImageData.isUploaded = true;
+      }
       if (!this.profileImageData.image) {
         form.image = [];
       }
+      form.mentor_id = form?.mentor_id ?? this.user.id;
       form.resources= this.updatedFiles;
       this.form1.myForm.markAsPristine();
+      if(this.isManagePage) {
+        form.managerFlow = true;
+      }
       const result = await this.sessionService.createSession(form, this.id);
       if (result) {
         this.sessionDetails = _.isEmpty(result) ? this.sessionDetails : result;
@@ -262,6 +281,8 @@ export class CreateSessionPage implements OnInit {
         this.profileImageData.image = this.lastUploadedImage;
         this.profileImageData.isUploaded = false;
       }
+      if(!this.isNotCompleted) 
+        this.router.navigate([`/${"session-detail"}/${this.id}`],{replaceUrl: true})
     } else {
       this.toast.showToast("Please fill all the mandatory fields", "danger");
     }
@@ -277,8 +298,8 @@ export class CreateSessionPage implements OnInit {
 
     for(let j=0;j<this?.meetingPlatforms?.length;j++){
       if( existingData.meeting_info.platform == this?.meetingPlatforms[j].name){
-         this.selectedLink = this?.meetingPlatforms[j];
-         this.selectedHint = this.meetingPlatforms[j].hint;
+        this.selectedLink = this?.meetingPlatforms[j];
+        this.selectedHint = this.meetingPlatforms[j].hint;
         let obj = this?.meetingPlatforms[j]?.form?.controls.find( (link:any) => link?.name == 'link');
         let meetingId = this?.meetingPlatforms[j]?.form?.controls.find( (meetingId:any) => meetingId?.name == 'meetingId')
         let password = this?.meetingPlatforms[j]?.form?.controls.find( (password:any) => password?.name == 'password')
@@ -291,10 +312,12 @@ export class CreateSessionPage implements OnInit {
         }
       }
     }
+    
     for (let i = 0; i < this.formData.controls.length; i++) {
       this.formData.controls[i].value =
         existingData[this.formData.controls[i].name];
         this.formData.controls[i].disabled = this.formData.controls[i].name !== "post" && existingData.status.value  === "COMPLETED" ? true : false;
+        this.isNotCompleted = existingData.status.value  !== "COMPLETED" ;
           if(
           this.formData.controls[i].name == "post" && existingData.status.value  !== "COMPLETED"
           ){
@@ -303,20 +326,39 @@ export class CreateSessionPage implements OnInit {
       if (this.formData.controls[i].type=='search' &&  this.formData.controls[i].meta.addPopupType !== 'file'){
         this.formData.controls[i].id = this.id;
         if(this.formData.controls[i].meta.multiSelect){
-          this.formData.controls[i].meta.searchData = existingData[this.formData.controls[i].name]
-          this.formData.controls[i].value = this.formData.controls[i].meta.searchData ? this.formData.controls[i].meta.searchData.map(obj => obj.id || obj.value) : [];
-        } else {
-          this.formData.controls[i].meta.searchData = [{
-            label: `${existingData.mentor_name}, ${existingData.organization.name}`,
-            id: existingData[this.formData.controls[i].name]
-          }];
+        this.formData.controls[i] = {
+          ...this.formData.controls[i],
+          meta: {
+            ...this.formData.controls[i].meta,
+            searchData: existingData[this.formData.controls[i].name]
+          }
+        };
+        
+        this.formData.controls[i].value = this.formData.controls[i].meta.searchData ? this.formData.controls[i].meta.searchData.map(obj => obj.id || obj.value) : [];
+      } else {
+        if(existingData[this.formData.controls[i].name]) {
+          this.formData.controls[i] = {
+            ...this.formData.controls[i],
+            meta: {
+              ...this.formData.controls[i].meta,
+              searchData: [{
+                label: `${existingData.mentor_name}, ${existingData.organization}`,
+                id: existingData[this.formData.controls[i].name]
+              }]
+            }
+          };   
         }
+      }
         if(!this.formData.controls[i].meta.disableIfSelected && existingData.status.value  !== "COMPLETED") {
           this.formData.controls[i].disabled = false;
         }
         if(this.formData.controls[i].meta.disableIfSelected&&this.formData.controls[i].value && existingData.status.value  !== "COMPLETED" &&  this.formData.controls[i].meta.addPopupType !== 'file'){
+        if(this.formData.controls[i].name === 'mentor_id') {
+        if(existingData[this.formData.controls[i].name]){
           this.formData.controls[i].disabled = true;
-        }
+        }} else {
+          this.formData.controls[i].disabled = true;
+        }}
       }else if (this.formData.controls[i].type === 'search' && this.formData.controls[i].meta.addPopupType === 'file') {
         const controlName = this.formData.controls[i].name;
         if (existingData.resources?.length) {
@@ -331,9 +373,16 @@ export class CreateSessionPage implements OnInit {
               })
             );
             if(filteredResources){
-              this.formData.controls[i].value = filteredResources.map(r => r);
-              this.formData.controls[i].meta.searchData = filteredResources;
-            }
+            this.formData.controls[i].value = filteredResources.map(r => r);
+
+            this.formData.controls[i] = {
+              ...this.formData.controls[i],
+              meta: {
+                ...this.formData.controls[i].meta,
+                searchData: filteredResources
+              }
+            };
+          }
         }
         this.formData.controls[i].id = this.id;
         if (!this.formData.controls[i].meta.disableIfSelected && existingData.status.value  !== "COMPLETED" &&  this.formData.controls[i].meta.addPopupType !== 'file') {
@@ -344,17 +393,31 @@ export class CreateSessionPage implements OnInit {
         }
       }
       let dependedChildIndex = this.formData.controls.findIndex(formControl => formControl.name === this.formData.controls[i].dependedChild)
+      if(existingData['mentor_id']) {
+        this.mentor_id = existingData['mentor_id'];
+      }
       if(this.formData.controls[i].dependedChild && this.formData.controls[i].name === 'type'){
         if(existingData[this.formData.controls[i].name].value){
           this.formData.controls[i].disabled = true;
+          this.sessionType = existingData[this.formData.controls[i].name].value;
           this.formData.controls[dependedChildIndex].validators['required']= existingData[this.formData.controls[i].name].value=='PUBLIC' ? false : true
         }
       }
+        if(this.formData.controls[i]?.name === "mentees") {
+          const { isCreator } = this.route.snapshot.queryParams;
+          if(!this.mentor_id) {
+          this.formData.controls[i].disabled = true;
+          }
+          if(isCreator === 'true' && this.sessionType ==='PUBLIC') {
+          this.formData.controls[i].showField = false;
+          }
+        }
       this.formData.controls[i].options = _.unionBy(
         this.formData.controls[i].options,
         this.formData.controls[i].value, 'value'
       );
     }
+      this.formData.controls = [...this.formData.controls];
     this.showForm = true;
   }
 
@@ -415,26 +478,40 @@ export class CreateSessionPage implements OnInit {
     return o1 === o2;
   };
 
-  formValueChanged(event){
+ formValueChanged(event){
+    const formRawValue = this.form1.myForm.getRawValue();
     let dependedControlIndex = this.formData.controls.findIndex(formControl => formControl.name === event.dependedChild)
     let dependedControl = this.form1.myForm.get(event.dependedChild)
+    this.sessionType = event?.value;
     if(event.value === "PUBLIC") {
-      this.sessionType = event?.value;
-      this.setControlValidity(dependedControlIndex, dependedControl, false);
+      if(this.isHome) {
+        this.setControlValidity(dependedControlIndex, dependedControl, false, true, false);
+        return;
+      }
+      if((typeof formRawValue?.mentor_id === 'string' && formRawValue?.mentor_id)) {
+      this.setControlValidity(dependedControlIndex, dependedControl, false, false);
+      return;
+      }
+      this.setControlValidity(dependedControlIndex, dependedControl, false, true);
     } else {
-      this.sessionType = event?.value;
-      this.setControlValidity(dependedControlIndex, dependedControl, true);
+      if((typeof formRawValue?.mentor_id === 'string' && formRawValue?.mentor_id)  || this.isHome) {
+        this.setControlValidity(dependedControlIndex, dependedControl, true, false);
+        return;
+      }
+      this.setControlValidity(dependedControlIndex, dependedControl, true, true);
     }
     this.formData.controls.forEach(control => {
-      if (event.meta.disabledChildren.includes(control.name)) {
-        control.disabled = false;
-      }
-    })
+    if (control.name === "mentor_id") {
+      control.disabled = false;
+    }
+    });
+
   }
   
-  setControlValidity(index, control, required) {
+  setControlValidity(index, control, required, disabled, showField = true) {
     this.formData.controls[index].validators['required'] = required;
-    this.formData.controls[index].disabled = false;
+    this.formData.controls[index].disabled = disabled;
+    this.formData.controls[index].showField = showField;
     control.setValidators(required ? [Validators.required] : null);
     control.updateValueAndValidity();
   }
@@ -464,19 +541,43 @@ export class CreateSessionPage implements OnInit {
 handleSelectedFile(file) {
     // Handle file upload logic here
 }
+
+    async onDynamicSelectClicked() {
+    const modal = await this.modalCtrl.create({
+      component: DynamicSelectModalComponent,
+      componentProps: {
+        items: this.timezones ? this.timezones : [],
+        selectedItem: this.selectedTimezone,
+        title: 'SELECT_TIMEZONE'
+      }
+    });
+
+    modal.onDidDismiss().then((result) => {
+      if (result.data) {
+        this.selectedTimezone = result.data;
+      }
+    });
+
+    return await modal.present();
+  }
   async showResourcesPopup(event) {
-       const modal = await this.modalCtrl.create({
+     const modal = await this.modalCtrl.create({
             component: PreAlertModalComponent,
             cssClass: 'pre-custom-modal',
             componentProps: {
               data: event.formControl.control, 
-              type: 'file'
+              type: 'file',
+              heading: 'ADD_FILE',
+              allowedFileTypes:event.formControl.control.validators.allowedFileTypes,
+              maxSize:event.formControl.control.validators.maxSize,
+              errorMsg : event.formControl.control.errorMessage
             },
             backdropDismiss: false
           });
         
           modal.onDidDismiss().then((result) => {
             if (result.data && result.data.success) {
+              event.formControl.control.value = event.formControl.control.value || [];
               event.formControl.control.value.push(result.data.data);
             }
           });
@@ -528,12 +629,21 @@ handleSelectedFile(file) {
           sessionType: this.sessionType,
           mentorId: this.mentor_id,
           formConfig: this.isHome,
+          isCreator: this.route.snapshot.queryParams.isCreator,
+          showConnectedMentees : this.showConnectedMentees
         }
       }
     });
 
     popover.onDidDismiss().then((data) => {
-      this.mentor_id = data.data[0]?.id;
+      if(data.data[0]?.data?.is_mentor) {
+        this.mentor_id = data.data[0]?.id;
+        this.formData.controls.forEach(control => {
+        if (control.name === "mentees") {
+          control.disabled = false;
+        }
+        });
+      }
       if (data.data) {
         event.formControl.selectedData = data.data;
         const values = event.formControl.control.meta.multiSelect ? data.data.map(obj => obj.id) : data.data[0].id;
@@ -556,7 +666,8 @@ handleSelectedFile(file) {
           showFilter: false,
           showSearch: false,
           viewListMode: true,
-          isMobile: this.isMobile
+          isMobile: this.isMobile,
+          disablePaginator: true
         }
       }
     });
@@ -604,24 +715,37 @@ handleSelectedFile(file) {
     await popover.present();
   }
 
-  async updateFormConfig() {
-    const queryParams = this.route.snapshot.queryParams;
-    const isManagePage = queryParams['source'] === 'manage';
-    this.isHome = queryParams['source'] === 'home';
+async updateFormConfig() {
+  const { source, isCreator } = this.route.snapshot.queryParams;
+  this.isHome = source === 'home';
+  this.isManagePage = source === 'manage';
 
-    if (isManagePage) {
-      const hasPermission = await this.permissionService.hasPermission({
-        module: permissions.MANAGE_SESSION,
-        action: manageSessionAction.SESSION_ACTIONS,
-      });
-
-      this.formConfig = hasPermission ? MANAGERS_CREATE_SESSION_FORM : CREATE_SESSION_FORM;
-    } else if(this.isHome) {
-      this.formConfig = CREATE_SESSION_FORM;
-    } else if(queryParams.isCreator) {
-      this.formConfig = CREATE_SESSION_FORM;
-    }else {
-      this.formConfig = MANAGERS_CREATE_SESSION_FORM;
-    }
+  const hasPermission = await this.permissionService.hasPermission({
+    module: permissions.MANAGE_SESSION,
+    action: manageSessionAction.SESSION_ACTIONS,
+  });
+  if (
+    (this.isManagePage && hasPermission) ||
+    (!this.isHome && isCreator != 'true' && hasPermission)
+  ) {
+    this.showConnectedMentees =false;
+    this.formConfig = MANAGERS_CREATE_SESSION_FORM;
+  } else {
+    this.showConnectedMentees = true;
+    this.formConfig = CREATE_SESSION_FORM;
   }
+}
+
+async modalDismiss(){
+  const topModal = await this.modalCtrl.getTop();
+  if(topModal){
+    this.modalCtrl.dismiss();
+  }
+}
+
+ionViewWillLeave() {
+  this.formData = null;
+  this.sessionType = '';
+  this.modalDismiss();
+}
 }

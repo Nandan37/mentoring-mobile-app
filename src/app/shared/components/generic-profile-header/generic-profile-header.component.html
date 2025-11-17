@@ -22,7 +22,7 @@
     </ion-col>
     <ion-col size="8" class="name-wrapper no-padding">
         <ion-label class="name">
-          Annoymous User
+             {{ "USER_NOT_FOUND" | translate }}
         </ion-label>
     </ion-col>
   </ion-row>
@@ -60,10 +60,18 @@
         </div>
     
         
-        <div *ngIf="headerData?.location" class="location-info">
+        <div *ngIf="headerData?.district || headerData?.state" class="location-info">
           <ion-label class="location">
-            <ion-icon name="location"></ion-icon>
-            {{ headerData?.location?.label }}
+             <ion-icon name="location"></ion-icon>
+            <ng-container *ngIf="headerData.district?.label as district">
+            {{ district }}
+             <ng-container *ngIf="headerData.state?.label">, </ng-container>
+           </ng-container>
+
+           <ng-container *ngIf="headerData.state?.label as state">
+             {{ state }}
+            </ng-container>
+
           </ion-label>
         </div>
       </div>
@@ -75,14 +83,11 @@
           >{{ headerData?.name }}
         </ion-label>
       </div>
-      <div class="roles-div">
-        <ion-label
-          >{{ headerData?.designation[0]?.label }} ({{
-            headerData?.experience
-          }}
-          years)</ion-label
-        >
-      </div>
+     <div class="roles-div" *ngIf="headerData?.designation?.[0]?.label && headerData?.experience">
+      <ion-label>
+        {{ headerData.designation[0].label }} ({{ headerData.experience }} years)
+      </ion-label>
+    </div>
       <div class="d-inline-flex flex-align-items-center my-4">
         <ion-label class="location" *ngIf="headerData?.is_mentor"
           >{{ "SESSIONS_CONDUCTED" | translate }} :
@@ -90,18 +95,20 @@
         >
         <ion-label class="location" *ngIf="!headerData?.is_mentor"
           >{{ "SESSIONS_ATTENDED" | translate }} :
-          {{ headerData?.sessions_hosted || 0 }}</ion-label
+          {{ headerData?.sessions_attended || 0 }}</ion-label
         >
       </div>
       <div *ngIf="buttonConfig" class="flex flex-justify-start mt-4 wrap">
         <div *ngFor="let button of buttonConfig.buttons">
-          <ion-button
-            color="light"
-            expand="block"
-            (click)="action(button?.action)"
-            >{{ button?.label | translate }}</ion-button
-          >
-        </div>
+        <ion-button
+          *ngIf="((button.action === 'chat' && chatConfig == 'true') || button.action !== 'chat') && !button.isHide"
+          color="light"
+          expand="block"
+          (click)="action(button?.action)"
+        >
+          {{ button?.label | translate }}
+        </ion-button>
+      </div>
       </div>
     </ion-col>
   </ion-row>

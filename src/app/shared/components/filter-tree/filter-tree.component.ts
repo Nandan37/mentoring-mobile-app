@@ -18,13 +18,13 @@ export class FilterTreeComponent implements OnInit {
   constructor() { }
 
   ngOnInit() {
-    if (this.eventData.control.validators.required) {
-      this.filterData.forEach(filter => {
-        if (filter.name === "type" && filter.key === "connected_mentees" && this.eventData?.formConfig) {
+    if (this.eventData?.sessionType) {
+      this.filterData?.forEach(filter => { 
+        if (filter.name === "type" ) {
           filter.options.forEach(option => {
-            option.selected = true;
+            option.selected = false;
             this.onFilterChange();  
-            option.readOnly = true; 
+            option.readOnly = false; 
           });
         }
       });
@@ -34,11 +34,7 @@ export class FilterTreeComponent implements OnInit {
   clearAll() {
   if (this.filterData) {
     this.filterData.forEach(filter => {
-      if (this.eventData.control.validators.required &&filter.name === "type" && filter.key === "connected_mentees" && this.eventData?.formConfig) {
-        filter.options = filter.options.map(option => ({ ...option, selected: true }));
-      } else {
         filter.options = filter.options.map(option => ({ ...option, selected: false }));
-      }
     });
   }
   this.onFilterChange();
@@ -57,16 +53,6 @@ export class FilterTreeComponent implements OnInit {
     this.filtersChanged.emit(selectedOptionsByCategory);
   }
   isCheckboxDisabled(filter: any, sessionType: string): boolean {
-    
-    if (filter.name === 'type') {
-      if (sessionType === 'PUBLIC') {
-        return true; 
-      } else if (sessionType === 'PRIVATE') {
-        return !filter.isConnectionEnabled;
-      } else {
-        return !filter.isConnectionEnabled;
-      }
-    }
     return false;
   }
 }

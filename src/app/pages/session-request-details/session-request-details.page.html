@@ -29,19 +29,43 @@
       {{ showFullText ? 'View Less' : 'View More' }}
     </ion-label>    
 
-    <p class="request-info text-left">
-      {{apiResponse?.user_details?.name | titlecase}} requested a slot at<strong style="padding-left: 5px;">
-        {{
-           apiResponse.start_date * 1000 | date: 'dd MMM, yyyy'
-        }},
+    <p *ngIf="apiResponse.status !== 'ACCEPTED'" class="request-info text-left">
+      {{
+        apiResponse?.created_by == apiResponse?.user_details?.user_id 
+      ? (apiResponse?.user_details?.name | titlecase)  + ' ' + ("IS_REQUESTING" | translate)
+      : ("YOU_HAVE" | translate)
+      }}
+      {{"A_SLOT" | translate}}<strong style="padding-left: 5px;">
         {{
           formatUnixTime(apiResponse.start_date)
         }} -
         {{
           formatUnixTime(apiResponse.end_date)
-        }}
+        }} 
+        {{"ON" | translate}}
+         {{ apiResponse.start_date * 1000 | date : "EEEE (dd MMM yyyy)" }}
       </strong>
     </p>
+
+    <p *ngIf="apiResponse.status === 'ACCEPTED'" class="request-info text-left">
+      
+       {{"SLOT_BOOKED" | translate}} {{
+        apiResponse?.created_by == apiResponse?.user_details?.user_id 
+      ? (apiResponse?.user_details?.name | titlecase) 
+      : ("YOU_HAVE" | translate)
+      }} 
+      at <strong style="padding-left: 5px;">
+        {{
+          formatUnixTime(apiResponse.start_date)
+        }} -
+        {{
+          formatUnixTime(apiResponse.end_date)
+        }} 
+         {{"ON" | translate}}
+         {{ apiResponse.start_date * 1000 | date : "EEEE (dd MMM yyyy)" }}
+      </strong>
+    </p>
+
     <ng-container *ngIf="apiResponse">
       <div class="text-left" *ngIf="apiResponse && apiResponse.requestor_id === apiResponse.user_details.user_id && apiResponse.status === 'ACCEPTED'">
         <h2 class="auto-margin">{{"MEETING_LINK" | translate}}</h2>
@@ -63,12 +87,13 @@
                 {{sessionDetails?.meeting_info?.platform}} : {{sessionDetails?.meeting_info?.link}}
               </ion-label>
             </div>
-          } @else if(sessionDetails?.meeting_info?.value === 'BBB'){
+          } @else if(sessionDetails?.meeting_info?.value === 'BBB' || sessionDetails?.meeting_info?.value === 'Default') {
             <div>
               <ion-label>
-                {{sessionDetails?.meeting_info?.platform}} : {{sessionDetails?.meeting_info?.value}}
+                {{sessionDetails?.meeting_info?.platform}} : Default
               </ion-label>
             </div>
+          } @else if(sessionDetails?.meeting_info?.value ==='OFF') {
           } @else {
             <div>
               <ion-label>

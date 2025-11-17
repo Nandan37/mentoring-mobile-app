@@ -61,7 +61,8 @@ export class PermissionService {
     }
   }
 
-  setConfigInLocal(result: any) {
+setConfigInLocal(result: any) {
     this.localStorage.setLocalData(localKeys.MAX_MENTEE_ENROLLMENT_COUNT, result.session_mentee_limit);
-  }
+    this.localStorage.setLocalData(localKeys.CHAT_CONFIG, result.chat_config);
+}
 }

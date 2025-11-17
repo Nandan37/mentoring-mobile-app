@@ -176,7 +176,10 @@ export class ProfileService {
   }
 
   getUserRole(userDetails) {
-    var roles = userDetails.user_roles.map(function (item) {
+    if (!userDetails) {
+      return;
+    }
+    var roles = userDetails.organizations[0].roles.map(function(item) {
       return item['title'];
     });
     this.isMentor = roles.includes('mentor')?true:false;
@@ -187,22 +190,12 @@ export class ProfileService {
     return roles
   }
 
-  async upDateProfilePopup(
-    msg: any = {
-      header: 'UPDATE_PROFILE',
-      message: 'PLEASE_UPDATE_YOUR_PROFILE_IN_ORDER_TO_PROCEED',
-      cancel: 'UPDATE',
-      submit: 'CANCEL',
-    }
-  ) {
-    this.utilService
-      .alertPopup(msg)
-      .then(async (data) => {
-        if (!data) {
-          this.router.navigate([`/${CommonRoutes.EDIT_PROFILE}`]);
-        }
-      })
-      .catch((error) => {});
+  async upDateProfilePopup(msg:any = {header: 'UPDATE_PROFILE',message: 'PLEASE_UPDATE_YOUR_PROFILE_IN_ORDER_TO_PROCEED',cancel:'UPDATE',submit:'CANCEL'}){
+    this.utilService.alertPopup(msg).then(async (data) => {
+      if(!data){
+        this.router.navigate([`/${CommonRoutes.EDIT_PROFILE}`],{replaceUrl:true});
+      }
+    }).catch(error => {})
   }
 
   async prefillData(
@@ -298,6 +291,8 @@ export class ProfileService {
           xAuthToken: resp.result.auth_token,
           userId: resp.result.user_id,
           textColor: '#fff',
+          headers :await this.httpService.setHeaders(),
+          appBaseUrl:environment['baseUrl'],
           chatBaseUrl:environment['chatBaseUrl'],
           chatWebSocketUrl:environment['chatWebSocketUrl'],
           bgColor: getComputedStyle(document.documentElement)
@@ -325,6 +320,18 @@ export class ProfileService {
       document.documentElement.style.setProperty('--ion-color-secondary', theme.secondaryColor);
       document.documentElement.style.setProperty('--background-color', theme.backgroundColor);
       // document.documentElement.style.setProperty('--text-color', theme.textColor);
+    }
+    catch (error) {
+    }
+  }
+
+    async getRequestCount(){
+    const config = {
+      url: urlConstants.API_URLS.REQUEST_SESSION_COUNT,
+    };
+    try {
+      let data: any = await this.httpService.get(config);
+      return data
     }
     catch (error) {
     }

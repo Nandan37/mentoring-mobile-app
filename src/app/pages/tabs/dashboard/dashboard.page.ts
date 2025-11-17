@@ -1,10 +1,10 @@
 import * as _ from 'lodash';
 import { BIG_NUMBER_DASHBOARD_FORM, DASHBOARD_TABLE_META_KEYS } from 'src/app/core/constants/formConstant';
-import { HttpService } from 'src/app/core/services';
+import { HttpService, UtilService } from 'src/app/core/services';
 import { FormService } from 'src/app/core/services/form/form.service';
 import * as moment from 'moment';
 import { urlConstants } from 'src/app/core/constants/urlConstants';
-import { Component, OnInit } from '@angular/core';
+import { Component, ViewChild } from '@angular/core';
 import { ProfileService } from 'src/app/core/services/profile/profile.service';
 import { environment } from 'src/environments/environment';
 import { TranslateService } from '@ngx-translate/core';
@@ -14,8 +14,8 @@ import { TranslateService } from '@ngx-translate/core';
   templateUrl: 'dashboard.page.html',
   styleUrls: ['dashboard.page.scss'],
 })
-export class DashboardPage implements OnInit {
-
+export class DashboardPage  {
+  @ViewChild('libTableRef') libTableRef: any;
   user: any;
   sessions: any;
   filteredCards: any = [];
@@ -50,22 +50,24 @@ export class DashboardPage implements OnInit {
   chartBodyConfig :any= {}
   chartBodyPayload: any;
   translatedChartConfig : any;
-  metaKeys =DASHBOARD_TABLE_META_KEYS
+  scrollLabelForMonth : string;
+   metaKeys = _.cloneDeep(DASHBOARD_TABLE_META_KEYS);
 
   constructor(
     private profile: ProfileService,
     private apiService: HttpService,
     private form: FormService,
-    public translate: TranslateService) { }
+    public translate: TranslateService,
+    private utilService: UtilService)
+     {this.translate.onLangChange.subscribe(() => {
+      this.getTranslatedLabel();
+    }); }
 
   
-  ionViewWillEnter() {
+  async ionViewWillEnter() {
     this.isMentor = this.profile.isMentor;
     this.segment = this.isMentor ? "mentor" : "mentee";
     this.dataAvailable = true;
-  }
-
-  async ngOnInit() {
     this.result = await this.reportFilterListApi();
     this.user = await this.getUserRole(this.result);
     const bigNumberResult = await this.form.getForm(BIG_NUMBER_DASHBOARD_FORM);
@@ -77,10 +79,10 @@ export class DashboardPage implements OnInit {
     this.session_type = 'ALL';
     this.chartBodyConfig = this.filteredFormData;
     this.chartBody = this.chartBodyConfig;
-    await this.getTranslatedLabel();
     if(this.user){
       this.initialDuration();
     }
+    await this.getTranslatedLabel();
 }
 
   public headerConfig: any = {
@@ -93,8 +95,9 @@ export class DashboardPage implements OnInit {
   }
 
   async initialDuration(){
+    this.scrollLabelForMonth = this.translate.instant("SCROLL_TO_EXPLORE_CHART");
     const today = moment();
-    this.startDate = today.clone().startOf('month').add(1, 'day');
+    this.startDate = today.clone().startOf('month').add(1, 'second');
     this.endDate = today.clone().endOf('month');
     this.groupBy = 'day';
     const startDateEpoch = this.startDate ? this.startDate.unix() : null;
@@ -103,6 +106,7 @@ export class DashboardPage implements OnInit {
     this.endDateEpoch = endDateEpoch;
     this.prepareTableUrl();
     this.prepareChartUrl();
+
     if( this.filteredCards){
       this.bigNumberCount();
     }
@@ -115,22 +119,23 @@ export class DashboardPage implements OnInit {
   
     switch (this.selectedDuration) {
       case 'week':
-        this.startDate = today.clone().startOf('week').add(1, 'day');
+        this.startDate = today.clone().startOf('week').add(1, 'second');
         this.endDate = today.clone().endOf('week');
         this.groupBy = 'day';
         break;
       case 'month':
-        this.startDate = today.clone().startOf('month').add(1, 'day');
+        this.startDate = today.clone().startOf('month').add(1, 'second');
         this.endDate = today.clone().endOf('month');
         this.groupBy = 'day';
         break;
       case 'quarter':
-        this.startDate = today.clone().startOf('quarter').add(1, 'day');
+        this.startDate = today.clone().startOf('quarter').add(1, 'second');
         this.endDate = today.clone().endOf('quarter');
         this.groupBy = 'month';
+        console.log(this.startDate, 'start date', this.endDate, 'end date', today, 'todayy')
         break;
       case 'year':
-        this.startDate = firstDayOfYear.clone().date(1).add(1, 'day');
+        this.startDate = firstDayOfYear.clone().date(1).add(1, 'second');
         this.endDate = lastDayOfYear.clone();
         this.groupBy = 'month';
         break;
@@ -300,7 +305,7 @@ export class DashboardPage implements OnInit {
       `&session_type=${this.session_type}` +
       `&start_date=${this.startDateEpoch || ''}` +
       `&end_date=${this.endDateEpoch || ''}` +
-      `&groupBy=${this.groupBy}`;
+      `&group_by=${this.groupBy}`;
     const params = `${urlConstants.API_URLS.DASHBOARD_REPORT_DATA}` +
       `report_code=${this.report_code}${queryParams}`;
     this.chartBodyPayload =  this.entityTypes ? { entityTypes: this.entityTypes}: {};
@@ -316,8 +321,7 @@ export class DashboardPage implements OnInit {
     `&session_type=${this.session_type}` +
     `&end_date=${this.endDateEpoch || ''}`;
   this.chartBody.tableUrl = this.chartBodyConfig.tableUrl;
-  setTimeout(() => {
-  this.chartBody.tableUrl =  `${environment.baseUrl}${urlConstants.API_URLS.DASHBOARD_REPORT_DATA}` +'report_code='+ this.chartBody.table_report_code +queryParams;}, 10);
+  this.chartBody.tableUrl =  `${environment.baseUrl}${urlConstants.API_URLS.DASHBOARD_REPORT_DATA}` +'report_code='+ this.chartBody.table_report_code +queryParams;
   this.chartBody.headers = await this.apiService.setHeaders();
   }
   async prepareChartUrl(){
@@ -327,7 +331,7 @@ export class DashboardPage implements OnInit {
     `&session_type=${this.session_type}` +
     `&start_date=${this.startDateEpoch || ''}` +
     `&end_date=${this.endDateEpoch || ''}` +
-    `&groupBy=${this.groupBy}`;
+    `&group_by=${this.groupBy}`;
   this.chartBody.chartUrl = this.chartBodyConfig.chartUrl;
   this.chartBodyPayload = this.entityTypes ? { entityTypes: this.entityTypes} : {};
   setTimeout(() => {
@@ -335,5 +339,14 @@ export class DashboardPage implements OnInit {
   }, 10);
   this.chartBody.headers = await this.apiService.setHeaders();
   }
+  async downloadCSV(data: { url: string; fileName: string }) {
+  await this.utilService.downloadFile(data.url, data.fileName);
+}
+
+ionViewWillLeave() {
+  if (this.libTableRef && this.libTableRef.showPopup) {
+    this.libTableRef.closePopup();
+  }
+}
 }
 

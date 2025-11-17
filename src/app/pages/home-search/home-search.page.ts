@@ -1,5 +1,5 @@
 import { Component, EventEmitter, OnInit, Output, ViewChild } from '@angular/core';
-import {  Router } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
 import { CommonRoutes } from 'src/global.routes';
 import { Location } from '@angular/common';
 import { environment } from 'src/environments/environment';
@@ -40,7 +40,7 @@ export class HomeSearchPage implements OnInit {
   type:any;
   filterData: any;
   filteredDatas = []
-  filterIcon: boolean;
+  filterIcon:boolean;
   page = 1;
   setPaginatorToFirstpage:any = false;
   totalCount: any;
@@ -54,6 +54,7 @@ export class HomeSearchPage implements OnInit {
   isOpen = false;
   urlQueryData: string;
   pageSize: any =5;
+  isMentor: boolean;
   searchTextSubscription: Subscription;
   criteriaChipSubscription: Subscription;
   showSelectedCriteria: any;
@@ -67,9 +68,20 @@ searchAndCriterias: any;
     private permissionService: PermissionService,
     private formService: FormService,
     private utilService: UtilService,
+    private route: ActivatedRoute,
   ) { }
 
-   ngOnInit() {
+   async ngOnInit() {
+    this.searchAndCriterias = {
+      headerData: {
+        searchText: '',
+        criterias: {
+          name: undefined,
+          label: undefined
+        }
+      }
+    };
+
     this.searchTextSubscription = this.utilService.currentSearchText.subscribe(searchText => {
       this.searchText = searchText;
     });
@@ -86,7 +98,8 @@ searchAndCriterias: any;
       
     });
     this.user = this.localStorage.getLocalData(localKeys.USER_DETAILS)
-    this.fetchSessionList()
+    let roles = await this.localStorage.getLocalData(localKeys.USER_ROLES);
+    this.isMentor = roles.includes('mentor')?true:false;
     this.permissionService.getPlatformConfig().then((config)=>{
       this.overlayChips = config?.result?.search_config?.search?.session?.fields;
     })
@@ -94,7 +107,47 @@ searchAndCriterias: any;
   }
 
   async ionViewWillEnter() {
-    this.showSelectedCriteria = this.criteriaChip? this.criteriaChip : "";
+    const queryParams = this.route.snapshot.queryParams;
+    const search = queryParams['search'];
+    const chip = queryParams['chip'];
+
+    if (search) {
+      this.searchAndCriterias = {
+        ...this.searchAndCriterias,
+        headerData: {
+          ...this.searchAndCriterias.headerData,
+          searchText: search
+        }
+      };
+      this.searchText = search;
+    }
+
+    const config = await this.permissionService.getPlatformConfig();
+    this.overlayChips = config?.result?.search_config?.search?.session?.fields;
+
+    if (chip) {
+      const matchedField = this.overlayChips?.find(d => d.name === chip);
+      if (matchedField && search) {
+        this.searchAndCriterias = {
+          ...this.searchAndCriterias,
+          headerData: {
+            ...this.searchAndCriterias.headerData,
+            criterias: {
+              name: matchedField.name,
+              label: matchedField.label
+            }
+          }
+        };
+        this.criteriaChip = {
+          name: matchedField.name,
+          label: matchedField.label
+        };
+        this.showSelectedCriteria = this.criteriaChip;
+      }
+    }
+
+    this.fetchSessionList();
+
     const obj = {filterType: 'session', org: false};
     let data = await this.formService.filterList(obj);
     this.filterData = await this.utilService.transformToFilterData(data, obj);
@@ -108,6 +161,14 @@ searchAndCriterias: any;
     this.showSelectedCriteria = event.criterias;
     this.criteriaChip = event.criterias;
     this.isOpen = false;
+    this.router.navigate([], {
+      relativeTo: this.route,
+      queryParams: { 
+        search: event.searchText, 
+        chip: event?.criterias?.name 
+      },
+      queryParamsHandling: 'merge',
+    });
     this.fetchSessionList()
    
   }
@@ -116,11 +177,18 @@ searchAndCriterias: any;
     this.criteriaChip = event;
   }
 
-  onClearSearch($event: string) {
+  async onClearSearch($event: string) {
+    this.page = 1;
+    this.searchAndCriterias.headerData.searchText = '';
     this.searchText = '';
-    this.isOpen = false;
-    this.fetchSessionList();
-    }
+    this.searchAndCriterias.headerData.criterias = undefined;
+    this.router.navigate([], {
+      relativeTo: this.route,
+      queryParams: { search: '', chip: '' },
+      queryParamsHandling: 'merge',
+    });
+    await this.fetchSessionList();
+  }
 
   async onClickFilter() {
     let modal = await this.modalCtrl.create({
@@ -131,6 +199,15 @@ searchAndCriterias: any;
 
     modal.onDidDismiss().then(async (dataReturned) => {
       this.filteredDatas = []
+        if(dataReturned?.data?.role === 'closed'){
+        this.filterData = dataReturned?.data?.data;
+        return;
+      }
+        if(Object.keys(dataReturned?.data).length === 0){
+            this.chips = [];
+            this.filteredDatas = [];
+            this.urlQueryData = null;
+      }
       if (dataReturned.data && dataReturned.data.data) {
         if (dataReturned.data.data.selectedFilters) {
           for (let key in dataReturned.data.data.selectedFilters) {
@@ -150,8 +227,6 @@ searchAndCriterias: any;
   async fetchSessionList() {
     var obj={page: this.page, limit: this.pageSize, type: this.type, searchText : this.searchText, selectedChip : this.criteriaChip?.name, filterData : this.urlQueryData}
     var response = await this.sessionService.getSessionsList(obj);
-    this.results = response.result.data;
-
     if(response.result.data.length){
       this.filterIcon = true;
     } else {
@@ -159,6 +234,7 @@ searchAndCriterias: any;
         this.filterIcon = false;
       }
     }
+    this.results = response.result.data;
     this.totalCount = response.result.count;
     this.noDataMessage = obj.searchText ? "SEARCH_RESULT_NOT_FOUND" : "THIS_SPACE_LOOKS_EMPTY"
   }
@@ -193,7 +269,7 @@ searchAndCriterias: any;
         case 'startAction':
           this.sessionService.startSession(event.data.id).then(async () => {
             var obj = { page: this.page, limit: this.pageSize, searchText: "" };
-            if(this.profileService.isMentor){
+            if(this.isMentor){
               this.createdSessions = await this.sessionService.getAllSessionsAPI(obj);
             }
           })
@@ -227,11 +303,18 @@ searchAndCriterias: any;
   }
 
   removeFilteredData(chip){
+    this.filterData.map((filter) => {
+      filter.options.map((option) => {
+        if (option.value === chip) {
+          option.selected = false;
+        }
+      });
+      return filter;
+    })
     for (let key in this.filteredDatas) {
       if (this.filteredDatas.hasOwnProperty(key)) {
 
           let values = this.filteredDatas[key].split(',');
-
           let chipIndex = values.indexOf(chip);
 
           if (chipIndex > -1) {

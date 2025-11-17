@@ -28,8 +28,9 @@ export class SearchAndSelectComponent implements OnInit, ControlValueAccessor {
   @Output() viewSelectedListPopover = new EventEmitter()
   @Input() uniqueId: any;
   @Input() sessionId: any;
-
+  private static menteeControlRef: any;
   disabled;
+  isDisabled: boolean;
   touched = false;
   selectedChips;
   _selectAll;
@@ -41,6 +42,7 @@ export class SearchAndSelectComponent implements OnInit, ControlValueAccessor {
   value: any[];
   isMobile: any;
   allowCustomEntities: any;
+  menteeValue: any;
 
   constructor(
     private alertController: AlertController,
@@ -61,9 +63,15 @@ export class SearchAndSelectComponent implements OnInit, ControlValueAccessor {
   }
 
   writeValue(value: any[]) {
+    if(this.control.name === 'mentees') {
+    SearchAndSelectComponent.menteeControlRef = this.control;
+    }
     this.selectedData = this.control.meta.searchData ? this.control.meta.searchData : []
     this.selectedChips = this.selectedData.map( data => data.id )
     this.icon = this.selectedData.length ? this.closeIconLight : this.addIconDark
+    if (this.control.name === 'mentees') {
+     this.selectedData = this.selectedData.map(data => ({...data, isDisabled: true}));
+  }
   }
   registerOnChange(onChange: any) {
     this.onChange = onChange;
@@ -85,9 +93,12 @@ export class SearchAndSelectComponent implements OnInit, ControlValueAccessor {
       this.onChange(this.selectedData.map(data => data.value || data.id))
       event.stopPropagation()
     }
+    if(this.control.name === 'mentor_id') {
+        SearchAndSelectComponent.menteeControlRef.disabled = true;
+    }
   }
 
-  removeFile(data:any,index:number) {
+  removeFile(data:any,index:number) { 
     if (this.control?.value ) {
       const updatedFiles = [...this.control.value];
       if(data.id && this.control.name == 'pre' || this.control.name == 'post'){
@@ -182,7 +193,8 @@ export class SearchAndSelectComponent implements OnInit, ControlValueAccessor {
       cssClass: 'pre-custom-modal',
       componentProps: {
         data: data, 
-        type: 'link'
+        type: 'link',
+        heading: 'ADD_LINK_POPUP'
       },
       backdropDismiss: false
     });

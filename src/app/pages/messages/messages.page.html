@@ -5,6 +5,7 @@
       (onSelect)="onSelect($event)"
       (newMessageEvent)="messageBadge($event)"
       (toastMessageEvent)="showToast($event)"
+      [translatedMessages]="translatedMessages"
     ></lib-message-listing>
   } @else if (isLoaded) {
     <div class="no-data-container">
