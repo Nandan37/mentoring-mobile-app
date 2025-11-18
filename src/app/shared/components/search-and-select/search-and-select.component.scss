@@ -14,11 +14,20 @@ ion-chip {
     text-transform: capitalize;
  }
 
+ .add-link-modal {
+  padding: 3px;
+  background-color: black;
+ }
+
+ .p-rel{
+  position: relative;
+  width: fit-content;
+ }
  .info {
     font-size: 24px !important;
     margin-top: 6px;
     z-index: 1000;
-    left : 95px;
+   right: 0px;
     position: absolute;
   }
 
@@ -40,3 +49,6 @@ ion-chip {
       width: 300px;
     }
   }
+.word-break {
+  word-break: break-word !important;
+}

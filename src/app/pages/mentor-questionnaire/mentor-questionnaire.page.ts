@@ -1,6 +1,6 @@
 import { Component, OnInit, ViewChild } from '@angular/core';
 import { Router } from '@angular/router';
-import * as _ from 'lodash';
+import * as _ from 'lodash-es';
 import { MENTOR_QUESTIONNAIRE } from 'src/app/core/constants/formConstant';
 import { localKeys } from 'src/app/core/constants/localStorage.keys';
 import { LocalStorageService, ToastService } from 'src/app/core/services';
@@ -26,6 +26,7 @@ export class MentorQuestionnairePage implements OnInit {
   };
   entityNames:any;
   showForm: boolean=false;
+  entityList: any;
 
   constructor(private toast: ToastService, private router: Router, private organisation: OrganisationService, private form: FormService, private localStorage: LocalStorageService,private profileService:ProfileService) {}
 
@@ -33,6 +34,8 @@ export class MentorQuestionnairePage implements OnInit {
     let form = await this.form.getForm(MENTOR_QUESTIONNAIRE)
     this.formData = _.get(form, 'data.fields');
     this.entityNames = await this.form.getEntityNames(this.formData)
+    this.entityList = await this.form.getEntities(this.entityNames, 'PROFILE')
+    this.formData = await this.form.populateEntity(this.formData, this.entityList)
     let userDetails = await this.localStorage.getLocalData(localKeys.USER_DETAILS)
     this.profileService.prefillData(userDetails,this.entityNames, this.formData)
     this.showForm = true;

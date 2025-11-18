@@ -79,9 +79,9 @@ export class OrganisationService {
     }
   }
 
-  async bulkUpload(path){
+  async bulkUpload(path, uploadCsvUrl){
     const config = {
-      url: urlConstants.API_URLS.ADMIN_BULK_UPLOAD,
+      url: uploadCsvUrl,
       payload: {
         "file_path": path,
       },
@@ -110,9 +110,24 @@ export class OrganisationService {
   upload(file: any, path: any) {
     var options = {
       headers: {
-        "Content-Type": "multipart/form-data"
+        "Content-Type": "multipart/form-data",
+         "x-ms-blob-type":"BlockBlob"
       },
     };
     return this.http.put(path.signedUrl, file, options);
+  }
+  
+  async downloadCsv(downloadCsvUrl){
+    let config = {
+      url: downloadCsvUrl,
+      payload: {}
+    }
+    try {
+      let data: any = await this.httpService.get(config);
+      return data.result
+    }
+    catch (error) {
+    }
+    
   }
 }

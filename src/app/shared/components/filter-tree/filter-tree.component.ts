@@ -7,23 +7,38 @@ import * as _ from 'lodash';
   styleUrls: ['./filter-tree.component.scss'],
 })
 export class FilterTreeComponent implements OnInit {
-  @Input() enableFilterHeader:any
+  @Input() enableFilterHeader:any;
+  @Input() enableFilterLabel: any;
   @Input() filterData: any;
   @Output() filtersChanged = new EventEmitter<any>();
+  @Input() eventData: any;
+  readOnly: boolean = false;
 
-  ogArrObj: any;
 
   constructor() { }
 
   ngOnInit() {
-    this.ogArrObj = _.cloneDeep(this.filterData);
+    if (this.eventData?.sessionType) {
+      this.filterData?.forEach(filter => { 
+        if (filter.name === "type" ) {
+          filter.options.forEach(option => {
+            option.selected = false;
+            this.onFilterChange();  
+            option.readOnly = false; 
+          });
+        }
+      });
+    }
   }
-
 
   clearAll() {
-    this.filterData = _.cloneDeep(this.ogArrObj)
-    this.filtersChanged.emit([])
+  if (this.filterData) {
+    this.filterData.forEach(filter => {
+        filter.options = filter.options.map(option => ({ ...option, selected: false }));
+    });
   }
+  this.onFilterChange();
+}
 
   onFilterChange() {
     const selectedOptionsByCategory = {};
@@ -37,6 +52,8 @@ export class FilterTreeComponent implements OnInit {
     });
     this.filtersChanged.emit(selectedOptionsByCategory);
   }
-
+  isCheckboxDisabled(filter: any, sessionType: string): boolean {
+    return false;
+  }
 }
 

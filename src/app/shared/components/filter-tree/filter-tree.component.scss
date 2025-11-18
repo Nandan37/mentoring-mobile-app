@@ -3,20 +3,32 @@
     font-size: 17px;
     letter-spacing: 1px;
 }
-.wrapper-class {
-    display: flex;
-    justify-content: space-between;
+.header-class {
+    -webkit-box-shadow: none;
+    box-shadow: none;
 }
 .underline {
-    border-bottom: 1px solid black;
     cursor: pointer;
+    font-weight: bold;
 }
 .sub-header {
     font-weight: bold;
     font-size: 16px;
-    padding-bottom: 16px;
-    // letter-spacing: 1px;
 }
 ion-checkbox {
-    --border-color: var(--ion-color-primary)
+    --border-color: var(--ion-color-primary);
+    --size: 18px;
+    min-width: 18px;
+    min-height: 18px;
+}
+.header{
+    padding-right: 65%;
+}
+.filter-underline{
+    cursor: pointer;
+    text-decoration: underline;
+}
+.readonly-checkbox {
+  pointer-events: none; /* Prevent clicking */
+  opacity: 1 !important; /* Keep normal appearance */
 }

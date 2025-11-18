@@ -1,18 +1,22 @@
 import { Injectable } from '@angular/core';
-import { HttpService, LoaderService, ToastService } from '..';
+import { HttpService, LoaderService, LocalStorageService, ToastService } from '..';
 import { urlConstants } from '../../constants/urlConstants';
 import * as _ from 'lodash-es';
 import { Browser } from '@capacitor/browser';
 import { Router } from '@angular/router';
 import { JoinDialogBoxComponent } from 'src/app/shared/components/join-dialog-box/join-dialog-box.component';
 import { ModalController } from '@ionic/angular';
+import { localKeys } from '../../constants/localStorage.keys';
 
 @Injectable({
   providedIn: 'root'
 })
 export class SessionService {
+  userDetails: any;
 
-  constructor(private loaderService: LoaderService, private httpService: HttpService, private toast: ToastService, private router: Router, private modalCtrl: ModalController) { }
+  constructor(private loaderService: LoaderService, private httpService: HttpService, private toast: ToastService, private router: Router, private modalCtrl: ModalController,
+    private localStorage: LocalStorageService
+  ) { }
 
   async createSession(formData, queryParams?: string) {
     await this.loaderService.startLoader();
@@ -62,7 +66,7 @@ export class SessionService {
 
   async getSessionsList(obj) {
     const config = {
-      url: urlConstants.API_URLS.GET_SESSIONS_LIST + obj?.type + '&page=' + obj?.page + '&limit=' + obj?.limit + '&search=' + btoa(obj?.searchText),
+      url: urlConstants.API_URLS.GET_SESSIONS_LIST + obj?.page + '&limit=' + obj?.limit + '&search=' + btoa(obj?.searchText) + '&search_on=' + (obj?.selectedChip ? obj?.selectedChip : '') + '&' + obj?.filterData,
     };
     try {
       let data: any = await this.httpService.get(config);
@@ -196,7 +200,6 @@ export class SessionService {
   async openBrowser(link, windowName: any = "_self") {
     await Browser.open({ url: link, windowName: windowName });
     Browser.addListener('browserFinished', () => {
-      console.log("exit");
     });
   }
 
@@ -248,6 +251,100 @@ export class SessionService {
     try {
       let data = await this.httpService.get(config);
       return data.result;
+    }
+    catch (error) {
+    }
+  }
+
+  async getSessions(obj) {
+    const config = {
+      url: urlConstants.API_URLS.HOME_SESSION + obj.page + '&limit=' + obj.limit + (obj.scope ? '&sessionScope=' + obj.scope : ''),
+    };
+    try {
+      let data: any = await this.httpService.get(config);
+      return data
+    }
+    catch (error) {
+    }
+  }
+
+  async requestSession(obj) {
+    const config = {
+      url: urlConstants.API_URLS.REQUEST_SESSION,
+      payload: obj
+    };
+    try {
+      let data: any = await this.httpService.post(config);
+      return data
+    }
+    catch (error) {
+    }
+  }
+
+  async requestSessionList(page: number) {
+    const config = {
+      url: urlConstants.API_URLS.REQUEST_SESSION_LIST + '?pageNo=' + page + '&pageSize=100' + '&status=REQUESTED,EXPIRED',
+    };
+    try {
+      let data: any = await this.httpService.get(config);
+      return data
+    }
+    catch (error) {
+    }
+  }
+
+  async getReqSessionDetails(id) {
+    const config = {
+      url: urlConstants.API_URLS.REQUEST_SESSION_DETAILS + '?request_session_id=' + id,
+    };
+    try {
+      let data: any = await this.httpService.get(config);
+      return data
+    }
+    catch (error) {
+    }
+  }
+
+  async requestSessionUserAvailability(startDate: number, endDate: number){
+    const config = {
+      url: urlConstants.API_URLS.REQUEST_SESSION_USER_AVAILABILITY +
+      `?pageNo=1&pageSize=5&searchText=&status=PUBLISHED&start_date=${startDate}&end_date=${endDate}`,
+    };
+    try {
+      let data: any = await this.httpService.get(config);
+      return data
+    }
+    catch (error) {
+    }
+  }
+
+  async requestSessionAccept(id){
+    const config = {
+      url: urlConstants.API_URLS.REQUEST_SESSION_ACCEPT,
+      payload: {
+        "request_session_id" : id
+      }
+    };
+    try {
+      let data: any = await this.httpService.post(config);
+      return data
+    }
+    catch (error) {
+    }
+  }
+
+  async requestSessionReject(id, reason){
+    id = id.toString();
+    const config = {
+      url: urlConstants.API_URLS.REQUEST_SESSION_REJECT,
+      payload: {
+        "request_session_id" : id,
+        "reason" : reason
+      }
+    };
+    try {
+      let data: any = await this.httpService.post(config);
+      return data
     }
     catch (error) {
     }

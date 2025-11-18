@@ -29,8 +29,6 @@ import { ModelComponent } from './components/model/model.component';
 import { MatInputModule } from '@angular/material/input';
 import { MatButtonModule } from '@angular/material/button';
 import { MatDatepickerModule } from '@angular/material/datepicker';                                              
-import { NgxMatDatetimePickerModule, NgxMatTimepickerModule } from '@angular-material-components/datetime-picker';
-import { NgxMatMomentModule } from '@angular-material-components/moment-adapter';
 import { GenericTableComponent } from './components/generic-table/generic-table.component';
 import { MatTableModule } from '@angular/material/table';
 import { MatPaginatorModule } from '@angular/material/paginator';
@@ -40,6 +38,20 @@ import { HasPermissionDirective } from './directive/permission.directive';
 import { FilterTreeComponent } from './components/filter-tree/filter-tree.component';
 import { FilterPopupComponent } from './components/filter-popup/filter-popup.component';
 import { MenteeListPopupComponent } from './components/mentee-list-popup/mentee-list-popup.component';
+import { BulkUploadComponent } from './components/bulk-upload/bulk-upload.component';
+import { UserListModalComponent } from './components/user-list-modal/user-list-modal.component';
+import { snakeCaseToUpperCasePipe } from '../core/pipes/snake-case-to-normal-case.pipe';
+import { AllowTemplateViewDirective } from './directive/allowTemplate.directive';
+import { GenericSearchComponent } from './components/generic-search/generic-search.component';
+import { SearchCompetencyComponent } from './components/search-competency/search-competency.component';
+import { SearchbarComponent } from './components/searchbar/searchbar.component';
+import { OverlayModule } from '@angular/cdk/overlay';
+import { ChipsAndFilterComponent } from './components/chips-and-filter/chips-and-filter.component';
+import { GenericCardComponent } from './components/generic-card/generic-card.component';
+import { OwlDateTimeModule, OwlNativeDateTimeModule } from '@danielmoncada/angular-datetime-picker';
+import {MatExpansionModule} from '@angular/material/expansion';
+import { PreAlertModalComponent } from './components/pre-alert-modal/pre-alert-modal.component';
+import { DynamicSelectModalComponent } from '../dynamic-select-modal/dynamic-select-modal.component';
 
 @NgModule({
   declarations: [
@@ -70,7 +82,18 @@ import { MenteeListPopupComponent } from './components/mentee-list-popup/mentee-
     HasPermissionDirective,
     FilterTreeComponent,
     FilterPopupComponent,
-    MenteeListPopupComponent
+    MenteeListPopupComponent,
+    BulkUploadComponent,
+    UserListModalComponent,
+    snakeCaseToUpperCasePipe,
+    AllowTemplateViewDirective,
+    GenericSearchComponent,
+    SearchCompetencyComponent,
+    SearchbarComponent,
+    ChipsAndFilterComponent,
+    GenericCardComponent,
+    PreAlertModalComponent,
+    DynamicSelectModalComponent
   ],
   imports: [
     CommonModule,
@@ -80,14 +103,15 @@ import { MenteeListPopupComponent } from './components/mentee-list-popup/mentee-
     FormsModule,
     MatDatepickerModule,
     MatInputModule,
-    NgxMatDatetimePickerModule,
-    NgxMatTimepickerModule,
     FormsModule,
     ReactiveFormsModule,
     MatButtonModule,
-    NgxMatMomentModule,
     MatTableModule,
-    MatPaginatorModule
+    MatPaginatorModule,
+    OverlayModule,
+    OwlDateTimeModule,
+    OwlNativeDateTimeModule,
+    MatExpansionModule
   ],
   exports: [
     DynamicFormComponent,
@@ -115,7 +139,19 @@ import { MenteeListPopupComponent } from './components/mentee-list-popup/mentee-
     HasPermissionDirective,
     FilterTreeComponent,
     FilterPopupComponent,
-    MenteeListPopupComponent
+    MenteeListPopupComponent,
+    BulkUploadComponent,
+    UserListModalComponent,
+    snakeCaseToUpperCasePipe,
+    AllowTemplateViewDirective,
+    GenericSearchComponent,
+    SearchCompetencyComponent,
+    SearchbarComponent,
+    ChipsAndFilterComponent,
+    GenericCardComponent,
+    PreAlertModalComponent,
+    DynamicSelectModalComponent
+    
   ],
 })
 export class SharedModule {}

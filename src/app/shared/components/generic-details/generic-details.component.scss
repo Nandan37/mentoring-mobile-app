@@ -5,6 +5,7 @@ ion-chip{
     --background: var(--white);
     color: var(--dark-gray);
     margin-top: 6px;
+    height: auto;
 }
 
 .value{
@@ -21,10 +22,13 @@ ion-chip{
       color: var(--dark-grey);
       margin-bottom: 5px;
   }
-
+.break-word{
+    word-break: break-word;
+    overflow-wrap: break-word;
+}
 .view-mentee-list{
-    color: #832915;
-    border: 1px solid #832915;
+    color: var(--ion-color-primary);
+    border: 1px solid var(--ion-color-primary);
     border-radius: 10px;
 }
 .mentee-count{
@@ -33,3 +37,53 @@ ion-chip{
     align-items: center;
     padding-right: 10px;
 }
+.resource-item {
+    border: 1px solid #ccc;
+    padding: 10px;
+    border-radius: 8px;
+    text-align: center;
+    height: 100%;
+  }
+  .resource-content{
+    display: flex;
+    align-items: center;
+    margin: 10px 10px;
+    gap: 5px;
+    border-radius: 10px;
+    width: 240px;
+    padding: 5px 0px 5px 5px;
+    background-color: var(--light-gray);
+    text-decoration: none;
+  }
+
+  .resource-content:hover {
+    transform: scale(1.05);
+  }
+  
+  .truncate-text {
+    display: inline-block;
+    max-width: 100%;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    vertical-align: middle;
+  }
+  .close-icon-modal{
+    position: absolute;
+      right: 0;
+      background: #fff;
+      border-radius: 14px;
+      width: 22px;
+      height: 22px;
+      margin: 4px;
+  }
+  .my-text {
+    color: var(--text-color );
+    flex:1
+  }
+  .icon-size {
+    width: 20px;
+    height: 20px; 
+    vertical-align: middle;
+    flex-shrink: 0; 
+  }

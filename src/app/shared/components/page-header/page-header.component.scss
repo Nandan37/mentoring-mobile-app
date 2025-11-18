@@ -3,6 +3,9 @@ ion-back-button{
     --icon-font-size:26px;
     --icon-font-weight: 800;
 }
+ion-header{
+   box-shadow: none !important;
+}
 ion-title{
     font-weight: bold;
     text-transform: none;
@@ -39,4 +42,22 @@ ion-col{
 }
 ion-buttons {
     cursor: pointer;
+}
+.badge {
+  width: 10px;
+  height: 10px;
+  background-color: #79D579;
+  border-radius: 50%;
+  position: absolute;
+  left: 30px;
+  top: 7px;
+  z-index: 999;
+}
+
+.mobile-badge {
+display: none;
+
+  @media (max-width: 767px) {  // Adjust breakpoint as needed
+    display: inline-block;
+}
 }

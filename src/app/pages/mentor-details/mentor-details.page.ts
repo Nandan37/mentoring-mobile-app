@@ -1,11 +1,21 @@
 import { DataSource } from '@angular/cdk/collections';
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ViewChild } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { localKeys } from 'src/app/core/constants/localStorage.keys';
 import { urlConstants } from 'src/app/core/constants/urlConstants';
-import { HttpService, LocalStorageService, ToastService, UserService } from 'src/app/core/services';
+import { SKELETON } from 'src/app/core/constants/skeleton.constant';
+import {
+  HttpService,
+  LocalStorageService,
+  ToastService,
+  UserService,
+  UtilService,
+} from 'src/app/core/services';
+import { Clipboard } from '@capacitor/clipboard';
 import { SessionService } from 'src/app/core/services/session/session.service';
 import { CommonRoutes } from 'src/global.routes';
+import { Location } from '@angular/common';
+import * as _ from 'lodash';
 
 @Component({
   selector: 'app-mentor-details',
@@ -14,114 +24,155 @@ import { CommonRoutes } from 'src/global.routes';
 })
 export class MentorDetailsPage implements OnInit {
   mentorId;
+  page = 1;
+  limit = 100;
+  totalCount = 0;
+  public isMobile: any;
+  currentUserId: any;
   public headerConfig: any = {
-    backButton: true,
+    backButton: false,
     headerColor: "primary"
   };
+  disableInfiniteScroll: boolean = false;
 
   public buttonConfig = {
-    meta : { 
-      id: null
+    meta: {
+      id: null,
     },
     buttons: [
-      {
-        label: "SHARE_PROFILE",
-        action: "share",
-      }
-    ]
-  }
-
-  detailData = {
-    form: [
-      {
-        title: 'ABOUT',
-        key: 'about',
-      },
-      {
-        title: "DESIGNATION",
-        key: "designation"
-      },
-      {
-        title: "ORGANIZATION",
-        key: "organizationName"
-      },
-      {
-        title: 'YEAR_OF_EXPERIENCE',
-        key: 'experience',
-      },
-      {
-        title: 'KEY_AREAS_OF_EXPERTISE',
-        key: 'area_of_expertise',
-      },
-      {
-        title: "EDUCATION_QUALIFICATION",
-        key: "education_qualification"
-      },
-      {
-        title: "LANGUAGES",
-        key: "languages" 
-      }
-    ],
-    data: {
-      rating: {
-        average:0
-      },
-      sessions_hosted:0 ,
-      organizationName:""
+    {
+      label: 'CHAT',
+      action: 'chat',
+      isHide: false
     },
+          {
+            label: 'REQUEST_SESSION',
+            action: 'requestSession',
+             isHide: false
+          },
+  ],
   };
-  userCantAccess:any;
-  isloaded:boolean=false
-  segmentValue = "about";
-  upcomingSessions;
-  mentorProfileData:any;
+
+  detailData: any = {
+    controls: [],
+    data:  {
+    }
+  };
+
+  userCantAccess?: boolean = false;
+  isloaded: boolean = false;
+  segmentValue = 'about';
+  upcomingSessions = [];
+  mentorProfileData: any;
+  userNotFound: boolean = false;
+  userCanAccess: boolean;
+  isLoading = false;
+  isUpcomingSession: boolean =false; 
+  SKELETON = SKELETON;
   constructor(
     private routerParams: ActivatedRoute,
     private httpService: HttpService,
     private router: Router,
     private sessionService: SessionService,
     private userService: UserService,
-    private localStorage:LocalStorageService,
-    private toast:ToastService
-  ) {
-    routerParams.params.subscribe(params => {
+    private localStorage: LocalStorageService,
+    private toast: ToastService,
+    private utilService: UtilService, 
+    private location: Location,
+  ) {}
+
+  ngOnInit() {}
+  async ionViewWillEnter() {
+    this.isMobile = this.utilService.isMobile();
+    if(this.isLoading)
+      return;
+    this.isLoading = true;
+    this.isUpcomingSession = false;
+    let user = await this.localStorage.getLocalData(localKeys.USER_DETAILS)
+    this.routerParams.params.subscribe((params) => {
       this.mentorId = this.buttonConfig.meta.id = params.id;
-      this.userService.getUserValue().then(async (result) => {
-        if (result) {
-          this.getMentor();
-        } else {
-          this.router.navigate([`/${CommonRoutes.AUTH}/${CommonRoutes.LOGIN}`], { queryParams: { mentorId: this.mentorId } })
-        }
-      })
+      this.getMentor();
     })
+    this.currentUserId = user.id
+    this.updateButtonConfig();
+    this.page = 1;
+    this.upcomingSessions = [];
+    if(this.mentorProfileData?.result?.is_mentor){
+    await this.getUpcomingSessions();
+    }
+    this.isLoading = false;
   }
 
-  ngOnInit() {
-  }
-  async ionViewWillEnter(){
-    this.upcomingSessions = await this.sessionService.getUpcomingSessions(this.mentorId);
-  }
   async getMentor() {
     let user = await this.localStorage.getLocalData(localKeys.USER_DETAILS);
-    this.mentorProfileData = await this.getMentorDetails()
-    this.isloaded = true
-    this.userCantAccess = this.mentorProfileData?.responseCode == 'OK' ? false:true
-      this.detailData.data = this.mentorProfileData?.result;
-      this.detailData.data.organizationName = this.mentorProfileData?.result?.organization.name;
+    this.mentorProfileData = await this.getMentorDetails();
+    this.updateButtonConfig();
+    this.isloaded = true;
+    this.detailData.controls = this.mentorProfileData?.result?.displayProperties;
+    this.detailData.data = this.mentorProfileData?.result;
+    this.detailData.data.organizationName =
+      this.mentorProfileData?.result?.organization?.name || '';
+    this.headerConfig.share = this.detailData.data?.is_mentor;
   }
 
-  async getMentorDetails(){
+  async getUpcomingSessions(isLoadMore: boolean = false) {
     const config = {
-      url: urlConstants.API_URLS.MENTORS_PROFILE_DETAILS + this.mentorId,
+      url: urlConstants.API_URLS.UPCOMING_SESSIONS + this.mentorId + "?page=" + this.page + '&limit=' + this.limit,
       payload: {}
     };
     try {
       let data = await this.httpService.get(config);
-      return data;
+      const newSessions = data?.result?.data || [];
+      this.isUpcomingSession = true;
+      if (isLoadMore) {
+        this.upcomingSessions = [...this.upcomingSessions, ...newSessions];
+      } else {
+        this.upcomingSessions = newSessions;
+      }
+
+      
+      this.totalCount = data?.result?.count || 0;
+      
+      if (!this.disableInfiniteScroll) {
+        this.disableInfiniteScroll = this.upcomingSessions.length >= this.totalCount;
+      }
     }
     catch (error) {
+      console.error('Error fetching upcoming sessions:', error);
+      this.disableInfiniteScroll = true;
     }
   }
+
+  async getMentorDetails() {
+    const config = {
+      url: urlConstants.API_URLS.GET_PROFILE_DATA + this.mentorId,
+      payload: {},
+    };
+    try {
+      const data = await this.httpService.get(config);
+      if (data) {
+        this.userCanAccess = true;
+      }
+      return data;
+    } catch (error: any) {
+      switch (error?.status) {
+       
+      case 404:
+        this.userNotFound = true;
+        break;
+
+      case 403:
+        this.userCantAccess = true;
+        break;
+
+      default:
+        this.toast.showToast('SOMETHING_WENT_WRONG', 'danger');
+        this.location.back();
+        break;
+    }
+    }
+  }
+
 
   goToHome() {
     this.router.navigate([`/${CommonRoutes.TABS}/${CommonRoutes.HOME}`]);
@@ -129,26 +180,104 @@ export class MentorDetailsPage implements OnInit {
 
   async segmentChanged(ev: any) {
     this.segmentValue = ev.detail.value;
-    this.upcomingSessions = (this.segmentValue == "upcoming") ? await this.sessionService.getUpcomingSessions(this.mentorId) : [];
+    this.isUpcomingSession = false;
+    if(this.segmentValue == 'upcoming'){
+      this.page = 1;
+      this.upcomingSessions = [];
+      await this.getUpcomingSessions();
+    }
   }
-  async onAction(event){
+  
+  action(event) {
+    switch (event) {
+      case 'share':
+        this.share();
+        break;
+    }
+  }
+  
+  async share() {
+    if(this.isMobile && navigator.share){
+          let url = `/mentoring/${CommonRoutes.MENTOR_DETAILS}/${this.buttonConfig.meta.id}`;
+          let link = await this.utilService.getDeepLink(url);
+          let params = {
+            link: link,
+            subject: "Profile Share",
+            text: '',
+          };
+          await this.utilService.shareLink(params);
+        } else {
+          await this.copyToClipBoard(window.location.href);
+          this.toast.showToast('PROFILE_LINK_COPIED', 'success');
+        }
+  }
+  
+  copyToClipBoard = async (copyData: any) => {
+    await Clipboard.write({
+      string: copyData,
+    }).then(() => {
+      this.toast.showToast('COPIED', 'success');
+    });
+  };
+  
+  async onAction(event) {
     switch (event.type) {
       case 'cardSelect':
-        this.router.navigate([`/${CommonRoutes.SESSIONS_DETAILS}/${event.data.id}`]);
+        this.router.navigate([`/${CommonRoutes.SESSIONS_DETAILS}/${event.data.id}`],{replaceUrl:true});
         break;
 
       case 'joinAction':
         await this.sessionService.joinSession(event.data);
-        this.upcomingSessions = await this.sessionService.getUpcomingSessions(this.mentorId);
+        this.page = 1;
+        this.isUpcomingSession =false;
+        this.upcomingSessions = [];
+        await this.getUpcomingSessions();
         break;
 
-        case 'enrollAction':
+      case 'enrollAction':
         let enrollResult = await this.sessionService.enrollSession(event.data.id);
         if(enrollResult.result){
           this.toast.showToast(enrollResult.message, "success")
-          this.upcomingSessions = await this.sessionService.getUpcomingSessions(this.mentorId);
+          this.page = 1;
+          this.isUpcomingSession =false;
+          this.upcomingSessions = [];
+          await this.getUpcomingSessions();
         }
         break;
     }
+  }
+  
+  private updateButtonConfig() {
+    this.buttonConfig.buttons = !this.mentorProfileData?.result?.is_mentor
+      ? [
+          {
+            label: 'CHAT',
+            action: 'chat',
+             isHide: false
+          },
+        ]
+      : [
+          {
+            label: 'CHAT',
+            action: 'chat',
+             isHide: false
+          },
+          {
+            label: 'REQUEST_SESSION',
+            action: 'requestSession',
+             isHide: false
+          },
+        ];
+        if (String(this.mentorProfileData?.result?.id) === String(this.currentUserId)) {
+            this.buttonConfig.buttons = this.buttonConfig.buttons.map(btn => ({
+                   ...btn,isHide: true
+            }));
+           }
+  }
+
+  async loadMore(event) {
+    this.page += 1;
+    await this.getUpcomingSessions(true);
+    event.target.complete();
   }
 }

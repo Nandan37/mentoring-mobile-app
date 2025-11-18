@@ -13,7 +13,6 @@ export class FormService {
     //Check if form is available in local DB
     let form = await this.db.getItem(this.getUniqueKey(formBody))
     let dbForm = JSON.parse(form);
-
     // Check if local form is expired; return the form if not expired
     if (form && !this.checkIfexpired(dbForm?.ttl)) {
       return dbForm;
@@ -64,6 +63,16 @@ export class FormService {
       const entity = _.find(entityList, (entityData) => formData.name === entityData.value);
       if (entity) {
         formData.options = entity.entities.map((entityItem)=>{ return { label : entityItem.label, value : entityItem.value }});
+        formData.meta = {
+          ...formData.meta,
+          entityId: entity.id,
+          allow_custom_entities: entity.allow_custom_entities,
+          allow_filtering: entity.allow_filtering
+        };
+        formData.validators = {
+          ...formData.validators,
+          required: entity.required
+        }
       }
     });
     return formData
@@ -71,12 +80,29 @@ export class FormService {
 
   async formatEntityOptions(existingData, entityList){
     await entityList.map((entityName)=>{
+      if(['state', 'district', 'block', 'cluster', 'school','professional_role','professional_subroles'].includes(entityName)){
+        return { label : existingData[entityName]?.label, value : existingData[entityName]?.value }
+      }else
       if(Array.isArray(existingData[entityName])){
         existingData[entityName] = existingData[entityName].map((data)=>{
-          return { label : data.label, value : data.value == 'other' ? data.label : data.value }
+          return { label : data?.label, value : data?.value == 'other' ? data?.label : data?.value, type: data?.value }
         })
       }
     })
     return existingData
+  }
+
+  async filterList(obj){
+    const config = {
+      url: urlConstants.API_URLS.FILTER_LIST + '&organization=' + obj?.org + '&filter_type=' + obj?.filterType,
+      payload: {},
+    };
+    try {
+      const data: any = await this.http.get(config);
+      return data.result
+    }
+    catch (error) {
+      return null;
+    }
   }
 }

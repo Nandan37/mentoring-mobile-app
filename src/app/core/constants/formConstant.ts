@@ -49,3 +49,77 @@ export const MANAGERS_CREATE_SESSION_FORM: IFORM = {
 	"type": "managersSession",
 	"sub_type": "managersSessionForm",
 }
+
+export const MENTOR_DIR_CARD_FORM: IFORM = {
+	"type": "mentorDirectoryCard",
+	"sub_type": "mentorDirectoryCardForm",
+}
+export const MENTOR_REQ_CARD_FORM: IFORM = {
+	"type": "mentorRequestCard",
+	"sub_type": "mentorRequestCardForm",
+}
+export const MENTOR_CONNECTION_CARD_FORM: IFORM = {
+	"type": "mentorConnectionCard",
+	"sub_type": "mentorConnectionCardForm",
+}
+
+export const BIG_NUMBER_DASHBOARD_FORM: IFORM = {
+	"type": "bignumberDashboard",
+	"sub_type": "bignumberDashboardForm"
+}
+export const DASHBOARD: IFORM = {
+	"type": "dashboard",
+	"sub_type": "dashboardForm",
+}
+
+export const FILTER_ROLES = {
+	"title": "Roles",
+	"name": "roles",
+	"options": [
+		{
+			"label": "Mentor",
+			"value": "mentor"
+		},
+		{
+			"label": "Mentee",
+			"value": "Mentee"
+		}
+	],
+	"type": "checkbox"
+}
+
+export const DASHBOARD_TABLE_META_KEYS ={
+	"reportDateError":"END_DATE_LESS_THAN_STARTDATE",
+	  "reportTableNoSessions" : "NO_SESSIONS_FOUND_TIME_PERIOD",
+	  "submit":"SUBMIT",
+	  "endDate":"END_DATE",
+	  "startDate":"START_DATE",
+	  "selectDateRange":"SELECT_DATE_RANGE",
+	  "selectDate":"SELECT_DATE",
+	  "noData":"NO_SESSIONS_FOUND",
+	  "clearFilters":"CLEAR_FILTERS",
+	  "downloadTable":"DOWNLOAD_TABLE",
+	  "search":"SEARCH",
+	  "select":"SELECT",
+	  "invalidSearch":"INVALID_SEARCH",
+	  "chooseADate":"CHOOSE_A_DATE",
+	  "noSessions":"NO_SESSIONS",
+	  "noDataFound":"NO_SESSIONS_FOUND",
+	"cancel":"CANCEL"}
+
+export const REQUEST_SESSION_FORM: IFORM = {
+	"type": "requestSession",
+	"sub_type": "requestSessionForm",
+}
+
+export const CHAT_LIB_META_KEYS = {
+    "cantSendMsg": "CANT_SEND_MESSAGE",
+    "cantSendMsgToMentor": "CANT_SEND_MESSAGE_TO_MENTOR",
+    "connectionLost":"CONNECTION_DELETE",
+    "YouCantReachUser":"YOU_CANT_REACH_USER"
+}
+
+export const MENTEE_CARD_FORM: IFORM = {
+	"type": "menteeCard",
+	"sub_type": "menteeCardForm"
+}

@@ -1,12 +1,14 @@
-import { Component, Input, OnInit } from '@angular/core';
+import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
 import {
   ControlValueAccessor,
   NG_VALUE_ACCESSOR,
 } from '@angular/forms';
-import { ModalController } from '@ionic/angular';
+import { AlertController, ModalController } from '@ionic/angular';
 import { TranslateService } from '@ngx-translate/core';
 import * as _ from 'lodash-es';
-import { SearchPopoverComponent } from '../search-popover/search-popover.component';
+import { urlConstants } from 'src/app/core/constants/urlConstants';
+import { HttpService, ToastService } from 'src/app/core/services';
+import { PreAlertModalComponent } from '../pre-alert-modal/pre-alert-modal.component';
 
 @Component({
   selector: 'app-search-and-select',
@@ -22,7 +24,13 @@ import { SearchPopoverComponent } from '../search-popover/search-popover.compone
 })
 export class SearchAndSelectComponent implements OnInit, ControlValueAccessor {
   @Input() control;
+  @Output() showSelectionPopover = new EventEmitter()
+  @Output() viewSelectedListPopover = new EventEmitter()
+  @Input() uniqueId: any;
+  @Input() sessionId: any;
+  private static menteeControlRef: any;
   disabled;
+  isDisabled: boolean;
   touched = false;
   selectedChips;
   _selectAll;
@@ -33,10 +41,15 @@ export class SearchAndSelectComponent implements OnInit, ControlValueAccessor {
   icon = this.addIconDark;
   value: any[];
   isMobile: any;
+  allowCustomEntities: any;
+  menteeValue: any;
 
   constructor(
-    private modalCtrl: ModalController,
-    private translateService: TranslateService
+    private alertController: AlertController,
+    private translateService: TranslateService,
+    private toast:ToastService,
+    private httpService : HttpService,
+    private modalController: ModalController
   ) { }
 
   onChange = (quantity) => {};
@@ -46,11 +59,19 @@ export class SearchAndSelectComponent implements OnInit, ControlValueAccessor {
   ngOnInit() { 
     this.originalLabel = this.control.label;
     this.isMobile = window.innerWidth <= 950;
+    this.allowCustomEntities = this.control.meta.allow_custom_entities;
   }
 
   writeValue(value: any[]) {
+    if(this.control.name === 'mentees') {
+    SearchAndSelectComponent.menteeControlRef = this.control;
+    }
     this.selectedData = this.control.meta.searchData ? this.control.meta.searchData : []
+    this.selectedChips = this.selectedData.map( data => data.id )
     this.icon = this.selectedData.length ? this.closeIconLight : this.addIconDark
+    if (this.control.name === 'mentees') {
+     this.selectedData = this.selectedData.map(data => ({...data, isDisabled: true}));
+  }
   }
   registerOnChange(onChange: any) {
     this.onChange = onChange;
@@ -66,77 +87,124 @@ export class SearchAndSelectComponent implements OnInit, ControlValueAccessor {
     }
   }
 
-  async showPopover(event) {
-    this.markAsTouched();
-    const popover = await this.modalCtrl.create({
-      component: SearchPopoverComponent,
-      cssClass: 'search-popover-config',
-      backdropDismiss: false,
-      componentProps: {
-        data: {
-          selectedData: this.selectedData,
-          control: this.control,
-          showFilter: true,
-          showSearch: true,
-          viewListMode: false,
-          isMobile: this.isMobile
+  handleCloseIconClick(event: Event, removedItem): void {
+    if (this.selectedData) {
+      this.selectedData = this.selectedData.filter(obj => obj.value !== removedItem.value || obj.id !== removedItem.id );
+      this.onChange(this.selectedData.map(data => data.value || data.id))
+      event.stopPropagation()
+    }
+    if(this.control.name === 'mentor_id') {
+        SearchAndSelectComponent.menteeControlRef.disabled = true;
+    }
+  }
+
+  removeFile(data:any,index:number) { 
+    if (this.control?.value ) {
+      const updatedFiles = [...this.control.value];
+      if(data.id && this.control.name == 'pre' || this.control.name == 'post'){
+        this.httpService.get({url:urlConstants.API_URLS.RESOURCES_DELETE+data.id+'?sessionId='+this.sessionId}).then((res:any) => {
+          if(res.responseCode == 'OK'){
+            updatedFiles.splice(index, 1);
+            this.toast.showToast(this.translateService.instant('SESSION_RESOURCE_DELETE'), 'success');
+            if (this.control.setValue) {
+              this.control.setValue(updatedFiles);
+            } else {
+              this.control.value = updatedFiles;
+            }
+          } else {
+            this.toast.showToast(this.translateService.instant('FILE_NOT_DELETED'), 'danger');
+          }
         }
+        ).catch((err) => {
+          this.toast.showToast(this.translateService.instant('FILE_NOT_DELETED'), 'danger');
+        }
+        );
+      }else{
+      updatedFiles.splice(index, 1);
+      if (this.control.setValue) {
+        this.toast.showToast(this.translateService.instant('SESSION_RESOURCE_DELETE'), 'success');
+        this.control.setValue(updatedFiles);
+      } else {
+        this.control.value = updatedFiles;
       }
-    });
+      } 
+    }
+  }
+  
 
-    popover.onDidDismiss().then((data) => {
-      if (data.data) {
-        this.selectedData = data.data;
-        const values = this.control.meta.multiSelect ? data.data.map(obj => obj.id) : data.data[0].id;
-        this.onChange(values);
-        this.icon = this.selectedData.length ? this.closeIconLight : this.addIconDark
-      }
-    });
-    await popover.present();
+  async showPopover() {
+    this.markAsTouched();
+    this.showSelectionPopover.emit({type: this.control.meta.addPopupType, id: this.uniqueId})
   }
 
-  clearControl(event){
-    this.control.label = this.originalLabel
-    this.selectedData = []
-    this.icon = this.addIconDark
-    this.onChange([])
-    event.stopPropagation()
-  }
+  
 
   async viewSelectedList() {
     this.markAsTouched();
-    const popover = await this.modalCtrl.create({
-      component: SearchPopoverComponent,
-      cssClass: 'search-popover-config',
-      backdropDismiss: false,
-      componentProps: {
-        data: {
-          selectedData: this.selectedData,
-          control: this.control,
-          showFilter: false,
-          showSearch: false,
-          viewListMode: true,
-          isMobile: this.isMobile
-        }
-      }
-    });
+    this.showSelectionPopover.emit({type:this.control.meta.addPopupType+' view', id: this.uniqueId})
+  }
 
-    popover.onDidDismiss().then((data) => {
-      if (data.data) {
-        this.selectedData = data.data
-        const values = this.selectedData.length
-        ? (this.control.meta.multiSelect ? this.selectedData.map(obj => obj.id) : this.selectedData[0].id)
-        : (this.control.meta.multiSelect ? [] : '');
-        this.onChange(values);
-        this.icon = this.selectedData.length ? this.closeIconLight : this.addIconDark
+  async addNewOption() {
+    const alert = await this.alertController.create({
+      cssClass: 'my-custom-class',
+      header: 'Add ' + `${this.control.label}`,
+      inputs: [
+        {
+          name: 'name',
+          type: 'text',
+          placeholder: 'Enter ' + `${this.control.label}`,
+          attributes: {
+            maxlength: 50,
+          }
+        },
+      ],
+      buttons: [
+        {
+          text: this.translateService.instant('CANCEL'),
+          role: 'cancel',
+          cssClass: 'secondary',
+          handler: () => { },
+        },
+        {
+          text: this.translateService.instant('OK'),
+          handler: (alertData) => {
+            let obj = {
+              label: alertData.name,
+              value: alertData.name,
+              type: "other"
+            };
+            this.selectedData.push(obj);
+            this.selectedChips.push(obj.value)
+            this.onChange(this.selectedData.map(data => data.value));
+            this.icon = this.selectedData.length ? this.closeIconLight : this.addIconDark
+          }
+      }
+      
+      ],
+    });
+    await alert.present();
+  }
+
+
+  async addLink(data){
+    data.value = data.value || [];
+    const modal = await this.modalController.create({
+      component: PreAlertModalComponent,
+      cssClass: 'pre-custom-modal',
+      componentProps: {
+        data: data, 
+        type: 'link',
+        heading: 'ADD_LINK_POPUP'
+      },
+      backdropDismiss: false
+    });
+  
+    modal.onDidDismiss().then((result) => {
+      if (result.data && result.data.success) {
+        data.value.push(result.data.data);
       }
     });
-    await popover.present();
+  
+    return await modal.present();
   }
-  // Your component code
-handleIconClick(event: Event): void {
-  if (this.selectedData) {
-    this.clearControl(event);
-  }
-}
 }

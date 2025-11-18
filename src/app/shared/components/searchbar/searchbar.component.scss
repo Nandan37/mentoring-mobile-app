@@ -1,0 +1,28 @@
+.overlay-container {
+    background-color: white;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+    border-radius: 4px;
+    padding: 16px;
+    max-width: 100%;
+    z-index: 1000;
+}
+.overlay-chip {
+    font-size: 14px;
+    align-items: center;
+    display: inline-block;
+    text-decoration: none;
+    ion-icon {
+        color: white;
+      }
+      &.selected-chip {
+        background-color: var(--ion-color-primary);
+        color: white;
+      }
+}
+.selected-chip{
+    --background:var(--ion-color-primary);
+    --color:var(--white);
+}
+
+
+

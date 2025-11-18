@@ -1,0 +1,35 @@
+<div class="d-flex">
+  <ion-toolbar>
+    <ion-title>{{ title | translate}}</ion-title>
+
+    <ion-buttons slot="end">
+      <ion-button (click)="dismiss()">
+        <ion-icon name="close"></ion-icon>
+      </ion-button>
+    </ion-buttons>
+  </ion-toolbar>
+</div >
+
+<ion-content>
+  <ion-searchbar
+    [(ngModel)]="searchTerm"
+    (ionInput)="filterItems($event)"
+    placeholder="Search..."
+    showClearButton="focus">
+  </ion-searchbar>
+
+  <ion-radio-group [(ngModel)]="selectedItem">
+    <ion-list>
+      <ion-item
+        button
+        *ngFor="let item of filteredItems"
+        (click)="selectItem(item)">
+        <ion-label>{{ item }}</ion-label>
+        <ion-radio
+          slot="start"
+          [value]="item">
+        </ion-radio>
+      </ion-item>
+    </ion-list>
+  </ion-radio-group>
+</ion-content>

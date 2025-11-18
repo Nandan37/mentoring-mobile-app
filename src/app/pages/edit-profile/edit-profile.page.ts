@@ -14,6 +14,7 @@ import {
   LoaderService,
   LocalStorageService,
   ToastService,
+  UtilService,
 } from 'src/app/core/services';
 import { localKeys } from 'src/app/core/constants/localStorage.keys';
 import { urlConstants } from 'src/app/core/constants/urlConstants';
@@ -21,6 +22,9 @@ import { AlertController, Platform } from '@ionic/angular';
 import { isDeactivatable } from 'src/app/core/guards/canDeactive/deactive.guard';
 import { TranslateService } from '@ngx-translate/core';
 import { map } from 'rxjs/operators';
+import { ActivatedRoute, Router } from '@angular/router';
+import { CommonRoutes } from 'src/global.routes';
+import { PlatformLocation, Location } from '@angular/common';
 
 @Component({
   selector: 'app-edit-profile',
@@ -29,15 +33,14 @@ import { map } from 'rxjs/operators';
 })
 export class EditProfilePage implements OnInit, isDeactivatable {
   private win: any = window;
+  updated: boolean;
   @ViewChild('form1') form1: DynamicFormComponent;
   profileImageData: any = {
     type: 'profile',
   };
   public headerConfig: any = {
-    // menu: true,
-    backButton: {
-      label: 'PROFILE_DETAILS',
-    },
+    backButton: true,
+    label: 'PROFILE_DETAILS',
     notification: false,
   };
   path;
@@ -47,6 +50,7 @@ export class EditProfilePage implements OnInit, isDeactivatable {
   entityNames: any;
   entityList: any;
   formData: any;
+  redirectUrl: any;
   constructor(
     private form: FormService,
     private api: HttpService,
@@ -57,63 +61,104 @@ export class EditProfilePage implements OnInit, isDeactivatable {
     private loaderService: LoaderService,
     private alert: AlertController,
     private translate: TranslateService,
-    private toast: ToastService
+    private toast: ToastService,
+    private utilService: UtilService,
+    private router: Router,
+    private platformLocation: PlatformLocation,
+    private activatedRoute: ActivatedRoute,
+    private location: Location
   ) {
   }
+
+  ionViewWillEnter() {
+    if(this.userDetails?.profile_mandatory_fields?.length || !this.userDetails?.about){
+      history.pushState(null, '', location.href);
+      this.platformLocation.onPopState(()=>{
+      history.pushState(null, '', location.href)
+    })
+    }
+    this.activatedRoute.queryParams.subscribe(params => {
+      this.redirectUrl = params.redirectUrl;
+    });
+  }
   async ngOnInit() {
+    this.userDetails = await this.localStorage.getLocalData(localKeys.USER_DETAILS);
     const response = await this.form.getForm(EDIT_PROFILE_FORM);
     this.profileImageData.isUploaded = true;
     this.formData = _.get(response, 'data.fields');
-    this.entityNames = await this.form.getEntityNames(this.formData)
-    this.entityList = await this.form.getEntities(this.entityNames, 'PROFILE')
+    const entityNames = await this.form.getEntityNames(this.formData);
+    this.entityNames = await this.updateEntityArray(this.userDetails?.profile_mandatory_fields, entityNames);
+    this.entityList = await this.form.getEntities(this.entityNames, 'PROFILE');
     this.formData = await this.form.populateEntity(this.formData, this.entityList)
     this.changeDetRef.detectChanges();
-    this.userDetails = await this.localStorage.getLocalData(localKeys.USER_DETAILS);
     if (this.userDetails) {
       this.profileImageData.image = this.userDetails.image;
       this.profileService.prefillData(this.userDetails, this.entityNames, this.formData);
       this.showForm = true;
     }
+    if(this.userDetails?.profile_mandatory_fields?.length || !this.userDetails?.about){
+    this.headerConfig.backButton = false;
+    let msg = {
+        header: 'SETUP_PROFILE',
+        message: 'SETUP_PROFILE_MESSAGE',
+        cancel: "CONTINUE"
+        }
+        this.utilService.profileUpdatePopup(msg)
+    }else{
+        this.headerConfig.backButton = true;
+    }
   }
 
   async canPageLeave() {
-    if (this.form1 && !this.form1.myForm.pristine || !this.profileImageData.isUploaded) {
+    if(!this.updated) {
       let texts: any;
       this.translate
-        .get(['FORM_UNSAVED_DATA', 'CANCEL', 'OK', 'EXIT_HEADER_LABEL'])
+        .get(['PROFILE_FORM_UNSAVED_DATA', 'DONOT_SAVE', 'SAVE', 'PROFILE_EXIT_HEADER_LABEL', 'SETUP_PROFILE','SETUP_PROFILE_MESSAGE', 'CONTINUE'])
         .subscribe((text) => {
           texts = text;
         });
+        let header = this.userDetails?.profile_mandatory_fields?.length ? texts['SETUP_PROFILE'] : texts['PROFILE_EXIT_HEADER_LABEL'];
       const alert = await this.alert.create({
-        header: texts['EXIT_HEADER_LABEL'],
-        message: texts['FORM_UNSAVED_DATA'],
-        buttons: [
+        header: this.userDetails?.profile_mandatory_fields?.length ? texts['SETUP_PROFILE'] : texts['PROFILE_EXIT_HEADER_LABEL'] , 
+        message: this.userDetails?.profile_mandatory_fields?.length ? texts['SETUP_PROFILE_MESSAGE'] : texts['PROFILE_FORM_UNSAVED_DATA'],
+        buttons:  this.userDetails?.profile_mandatory_fields?.length ? [ {
+          text: texts['CONTINUE'],
+          role: 'cancel',
+          cssClass: 'alert-button-red',
+          handler: () => { },
+        }] : [
           {
-            text: texts['CANCEL'],
+            text: texts['DONOT_SAVE'],
             cssClass: 'alert-button-bg-white',
             role: 'exit',
             handler: () => { },
           },
           {
-            text: texts['OK'],
+            text: texts['SAVE'],
             role: 'cancel',
             cssClass: 'alert-button-red',
             handler: () => { },
           },
         ],
       });
+      if (this.form1 && !this.form1.myForm.pristine || !this.profileImageData.isUploaded) {
       await alert.present();
       let data = await alert.onDidDismiss();
-      if (data.role == 'exit') {
+      if (data.role == 'exit' && this.headerConfig.backButton) {
         return true;
       }
       return false;
     } else {
+      if(this.headerConfig.backButton === false) {
+        await alert.present();
+        return false;
+      }
       return true;
+    }
     }
   }
 
-  onSubmit() {
+  async onSubmit() {
     this.form1.onSubmit();
     if (this.form1.myForm.valid) {
       if (this.profileImageData.image && !this.profileImageData.isUploaded) {
@@ -121,11 +166,25 @@ export class EditProfilePage implements OnInit, isDeactivatable {
       } else {
         const form = Object.assign({}, this.form1.myForm.value);
         _.forEach(this.entityNames, (entityKey) => {
-          let control = this.formData.controls.find(obj => obj.name === entityKey);
-          form[entityKey] = control.multiple ? _.map(form[entityKey], 'value') : form[entityKey]
+          let control = this.formData.controls.find(obj => 
+          obj.name === entityKey
+          );  
+            if (['state', 'cluster', 'block', 'district', 'school', 'professional_role'].includes(entityKey)) {
+              form[entityKey] = control.value?.value || '';
+            } else if (entityKey === 'professional_subroles' && Array.isArray(control.value)) {
+              form[entityKey] = control.value.map(item => item.value);
+            } else {
+            form[entityKey] = control.multiple ? _.map(form[entityKey], 'value') : form[entityKey];
+            }
         });
         this.form1.myForm.markAsPristine();
-        this.profileService.profileUpdate(form);
+        this.updated = await this.profileService.profileUpdate(form);
+        this.userDetails.profile_mandatory_fields =[];
+        if(this.updated && this.redirectUrl){ 
+          this.router.navigate([this.redirectUrl], { replaceUrl: true })
+        }else{
+        this.router.navigate([`/${CommonRoutes.TABS}/${CommonRoutes.HOME}`], { replaceUrl: true });
+        }
       }
     } else {
       this.toast.showToast('Please fill all the mandatory fields', 'danger');
@@ -167,5 +226,14 @@ export class EditProfilePage implements OnInit, isDeactivatable {
     }
     let data: any = await this.api.get(config);
     return this.upload(file, data.result).subscribe()
+  }
+
+  updateEntityArray(arr1: string[], arr2: string[]) {
+    arr1.forEach(value => {
+      if (!arr2.includes(value)) {
+        arr2.push(value);
+      }
+    });
+    return arr2
   }
 }

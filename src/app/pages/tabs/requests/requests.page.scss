@@ -1,0 +1,7 @@
+.normal-case {
+    text-transform: none;
+  }
+
+::ng-deep .expired-tag {
+  background-color: var(--dark-gray);
+}

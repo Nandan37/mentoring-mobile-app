@@ -1,9 +1,8 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnDestroy, OnInit } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { LocalStorageService, ToastService, UserService, UtilService } from 'src/app/core/services';
 import { SessionService } from 'src/app/core/services/session/session.service';
 import { CommonRoutes } from 'src/global.routes';
-import *  as moment from 'moment';
 import { localKeys } from 'src/app/core/constants/localStorage.keys';
 import { Location } from '@angular/common';
 import { ModalController, ToastController } from '@ionic/angular';
@@ -14,13 +13,14 @@ import { MenteeListPopupComponent } from 'src/app/shared/components/mentee-list-
 import { EventListenerFocusTrapInertStrategy } from '@angular/cdk/a11y';
 import { PermissionService } from 'src/app/core/services/permission/permission.service';
 import { FormService } from 'src/app/core/services/form/form.service';
+import { environment } from 'src/environments/environment';
 
 @Component({
   selector: 'app-session-detail',
   templateUrl: './session-detail.page.html',
   styleUrls: ['./session-detail.page.scss'],
 })
-export class SessionDetailPage implements OnInit {
+export class SessionDetailPage implements OnInit, OnDestroy {
   id: any;
   showEditButton: any;
   isConductor:any =false;
@@ -41,6 +41,12 @@ export class SessionDetailPage implements OnInit {
   sessionManagerText="";
  activeUrl:any;
  isNotInvited: any;
+ defaultUiForm = [
+  {
+    title: "Meeting Platform",
+    key: "meeting_info",
+  }
+ ];
 
   constructor(private localStorage: LocalStorageService, private router: Router,
     private activatedRoute: ActivatedRoute, private sessionService: SessionService,
@@ -49,30 +55,28 @@ export class SessionDetailPage implements OnInit {
     this.isMobile = utilService.isMobile()
   }
   ngOnInit() {
-      App.addListener('appStateChange', (state: AppState) => {
+      App.addListener('appStateChange', async (state: AppState) => {
         if (state.isActive == true && this.id && this.sessionDatas && !this.dismissWhenBack) {
-          this.fetchSessionDetails();
+          await this.fetchSessionDetails();
         }
       });
   }
 
   async ionViewWillEnter() {
+    this.detailData.controls = JSON.parse(JSON.stringify(this.defaultUiForm));
     await this.user.getUserValue();
     this.userDetails = await this.localStorage.getLocalData(localKeys.USER_DETAILS);
-    this.fetchSessionDetails();
+     await this.fetchSessionDetails();
   }
 
   public headerConfig: any = {
-    backButton: true,
+    backButton: false,
     label: "",
     share: false
   };
   detailData = {
-    form: [
-      {
-        title: "MEETING_PLATFORM",
-        key: "meeting_info",
-      },
+    controls: [
+      
     ],
     data: {
       id:'',
@@ -140,8 +144,8 @@ export class SessionDetailPage implements OnInit {
     if(response && entityList.result.length){
       entityList.result.forEach(entity => {
         Object.entries(response?.result).forEach(([key, value]) => {
-          if(Array.isArray(value) &&   entity.value == key && !this.detailData.form.some(obj => obj.key === entity.value) ){
-            this.detailData.form.push(
+          if(Array.isArray(value) &&   entity.value == key && !this.detailData.controls.some(obj => obj.key === entity.value) ){
+            this.detailData.controls.push(
               {
                   title: entity.label,
                   key: entity.value,
@@ -161,34 +165,41 @@ export class SessionDetailPage implements OnInit {
     if (!this.userCantAccess) {
       response = response.result;
       this.setPageHeader(response);
-      let readableStartDate = moment.unix(response.start_date).toLocaleString();
+      let readableStartDate = new Date(response.start_date * 1000).toLocaleString();
       let currentTimeInSeconds=Math.floor(Date.now()/1000);
       if(response.is_enrolled){
         this.isEnabled = ((response.start_date - currentTimeInSeconds) < 600 || response?.status?.value=='LIVE') ? true : false
       } else {
         this.isEnabled = ((response.start_date-currentTimeInSeconds)<600 || response?.status?.value=='LIVE')?true:false;
       }
-      this.detailData.data = Object.assign({}, response);
-      this.detailData.data.start_date = readableStartDate;
-      this.detailData.data.meeting_info = response.meeting_info?.platform;
-      this.detailData.data.mentee_count = response.seats_limit - response.seats_remaining
-      this.startDate = (response.start_date>0)?moment.unix(response.start_date).toLocaleString():this.startDate;
-      this.endDate = (response.end_date>0)?moment.unix(response.end_date).toLocaleString():this.endDate;
+      this.detailData = {
+        data: {
+          ...response,
+          start_date: readableStartDate,
+          meeting_info: response.meeting_info?.platform,
+          mentee_count: response.seats_limit - response.seats_remaining,
+          mentor_designation: response?.mentor_designation?.length
+          ? response.mentor_designation.map((d: any) => d?.label).join(', ')
+          : []
+          },
+          controls: [...this.detailData.controls]
+        };
+      this.startDate = (response.start_date>0)?new Date(response.start_date * 1000):this.startDate;
+      this.endDate = (response.end_date>0)?new Date(response.end_date * 1000):this.endDate;
       this.platformOff = (response?.meeting_info?.platform == 'OFF') ? true : false;
-      this.detailData.data.mentor_designation = response?.mentor_designation.map(designation => designation?.label).join(', ');
-      if((!this.isConductor && !this.detailData.form.some(obj => obj.title === 'MENTOR'))){
-        this.detailData.form.push(
+      if((!this.detailData.controls.some(obj =>  obj.key === 'mentor_name'))){
+        this.detailData.controls.push(
           {
-            title: 'MENTOR',
+            title: 'Mentor',
             key: 'mentor_name',
           },
         );
       } 
-      if((this.isCreator || this.isConductor) && !this.detailData.form.some(obj => obj.title === 'MENTEE_COUNT')){
+      if((this.isCreator || this.isConductor) && !this.detailData.controls.some(obj => obj.key === 'mentee_count')){
         
-        this.detailData.form.push(
+        this.detailData.controls.push(
           {
-            title: 'MENTEE_COUNT',
+            title: 'Mentee Count',
             key: 'mentee_count',
           },
         );
@@ -207,7 +218,14 @@ export class SessionDetailPage implements OnInit {
     } 
     this.dismissWhenBack = true;
   }
-  ionViewWillLeave(){
+
+  ionViewWillLeave() {
+    if(!this.skipWhenDelete && this.snackbarRef){
+      this.snackbarRef = this.toaster.dismiss()
+    }
+   }
+
+   ngOnDestroy() {
     if(!this.skipWhenDelete && this.snackbarRef){
       this.snackbarRef = this.toaster.dismiss()
     }
@@ -221,7 +239,8 @@ export class SessionDetailPage implements OnInit {
       if(this.userDetails){
         this.isConductor = this.userDetails.id == response.mentor_id ? true : false;
       }
-      this.headerConfig.edit = (this.isCreator && response?.status?.value !="COMPLETED"&& ((response.end_date>currentTimeInSeconds)))?true:null;
+      let twentyFourHoursInSeconds = 24 * 60 * 60;
+      this.headerConfig.edit = (this.isCreator  && response.end_date > 0 && (currentTimeInSeconds - response.end_date) <= twentyFourHoursInSeconds);
       this.headerConfig.delete = (this.isCreator && response?.status?.value !="COMPLETED" && response?.status?.value !="LIVE" &&  ((response.end_date>currentTimeInSeconds)))?true:null;
   }
 
@@ -242,7 +261,7 @@ export class SessionDetailPage implements OnInit {
   async share() {
     if(this.isMobile && navigator.share){
       if(this.id){
-          let url = `/${CommonRoutes.SESSIONS_DETAILS}/${this.id}`;
+          let url = `/mentoring/${CommonRoutes.SESSIONS_DETAILS}/${this.id}`;
           let link = await this.utilService.getDeepLink(url);
           this.detailData.data.mentor_name = this.detailData.data.mentor_name.trim();
           this.detailData.data.title = this.detailData.data.title.trim();
@@ -267,7 +286,7 @@ export class SessionDetailPage implements OnInit {
 
   editSession() {
     this.activeUrl = this.router.url;
-    (this.sessionDatas?.status?.value=='LIVE') ? this.router.navigate([CommonRoutes.CREATE_SESSION], { queryParams: { id: this.id , type: 'segment'} }) : this.router.navigate([CommonRoutes.CREATE_SESSION], { queryParams: { id: this.id } });
+    (this.sessionDatas?.status?.value=='LIVE') ? this.router.navigate([CommonRoutes.CREATE_SESSION], { queryParams: { id: this.id , type: 'segment'} }) : this.router.navigate([CommonRoutes.CREATE_SESSION], { queryParams: { id: this.id, isCreator: this.isConductor } });
   }
 
   deleteSession() {
@@ -297,7 +316,7 @@ export class SessionDetailPage implements OnInit {
 
   async onEnroll() {
     if (this.userDetails) {
-      if (this.userDetails?.about) {
+      if (this.userDetails?.about || environment['isAuthBypassed']) {
         let result = await this.sessionService.enrollSession(this.id);
         if (result?.result) {
           this.toast.showToast(result?.message, "success");
@@ -357,7 +376,7 @@ export class SessionDetailPage implements OnInit {
      
     let modal = await this.modalCtrl.create({
       component: MenteeListPopupComponent, 
-      cssClass: 'search-popover-config',
+      cssClass: 'large-width-popover-config',
       componentProps: { id:this.id }
     });
 

@@ -1,15 +1,11 @@
 import { Component, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
-import { LineElement } from 'chart.js/dist';
-import { urlConstants } from 'src/app/core/constants/urlConstants';
 import { AdminWorkapceService } from 'src/app/core/services/admin-workspace/admin-workapce.service';
 import { CommonRoutes } from 'src/global.routes';
 import { ModalController } from '@ionic/angular';
 import { FilterPopupComponent } from 'src/app/shared/components/filter-popup/filter-popup.component';
-import { UtilService } from 'src/app/core/services';
-import { SessionService } from 'src/app/core/services/session/session.service';
 import { MenteeListPopupComponent } from 'src/app/shared/components/mentee-list-popup/mentee-list-popup.component';
-import *  as moment from 'moment';
+import { urlConstants } from 'src/app/core/constants/urlConstants';
 
 @Component({
   selector: 'app-manage-session',
@@ -24,7 +20,13 @@ export class ManageSessionComponent implements OnInit {
     // label: 'MANAGE_SESSION'
   };
   receivedEventData: any;
-  constructor(private adminWorkapceService: AdminWorkapceService, private router: Router, private modalCtrl: ModalController,private utilService:UtilService, private sessionService:SessionService) { }
+
+  public manageSessionUrls: any = {
+    downloadCsvApiUrl: urlConstants.API_URLS.SESSION_DOWNLOAD_CSV,
+    uploadCsvApiUrl: urlConstants.API_URLS.SESSION_BULK_UPLOAD
+  }
+
+  constructor(private adminWorkapceService: AdminWorkapceService, private router: Router, private modalCtrl: ModalController) { }
   headingText = "SESSION_LIST"
   download = "DOWNLOAD";
   page = 1;
@@ -35,6 +37,7 @@ export class ManageSessionComponent implements OnInit {
   sortingData: any;
   setPaginatorToFirstpage:any = false;
   columnData = [
+    { name: 'id', displayName: 'Session Id', type: 'text'},
     { name: 'title', displayName: 'Session name', type: 'text', sortingData: [{ sort_by: 'title', order: 'ASC', label: 'A -> Z' }, { sort_by: 'title', order: 'DESC', label: 'Z -> A' }] },
     { name: 'type', displayName: 'Type', type: 'text' },
     { name: 'mentor_name', displayName: 'Mentor', type: 'text' },
@@ -85,6 +88,7 @@ export class ManageSessionComponent implements OnInit {
   tableData: any;
   dummyTableData: any = false;
   noDataMessage: any;
+  segmentType = 'manage-session';
   filteredDatas = []
   actionButtons = {
     'UPCOMING': [{ icon: 'eye', cssColor: 'white-color' , action:'VIEW'}, { icon: 'create', cssColor: 'white-color' ,action:'EDIT'}, { icon: 'trash', cssColor: 'white-color',action:'DELETE' }],
@@ -109,7 +113,7 @@ export class ManageSessionComponent implements OnInit {
       case "mentee_count":
         let modal = await this.modalCtrl.create({
           component: MenteeListPopupComponent, 
-          cssClass: 'search-popover-config',
+          cssClass: 'large-width-popover-config',
           componentProps: { id:this.receivedEventData.element.id }
         });
     
@@ -120,7 +124,7 @@ export class ManageSessionComponent implements OnInit {
         break;
 
       case "EDIT":
-        (this.receivedEventData?.element?.status=='Live') ? this.router.navigate([CommonRoutes.CREATE_SESSION], { queryParams: { id: this.receivedEventData.element.id , type: 'segment'} }) : this.router.navigate([CommonRoutes.CREATE_SESSION], { queryParams: { id: this.receivedEventData.element.id } });
+        (this.receivedEventData?.element?.status=='Live') ? this.router.navigate([CommonRoutes.CREATE_SESSION], {queryParams: { id: this.receivedEventData.element.id , type: 'segment'} }) : this.router.navigate([CommonRoutes.CREATE_SESSION], { queryParams: { id: this.receivedEventData.element.id } });
         break;
       case 'DELETE':
         await this.adminWorkapceService.deleteSession(this.receivedEventData.element.id)
@@ -157,6 +161,13 @@ export class ManageSessionComponent implements OnInit {
     this.fetchSessionList()
   }
 
+  searchResults(event) {
+    this.searchText= event.searchText;
+    this.page = 1;
+    this.setPaginatorToFirstpage = true
+    this.fetchSessionList()
+  }
+
   async onClickFilter() {
     let modal = await this.modalCtrl.create({
       component: FilterPopupComponent,
@@ -166,7 +177,11 @@ export class ManageSessionComponent implements OnInit {
 
     modal.onDidDismiss().then(async (dataReturned) => {
       this.filteredDatas = []
-      if (dataReturned !== null) {
+       if(dataReturned?.data?.role === 'closed'){
+        this.filterData = dataReturned?.data?.data;
+        return;
+      }
+      if (dataReturned.data && dataReturned.data.data) {
         if (dataReturned.data.data.selectedFilters) {
           for (let key in dataReturned.data.data.selectedFilters) {
             this.filteredDatas[key] = dataReturned.data.data.selectedFilters[key].slice(0, dataReturned.data.data.selectedFilters[key].length).map(obj => obj.value).join(',').toString()
@@ -193,8 +208,8 @@ export class ManageSessionComponent implements OnInit {
         let currentTimeInSeconds=Math.floor(Date.now()/1000);
         let setButton = (ele?.status?.value == 'PUBLISHED' && ele.end_date > currentTimeInSeconds) ? 'UPCOMING' :(ele?.status?.value == 'LIVE' && ele.end_date > currentTimeInSeconds) ? 'LIVE' : 'COMPLETED';
         let date = ele.start_date;
-        ele.start_date = moment.unix(date).format('DD-MMM-YYYY')
-        ele.start_time = moment.unix(date).format('h:mm A')
+        ele.start_date = new Date(date * 1000).toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' }).replace(/,/, '');
+        ele.start_time = new Date(date * 1000).toLocaleTimeString('en-US', { hour: 'numeric', minute: 'numeric', hour12: true });
         ele.action = this.actionButtons[setButton]
         ele.status = ele?.status?.label;
         ele.type = ele?.type?.label;
@@ -202,11 +217,18 @@ export class ManageSessionComponent implements OnInit {
       });
     }
     this.tableData = data;
-    this.noDataMessage = this.searchText ? "SEARCH_RESULT_NOT_FOUND" : "THIS_SPACE_LOOKS_EMPTY"
+    this.noDataMessage = this.searchText ? "SEARCH_RESULT_NOT_FOUND" : "SEARCH_RESULT_NOT_FOUND"
   }
 
   createSession(){
-      this.router.navigate([`${CommonRoutes.CREATE_SESSION}`]); 
+      this.router.navigate([`${CommonRoutes.CREATE_SESSION}`], { queryParams: { source: 'manage' } }); 
   } 
+  segmentChanged(event){
+    this.segmentType = event.target.value;
+  }
 
+    onClearSearch($event: string) {
+    this.searchText ='';
+    this.fetchSessionList()
+    }
 }

@@ -1,23 +1,76 @@
-import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
+import { Component, EventEmitter, Input, OnChanges, OnInit, Output, SimpleChanges } from '@angular/core';
+import { UtilService } from 'src/app/core/services';
 
 @Component({
   selector: 'app-generic-details',
   templateUrl: './generic-details.component.html',
   styleUrls: ['./generic-details.component.scss'],
 })
-export class GenericDetailsComponent implements OnInit {
+export class GenericDetailsComponent implements OnInit, OnChanges {
   @Input() sessionData: any;
   @Input() isMentor: any;
   @Output() onViewList = new EventEmitter();
-
-  constructor() { }
+  preResources = [];
+  postResources = [];
+  isImageModalOpen = false;
+selectedImageUrl: string | null = null;
+  constructor(private utilService: UtilService) { }
+  
   public isArray(arr:any ) {
     return Array.isArray(arr)
  }
 
-  ngOnInit() {}
+  ngOnInit() {
+    if (this.sessionData?.controls) {
+    this.sessionData.controls = this.sessionData.controls.sort((a, b) => 
+      (a.sequence ?? Infinity) - (b.sequence ?? Infinity)
+    );
+  }
+    const resources = this.sessionData?.data?.resources || [];
+    this.preResources = resources.filter(res => res.type === 'pre');
+    this.postResources = resources.filter(res => res.type === 'post');
+  }
 
-  onClickViewList(){
+
+    ngOnChanges(changes: SimpleChanges): void {
+    if (changes.sessionData && changes.sessionData.currentValue) {
+      const resources = this.sessionData.data.resources || [];
+      this.preResources = resources.filter(res => res.type === 'pre');
+      this.postResources = resources.filter(res => res.type === 'post');
+    }
+  }
+
+  onClickViewList(){ 
     this.onViewList.emit()
+  }
+
+  getFileType(data: any) {
+    if (!data) return 'other';
+    const link : string = data.link;
+    const extension = link.split('.').pop()?.toLowerCase();
+    if (['jpg', 'jpeg', 'png', 'gif', 'bmp', 'webp'].includes(extension)) {
+      return 'image';
+    } else if (extension === 'pdf') {
+      return 'pdf';
+    }
+    return 'other';
+  }
+
+  async downloadFile($event: Event, resource: any) {
+      if (resource?.mime_type ==='link') {
+      return; 
+      }
+    $event.preventDefault()
+    await this.utilService.downloadFile(resource.link, resource.name, resource.mime_type);
+  }
+
+  openImageModal(url: string) {
+    this.selectedImageUrl = url;
+    this.isImageModalOpen = true;
+  }
+  
+  closeImageModal() {
+    this.selectedImageUrl = null;
+    this.isImageModalOpen = false;
   }
 }

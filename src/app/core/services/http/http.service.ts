@@ -1,6 +1,5 @@
 import { Injectable, Injector } from '@angular/core';
 import { RequestParams } from '../../interface/request-param';
-import { environment } from 'src/environments/environment';
 import * as _ from 'lodash-es';
 import { UserService } from '../user/user.service';
 import { NetworkService } from '../network.service';
@@ -14,6 +13,8 @@ import { AlertController, ModalController } from '@ionic/angular';
 import { FeedbackPage } from 'src/app/pages/feedback/feedback.page';
 import { CapacitorHttp } from '@capacitor/core';
 import { TranslateService } from '@ngx-translate/core';
+import { environment } from 'src/environments/environment';
+import { Router } from '@angular/router';
 
 
 @Injectable({
@@ -23,6 +24,8 @@ export class HttpService {
   baseUrl;
   isFeedbackTriggered = false;
   isAlertOpen: any = false;
+  extraHeaders
+
   constructor(
     private userService: UserService,
     private network: NetworkService,
@@ -33,12 +36,17 @@ export class HttpService {
     private modalController: ModalController,
     private translate: TranslateService,
     private alert: AlertController,
-  ) {
-    this.baseUrl = environment.baseUrl;
+    private router : Router,
+    private toast: ToastService
+  ) {  
+    this.baseUrl = environment['baseUrl'];
   }
 
   async setHeaders() {
     let token = await this.getToken();
+    if(!token) {
+      return null;
+    } 
     const timezone = Intl.DateTimeFormat().resolvedOptions().timeZone;
     const acceptLanguage = await this.localStorage.getLocalData(localKeys.SELECTED_LANGUAGE);
     const headers = {
@@ -47,16 +55,27 @@ export class HttpService {
       'timeZone': timezone,
       'accept-language':acceptLanguage
     }
+    this.extraHeaders = JSON.parse(localStorage.getItem('headers'))
+    if(this.extraHeaders) {
+      Object.keys(this.extraHeaders).forEach(key => {
+        headers[key] = this.extraHeaders[key];
+      });
+    }
     return headers;
   }
 
   async post(requestParam: RequestParams) {
-    if (!this.checkNetworkAvailability()) {
-      throw Error(null);
-    }
+    if (!(await this.checkNetworkAvailability())) {
+      
+  throw Error(null);
+}
+
     let defaultHeaders = await this.setHeaders();
     const headers = requestParam.headers ?  { ...requestParam.headers, ...defaultHeaders } : defaultHeaders;
     let body = requestParam.payload ? requestParam.payload : {};
+    if (body?.time_zone) {
+    headers.timeZone = body.time_zone;        
+  }
     const options = {
       url: this.baseUrl + requestParam.url,
       headers: headers,
@@ -74,9 +93,9 @@ export class HttpService {
   }
 
   async get(requestParam: RequestParams) {
-    if (!this.checkNetworkAvailability()) {
-      throw Error(null);
-    }
+    if (!(await this.checkNetworkAvailability())) {
+  throw Error(null);
+}
     const headers = requestParam.headers ? requestParam.headers : await this.setHeaders();
     const options = {
       url: this.baseUrl + requestParam.url,
@@ -100,9 +119,9 @@ export class HttpService {
   }
 
   async delete(requestParam: RequestParams) {
-    if (!this.checkNetworkAvailability()) {
-      throw Error(null);
-    }
+    if (!(await this.checkNetworkAvailability())) {
+  throw Error(null);
+}
     const headers = requestParam.headers ? requestParam.headers : await this.setHeaders();
     const options = {
       url: this.baseUrl + requestParam.url,
@@ -121,9 +140,9 @@ export class HttpService {
   }
 
   async patch(requestParam: RequestParams) {
-    if (!this.checkNetworkAvailability()) {
-      throw Error(null);
-    }
+    if (!(await this.checkNetworkAvailability())) {
+  throw Error(null);
+}
     let body = requestParam.payload ? requestParam.payload : {};
     const headers = requestParam.headers ? requestParam.headers : await this.setHeaders();
     const options = {
@@ -143,8 +162,8 @@ export class HttpService {
   }
 
   //network check
-  checkNetworkAvailability() {
-    this.network.getCurrentStatus()
+  async checkNetworkAvailability() {
+    await this.network.getCurrentStatus()
     if (!this.network.isNetworkAvailable) {
       this.toastService.showToast('MSG_PLEASE_NETWORK', 'danger')
       return false;
@@ -153,32 +172,32 @@ export class HttpService {
     }
   }
 
-  //token validation and logout 
 
-  async getToken() {
-    let token = _.get(this.userService.token, 'access_token');
+async getToken() {
+    const token = await this.userService.getUserValue();
+    //need to verify token validity
     if (!token) {
       return null;
     }
-    let isValidToken = this.userService.validateToken(token);
-    if (!isValidToken) {
-      let data: any = await this.getAccessToken();
-      let access_token = _.get(data, 'access_token');
-      if (!access_token) {
-        let authService = this.injector.get(AuthService);
-        await authService.logoutAccount();
-      }
-      this.userService.token['access_token'] = access_token;
-      await this.localStorage.setLocalData(localKeys.TOKEN, this.userService.token);
-    }
-    let userToken = 'bearer ' + _.get(this.userService.token, 'access_token');
-    return userToken;
+
+    // these are commented because of old mentor flow changes
+    // if (!isValidToken) {
+    //   let data: any = await this.getAccessToken();
+    //   let access_token = _.get(data, 'access_token');
+    //   if (!access_token) {
+    //       let authService = this.injector.get(AuthService);
+    //     await authService.logoutAccount();
+    //   }
+    //   this.userService.token['access_token'] = access_token;
+    //   await this.localStorage.setLocalData(localKeys.TOKEN, this.userService.token);
+    // }
+    return token;
   }
 
   async getAccessToken() {
-    if (!this.checkNetworkAvailability()) {
-      throw Error(null);
-    }
+    if (!(await this.checkNetworkAvailability())) {
+  throw Error(null);
+}
     const options = {
       url: this.baseUrl + urlConstants.API_URLS.REFRESH_TOKEN,
       headers: {
@@ -201,6 +220,12 @@ export class HttpService {
 
   public handleError(result) {
     let msg = result.data.message;
+    if (result.url.includes(urlConstants.API_URLS.GET_CHAT_TOKEN)) {
+      return;
+    }
+    if(result.url.includes("interface/v1/profile/get")) {
+      throw result;
+    }
     switch (result.status) {
       case 400:
       case 406:
@@ -209,9 +234,15 @@ export class HttpService {
         this.toastService.showToast(msg ? msg : 'SOMETHING_WENT_WRONG', 'danger')
         break
       case 401:
-          this.triggerLogoutConfirmationAlert(result)
-
-        break
+        let auth = this.injector.get(AuthService);
+        if (result.data.message && result.data.message.startsWith('Congratulations')) {
+          this.triggerLogoutConfirmationAlert(result);
+        } else {
+          localStorage.clear();
+          auth.clearLocalData();
+          location.href = window.location.origin;
+        }
+        break;
       default:
         this.toastService.showToast(msg ? msg : 'SOMETHING_WENT_WRONG', 'danger')
     }
@@ -231,6 +262,7 @@ export class HttpService {
   }
 
   async triggerLogoutConfirmationAlert(result) {
+    this.toast.setDisableToast(true); 
     if(await this.modalController.getTop()) {
       await this.modalController.dismiss()
     }
@@ -252,6 +284,7 @@ export class HttpService {
             cssClass: 'alert-button-red',
             handler: () => {
               this.isAlertOpen = false;
+              this.toast.setDisableToast(false); 
             },
           },
         ],
@@ -260,8 +293,14 @@ export class HttpService {
       await alert.present();
       let data = await alert.onDidDismiss();
       if (data.role == 'cancel') {
-        let auth = this.injector.get(AuthService);
-        auth.logoutAccount(true);
+        if(environment.isAuthBypassed) {
+          let auth = this.injector.get(AuthService);
+          auth.clearLocalData();
+          location.href = window.location.origin
+        } else {
+          let auth = this.injector.get(AuthService);
+          auth.logoutAccount(true);
+        }
       }
       return false;
     } else {

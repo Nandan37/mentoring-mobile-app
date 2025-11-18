@@ -5,16 +5,19 @@ import {
   OnInit,
   Output,
   ViewChild,
-  EventEmitter
+  EventEmitter,
+  ViewChildren,
+  QueryList
 } from '@angular/core';
-import { FormGroup, FormBuilder, Validators } from '@angular/forms';
+import { UntypedFormGroup, UntypedFormBuilder, Validators } from '@angular/forms';
 import * as _ from 'lodash-es';
-import * as moment from 'moment';
-import { ToastService } from 'src/app/core/services';
+import { AttachmentService, ToastService } from 'src/app/core/services';
 import { ThemePalette } from '@angular/material/core';
 import { MatDatepicker } from '@angular/material/datepicker';
-import { NGX_MAT_DATE_FORMATS, NgxMatDateFormats, NgxMatDatetimePicker } from '@angular-material-components/datetime-picker';
 import { debounceTime } from 'rxjs/operators';
+import { SearchAndSelectComponent } from '../search-and-select/search-and-select.component';
+import { OWL_DATE_TIME_FORMATS } from '@danielmoncada/angular-datetime-picker';
+import * as moment from 'moment-timezone';
 
 interface JsonFormValidators {
   min?: number;
@@ -56,6 +59,7 @@ interface JsonFormControls {
   position: string;
   required?: boolean;
   disabled?: boolean;
+  showField?: boolean;
   options?: Array<object>;
   validators: JsonFormValidators;
   numberOfStars?:number;
@@ -78,16 +82,13 @@ export interface JsonFormData {
   controls: JsonFormControls[];
 }
 
-const CUSTOM_DATE_FORMATS: NgxMatDateFormats = {
-  parse: {
-    dateInput: 'LL LT'
-  },
-  display: {
-    dateInput: 'LL LT',
-    monthYearLabel: 'MMM YYYY',
-    dateA11yLabel: 'LL',
-    monthYearA11yLabel: 'MMM YYYY'
-  }
+const CUSTOM_DATE_FORMATS = {
+  fullPickerInput: {year: 'numeric', month: 'long', day: 'numeric', hour: 'numeric', minute: 'numeric', hour12: true},
+  datePickerInput: {year: 'numeric', month: 'long', day: 'numeric'},
+  timePickerInput: {hour: 'numeric', minute: 'numeric', hour12: true},
+  monthYearLabel: {year: 'numeric', month: 'long'},
+  dateA11yLabel: {year: 'numeric', month: 'long', day: 'numeric'},
+  monthYearA11yLabel: {year: 'numeric', month: 'long'},
 };
 
 @Component({
@@ -96,19 +97,23 @@ const CUSTOM_DATE_FORMATS: NgxMatDateFormats = {
   styleUrls: ['./dynamic-form.component.scss'],
   providers: [
     {
-      provide: NGX_MAT_DATE_FORMATS,
-      useValue: CUSTOM_DATE_FORMATS
+      provide: OWL_DATE_TIME_FORMATS, useValue: CUSTOM_DATE_FORMATS
     }
 ]
 })
 export class DynamicFormComponent implements OnInit {
   @Input() jsonFormData: any;
+  @Input() existingData : any;
   @Input() readonly: any = false;
+  @Input()  selectedDynamicValue: string;
   @Output() formValid = new EventEmitter()
   @Output() onEnter = new EventEmitter()
   @Output() formValueChanged = new EventEmitter()
+  @Output() dynamicSelectClicked = new EventEmitter()
   @ViewChild('picker') picker: MatDatepicker<Date>;
-  
+  @ViewChildren(SearchAndSelectComponent) searchAndSelectComponents: QueryList<SearchAndSelectComponent>;
+  @Output() customEventEmitter = new EventEmitter()
+  @Input() sesionId : any;
   public showSpinners = true;
   public showSeconds = false;
   public touchUi = false;
@@ -117,18 +122,23 @@ export class DynamicFormComponent implements OnInit {
   public stepMinute = 1;
   public stepSecond = 1;
   public color: ThemePalette = 'warn';
+  currentDate = moment().startOf('day').toDate();
+  currentTime: string = '';
+  interval: any;
 
 
-  public myForm: FormGroup = this.fb.group({});
+  public myForm: UntypedFormGroup = this.fb.group({});
   showForm = false;
-  currentDate = moment().format();
-  maxDate = moment(this.currentDate).add(10, "years").format();
+  maxDate = new Date(new Date().setFullYear(new Date().getFullYear() + 10));
   dependedChild: any;
-  dependedChildDate="";
+  dependedChildDate: any;
   dependedParent: any;
   dependedParentDate: any;
+  isMobile = window.innerWidth <= 950;
 
-  constructor(private fb: FormBuilder, private toast: ToastService) {}
+  constructor(private fb: UntypedFormBuilder, private toast: ToastService,
+        private attachment: AttachmentService
+  ) {}
   ngOnInit() {
     this.jsonFormData.controls.find((element, index) => {
       if(element.type == "select"){
@@ -190,10 +200,13 @@ export class DynamicFormComponent implements OnInit {
             break;
         }
       }
+      const controlValue = ['state', 'district', 'block', 'cluster', 'school','professional_role','professional_subroles'].includes(control.name) 
+        ? control.value?.label 
+        : control.value;
       this.myForm.addControl(
         control.name,
         this.fb.control(
-          { value: control.value, disabled: control.disabled },
+          { value: controlValue, disabled: control.disabled },
           validatorsToAdd
         )
       );
@@ -209,8 +222,6 @@ export class DynamicFormComponent implements OnInit {
     return JSON.stringify(a) == JSON.stringify(b);
   }
   onSubmit() {
-    console.log('Form valid: ', this.myForm.valid);
-    console.log('Form values: ', this.myForm.value);
     this.isFormValid();
   }
   reset() {
@@ -227,25 +238,30 @@ export class DynamicFormComponent implements OnInit {
     control.showPasswordIcon = true;
   }
 
-  dateSelected(event, control){
-    const indexToEdit = this.jsonFormData.controls.findIndex(formControl => formControl.name === control.name);
-    if (indexToEdit !== -1) {
-      this.jsonFormData.controls[indexToEdit].value = event.value
+   dateSelected(event, control){
+    if(event.value < this.currentDate) {
+      this.myForm.controls[control.name].setValue(this.currentDate);
     }
     if(control.dependedChild){
       this.dependedChild = control.dependedChild;
       this.dependedChildDate = event.value;
-    } else {
-      this.dependedParent = control.dependedParent
-      this.dependedParentDate = event.value;
-    }
+      if(event.value > new Date(this.myForm.controls[this.dependedChild].value)) {
+        this.myForm.controls[this.dependedChild].setValue(this.dependedChildDate);
+      }
+    }    
+  }
+    async openDynamicSelectModal() {
+      this.dynamicSelectClicked.emit(); 
   }
 
-  dateInputClick(control, datetimePicker: NgxMatDatetimePicker<any>) {
+  dateInputClick(control, datetimePicker) {
     if (this.myForm.get(control.name).value)
       datetimePicker._selected = this.myForm.get(control.name).value;
-    datetimePicker.open();
+    setTimeout(()=>{
+      datetimePicker.open();
+    },500)
   }
+
 
   selectionChanged(control, event){
     const indexToEdit = this.jsonFormData.controls.findIndex(formControl => formControl.name === control.name);
@@ -263,5 +279,37 @@ export class DynamicFormComponent implements OnInit {
     if(this.myForm.valid){
       this.onEnter.emit(event)
     }
+  }
+
+  searchEventEmitter(event){
+    const componentInstance = this.searchAndSelectComponents.find(comp => comp.uniqueId === event.id);
+    if (componentInstance) {
+      event.formControl = componentInstance
+      this.customEventEmitter.emit(event)
+    }    
+  }
+
+
+  upload(event: any, control: any) {
+    const file = event.target.files[0];
+    if (file) {
+      const reader = new FileReader();
+      reader.onload = () => {
+        this.myForm.get(control.name).setValue(reader.result);
+      };
+      reader.readAsDataURL(file);
+    }
+  }
+  
+  uploadPhoto(action: string, control: any) {
+    if (action === 'ADD_PHOTO') {
+      (document.querySelector(`#${control.name}-file`) as HTMLInputElement).click();
+    } else if (action === 'REMOVE_PHOTO') {
+      this.myForm.get(control.name).setValue('');
+    }
+  }
+  
+  clearFileInput(control: any) {
+    (document.querySelector(`#${control.name}-file`) as HTMLInputElement).value = '';
   }
 }

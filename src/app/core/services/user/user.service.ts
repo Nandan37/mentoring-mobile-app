@@ -3,8 +3,6 @@ import { localKeys } from '../../constants/localStorage.keys';
 import { LocalStorageService } from '../localstorage.service';
 import * as _ from 'lodash-es';
 import jwt_decode from "jwt-decode";
-import * as moment from 'moment';
-import { environment } from 'src/environments/environment';
 import { Subject } from 'rxjs';
 
 @Injectable({
@@ -16,26 +14,31 @@ export class UserService {
   userEvent = new Subject<any>();
   userEventEmitted$ = this.userEvent.asObservable();
   constructor(
-    private localStorage: LocalStorageService,
-    ) { 
-      this.baseUrl = environment.baseUrl;
+
+    ) {}
+  async getUserValue(): Promise<string | null> {
+    try {
+    const data = localStorage.getItem('accToken'); 
+    this.token = data;
+    if (!this.validateToken(data)) { 
+    return null;
     }
 
-  async getUserValue() {
-    return this.localStorage
-      .getLocalData(localKeys.TOKEN)
-      .then((data: any) => {
-        this.token=data;
-        return data;
-      })
-      .catch((error) => { });
+    this.token = data;
+    return data;
+    } catch (error) {
+      return null;
+    }
   }
 
-  validateToken(token){
-    const tokenDecoded: any = jwt_decode(token);
-    const tokenExpiryTime = moment(tokenDecoded.exp * 1000);
-    const currentTime = moment(Date.now());
-    return currentTime.isBefore(tokenExpiryTime);
+
+  validateToken(token: string): boolean {
+  try {
+    const decoded: any = jwt_decode(token);
+    const expiry = new Date(decoded.exp * 1000);
+    return new Date() < expiry;
+  } catch (err) {
+    return false;
   }
-  
+}
 }

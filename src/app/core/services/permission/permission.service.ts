@@ -54,13 +54,15 @@ export class PermissionService {
     try {
       const data: any = await this.httpService.get(config);
       this.setConfigInLocal(data.result)
+      return data
     }
     catch (error) {
       return null;
     }
   }
 
-  setConfigInLocal(result: any) {
+setConfigInLocal(result: any) {
     this.localStorage.setLocalData(localKeys.MAX_MENTEE_ENROLLMENT_COUNT, result.session_mentee_limit);
-  }
+    this.localStorage.setLocalData(localKeys.CHAT_CONFIG, result.chat_config);
+}
 }

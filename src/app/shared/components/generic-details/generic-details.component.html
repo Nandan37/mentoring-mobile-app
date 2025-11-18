@@ -1,34 +1,118 @@
-<div class="field-wrapper" *ngFor="let item of sessionData.form">
-  <div *ngIf="!sessionData?.menteeForm?.includes(item.title) || (sessionData?.menteeForm?.includes(item.title)&&!isMentor)">
-    <p class="session-detail-heading">{{item.title | translate }}</p>
-    <div *ngIf="isArray(sessionData.data[item.key]); else elseBlock">
-      <ion-chip outline="true" class="ion-margin-top" *ngFor="let chip of sessionData.data[item.key]">
-        <ion-label>{{chip.label}}</ion-label>
-      </ion-chip>
+<div class="field-wrapper" *ngFor="let item of sessionData.controls">
+  <div 
+    *ngIf="(!sessionData?.menteeForm?.includes(item.title) || (sessionData?.menteeForm?.includes(item.title) && !isMentor)) && (item?.visible !== undefined ? item.visible : true) && (item?.visibility === 'main' || !item?.visibility)">
+    <p class="session-detail-heading">{{ item.title || item?.label }}</p>
+    
+    <!-- Handle Array type data -->
+    <div *ngIf="isArray(sessionData.data[item.key]); else nonArrayBlock">
+      <ng-container *ngIf="sessionData.data[item.key].length > 0; else noData">
+        <ion-chip outline="true" class="ion-margin-top break-word" *ngFor="let chip of sessionData.data[item.key]">
+          <ion-label>{{ chip?.label || ('NOT_UPDATED_MSG' | translate) }}</ion-label>
+        </ion-chip>
+      </ng-container>
+      <ng-template #noData>
+        <p class="value">{{ 'NOT_UPDATED_MSG' | translate }}</p>
+      </ng-template>
     </div>
-    <ng-template #elseBlock>
-      <p *ngIf="item?.key=='duration';else elseBlock2" class="value">{{sessionData.data.duration.hours}} {{"HOURS" | translate}} {{sessionData.data.duration.minutes}} {{"MINUTES" | translate}}</p>
-    </ng-template>
-    <ng-template #elseBlock2>
-      <p *ngIf="item?.key=='startDate' || item?.key=='endDate';else elseBlock3" class="value">{{sessionData.data[item.key] | date:'MMM d, y, h:mm a'}}</p>
-    </ng-template>
-    <ng-template #elseBlock3>
-      <div class="d-flex" *ngIf="item?.key=='mentee_count';else elseBlock4">
-        <p class="mentee-count">{{sessionData.data[item.key] }}</p>
-        <ion-button class="view-mentee-list" color="white" (click)="onClickViewList()">View list</ion-button>
-      </div>
-    </ng-template>
-    <ng-template #elseBlock4>
-      <div *ngIf="item?.key=='mentor_name';else elseBlock5">
-        <p>{{sessionData.data[item.key] }}</p>
-        <div>
-          {{sessionData.data.mentor_designation}}
+
+    <!-- Handle non-array data types -->
+    <ng-template #nonArrayBlock>
+      <ng-container [ngSwitch]="item.key">
+        
+        <!-- Duration field -->
+        <p *ngSwitchCase="'duration'" class="value">
+          {{ sessionData.data.duration.hours }} hr
+          {{ sessionData.data.duration.minutes }} minutes
+        </p>
+
+        <!-- Date fields -->
+        <p *ngSwitchCase="'startDate'" class="value">
+          {{ sessionData.data[item.key] | date:'MMM d, y, h:mm a' }}
+        </p>
+        <p *ngSwitchCase="'endDate'" class="value">
+          {{ sessionData.data[item.key] | date:'MMM d, y, h:mm a' }}
+        </p>
+
+        <!-- Mentee count with view list button -->
+        <div *ngSwitchCase="'mentee_count'" class="d-flex">
+          <p class="mentee-count">{{ sessionData.data[item.key] }}</p>
+          <ion-button class="view-mentee-list" color="white" (click)="onClickViewList()">
+            View List
+          </ion-button>
         </div>
-      </div>
-    </ng-template>
-    <ng-template #elseBlock5>
-      <p *ngIf="item?.key=='experience'" class="value">{{sessionData.data[item.key]}} {{"YEARS"|translate}}</p>
-      <p *ngIf="item?.key!='experience'" class="value">{{sessionData.data[item.key]}}</p>
+
+        <!-- Mentor name with designation -->
+        <div *ngSwitchCase="'mentor_name'">
+          <p class="break-word">
+            {{ sessionData.data[item.key]?.label || sessionData.data[item.key] }}
+          </p>
+          <div>{{ sessionData.data.mentor_designation }}</div>
+        </div>
+
+        <!-- Experience field -->
+        <p *ngSwitchCase="'experience'" class="value">
+          {{ sessionData.data[item.key] ? 
+             sessionData.data[item.key] + ' ' + "Years": 
+             ('NOT_UPDATED_MSG' | translate) }}
+        </p>
+
+        <!-- Default case for all other fields -->
+        <p *ngSwitchDefault class="value">
+          <span>
+            {{ sessionData.data[item.key]?.label || 
+               sessionData.data[item.key]?.name || 
+               sessionData.data[item.key] || 
+               ('NOT_UPDATED_MSG' | translate) }}
+          </span>
+        </p>
+      </ng-container>
     </ng-template>
   </div>
 </div>
+<div *ngIf="preResources.length > 0">
+  <p class="session-detail-heading" style="margin: 0 10px;">Pre resources</p>
+      <div style="display: flex; flex-direction: column; flex-wrap: wrap;">
+            <div *ngFor="let resource of preResources" >
+              <a
+                (click)="downloadFile($event, resource);"
+                [href]="resource.link"
+                class="resource-content">
+                         <ion-icon *ngIf="resource.mime_type?.includes('image')" name="image" class="icon-size" ></ion-icon>
+                         <ion-icon *ngIf="resource.mime_type?.includes('pdf') || resource.mime_type?.includes('other') || resource.mime_type?.includes('application')"  name="document" class="icon-size"></ion-icon>
+                         <ion-icon *ngIf="resource.mime_type?.includes('link')" name="link" class="icon-size"></ion-icon>
+                         <ion-icon *ngIf="resource.mime_type?.includes('video')" name="videocam" class="icon-size"></ion-icon>
+                          <div class=" truncate-text my-text">
+                          {{ resource.name }}
+                        </div>
+              </a>
+    </div>
+    </div>
+</div>
+<div *ngIf="postResources.length > 0 && sessionData?.data?.status?.value === 'COMPLETED'">
+  <p class="session-detail-heading" style="margin: 0 10px;">Post resources</p>
+      <div>
+            <div *ngFor="let resource of postResources" style="display: flex; flex-direction: column; flex-wrap: wrap;">
+                <a 
+                (click)="downloadFile($event, resource)"
+                [href]="resource.link"
+                class=" resource-content">
+                         <ion-icon *ngIf="resource.mime_type?.includes('image')" name="image" class="icon-size" ></ion-icon>
+                         <ion-icon *ngIf="resource.mime_type?.includes('pdf') || resource.mime_type?.includes('other') || resource.mime_type?.includes('application')"  name="document" class="icon-size"></ion-icon>
+                         <ion-icon *ngIf="resource.mime_type?.includes('link')" name="link" class="icon-size"></ion-icon>
+                         <ion-icon *ngIf="resource.mime_type?.includes('video')" name="videocam" class="icon-size"></ion-icon>
+                          <div class=" truncate-text my-text">
+                          {{ resource.name }}
+                        </div>
+              </a>
+      </div>
+      </div>
+</div>
+<ion-modal [isOpen]="isImageModalOpen" (ionModalDidDismiss)="closeImageModal()">
+  <ng-template>
+    <ion-content>
+      <ion-icon  name="close-circle" (click)="closeImageModal()" class="close-icon-modal"></ion-icon>
+      <ion-img [src]="selectedImageUrl" style="width: 100%; height: auto;"></ion-img>
+    </ion-content>
+  </ng-template>
+</ion-modal>
+

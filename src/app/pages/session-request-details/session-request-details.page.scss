@@ -1,0 +1,163 @@
+.profile-container {
+    text-align: center;
+  }
+  
+  .profile-avatar {
+    width: 100px;
+    height: 100px;
+    margin: 16px auto;
+  }
+  
+  .profile-name {
+    font-size: 1.5rem;
+    font-weight: bold;
+  }
+  
+  .profile-description {
+    color: gray;
+    margin-bottom: 15px;
+  }
+  
+  .request-info {
+    margin-top: 20px;
+    font-size: 1rem;
+  }
+  
+  ion-chip {
+    display: flex;
+    justify-content: left;
+    margin-top: 10px;
+  }
+.viewMore{
+    display: flex;
+    justify-content: end;
+    margin: 0px;
+    color: var(--blue);
+    text-decoration: underline;
+    font-style: italic;
+    cursor: pointer;
+}
+
+
+//////////////
+
+
+ion-modal {
+  --height: 50%;
+  --box-shadow: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1);
+}
+
+ion-modal::part(backdrop) {
+  background: rgba(209, 213, 219);
+  opacity: 1;
+}
+
+ion-modal ion-toolbar {
+  --color: white;
+}
+
+
+.card-title{
+  font-weight: 800;
+}
+
+.hint-icon{
+  font-size: 12px;
+  margin: 0%;
+}
+
+.hint-label{
+  font-size: 12px;
+  padding-left: 5px;
+  margin: 0%;
+}
+
+
+
+
+.timeline{
+  display: flex;
+  gap: 20px;
+  width: 100%;
+}
+.timeline-card{
+  background: var(--white);
+  width: 100%;
+  box-sizing: border-box;
+
+  border-radius: 15px;
+  border: .5px;
+
+
+}
+
+
+.timeline-line{
+  height: 113%;
+  width: 2px;
+  background-color: var(--black);
+
+}
+
+.timeline-dot{
+  position: absolute;
+  transform: translateX(0%);
+  width: 12px;
+  height: 12px;
+  background: black;
+  border-radius: 50%;
+  z-index: 1;
+}
+.timeline-item {
+ width: 100%;
+}
+.timeline-date{
+width: 10%;
+text-align: left;
+}
+
+.timeline-description {
+  display: flex;
+  width: 85%;
+  gap: 0px;
+
+}
+.timeline-cards {
+  display: flex;
+  width: 95%;
+  flex-direction: column;
+  gap: 10px;
+ 
+}
+.session-title{
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  width: 100%;
+}
+
+::ng-deep .mat-expansion-panel-body {
+  padding: 0 24px 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+
+@media (max-width: 576px) {
+  .timeline-date {
+    width: 23%;
+    padding-right: 0;
+  }
+
+  .timeline-description {
+    width: 74%;
+  }
+
+  .timeline{
+    display: flex;
+    gap: 10px;
+    width: 100%;
+  }
+
+}

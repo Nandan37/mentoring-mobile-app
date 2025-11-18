@@ -16,6 +16,9 @@ ion-item {
     caret-color: black !important;
   }
 }
+.p-rel{
+position: relative;
+}
 :host {
   .item-interactive.ion-invalid {
     --highlight-background: rgba(255, 255, 255, 0) !important;
@@ -82,7 +85,7 @@ mat-datepicker-toggle {
   font-size: 24px !important;
   margin-top: 18px;
   z-index: 1000;
-  left : 95px;
+  right: 0px;
   position: absolute;
 }
 
@@ -99,4 +102,20 @@ ion-popover {
   &::part(content) {
     width: 300px;
   }
+}
+
+.date-input-container {
+  margin: 10px 0px;
+  width: 100%;
+}
+
+.date-input {
+  border: none;
+  outline: none;
+  width: 100%;
+}
+.calendar-icon {
+  position: absolute;
+  right: 10px;
+  font-size: 24px;
 }

@@ -5,6 +5,14 @@ ion-card{
         padding: 6px;
     }
 }
+
+.detail-container {
+    display: flex;
+    flex-direction: column; 
+    height: 100vh; 
+    background-color: white;
+}
+
 .card-wrapper{
     // margin-top: 5%;
 }
@@ -23,12 +31,12 @@ ion-card{
     font-weight: bold;
     text-transform: none;
 }
-ion-segment-button{
-    width: 50%;
-}
 .no-details-message{
-    color: red;
+    color: var(--ion-color-primary);
     font-size:larger;
     text-align: center;
     margin: 20px;
+}
+.content-wrapper {
+  padding: 16px 16px 16px 0px;
 }
