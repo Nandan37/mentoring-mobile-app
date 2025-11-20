@@ -163,7 +163,7 @@ public buttonConfig = {
   });
     if(result){
       this.formData.data = result;
-      this.formData.data.emailId = result.email;
+      this.formData.data.emailId = result?.email;
       this.formData.data.organizationName = this.user.organization?.name;
     }
   }
