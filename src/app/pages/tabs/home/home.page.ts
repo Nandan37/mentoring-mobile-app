@@ -88,6 +88,7 @@ export class HomePage{
 async ionViewWillEnter() {
     if (this.isLoading) return;
     this.isLoading = true;
+     this.isLoading = true;
     this.isCreatedSessions = false;
     this.isEnrolledSession = false;
     this.page = 1;
