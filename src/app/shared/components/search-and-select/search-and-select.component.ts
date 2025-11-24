@@ -30,6 +30,7 @@ export class SearchAndSelectComponent implements OnInit, ControlValueAccessor {
   @Input() sessionId: any;
   private static menteeControlRef: any;
   disabled;
+  isDisabled: boolean;
   touched = false;
   selectedChips;
   _selectAll;
@@ -68,6 +69,9 @@ export class SearchAndSelectComponent implements OnInit, ControlValueAccessor {
     this.selectedData = this.control.meta.searchData ? this.control.meta.searchData : []
     this.selectedChips = this.selectedData.map( data => data.id )
     this.icon = this.selectedData.length ? this.closeIconLight : this.addIconDark
+    if (this.control.name === 'mentees') {
+     this.selectedData = this.selectedData.map(data => ({...data, isDisabled: true}));
+  }
   }
   registerOnChange(onChange: any) {
     this.onChange = onChange;
@@ -190,7 +194,7 @@ export class SearchAndSelectComponent implements OnInit, ControlValueAccessor {
       componentProps: {
         data: data, 
         type: 'link',
-        heading: 'ADD_LINK'
+        heading: 'ADD_LINK_POPUP'
       },
       backdropDismiss: false
     });

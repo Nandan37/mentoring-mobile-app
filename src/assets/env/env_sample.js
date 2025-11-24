@@ -1,7 +1,9 @@
 window["env"] = {
     production: false, // Toggle between development (false) and production (true) mode
-    name: '<APP_NAME>', // Application name, e.g., "Mentoring App"
-    baseUrl: '<BASE_URL>', // Base URL for API requests (e.g., "https://api.example.com")
+    name: '<APP_NAME>', // Application name, e.g., "Mentoring App",
+    baseUrl: '<BASE_URL>', // Base URL for API requests (e.g., "https://api.example.com"),
+    chatBaseUrl: '<chatBase-url>', // Rocket.Chat base URL for chat functionality
+    chatWebSocketUrl: '<chatWebSocket-url>', // WebSocket URL for enabling real-time communication
     sqliteDBName: 'mentoring.db', // Local SQLite database file name used for local storage (e.g., "mentoring.db")
     deepLinkUrl: '<DEEPLINK_URL>', // Base URL for deep linking into the app (e.g., "app://deeplink")
     privacyPolicyUrl:'<PRIVACY_POLICY_LINKS>', // URL to the Privacy Policy page

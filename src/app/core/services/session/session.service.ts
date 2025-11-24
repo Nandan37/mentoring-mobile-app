@@ -218,7 +218,7 @@ export class SessionService {
 
   async getUpcomingSessions(id) {
     const config = {
-      url: urlConstants.API_URLS.UPCOMING_SESSIONS + id + "?page=1&limit=100&type=PUBLIC",
+      url: urlConstants.API_URLS.UPCOMING_SESSIONS + id + "?page=1&limit=100",
       payload: {}
     };
     try {
@@ -258,7 +258,7 @@ export class SessionService {
 
   async getSessions(obj) {
     const config = {
-      url: urlConstants.API_URLS.HOME_SESSION + obj.page + '&limit=' + obj.limit,
+      url: urlConstants.API_URLS.HOME_SESSION + obj.page + '&limit=' + obj.limit + (obj.scope ? '&sessionScope=' + obj.scope : ''),
     };
     try {
       let data: any = await this.httpService.get(config);
@@ -281,9 +281,9 @@ export class SessionService {
     }
   }
 
-  async requestSessionList() {
+  async requestSessionList(page: number) {
     const config = {
-      url: urlConstants.API_URLS.REQUEST_SESSION_LIST + '?pageNo=1&pageSize=100' + '&status=REQUESTED,EXPIRED',
+      url: urlConstants.API_URLS.REQUEST_SESSION_LIST + '?pageNo=' + page + '&pageSize=100' + '&status=REQUESTED,EXPIRED',
     };
     try {
       let data: any = await this.httpService.get(config);

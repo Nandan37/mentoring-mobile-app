@@ -43,7 +43,7 @@
       class="message-info"
       [ngStyle]="{'bottom': info.hasOwnProperty('created_by') && info.created_by != info.user_id ? '20px' : '100px'}"
     >
-      <div class="flex flex-justify-center">
+      <div class="flex flex-justify-center" *ngIf="messages[info?.status]">
         <div class="info-container">
           <ion-icon name="information-circle"></ion-icon>
           <span>
@@ -72,14 +72,14 @@
     </div>
   </div>
 </ion-content>
-<ion-footer
+<div
   *ngIf="info.created_by === info.user_id  && info.status != 'ACCEPTED'"
+  style="background-color: white;"
 >
-  <ion-toolbar>
+  <div>
     <div class="msg-limit"> {{message?.length}} / {{messageLimit}}
     </div>
     <div class="p-3 border-t flex items-center psfixed">
-     
       <input type="text" [(ngModel)]="message" placeholder="Type a message..."
         class="flex-1 border rounded-full px-4 py-3 text-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
         (keyup.enter)="sendRequest()" />
@@ -91,5 +91,5 @@
         <ion-icon name="send" style="padding: 10px"></ion-icon>
       </ion-fab-button>
     </div>
-  </ion-toolbar>
-</ion-footer>
+  </div>
+</div>

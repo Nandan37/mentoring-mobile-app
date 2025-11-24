@@ -36,7 +36,8 @@ export class HttpService {
     private modalController: ModalController,
     private translate: TranslateService,
     private alert: AlertController,
-    private router : Router
+    private router : Router,
+    private toast: ToastService
   ) {  
     this.baseUrl = environment['baseUrl'];
   }
@@ -261,6 +262,7 @@ async getToken() {
   }
 
   async triggerLogoutConfirmationAlert(result) {
+    this.toast.setDisableToast(true); 
     if(await this.modalController.getTop()) {
       await this.modalController.dismiss()
     }
@@ -282,6 +284,7 @@ async getToken() {
             cssClass: 'alert-button-red',
             handler: () => {
               this.isAlertOpen = false;
+              this.toast.setDisableToast(false); 
             },
           },
         ],

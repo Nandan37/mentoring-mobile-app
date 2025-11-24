@@ -1,10 +1,14 @@
 import { Component, Input, OnInit } from '@angular/core';
-import { ModalController, Platform } from '@ionic/angular';
+import {  ModalController, Platform } from '@ionic/angular';
 import { TranslateService } from '@ngx-translate/core';
 import * as _ from 'lodash-es';
+import { MENTOR_DIR_CARD_FORM } from 'src/app/core/constants/formConstant';
+import { MENTEE_CARD_FORM } from 'src/app/core/constants/formConstant';
 import { localKeys } from 'src/app/core/constants/localStorage.keys';
 import { urlConstants } from 'src/app/core/constants/urlConstants';
 import { HttpService, LocalStorageService, ToastService, UtilService } from 'src/app/core/services';
+import { FormService } from 'src/app/core/services/form/form.service';
+import { FilterPopupComponent } from '../filter-popup/filter-popup.component';
 
 @Component({
   selector: 'app-search-popover',
@@ -15,6 +19,10 @@ export class SearchPopoverComponent implements OnInit {
 
   @Input() data: any;
   showFilterHeader = true
+  headerConfig: any = {
+    label: 'MENTOR_LIST',
+    headerColor: 'primary',
+  };
   columnData = [
     { name: 'name', displayName: 'Name', type: 'text' },
     { name: 'designation', displayName: 'Designation', type: 'array' },
@@ -37,15 +45,20 @@ export class SearchPopoverComponent implements OnInit {
   sortingData;
   setPaginatorToFirstpage:any = false;
   actionButtons = {
-    'ADD': [{ name: 'ADD', cssColor: 'white-color' }],
-    'REMOVE': [{ name: 'REMOVE', cssColor: 'primary-color' }],
+    'ADD': [{ label: 'ADD', action: 'ADD', color: 'light', name: 'ADD', cssColor: 'white-color', isDisabled: false }],
+    'REMOVE': [{ label: 'REMOVE', action: 'REMOVE', color: 'primary',name: 'REMOVE', cssColor: 'primary-color', isDisabled: false }],
   }
   selectedFilters:any = {};
   selectedList: any=[];
   noDataMessage: string;
   hasSessionManager: any;
+  mentorForm: any;
+  chips : any[] = [];
+  disableInfiniteScroll = false; 
+  disableNavigation= true;
+  showPaginator: boolean= true;
 
-  constructor(private platform: Platform, private modalController: ModalController, private toast: ToastService,private translate: TranslateService, private localStorage: LocalStorageService, private util: UtilService, private httpService: HttpService) { 
+  constructor(private platform: Platform, private modalController: ModalController, private toast: ToastService,private translate: TranslateService, private localStorage: LocalStorageService, private util: UtilService, private httpService: HttpService, private form: FormService) { 
     this.platform.backButton.subscribeWithPriority(10, () => {
       this.handleBackButton();
     });
@@ -62,24 +75,31 @@ export class SearchPopoverComponent implements OnInit {
   }
 
   async ngOnInit() {
+    let isMobile = this.util.isMobile();
+    if(isMobile)
+      this.limit = 25;
     this.maxCount = await this.localStorage.getLocalData(localKeys[this.data.control.meta.maxCount])
     this.user = await this.localStorage.getLocalData(localKeys.USER_DETAILS)
     this.roles = await this.localStorage.getLocalData(localKeys.USER_ROLES);
+    const result = await this.form.getForm(MENTEE_CARD_FORM);
+    this.mentorForm = _.get(result, 'data.fields.controls');
+    this.headerConfig.label = this.data?.control?.name === "mentees" ? "MENTEE_LIST" : "MENTOR_LIST";
     this.selectedList = this.data.selectedData ? this.data.selectedData : this.selectedList
     if (this.data.viewListMode) {
       this.selectedList.forEach((ele) => {
         ele.organization = (typeof ele.organization === 'object' && ele.organization !== null) ? ele.organization.name : ele.organization;
-        ele.action = ele.type=='ENROLLED' ? [] : this.actionButtons.REMOVE;
+        ele.action = ele.type=='ENROLLED' ? [{ label: 'REMOVE', action: 'REMOVE', color: 'primary', name: 'REMOVE', cssColor: 'primary-color' , isDisabled: true}] : this.actionButtons.REMOVE;
       });
       this.tableData = this.selectedList
       this.filterData = [];
     } else {
       this.tableData = await this.getMenteelist();
-      this.filterData = this.data.isMobile ? [] : await this.getFilters();
-      this.filterData = this.data.isMobile ? [] : this.util.getFormatedFilterData(this.filterData, this.data.control.meta);
+      this.filterData =  await this.getFilters();
+      this.filterData = await this.util.getFormatedFilterData(this.filterData, this.data.control.meta);
       if(this.data.control.name != "mentor_id")
       this.filterData = [...this.filterData, this.data?.control?.meta?.filters?.type[0]];
-    }    
+    }   
+    this.showPaginator = this.data.disablePaginator ? false : true;
   }
 
   async getFilters() {
@@ -118,7 +138,7 @@ export class SearchPopoverComponent implements OnInit {
     ? '&' + this.data.control.meta.filters.type[0].key +'=' + this.selectedFilters.type.map(des => des.value).join(',')
     : '';
     let queryString = organizationsQueryParam + designationQueryParam + 
-    ((this.data.sessionType === 'PRIVATE' && (this.data.formConfig || Boolean(this.data.isCreator))) 
+    ((this.data.sessionType === 'PRIVATE' && this.data.showConnectedMentees)
     ? '&connected_mentees=true' 
     : typeQueryParam);
 
@@ -137,7 +157,7 @@ export class SearchPopoverComponent implements OnInit {
       this.noDataMessage = this.searchText ? "SEARCH_RESULT_NOT_FOUND" : "THIS_SPACE_LOOKS_EMPTY"
       let selectedIds =  _.map(this.selectedList, 'id');
       data.result.data.forEach((ele) => {
-        ele.action = _.includes(selectedIds, ele.id) ? (ele.enrolled_type === 'ENROLLED' ? [] : this.actionButtons.REMOVE) : this.actionButtons.ADD;
+        ele.action = _.includes(selectedIds, ele.id) ? (ele.enrolled_type === 'ENROLLED' ?  [{ label: 'REMOVE', action: 'REMOVE', color: 'primary', name: 'REMOVE', cssColor: 'primary-color' , isDisabled: true}] : this.actionButtons.REMOVE) : this.actionButtons.ADD;
         ele.type = ele?.enrolled_type
         ele.organization = ele?.organization?.name;
       });
@@ -155,7 +175,7 @@ export class SearchPopoverComponent implements OnInit {
   async onClearSearch(event: any) {
     this.searchText =''
     this.tableData = await this.getMenteelist();
-    }
+  }
 
   async filtersChanged(event) {
     this.selectedFilters = event
@@ -165,10 +185,10 @@ export class SearchPopoverComponent implements OnInit {
   }
 
   async onSearch(event: any){
-    this.searchText= event.searchText;
-      this.page=1;
-      this.setPaginatorToFirstpage= true
-      this.tableData = await this.getMenteelist()
+    this.searchText = event.searchText;
+    this.page=1;
+    this.setPaginatorToFirstpage= true
+    this.tableData = await this.getMenteelist()
   }
 
   onButtonCLick(data: any) {
@@ -176,7 +196,7 @@ export class SearchPopoverComponent implements OnInit {
       const sessionManager = this.selectedList.some(element => this.user.id === element.id);
       this.countSelectedList = sessionManager ? this.selectedList.length - 1 : this.selectedList.length;
     }
-    switch(data.action){
+    switch(data?.action || data?.type){
       case 'ADD':
         this.countSelectedList = (this.user.id == data.element.id) ?this.countSelectedList : this.countSelectedList+1
         if(!this.data.control.meta.multiSelect){
@@ -184,7 +204,7 @@ export class SearchPopoverComponent implements OnInit {
         } else {
           if(this.maxCount && this.maxCount>=this.countSelectedList){
             const index = this.tableData.findIndex(item => item.id === data.element.id);
-            this.tableData[index].action = this.actionButtons.REMOVE
+            this.tableData[index].action = this.actionButtons.REMOVE;
             let addedData = data.element
             this.selectedList.push(addedData)
           } else {
@@ -199,7 +219,7 @@ export class SearchPopoverComponent implements OnInit {
         if(this.data.viewListMode) {
           this.tableData = this.tableData.filter(obj => obj.id !== data.element.id);
         } else {
-          this.tableData[index].action = this.actionButtons.ADD
+          this.tableData[index].action = this.actionButtons.ADD;
         }
         this.selectedList = this.selectedList.filter(obj => obj.id !== data.element.id);
       default:
@@ -209,15 +229,21 @@ export class SearchPopoverComponent implements OnInit {
 
   async onPaginatorChange(data:any) {
     this.setPaginatorToFirstpage= false;
-    if(this.data.isMobile){
-      this.page = this.page+1;
-      this.limit = data.pageSize 
-      this.tableData = this.tableData.concat(await this.getMenteelist())
-    } else {
       this.page = data.page;
       this.limit = data.pageSize 
-      this.tableData = await this.getMenteelist()
-    }
+      this.tableData = await this.getMenteelist();
+  }
+
+  async loadMore(event) {
+      this.page = this.page+1;
+
+      let data = await this.getMenteelist();
+        if(data.length === 0) {
+          this.disableInfiniteScroll = true;
+          return ;
+      }
+    this.tableData = this.tableData.concat(data)
+    event.target.complete();
   }
 
   onSorting(data: any) {
@@ -225,5 +251,71 @@ export class SearchPopoverComponent implements OnInit {
     this.setPaginatorToFirstpage= true
     this.sortingData = data;
     this.getMenteelist()
+  }
+
+  extractLabels(data) {
+    this.chips = [];
+    for (const key in data) {
+      if (data.hasOwnProperty(key)) {
+        this.chips.push(...data[key]);
+      }
+    }
+  }
+
+  removeFilteredData(chip) {
+    this.filterData.map((filter) => {
+      filter.options.map((option) => {
+        if (option.value === chip) {
+          option.selected = false;
+        }
+      });
+      return filter;
+    })
+    for (let key in this.selectedFilters) {
+      if (this.selectedFilters.hasOwnProperty(key)) {
+        this.selectedFilters[key] = this.selectedFilters[key].filter(item => item.value !== chip);
+        if (this.selectedFilters[key].length === 0) {
+          delete this.selectedFilters[key];
+        }
+      }
+    }
+  }
+
+  async removeChip(event) {
+    this.chips.splice(event.index, 1);
+    this.removeFilteredData(event.chipValue);
+    this.page = 1;
+    this.setPaginatorToFirstpage = true;
+    this.tableData = await this.getMenteelist();
+  }
+
+
+  async onClickFilter() {
+    let modal = await this.modalController.create({
+      component: FilterPopupComponent,
+      cssClass: 'filter-modal',
+      componentProps: { filterData: this.filterData }
+    });
+  
+    modal.onDidDismiss().then(async (dataReturned) => {
+      if(dataReturned?.data?.role === 'closed'){
+        this.filterData = dataReturned?.data?.data;
+        return;
+      }
+      if(Object.keys(dataReturned?.data).length === 0){
+        this.chips = [];
+        this.selectedFilters = {};
+      }
+      if (dataReturned.data && dataReturned.data.data) {
+        if (dataReturned.data.data.selectedFilters) {
+          this.selectedFilters = dataReturned.data.data.selectedFilters;
+          this.extractLabels(dataReturned.data.data.selectedFilters);
+        }
+      }
+      this.page = 1;
+      this.setPaginatorToFirstpage = true
+      this.tableData = await this.getMenteelist();
+    });
+    modal.present()
   }
 }

@@ -261,7 +261,7 @@ async ionViewWillEnter() {
     }
   }
 
-  async getMentors(){
+ async getMentors(){
     var obj = {
       page: this.page, 
       pageSize: this.pageSize, 
@@ -281,7 +281,7 @@ async ionViewWillEnter() {
         mentor.buttonConfig = this.buttonConfig.map(btn => ({ ...btn }));
       }
     });
-      this.filterIcon = true;
+      // this.filterIcon = true;
     } else {
       this.data = [];
       this.totalCount = [];
@@ -289,6 +289,7 @@ async ionViewWillEnter() {
         this.filterIcon = false;
       }
     }
+    this.filterIcon = !!obj.searchText?.trim();
   }
 
   removeChip(event) {
@@ -307,6 +308,7 @@ async ionViewWillEnter() {
         }
       }
     };
+    this.filterIcon = false;
     this.chips = [];
     this.urlQueryData = null;
   }

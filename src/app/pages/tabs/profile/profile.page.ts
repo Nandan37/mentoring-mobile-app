@@ -18,32 +18,32 @@ import { EDIT_PROFILE_FORM } from 'src/app/core/constants/formConstant';
 export class ProfilePage implements OnInit {
   @ViewChild(IonContent) content: IonContent;
   formData: any = {
-    form: [
-      { title: 'SESSIONS_ATTENDED',
+    controls: [
+      { title: 'Sessions attended',
         key: 'sessions_attended',
       },
       {
-        title: 'ABOUT',
+        title: 'About',
         key: 'about',
       },
       {
-        title: "ORGANIZATION",
+        title: "Organization",
         key: "organizationName"
       },
       {
-        title: 'YEAR_OF_EXPERIENCE',
+        title: 'Years of experience',
         key: 'experience',
       },
       {
-        title: "EDUCATION_QUALIFICATION",
+        title: "Education qualification",
         key: "education_qualification"
       },
       {
-        title: "EMAIL_ID",
+        title: "Email id",
         key: "emailId"
       },
       {
-        title: "PROFESSIONAL_ROLE",
+        title: "Professional role",
         key: "professional_role"
       }
     ],
@@ -85,17 +85,18 @@ public buttonConfig = {
   }
   async ionViewWillEnter() {
     this.user = await this.localStorage.getLocalData(localKeys.USER_DETAILS)
+    let roles = await this.localStorage.getLocalData(localKeys.USER_ROLES);
+    this.isMentor = roles.includes('mentor')?true:false;
     if(this.user){
       await this.profileService.getUserRole(this.user)
     }
-    if(!this.profileService.isMentor&&!await this.localStorage.getLocalData(localKeys.IS_ROLE_REQUESTED)&&!this.isMentorButtonPushed) {
+    if(!this.isMentor&&!await this.localStorage.getLocalData(localKeys.IS_ROLE_REQUESTED)&&!this.isMentorButtonPushed) {
       this.buttonConfig.buttons.push(this.becomeAMentorButton)
       this.isMentorButtonPushed = true;
     }
     this.formData.data = this.user;
-    this.formData.data.emailId = this.user.email.address;
+    this.formData.data.emailId = this.user?.email;
     this.formData.data.organizationName = this.user?.organization?.name;
-    this.isMentor = this.profileService.isMentor;
     if (!this.formData?.data?.about) {
       (!this.visited && !this.formData.data.deleted)?this.router.navigate([CommonRoutes.EDIT_PROFILE],{replaceUrl:true}):null;
       this.visited=true;
@@ -123,8 +124,8 @@ public buttonConfig = {
     var result = await this.profileService.getProfileDetailsFromAPI();
     response.data.fields.controls.forEach(entity => {
       Object.entries(result).forEach(([key, value]) => {
-        if(entity.type=='chip' &&  entity.name == key && !this.formData.form.some(obj => obj.key === entity.name)){
-          this.formData.form.push(
+        if(entity.type=='chip' &&  entity.name == key && !this.formData.controls.some(obj => obj.key === entity.name)){
+          this.formData.controls.push(
             {
               title: entity.label,
               key: entity.name
@@ -135,34 +136,34 @@ public buttonConfig = {
     });
   let extraDataForm = [
     {
-      title: "STATE",
+      title: "State",
       key: "state"
     },
     {
-      title: "DISTRICT",
+      title: "District",
       key: "district"
     },
     {
-      title: "BLOCK",
+      title: "Block",
       key: "block"
     },
     {
-      title: "CLUSTER",
+      title: "Cluster",
       key: "cluster"
     },
     {
-      title: "SCHOOL",
+      title: "School",
       key: "school"
     }
   ];
   extraDataForm.forEach(field => {
-    if (!this.formData.form.some(existingField => existingField.key === field.key)) {
-      this.formData.form.push(field);
+    if (!this.formData.controls.some(existingField => existingField.key === field.key)) {
+      this.formData.controls.push(field);
     }
   });
     if(result){
       this.formData.data = result;
-      this.formData.data.emailId = result.email;
+      this.formData.data.emailId = result?.email;
       this.formData.data.organizationName = this.user.organization?.name;
     }
   }

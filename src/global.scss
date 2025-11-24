@@ -35,7 +35,7 @@
 :root {
   --ion-default-font: "NotoSans-Regular";
   --ion-font-family: "NotoSans-Regular";
-  --ion-color-primary: #832215;
+  --ion-color-primary: #572E91;
   --ion-color-secondary: #ffffff;
   --red: rgb(255, 0, 0);
   --white: #fff;
@@ -188,6 +188,10 @@ body{
 
 .gap-3 {
   gap: 12px;
+}
+
+.gap-1 {
+  gap: 4px
 }
 
 .header-bottom-border {

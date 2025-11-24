@@ -31,6 +31,6 @@
     </ion-row>
   </ion-grid>
   <div *ngIf="totalCount == 0 || !data">
-    <app-no-data-found [messageHeader]="'NO_MENTORS_AVAILABLE'"> </app-no-data-found>
+      <app-no-data-found [messageHeader]="'SEARCH_RESULT_NOT_FOUND'" [messageDescription]="'NO_SESSION_MESSAGE_DESCRIPTION'"> </app-no-data-found>
   </div>
 </ion-content>
