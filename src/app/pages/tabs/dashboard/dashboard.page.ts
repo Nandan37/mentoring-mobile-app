@@ -4,7 +4,7 @@ import { HttpService, UtilService } from 'src/app/core/services';
 import { FormService } from 'src/app/core/services/form/form.service';
 import * as moment from 'moment';
 import { urlConstants } from 'src/app/core/constants/urlConstants';
-import { Component } from '@angular/core';
+import { Component, ViewChild } from '@angular/core';
 import { ProfileService } from 'src/app/core/services/profile/profile.service';
 import { environment } from 'src/environments/environment';
 import { TranslateService } from '@ngx-translate/core';
@@ -15,6 +15,7 @@ import { TranslateService } from '@ngx-translate/core';
   styleUrls: ['dashboard.page.scss'],
 })
 export class DashboardPage  {
+  @ViewChild('libTableRef') libTableRef: any;
   user: any;
   sessions: any;
   filteredCards: any = [];
@@ -49,6 +50,7 @@ export class DashboardPage  {
   chartBodyConfig :any= {}
   chartBodyPayload: any;
   translatedChartConfig : any;
+  scrollLabelForMonth : string;
    metaKeys = _.cloneDeep(DASHBOARD_TABLE_META_KEYS);
 
   constructor(
@@ -93,6 +95,7 @@ export class DashboardPage  {
   }
 
   async initialDuration(){
+    this.scrollLabelForMonth = this.translate.instant("SCROLL_TO_EXPLORE_CHART");
     const today = moment();
     this.startDate = today.clone().startOf('month').add(1, 'second');
     this.endDate = today.clone().endOf('month');
@@ -103,6 +106,7 @@ export class DashboardPage  {
     this.endDateEpoch = endDateEpoch;
     this.prepareTableUrl();
     this.prepareChartUrl();
+
     if( this.filteredCards){
       this.bigNumberCount();
     }
@@ -335,8 +339,14 @@ export class DashboardPage  {
   }, 10);
   this.chartBody.headers = await this.apiService.setHeaders();
   }
-   downloadCSV(data: { url: string; fileName: string }) {
-    this.utilService.downloadCSVFile(data.url, data.fileName);
+  async downloadCSV(data: { url: string; fileName: string }) {
+  await this.utilService.downloadFile(data.url, data.fileName);
+}
+
+ionViewWillLeave() {
+  if (this.libTableRef && this.libTableRef.showPopup) {
+    this.libTableRef.closePopup();
   }
+}
 }
 

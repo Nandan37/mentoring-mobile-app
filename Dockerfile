@@ -1,4 +1,4 @@
-FROM node:17 AS build
+FROM node:18 AS build
 
 WORKDIR /app
 
@@ -16,9 +16,9 @@ RUN npm install --force
 
 COPY . .
 
-RUN ionic build --prod
+RUN ionic build --configuration production
 
-FROM node:17 AS final
+FROM node:18 AS final
 
 WORKDIR /usr/src/app
 

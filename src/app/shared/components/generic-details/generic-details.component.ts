@@ -1,4 +1,5 @@
 import { Component, EventEmitter, Input, OnChanges, OnInit, Output, SimpleChanges } from '@angular/core';
+import { UtilService } from 'src/app/core/services';
 
 @Component({
   selector: 'app-generic-details',
@@ -13,7 +14,7 @@ export class GenericDetailsComponent implements OnInit, OnChanges {
   postResources = [];
   isImageModalOpen = false;
 selectedImageUrl: string | null = null;
-  constructor() { }
+  constructor(private utilService: UtilService) { }
   
   public isArray(arr:any ) {
     return Array.isArray(arr)
@@ -53,6 +54,14 @@ selectedImageUrl: string | null = null;
       return 'pdf';
     }
     return 'other';
+  }
+
+  async downloadFile($event: Event, resource: any) {
+      if (resource?.mime_type ==='link') {
+      return; 
+      }
+    $event.preventDefault()
+    await this.utilService.downloadFile(resource.link, resource.name, resource.mime_type);
   }
 
   openImageModal(url: string) {

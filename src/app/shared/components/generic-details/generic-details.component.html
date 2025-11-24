@@ -73,10 +73,10 @@
   <p class="session-detail-heading" style="margin: 0 10px;">Pre resources</p>
       <div style="display: flex; flex-direction: column; flex-wrap: wrap;">
             <div *ngFor="let resource of preResources" >
-              <a 
+              <a
+                (click)="downloadFile($event, resource);"
                 [href]="resource.link"
-                target="_blank"
-                class=" resource-content">
+                class="resource-content">
                          <ion-icon *ngIf="resource.mime_type?.includes('image')" name="image" class="icon-size" ></ion-icon>
                          <ion-icon *ngIf="resource.mime_type?.includes('pdf') || resource.mime_type?.includes('other') || resource.mime_type?.includes('application')"  name="document" class="icon-size"></ion-icon>
                          <ion-icon *ngIf="resource.mime_type?.includes('link')" name="link" class="icon-size"></ion-icon>
@@ -93,8 +93,8 @@
       <div>
             <div *ngFor="let resource of postResources" style="display: flex; flex-direction: column; flex-wrap: wrap;">
                 <a 
+                (click)="downloadFile($event, resource)"
                 [href]="resource.link"
-                target="_blank"
                 class=" resource-content">
                          <ion-icon *ngIf="resource.mime_type?.includes('image')" name="image" class="icon-size" ></ion-icon>
                          <ion-icon *ngIf="resource.mime_type?.includes('pdf') || resource.mime_type?.includes('other') || resource.mime_type?.includes('application')"  name="document" class="icon-size"></ion-icon>

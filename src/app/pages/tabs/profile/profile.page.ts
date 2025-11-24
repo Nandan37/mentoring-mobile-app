@@ -95,7 +95,7 @@ public buttonConfig = {
       this.isMentorButtonPushed = true;
     }
     this.formData.data = this.user;
-    this.formData.data.emailId = this.user.email.address;
+    this.formData.data.emailId = this.user?.email;
     this.formData.data.organizationName = this.user?.organization?.name;
     if (!this.formData?.data?.about) {
       (!this.visited && !this.formData.data.deleted)?this.router.navigate([CommonRoutes.EDIT_PROFILE],{replaceUrl:true}):null;
@@ -163,7 +163,7 @@ public buttonConfig = {
   });
     if(result){
       this.formData.data = result;
-      this.formData.data.emailId = result.email;
+      this.formData.data.emailId = result?.email;
       this.formData.data.organizationName = this.user.organization?.name;
     }
   }

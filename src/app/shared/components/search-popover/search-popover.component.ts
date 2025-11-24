@@ -56,6 +56,7 @@ export class SearchPopoverComponent implements OnInit {
   chips : any[] = [];
   disableInfiniteScroll = false; 
   disableNavigation= true;
+  showPaginator: boolean= true;
 
   constructor(private platform: Platform, private modalController: ModalController, private toast: ToastService,private translate: TranslateService, private localStorage: LocalStorageService, private util: UtilService, private httpService: HttpService, private form: FormService) { 
     this.platform.backButton.subscribeWithPriority(10, () => {
@@ -97,7 +98,8 @@ export class SearchPopoverComponent implements OnInit {
       this.filterData = await this.util.getFormatedFilterData(this.filterData, this.data.control.meta);
       if(this.data.control.name != "mentor_id")
       this.filterData = [...this.filterData, this.data?.control?.meta?.filters?.type[0]];
-    }    
+    }   
+    this.showPaginator = this.data.disablePaginator ? false : true;
   }
 
   async getFilters() {
@@ -136,7 +138,7 @@ export class SearchPopoverComponent implements OnInit {
     ? '&' + this.data.control.meta.filters.type[0].key +'=' + this.selectedFilters.type.map(des => des.value).join(',')
     : '';
     let queryString = organizationsQueryParam + designationQueryParam + 
-    ((this.data.sessionType === 'PRIVATE' && (this.data.formConfig || Boolean(this.data.isCreator))) 
+    ((this.data.sessionType === 'PRIVATE' && this.data.showConnectedMentees)
     ? '&connected_mentees=true' 
     : typeQueryParam);
 
@@ -236,10 +238,11 @@ export class SearchPopoverComponent implements OnInit {
       this.page = this.page+1;
 
       let data = await this.getMenteelist();
-      this.tableData = this.tableData.concat(data)
-      if(data.length === 0) {
+        if(data.length === 0) {
           this.disableInfiniteScroll = true;
+          return ;
       }
+    this.tableData = this.tableData.concat(data)
     event.target.complete();
   }
 

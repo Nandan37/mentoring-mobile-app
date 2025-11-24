@@ -1,7 +1,6 @@
 import { DataSource } from '@angular/cdk/collections';
 import { Component, OnInit, ViewChild } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
-import { IonInfiniteScroll } from '@ionic/angular';
 import { localKeys } from 'src/app/core/constants/localStorage.keys';
 import { urlConstants } from 'src/app/core/constants/urlConstants';
 import { SKELETON } from 'src/app/core/constants/skeleton.constant';
@@ -24,7 +23,6 @@ import * as _ from 'lodash';
   styleUrls: ['./mentor-details.page.scss'],
 })
 export class MentorDetailsPage implements OnInit {
-  @ViewChild(IonInfiniteScroll) infiniteScroll: IonInfiniteScroll;
   mentorId;
   page = 1;
   limit = 100;
@@ -35,6 +33,7 @@ export class MentorDetailsPage implements OnInit {
     backButton: false,
     headerColor: "primary"
   };
+  disableInfiniteScroll: boolean = false;
 
   public buttonConfig = {
     meta: {
@@ -68,6 +67,7 @@ export class MentorDetailsPage implements OnInit {
   userNotFound: boolean = false;
   userCanAccess: boolean;
   isLoading = false;
+  isUpcomingSession: boolean =false; 
   SKELETON = SKELETON;
   constructor(
     private routerParams: ActivatedRoute,
@@ -87,6 +87,7 @@ export class MentorDetailsPage implements OnInit {
     if(this.isLoading)
       return;
     this.isLoading = true;
+    this.isUpcomingSession = false;
     let user = await this.localStorage.getLocalData(localKeys.USER_DETAILS)
     this.routerParams.params.subscribe((params) => {
       this.mentorId = this.buttonConfig.meta.id = params.id;
@@ -122,24 +123,23 @@ export class MentorDetailsPage implements OnInit {
     try {
       let data = await this.httpService.get(config);
       const newSessions = data?.result?.data || [];
-      
+      this.isUpcomingSession = true;
       if (isLoadMore) {
         this.upcomingSessions = [...this.upcomingSessions, ...newSessions];
       } else {
         this.upcomingSessions = newSessions;
       }
+
       
       this.totalCount = data?.result?.count || 0;
       
-      if (this.infiniteScroll) {
-        this.infiniteScroll.disabled = this.upcomingSessions.length >= this.totalCount;
+      if (!this.disableInfiniteScroll) {
+        this.disableInfiniteScroll = this.upcomingSessions.length >= this.totalCount;
       }
     }
     catch (error) {
       console.error('Error fetching upcoming sessions:', error);
-      if (this.infiniteScroll) {
-        this.infiniteScroll.disabled = true;
-      }
+      this.disableInfiniteScroll = true;
     }
   }
 
@@ -180,6 +180,7 @@ export class MentorDetailsPage implements OnInit {
 
   async segmentChanged(ev: any) {
     this.segmentValue = ev.detail.value;
+    this.isUpcomingSession = false;
     if(this.segmentValue == 'upcoming'){
       this.page = 1;
       this.upcomingSessions = [];
@@ -228,6 +229,7 @@ export class MentorDetailsPage implements OnInit {
       case 'joinAction':
         await this.sessionService.joinSession(event.data);
         this.page = 1;
+        this.isUpcomingSession =false;
         this.upcomingSessions = [];
         await this.getUpcomingSessions();
         break;
@@ -237,6 +239,7 @@ export class MentorDetailsPage implements OnInit {
         if(enrollResult.result){
           this.toast.showToast(enrollResult.message, "success")
           this.page = 1;
+          this.isUpcomingSession =false;
           this.upcomingSessions = [];
           await this.getUpcomingSessions();
         }

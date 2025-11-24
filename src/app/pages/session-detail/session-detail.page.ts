@@ -187,7 +187,7 @@ export class SessionDetailPage implements OnInit, OnDestroy {
       this.startDate = (response.start_date>0)?new Date(response.start_date * 1000):this.startDate;
       this.endDate = (response.end_date>0)?new Date(response.end_date * 1000):this.endDate;
       this.platformOff = (response?.meeting_info?.platform == 'OFF') ? true : false;
-      if((!this.detailData.controls.some(obj => obj.title === 'MENTOR'))){
+      if((!this.detailData.controls.some(obj =>  obj.key === 'mentor_name'))){
         this.detailData.controls.push(
           {
             title: 'Mentor',
@@ -195,7 +195,7 @@ export class SessionDetailPage implements OnInit, OnDestroy {
           },
         );
       } 
-      if((this.isCreator || this.isConductor) && !this.detailData.controls.some(obj => obj.title === 'MENTEE_COUNT')){
+      if((this.isCreator || this.isConductor) && !this.detailData.controls.some(obj => obj.key === 'mentee_count')){
         
         this.detailData.controls.push(
           {

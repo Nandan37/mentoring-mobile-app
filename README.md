@@ -58,8 +58,8 @@ Setting up the Project
 ----------------------
 
 1. Clone the [repository](https://github.com/ELEVATE-Project/mentoring-mobile-app.git).
-2. Change to the latest GitHub branch (**release-2.6.1**).
-3. Add environment files into the src/environments folder.
+2. Change to the latest GitHub branch (**3.2.0-saaschanges**).
+3. Add environment files into the src/environments folder.[Sample env file](https://github.com/ELEVATE-Project/mentoring-mobile-app/blob/3.2.0-saaschange/README.md#structure-of-environmentts-file) 
 4. Go to the project folder and run `npm i`.
 
 
@@ -222,12 +222,19 @@ For deploying your application, you need an Environment file, Server.js, and a p
       staging: true / false,
       dev: true / false,
       baseUrl: "<base-url>",
+      chatBaseUrl: "<chatBase-url>",
+      chatWebSocketUrl: "<chatWebSocket-url>",
+      isAuthBypassed: true / false,
+      restictedPages: [
+      "HELP_VIDEOS_PAGE", "HELP_PAGE", "FAQ_PAGE", "LOGIN_ACTIVITY_PAGE", "CHANGE_PASSWORD_PAGE", "LOGIN_PAGE", "REGISTER_PAGE", "RESET_PASSWORD_PAGE","OTP_PAGE", 'EDIT_PROFILE']
       sqliteDBName: "<db-name> (if you have)",
       deepLinkUrl: "<deeplink-url>",
       privacyPolicyUrl: "<privacy-policy-url>",
       termsOfServiceUrl: "<term-of-service-url>",
    };
 ```
+
+For detailed descriptions of each key, refer to the [Environment Configuration Guide](./src/assets/env/env.md).
 
 ### Structure of pm2.config.json File
 
