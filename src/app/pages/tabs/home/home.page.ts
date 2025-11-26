@@ -119,19 +119,6 @@ async ionViewWillEnter() {
     this.isLoading = false;
   }
 
-
-   a() {
-  const x = 10;
-  const y = 20;
-  return x + y;
-}
-
- b() {
-  const x = 10;
-  const y = 20;
-  return x + y;  // ❌ Duplicate code block
-}
-
   async loadSegmentData(segmentName: string, isLoadMore: boolean = false) {
     this.isCreatedSessions =false;
     this.isEnrolledSession =false;
