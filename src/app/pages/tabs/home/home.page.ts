@@ -10,7 +10,6 @@ import { ProfileService } from 'src/app/core/services/profile/profile.service';
 import { HttpService, LoaderService, LocalStorageService, ToastService, UserService, UtilService } from 'src/app/core/services';
 import { SessionService } from 'src/app/core/services/session/session.service';
 import { TermsAndConditionsPage } from '../../terms-and-conditions/terms-and-conditions.page';
-import { App, AppState } from '@capacitor/app';
 import { Capacitor } from '@capacitor/core';
 import { PermissionService } from 'src/app/core/services/permission/permission.service';
 import { environment } from 'src/environments/environment';
@@ -22,9 +21,10 @@ import { CdkConnectedOverlay } from '@angular/cdk/overlay';
   templateUrl: 'home.page.html',
   styleUrls: ['home.page.scss'],
 })
-export class HomePage implements OnInit {
+export class HomePage{
   public formData: JsonFormData;
   user;
+  private isLoading: boolean = false;
   SESSIONS: string = CommonRoutes.SESSIONS;
   SKELETON = SKELETON;
   page = 1;
@@ -51,10 +51,16 @@ export class HomePage implements OnInit {
   isMentor: boolean;
   userEventSubscription: any;
   isOpen = false;
-
   chips= [];
   criteriaChip: any;
   searchText: string;
+  isCreatedSessions: boolean;
+  isEnrolledSession: boolean;
+
+  allSessionsCount = 0;
+  createdSessionsCount = 0;
+  enrolledSessionsCount = 0;
+  
   constructor(
     private router: Router,
     private profileService: ProfileService,
@@ -75,51 +81,75 @@ export class HomePage implements OnInit {
   }
  
 
-  async ngOnInit() {
-    await this.getUser();
-    if(this.user && !this.user.profile_mandatory_fields.length){
-      this.getSessions();
-    }
-    App.addListener('appStateChange', (state: AppState) => {
-      this.localStorage.getLocalData(localKeys.USER_DETAILS).then(data => {
-        if (state.isActive == true && data && !data.profile_mandatory_fields.length) {
-          this.getSessions();
-          if(this.profileService.isMentor){
-            this.getCreatedSessionDetails();
-          }
-        }
-      })
-    });
-    let isRoleRequested = await this.localStorage.getLocalData(localKeys.IS_ROLE_REQUESTED)
-    let isBecomeMentorTileClosed = await this.localStorage.getLocalData(localKeys.IS_BECOME_MENTOR_TILE_CLOSED);
-    this.showBecomeMentorCard = (isRoleRequested || this.profileService.isMentor || isBecomeMentorTileClosed) ? false : true;
-    if(this.profileService.isMentor){
-      this.getCreatedSessionDetails();
-    }
-    this.userEventSubscription = this.userService.userEventEmitted$.subscribe(data => {
-      if (data) {
-        this.isMentor = this.profileService.isMentor
-        this.user = data;
-      }
-    })
-    this.user = await this.localStorage.getLocalData(localKeys.USER_DETAILS)
-    this.permissionService.getPlatformConfig().then((config)=>{
-      this.chips = config.result.search_config.search.session.fields;
-    })
-  }
+  
   gotToTop() {
     this.content.scrollToTop(1000);
   }
-
-  async ionViewWillEnter() {
-    this.getSessions();
+async ionViewWillEnter() {
+    if (this.isLoading) return;
+    this.isLoading = true;
+    this.isCreatedSessions = false;
+    this.isEnrolledSession = false;
+    this.page = 1;
+    this.sessions = null;
+    this.createdSessions = null;
     await this.getUser();
+    await this.getUser();
+    let roles = await this.localStorage.getLocalData(localKeys.USER_ROLES);
+    this.isMentor = roles?.includes('mentor')?true:false;
     this.gotToTop();
-    let isRoleRequested = await this.localStorage.getLocalData(localKeys.IS_ROLE_REQUESTED)
-    let isBecomeMentorTileClosed =await this.localStorage.getLocalData(localKeys.IS_BECOME_MENTOR_TILE_CLOSED);
-    this.showBecomeMentorCard = (isRoleRequested || this.profileService.isMentor || isBecomeMentorTileClosed) ? false : true;
-    var obj = { page: this.page, limit: this.limit, searchText: "" };
-    this.createdSessions = this.isMentor ? await this.sessionService.getAllSessionsAPI(obj) : []
+    let isRoleRequested = await this.localStorage.getLocalData(localKeys.IS_ROLE_REQUESTED);;
+    let isBecomeMentorTileClosed = await this.localStorage.getLocalData(localKeys.IS_BECOME_MENTOR_TILE_CLOSED);
+    this.showBecomeMentorCard = (isRoleRequested || this.isMentor || isBecomeMentorTileClosed) ? false : true;
+     if (!this.userEventSubscription) {
+      this.userEventSubscription = this.userService.userEventEmitted$.subscribe(data => {
+        if (data) {
+          this.user = data;
+        }
+      });
+    }
+    if (this.user && !this.user.profile_mandatory_fields.length) {
+      await this.loadSegmentData(this.selectedSegment);
+    }
+    if (this.chips.length == 0) {
+      this.permissionService.getPlatformConfig().then((config) => {
+        this.chips = config.result.search_config.search.session.fields;
+      });
+    }
+    
+    this.isLoading = false;
+  }
+
+  async loadSegmentData(segmentName: string, isLoadMore: boolean = false) {
+    this.isCreatedSessions =false;
+    this.isEnrolledSession =false;
+    switch(segmentName) {
+      case 'all-sessions':
+        await this.getSessions('all', isLoadMore);
+        break;
+      case 'created-sessions':
+        if (this.isMentor) {
+          var obj = { page: this.page, limit: this.limit, searchText: "" };
+          let data = await this.sessionService.getAllSessionsAPI(obj);
+          if (!data || data.length === 0) {
+          this.isCreatedSessions = true;
+        }
+          
+          if (isLoadMore && this.createdSessions?.data) {
+            this.createdSessions.data = [...this.createdSessions.data, ...data.data];
+          } else {
+            this.createdSessions = data;
+          }
+          this.createdSessionsCount = data?.count || 0;
+        } else {
+          this.createdSessions = { data: [] };
+          this.createdSessionsCount = 0;
+        }
+        break;
+      case 'my-sessions':
+        await this.getSessions('my', isLoadMore);
+        break;
+    }
   }
   async eventAction(event) {
     if (this.user.about || environment['isAuthBypassed']) {
@@ -130,23 +160,23 @@ export class HomePage implements OnInit {
 
         case 'joinAction':
           await this.sessionService.joinSession(event.data)
-          this.getSessions();
+          this.page = 1;
+          await this.loadSegmentData(this.selectedSegment);
           break;
 
         case 'enrollAction':
           let enrollResult = await this.sessionService.enrollSession(event.data.id);
           if (enrollResult.result) {
             this.toast.showToast(enrollResult.message, "success")
-            this.getSessions();
+            this.page = 1;
+            await this.loadSegmentData(this.selectedSegment);
           }
           break;
 
         case 'startAction':
           this.sessionService.startSession(event.data.id).then(async () => {
-            var obj = { page: this.page, limit: this.limit, searchText: "" };
-            if(this.profileService.isMentor){
-              this.createdSessions = await this.sessionService.getAllSessionsAPI(obj);
-            }
+            this.page = 1;
+            await this.loadSegmentData(this.selectedSegment);
           })
           break;
       }
@@ -164,26 +194,48 @@ export class HomePage implements OnInit {
       this.searchText = event ? event : "";
       this.utilService.subscribeSearchText(this.searchText);
       this.utilService.subscribeCriteriaChip(JSON.stringify(this.criteriaChip))
-      this.router.navigate([`/${CommonRoutes.HOME_SEARCH}`]);
+      this.router.navigate([`/${CommonRoutes.HOME_SEARCH}`], {
+        queryParams: {
+          search: this.searchText,
+          chip: this.criteriaChip?.name
+        }
+      });
     }else {
       this.toast.showToast("ENTER_MIN_CHARACTER","danger");
     }
   }
   async getUser() {
     let data = await this.profileService.getProfileDetailsFromAPI();
-    this.isMentor = this.profileService.isMentor;
     this.user = data;
     if (!this.user?.terms_and_conditions) {
       // this.openModal();
     }
   }
 
-  async getSessions() {
-    var obj = {page: this.page, limit: this.limit}
+  async getSessions(scope: string = 'all', isLoadMore: boolean = false) {
+    var obj = {page: this.page, limit: this.limit, scope: scope};
     let data = await this.sessionService.getSessions(obj);
-    this.sessions = data.result;
-    this.sessionsCount = data.result.count;
+    
+    if (scope === 'all') {
+      if (isLoadMore && this.sessions?.all_sessions) {
+        this.sessions.all_sessions = [...this.sessions.all_sessions, ...(data.result.all_sessions || [])];
+      } else {
+        this.sessions = data.result;
+      }
+      this.allSessionsCount = data.result.allSessions_count || 0;
+    } else if (scope === 'my') {
+      if (isLoadMore && this.sessions?.my_sessions) {
+        this.sessions.my_sessions = [...this.sessions.my_sessions, ...(data.result.my_sessions || [])];
+      } else {
+        this.sessions = data.result;
+      }
+      if (!this.sessions.my_sessions || this.sessions.my_sessions.length === 0) {
+      this.isEnrolledSession = true;
+    }
+      this.enrolledSessionsCount = data.result.my_sessions_count || 0;
+    }
   }
+
   async openModal() {
     const modal = await this.modalController.create({
       component: TermsAndConditionsPage,
@@ -193,6 +245,8 @@ export class HomePage implements OnInit {
   }
   async segmentChanged(event) {
     this.selectedSegment = event.name;
+    this.page = 1;
+    await this.loadSegmentData(this.selectedSegment);
   }
   async createSession() {
     if (this.user?.about != null || environment['isAuthBypassed']) {
@@ -215,12 +269,27 @@ export class HomePage implements OnInit {
     await this.localStorage.setLocalData(localKeys.IS_BECOME_MENTOR_TILE_CLOSED, true)
   }
 
-  getCreatedSessionDetails() {
-    if (this.isMentor) {
-      var obj = { page: this.page, limit: this.limit, searchText: "" };
-      this.sessionService.getAllSessionsAPI(obj).then((data) => {
-        this.createdSessions = data;
-      })
+  async loadMore(event) {
+    this.page++;
+    await this.loadSegmentData(this.selectedSegment, true);
+    event.target.complete();
+  }
+
+  get isInfiniteScrollDisabled(): boolean {
+    switch(this.selectedSegment) {
+      case 'all-sessions':
+        const allSessionsLength = this.sessions?.all_sessions?.length || 0;
+        return allSessionsLength >= this.allSessionsCount || allSessionsLength === 0;
+      
+      case 'created-sessions':
+        const createdSessionsLength = this.createdSessions?.data?.length || 0;
+        return createdSessionsLength >= this.createdSessionsCount || createdSessionsLength === 0;
+      
+      case 'my-sessions':
+        const enrolledSessionsLength = this.sessions?.my_sessions?.length || 0;
+        return enrolledSessionsLength >= this.enrolledSessionsCount || enrolledSessionsLength === 0;
+      default:
+        return true;
     }
   }
 
@@ -240,6 +309,7 @@ export class HomePage implements OnInit {
 
   ionViewWillLeave(){
     this.isOpen = false;
+    this.isLoading = false;
     if (this.connectedOverlay && this.connectedOverlay.overlayRef) {
     this.connectedOverlay.overlayRef.detach();
     }
@@ -248,6 +318,6 @@ export class HomePage implements OnInit {
   ionViewDidLeave(){
     this.criteriaChip = '';
     this.searchText = '';
+    this.page = 1;
   }
-  
 }

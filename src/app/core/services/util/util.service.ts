@@ -199,7 +199,7 @@ export class UtilService {
         const options = filterData[key].map((item) => ({
           id: item.id,
           label: item.name,
-          value: item.code,
+          value: item.id,
         }));
         const type = formData.filters[key].find((obj) => obj.key === name).type;
         result.push({ title, name, options, type });
@@ -223,7 +223,7 @@ export class UtilService {
     }
     return result;
   }
-
+  
   parseAndDownloadCSV(rawCSVData: string, fileName: string): void {
     Papa.parse(rawCSVData, {
       complete: (result) => {
@@ -238,6 +238,52 @@ export class UtilService {
       },
     });
   }
+
+async downloadFile(fileUrl: string, fileName: string, mimeType?: string): Promise<void> {
+  try {
+    const response = await fetch(fileUrl);
+    let contentType: string;
+    let fileExtension: string;
+    
+    if (!mimeType || mimeType.includes('csv') || fileName.endsWith('.csv')) {
+      contentType = 'text/csv;charset=utf-8;';
+      fileExtension = '.csv';
+    }
+    else if (mimeType.includes('pdf')) {
+      contentType = 'application/pdf';
+      fileExtension = '.pdf';
+    }
+    else if (mimeType.includes('word') || mimeType.includes('.document') || mimeType.includes('docx')) {
+      contentType = 'application/vnd.openxmlformats-officedocument.wordprocessingml.document';
+      fileExtension = '.docx';
+    }
+    else if (mimeType.includes('presentation') || mimeType.includes('powerpoint') || mimeType.includes('pptx')) {
+      contentType = 'application/vnd.openxmlformats-officedocument.presentationml.presentation';
+      fileExtension = '.pptx';
+    }
+    else {
+      contentType = 'application/octet-stream';
+      fileExtension = '';
+    }
+    
+    const blob = await response.blob();
+    const typedBlob = new Blob([blob], { type: contentType });
+    const url = URL.createObjectURL(typedBlob);
+    const link = document.createElement('a');
+    link.href = url;
+    link.download = fileName.includes('.') ? fileName : `${fileName}${fileExtension}`;
+    
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    
+    setTimeout(() => URL.revokeObjectURL(url), 1000);
+  } catch (error) {
+    console.error('Error downloading file:', error);
+  }
+}
+
+
 
   async deviceDetails() {
     const browser = Bowser.getParser(window.navigator.userAgent);

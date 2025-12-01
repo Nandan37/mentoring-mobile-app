@@ -18,6 +18,7 @@ export class GenericCardComponent implements OnInit {
   @Input() cardConfig: any;
   @Input() disableButton: boolean;
   @Input() showTag: any;
+  @Input() disableNavigation: boolean= false;
 
   constructor(private router: Router, private localStorage: LocalStorageService) {}
 
@@ -26,10 +27,12 @@ export class GenericCardComponent implements OnInit {
   }
 
   onCardClick(data) {
+    if(!this.disableNavigation){
     this.router.navigate([
       CommonRoutes.MENTOR_DETAILS,
       data?.id || data?.user_id,
     ]);
+    }
   }
   handleButtonClick(action: string, data) {
     let value = {
@@ -37,6 +40,7 @@ export class GenericCardComponent implements OnInit {
       name : data.name,
       type: action,
       rid: data?.connection_meta?.room_id,
+      element: data
     };
     this.onClickEvent.emit(value);
   }

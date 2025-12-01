@@ -24,17 +24,21 @@ export class RequestsPage implements OnInit {
   };
   segmentType = 'slot-requests';
   buttonConfig: any;
-  data: any;
+  data: any[] = [];
   noResult: any;
   routeData: any;
   slotBtnConfig: any;
-  slotRequests: any;
-  mentorForm:any
+  slotRequests: any[] = [];
+  mentorForm:any;
   expiryTag = {
     label: 'EXPIRED',
     cssClass: 'expired-tag'
-  }
-
+  };
+  page = 1;
+  isInfiniteScrollDisabled = false;
+  isLoading: boolean = false;
+  isDataAvailable: boolean;
+  
   constructor(
     private httpService: HttpService,
     private route: ActivatedRoute,
@@ -44,6 +48,10 @@ export class RequestsPage implements OnInit {
   ) {}
 
   async ionViewWillEnter(){
+    if(this.isLoading)
+      return;
+    this.isDataAvailable = false;
+    this.isLoading = true;
     const result = await this.form.getForm(MENTOR_REQ_CARD_FORM);
     this.mentorForm = _.get(result, 'data.fields.controls');
     this.route.data.subscribe((data) => {
@@ -51,77 +59,121 @@ export class RequestsPage implements OnInit {
       this.buttonConfig = this.routeData?.button_config;
       this.slotBtnConfig = this.routeData.slotButtonConfig;
     });
+    
+    this.page = 1;
+    this.slotRequests = [];
+    this.data = [];
+    this.isInfiniteScrollDisabled = false;
+    
     if (this.segmentType === 'slot-requests') {
-    await this.slotRequestData();
-  } else {
-    await this.pendingRequest();
+      await this.slotRequestData();
+    } else {
+      await this.pendingRequest();
+    }
+    this.isLoading = false;
   }
-
-  }
+  
   ngOnInit() {
   }
 
-async segmentChanged(event: any) {
-  this.segmentType = event.target.value;
-  if (this.segmentType === 'slot-requests') {
-    await this.slotRequestData();
-  } else {
-    await this.pendingRequest();
-  }
-}
-
-
-  async pendingRequest() {
-    const config = {
-      url: urlConstants.API_URLS.CONNECTION_REQUEST,
-    };
-    try {
-      let data: any = await this.httpService.get(config);
-      this.data = data ? data.result.data : '';
-      if (!this.data?.length) {
-      this.noResult = { subHeader: this.routeData?.noDataFound.noMessage };
+  async segmentChanged(event: any) {
+    this.segmentType = event.target.value;
+    this.page = 1;
+    this.isInfiniteScrollDisabled = false;
+    this.noResult = '';
+    this.slotRequests = [];
+    this.data = [];
+    this.isDataAvailable = false;
+    if (this.segmentType === 'slot-requests') {
+      await this.slotRequestData();
+    } else {
+      await this.pendingRequest();
     }
-      return data;
+  }
+
+  async pendingRequest(isLoadMore: boolean = false) {
+    const config = {
+      url: urlConstants.API_URLS.CONNECTION_REQUEST +
+      '?pageNo=' + this.page +
+      '&pageSize=100',
+    };
+    
+    try {
+      let response: any = await this.httpService.get(config);
+       this.isDataAvailable = true;
+      let newData = response?.result?.data || [];
+      
+      if (isLoadMore) {
+        this.data = [...this.data, ...newData];
+      } else {
+        this.data = newData;
+      }
+      
+      const totalCount = response?.result?.count || 0;
+      this.isInfiniteScrollDisabled = this.data.length >= totalCount;
+      
+      if (this.data.length === 0 && this.page === 1) {
+        this.noResult = this.routeData?.noDataFound?.noMessage;
+      } else {
+        this.noResult = '';
+      }
+      
+      return response;
     } catch (error) {
+      console.error('Error fetching pending requests:', error);
+      this.isInfiniteScrollDisabled = true;
       return error;
     }
   }
 
- async slotRequestData() {
-  try {
-    const res = await this.sessionService.requestSessionList();
-    const data = res?.result?.data ?? [];
+  async slotRequestData(isLoadMore: boolean = false) {
+    try {
+      const res = await this.sessionService.requestSessionList(this.page);
+       this.isDataAvailable = true;
+      let data = [];
+      
+      if (isLoadMore) {
+        data = [...this.slotRequests, ...(res?.result?.data || [])];
+      } else {
+        data = res?.result?.data || [];
+      }
+      
+      const totalCount = res?.result?.count || 0;
+      this.isInfiniteScrollDisabled = data.length >= totalCount;
+      
+      if (data.length === 0 && this.page === 1) {
+        this.noResult = this.routeData?.noDataFound?.noSession;
+        return;
+      }
 
-    if (data.length === 0) {
-      this.noResult = { subHeader: this.routeData?.noDataFound?.noSession };
+      const formattedData = data.map(value => ({
+        ...value,
+        meta: this.getMeta(value),
+        showTag: this.isSessionExpired(value) ? this.expiryTag : '',
+        disableButton: this.isSessionExpired(value)
+      }));
+
+      this.slotRequests = formattedData;
+
+    } catch (error) {
+      console.error('Error fetching session list:', error);
+      this.isInfiniteScrollDisabled = true;
     }
-
-    this.slotRequests = data.map(value => ({
-      ...value,
-      meta: this.getMeta(value),
-      showTag: this.isSessionExpired(value) ? this.expiryTag : '',
-      disableButton: this.isSessionExpired(value)
-    }));
-
-  } catch (error) {
-    console.error('Error fetching session list:', error);
   }
-}
-
 
   getMeta(value: any) {
-  return {
-    isSent: value?.requestee_id === value?.user_details?.user_id,
-    message: value?.meta?.message,
-    timeStamp: '',
-    resp: value
-  };
-}
+    return {
+      isSent: value?.requestee_id === value?.user_details?.user_id,
+      message: value?.meta?.message,
+      timeStamp: '',
+      resp: value
+    };
+  }
 
   isSessionExpired(meta): boolean {
-  const endDate = meta?.end_date;
-  if (!endDate) return false; 
-  return Date.now() > endDate * 1000;
+    const endDate = meta?.end_date;
+    if (!endDate) return false; 
+    return Date.now() > endDate * 1000;
   }
   
   onCardClick(event, data?) {
@@ -135,4 +187,15 @@ async segmentChanged(event: any) {
     }
   }
 
+  async loadMore($event: any) {
+    this.page = this.page + 1;
+    
+    if (this.segmentType === 'slot-requests') {
+      await this.slotRequestData(true);
+    } else {
+      await this.pendingRequest(true);
+    }
+    
+    $event.target.complete();
+  }
 }

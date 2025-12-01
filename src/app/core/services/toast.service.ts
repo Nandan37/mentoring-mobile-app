@@ -14,6 +14,7 @@ export class ToastService {
   }
   private activeToast: HTMLIonToastElement | null = null;
   private isToastPreloaded = false;
+  private disableToast = false;
 
   private async preloadToast() {
     if (this.isToastPreloaded) return;
@@ -34,6 +35,9 @@ export class ToastService {
   }
 
   async showToast(msg, color, duration = 5000, toastButton = [], subText?: string, params?: any) {
+    if(this.disableToast) {
+      return;
+    }
     try {
       if (this.activeToast) {
         await this.activeToast.dismiss();
@@ -87,5 +91,9 @@ export class ToastService {
     } catch (error) {
       alert(msg);
     }
+  }
+
+  setDisableToast(value: boolean) {
+    this.disableToast = value;
   }
 }
