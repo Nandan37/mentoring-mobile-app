@@ -157,6 +157,15 @@ export class EditProfilePage implements OnInit, isDeactivatable {
           form[entityKey] = control.multiple ? _.map(form[entityKey], 'value') : form[entityKey]
         });
         this.form1.myForm.markAsPristine();
+          if(!form['about']){
+            form['about'] = 'NA';
+          }
+          if(!form['education_qualification']){
+            form['education_qualification'] = 'NA';
+          }
+          if(!form['experience']){
+            form['experience'] = 0;
+          }
         const updated = await this.profileService.profileUpdate(form);
         if(updated && this.redirectUrl){ 
           this.router.navigate([this.redirectUrl], { replaceUrl: true })

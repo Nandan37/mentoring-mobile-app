@@ -47,7 +47,7 @@ export class HttpService {
     const timezone = Intl.DateTimeFormat().resolvedOptions().timeZone;
     const acceptLanguage = await this.localStorage.getLocalData(localKeys.SELECTED_LANGUAGE);
     const headers = {
-      'x-authenticated-user-token': token ? token : "",
+      'x-auth-token': token ? token : "",
       'Content-Type': 'application/json',
       'timeZone': timezone,
       'accept-language':acceptLanguage
