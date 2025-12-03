@@ -8,7 +8,7 @@ import { HttpService, UtilService } from 'src/app/core/services';
 import { FormService } from 'src/app/core/services/form/form.service';
 import { ProfileService } from 'src/app/core/services/profile/profile.service';
 
-import { TranslateModule } from '@ngx-translate/core';
+import { TranslateModule, TranslateService } from '@ngx-translate/core';
 import * as moment from 'moment';
 
 // ---------- MOCKS ----------
@@ -76,7 +76,7 @@ class MockFormService {
               report_code: 'CHART_1'
             }
           },
-          // 🔑 mentee also exists because getUserRole puts 'mentee' first
+          // mentee exists because getUserRole puts 'mentee' first
           mentee: {
             ALL: {
               bigNumbers: [],
@@ -105,6 +105,7 @@ describe('DashboardPage', () => {
   let httpService: MockHttpService;
   let formService: MockFormService;
   let utilService: MockUtilService;
+  let translate: TranslateService;
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
@@ -128,12 +129,20 @@ describe('DashboardPage', () => {
     httpService = TestBed.inject(HttpService) as any;
     formService = TestBed.inject(FormService) as any;
     utilService = TestBed.inject(UtilService) as any;
+    translate = TestBed.inject(TranslateService);
+
+    // ensure translate.instant returns key for deterministic tests
+    spyOn(translate, 'instant').and.callFake((key: string) => key);
 
     fixture.detectChanges();
   });
 
   afterEach(() => {
     fixture.destroy();
+    (httpService.get as any).calls.reset?.();
+    (httpService.post as any).calls.reset?.();
+    (formService.getForm as any).calls.reset?.();
+    (utilService.downloadFile as any).calls.reset?.();
   });
 
   it('should create the DashboardPage', () => {
@@ -222,7 +231,7 @@ describe('DashboardPage', () => {
     expect(updateFormDataSpy).toHaveBeenCalledWith(jasmine.any(Object));
     expect(initialDurationSpy).toHaveBeenCalled();
 
-    // 🔑 getUserRole adds "mentee" first if missing
+    // getUserRole adds "mentee" first if missing
     expect(component.user[0]).toBe('mentee');
     expect(component.selectedRole).toBe('mentee');
 
@@ -252,6 +261,29 @@ describe('DashboardPage', () => {
     expect(component.endDate).toBeDefined();
     expect(component.startDateEpoch).toBeGreaterThan(0);
     expect(component.endDateEpoch).toBeGreaterThan(component.startDateEpoch);
+
+    expect(bigNumberSpy).toHaveBeenCalled();
+    expect(chartSpy).toHaveBeenCalled();
+  }));
+
+  it('calculateDuration should handle week/quarter/year correctly', fakeAsync(() => {
+    const bigNumberSpy = spyOn(component, 'bigNumberCount').and.returnValue(Promise.resolve());
+    const chartSpy = spyOn(component, 'prepareChartUrl').and.returnValue(Promise.resolve());
+
+    component.selectedDuration = 'week';
+    component.calculateDuration();
+    tick(200);
+    expect(component.groupBy).toBe('day');
+
+    component.selectedDuration = 'quarter';
+    component.calculateDuration();
+    tick(200);
+    expect(component.groupBy).toBe('month');
+
+    component.selectedDuration = 'year';
+    component.calculateDuration();
+    tick(200);
+    expect(component.groupBy).toBe('month');
 
     expect(bigNumberSpy).toHaveBeenCalled();
     expect(chartSpy).toHaveBeenCalled();
@@ -288,6 +320,21 @@ describe('DashboardPage', () => {
     expect(cityControl.type).toBe('select');
   });
 
+  it('transformData should not modify controls when no matching entityType', () => {
+    const firstObj = {
+      form: {
+        controls: [
+          { value: 'abc', label: 'ABC', type: 'text' }
+        ]
+      }
+    };
+    const secondObj = { entityTypes: [] };
+
+    const result = component.transformData(firstObj, secondObj);
+    expect(result.form.controls[0].label).toBe('ABC');
+    expect(result.form.controls[0].type).toBe('text');
+  });
+
   // ---------- getTranslatedLabel ----------
 
   it('getTranslatedLabel should build translatedChartConfig', () => {
@@ -300,6 +347,7 @@ describe('DashboardPage', () => {
       }
     };
 
+    // translate.instant mocked in beforeEach to return key itself
     component.getTranslatedLabel();
 
     expect(component.translatedChartConfig).toBeDefined();
@@ -331,6 +379,40 @@ describe('DashboardPage', () => {
 
     expect(reportDataSpy).toHaveBeenCalled();
     expect(result.total).toBe(100);
+  }));
+
+  it('preparedUrl should return undefined if reportData returns no data when no value passed', fakeAsync(() => {
+    component.report_code = 'TEST_NO_VAL';
+    spyOn<any>(component, 'reportData').and.returnValue(Promise.resolve({}));
+    let res: any;
+    component.preparedUrl().then(r => (res = r));
+    tick();
+    expect(res).toBeUndefined();
+  }));
+
+  // ---------- bigNumberCount ----------
+
+  it('bigNumberCount should call preparedUrl and set big number values', fakeAsync(() => {
+    // set filteredCards with one report that has one bigNumber entry
+    component.filteredCards = {
+      ALL: {
+        bigNumbers: [
+          {
+            Url: 'BN_REPORT',
+            data: [
+              { key: 'total', value: 0 }
+            ]
+          }
+        ]
+      }
+    };
+    component.report_code = 'BN_REPORT';
+    // spy preparedUrl to return an object containing the key
+    const preparedSpy = spyOn<any>(component, 'preparedUrl').and.returnValue(Promise.resolve({ total: 42 }));
+    component.bigNumberCount();
+    tick();
+    expect(preparedSpy).toHaveBeenCalled();
+    expect(component.filteredCards.ALL.bigNumbers[0].data[0].value).toBe(42);
   }));
 
   // ---------- prepareTableUrl ----------
@@ -371,7 +453,7 @@ describe('DashboardPage', () => {
     component.endDateEpoch = 1700003600;
 
     component.prepareChartUrl();
-    tick(20); // for internal setTimeout(10)
+    tick(50); // for internal setTimeout(10)
 
     expect(component.chartBody.chartUrl).toContain('report_code=');
     expect(component.chartBody.headers).toBeDefined();
@@ -387,6 +469,98 @@ describe('DashboardPage', () => {
     tick();
 
     expect(utilService.downloadFile).toHaveBeenCalledWith(data.url, data.fileName);
+  }));
+
+  // ---------- handleFormControlChange ----------
+
+  it('handleFormControlChange should update duration and call relevant flows', fakeAsync(() => {
+    const bigNumSpy = spyOn(component, 'bigNumberCount').and.returnValue(Promise.resolve());
+    const prepChartSpy = spyOn(component, 'prepareChartUrl').and.returnValue(Promise.resolve());
+
+    component.handleFormControlChange('duration', { detail: { value: 'month' } } as any);
+    tick(200);
+
+    expect(component.selectedDuration).toBe('month');
+    expect(bigNumSpy).toHaveBeenCalled();
+    expect(prepChartSpy).toHaveBeenCalled();
+  }));
+
+it('handleFormControlChange should update session_type when type provided', fakeAsync(() => {
+  // Setup filteredCards to prevent bigNumberCount from failing
+  component.filteredCards = {
+    SOME: {
+      bigNumbers: []
+    }
+  };
+  component.session_type = 'ALL';
+  
+  // Spy on bigNumberCount to prevent actual execution
+  const bigNumSpy = spyOn(component, 'bigNumberCount').and.returnValue(Promise.resolve());
+  const prepChartSpy = spyOn(component, 'prepareChartUrl').and.returnValue(Promise.resolve());
+  
+  component.handleFormControlChange('type', { detail: { value: 'SOME' } } as any);
+  tick(200);
+  
+  expect(component.session_type).toBe('SOME');
+  expect(bigNumSpy).toHaveBeenCalled();
+  expect(prepChartSpy).toHaveBeenCalled();
+}));
+
+it('handleFormControlChange should set entityTypes when selection provided', fakeAsync(() => {
+  // Setup filteredCards to prevent bigNumberCount from failing
+  component.filteredCards = {
+    ALL: {
+      bigNumbers: []
+    }
+  };
+  component.session_type = 'ALL';
+  component.entityTypes = null;
+  
+  // Spy on bigNumberCount to prevent actual execution
+  const bigNumSpy = spyOn(component, 'bigNumberCount').and.returnValue(Promise.resolve());
+  const prepChartSpy = spyOn(component, 'prepareChartUrl').and.returnValue(Promise.resolve());
+  
+  component.handleFormControlChange('city', { detail: { value: ['A'] } } as any);
+  tick(200);
+  
+  expect(component.entityTypes.city).toEqual(['A']);
+  expect(bigNumSpy).toHaveBeenCalled();
+  expect(prepChartSpy).toHaveBeenCalled();
+}));
+
+  // ---------- handleRoleChange ----------
+
+  it('handleRoleChange should switch role and trigger updates', fakeAsync(() => {
+    spyOn(component, 'getTranslatedLabel').and.returnValue(undefined);
+    spyOn(component, 'bigNumberCount').and.returnValue(Promise.resolve());
+    spyOn(component, 'updateFormData').and.returnValue(Promise.resolve());
+    spyOn(component, 'prepareChartUrl').and.returnValue(Promise.resolve());
+    spyOn(component, 'prepareTableUrl').and.returnValue(Promise.resolve());
+    // simulate form data coming from formService
+    component.bigNumberFormData = {
+      mentee: {
+        ALL: {
+          bigNumbers: [],
+          chartConfig: [],
+          tableUrl: '/t',
+          table_report_code: 'T'
+        }
+      },
+      mentor: {
+        ALL: {
+          bigNumbers: [],
+          chartConfig: [],
+          tableUrl: '/t2',
+          table_report_code: 'T2'
+        }
+      }
+    };
+
+    component.handleRoleChange({ detail: { value: 'mentor' } } as any);
+    tick(200);
+
+    expect(component.selectedRole).toBe('mentor');
+    expect(component.session_type).toBe('ALL');
   }));
 
   // ---------- ionViewWillLeave ----------
@@ -408,4 +582,31 @@ describe('DashboardPage', () => {
 
     expect(() => component.ionViewWillLeave()).not.toThrow();
   });
+
+  // ---------- reportFilterListApi / reportData error handling ----------
+
+  it('reportFilterListApi should handle http errors gracefully', fakeAsync(() => {
+    (httpService.get as any).and.returnValue(Promise.reject('error'));
+    let res: any;
+    component.reportFilterListApi().then(r => (res = r));
+    tick();
+    expect(res).toBeUndefined();
+  }));
+
+  it('reportData should handle http post errors gracefully', fakeAsync(() => {
+    (httpService.post as any).and.returnValue(Promise.reject('post error'));
+    let res: any;
+    component.reportData('/some', {}).then(r => (res = r));
+    tick();
+    expect(res).toBeUndefined();
+  }));
+
+  // ---------- getUserRole ----------
+
+  it('getUserRole should add mentee first if missing', () => {
+    const input = { roles: [{ title: 'mentor' }, { title: 'admin' }] };
+    const result = component.getUserRole(input as any);
+    expect(result[0]).toBe('mentee');
+  });
+
 });
