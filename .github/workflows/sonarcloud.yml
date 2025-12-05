@@ -3,7 +3,7 @@ name: SonarCloud Scan
 on:
   push:
     branches:
-      - 3.4.0-unittest
+      - "**"
   pull_request:
     types: [opened, synchronize, reopened]
 
@@ -12,20 +12,21 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - uses: actions/checkout@v4
+      - name: Checkout repository
+        uses: actions/checkout@v4
         with:
           fetch-depth: 0
 
-      - name: Setup Node
+      - name: Setup Node (latest LTS)
         uses: actions/setup-node@v4
         with:
-          node-version: 18
+          node-version: "lts/*"
 
       - name: Install dependencies
         run: npm ci --legacy-peer-deps
 
-      # - name: Run tests
-      #   run: npm test --if-present
+      - name: Run tests and generate coverage
+        run: npx ng test --watch=false --code-coverage
 
       - name: SonarCloud Scan
         uses: SonarSource/sonarcloud-github-action@v2
