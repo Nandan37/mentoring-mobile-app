@@ -23,6 +23,7 @@ export class GenericProfileHeaderComponent implements OnInit {
   @Input() showRole: any;
   @Input() isMentor: any;
   @Input() userNotFound?: any;
+  @Input() isblocked:any;
   labels = ['CHECK_OUT_MENTOR', 'PROFILE_ON_MENTORED_EXPLORE_THE_SESSIONS'];
 
   public isMobile: any;

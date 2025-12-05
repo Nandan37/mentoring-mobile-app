@@ -241,6 +241,37 @@
               "multiple": true
           },
           {
+               "name": "chat_mode",
+              "label": "Chat Mode",
+              "class": "ion-no-margin",
+              "type": "toggle",
+              "slot": "end",
+               "value" : true,
+              "placeholderOff" : "Enable Chat Mode to resume messages",
+              "placeholderOn" : "Disable Chat Mode to pause messages",
+              
+              
+              "validators": {
+                  "required": false
+                  
+              }
+          },
+           {
+               "name": "discovery",
+              "label": "Discovery",
+              "class": "ion-no-margin",
+              "type": "toggle",
+              "slot": "end",
+              "value" : true,
+              "placeholderOn" : "Turn off discovery mode to hide profile",
+              "placeholderOff" : "Turn on discovery mode to display profile",
+              
+              "validators": {
+                  "required": false
+                  
+              }
+          },
+          {
               "name": "state",
               "label": "State",
               "class": "ion-no-margin",
@@ -2745,6 +2776,35 @@
             }
           ]
       }
+    }
+  }
+},
+{
+  "type": "blockedUsersCard",
+  "sub_type": "blockedUsersCardForm",
+  "action": "create",
+  "data": {
+    "template_name": "defaultTemplate",
+    "fields": {
+      "controls": {
+          "header": {
+            "image": "image",
+            "title": "name"
+          },
+          "body": [
+            {
+              "name": "designation",
+              "type": "string",
+              "subText": ""
+            },
+
+            {
+              "name": "organization",
+              "type": "string",
+              "subText": ""
+            }
+          ]
+        }
     }
   }
 }

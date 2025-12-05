@@ -6,6 +6,8 @@ import { PAGE_IDS } from 'src/app/core/constants/page.ids';
 import { UtilService } from 'src/app/core/services';
 import { environment } from 'src/environments/environment';
 import { CommonRoutes } from 'src/global.routes';
+import { PopoverController } from '@ionic/angular';
+import { PopoverMenuComponent } from 'src/app/popover-menu/popover-menu.component';
 @Component({
   selector: 'app-page-header',
   templateUrl: './page-header.component.html',
@@ -18,7 +20,8 @@ export class PageHeaderComponent implements OnInit {
 
   constructor(private location:NavController,
     private router : Router,
-    private utilService: UtilService
+    private utilService: UtilService,
+    private popoverCtrl: PopoverController
   ) {}
 
   routes =[
@@ -28,6 +31,7 @@ export class PageHeaderComponent implements OnInit {
      { title: 'FAQ', action: "faq", icon: 'alert-circle', url: CommonRoutes.FAQ, pageId: PAGE_IDS.faq},
      { title: 'HELP_VIDEOS', action: "help videos", icon: 'videocam',url: CommonRoutes.HELP_VIDEOS, pageId: PAGE_IDS.helpVideos },
      { title: 'LANGUAGE', action: "selectLanguage", icon: 'language', url: CommonRoutes.LANGUAGE, pageId: PAGE_IDS.language },
+     { title: 'BLOCKED_USERS', action: "blocked-users", icon: 'blocked-users', url: CommonRoutes.BLOCKED_USERS, pageId: PAGE_IDS.blockedUsers },
      { title: 'CHANGE_PASSWORD', action: 'change-password', icon: 'key', url: CommonRoutes.CHANGE_PASSWORD, pageId: PAGE_IDS.changePassword},
      { title: 'LOGIN_ACTIVITY', action: 'login-activity', icon: 'time', url: CommonRoutes.LOGIN_ACTIVITY, pageId: PAGE_IDS.loginActivity},
      {title: 'ADMIN_WORKSPACE', action: "admin", icon: 'briefcase' ,class:'', url: CommonRoutes.ADMIN+'/'+CommonRoutes.ADMIN_DASHBOARD, pageId: PAGE_IDS.adminWorkspace}
@@ -48,6 +52,37 @@ export class PageHeaderComponent implements OnInit {
       window.location.href = `${baseUrl}/home`;
     } else {
       this.location.pop();
+    }
+    
+  }
+  async openPopover(ev: Event) {
+    const popover = await this.popoverCtrl.create({
+      component: PopoverMenuComponent,
+      event: ev,
+      translucent: true,
+       componentProps: {
+        actions: this.config?.actions || []
+      },
+    });
+
+    await popover.present();
+
+    const { data } = await popover.onDidDismiss();
+    if (data) {
+      this.handleAction(data);
+    }
+  }
+
+  handleAction(event: string) {
+    switch(event) {
+
+      case "block":
+        this.actionEvent.next(event);
+        break;
+
+      case "share":
+        this.actionEvent.next(event);
+        break;
     }
   }
 }

@@ -21,7 +21,7 @@
 
   <ion-chip *ngIf="allowCustomEntities" (click)="addNewOption()" [disabled]="control?.disabled">
     <ion-icon name="add"></ion-icon>
-    <ion-label> {{ "OTHER" | translate}}</ion-label>
+    <ion-label class="wrap"> {{ "OTHER" | translate}}</ion-label>
   </ion-chip>
   <ion-chip *ngIf="control.meta.add_link" (click)="addLink(control)" [disabled]="control?.disabled">
     <ion-icon name="add"></ion-icon>

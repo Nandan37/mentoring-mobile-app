@@ -86,6 +86,7 @@ export const urlConstants = {
     REQUEST_SESSION_COUNT: '/mentoring/v1/users/requestCount',
     REQUEST_SESSION_ACCEPT: '/mentoring/v1/requestSessions/accept?SkipValidation=true',
     REQUEST_SESSION_REJECT: '/mentoring/v1/requestSessions/reject',
-    GETUSERIDBYRID:"/mentoring/v1/profile/externalIdMapping"
+    GETUSERIDBYRID:"/mentoring/v1/profile/externalIdMapping",
+    // BLOCKED_USERS:"/mentoring/v1/blockedUsers/list"
   }
 };

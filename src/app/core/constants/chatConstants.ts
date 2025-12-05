@@ -63,5 +63,13 @@ export const CHAT_MESSAGES = {
             action: 'viewDetails',
             color: 'primary',
         },
-    ]
+    ],
+    GENERIC_CARD_BLOCKED_USERS_BTN_CONFIG: [
+        {
+            label: 'UNBLOCK',
+            action: 'unblock',
+            color: 'white',
+            textColor: "red"
+        }
+]
 };

@@ -64,36 +64,53 @@ export class UtilService {
     const { data, role } = await this.modal.onWillDismiss();
   }
 
-  async alertPopup(msg) {
+  async alertPopup(msg, parameters? : any) {
     return new Promise(async (resolve) => {
       let texts: any;
       this.translate
-        .get([msg.header, msg.message, msg.cancel, msg.submit])
+        .get([msg.header, msg.message, msg.cancel, msg.submit], parameters)
         .subscribe((text) => {
           texts = text;
         });
+        const buttons = msg.swapButtons
+      ? [
+          {
+            text: texts[msg.cancel],
+            role: 'cancel',
+            cssClass: 'alert-button-bg-white', 
+            handler: () => resolve(false),
+          },
+          {
+            text: texts[msg.submit],
+            cssClass: 'alert-button-red',
+            handler: (data) => {
+          resolve(msg.inputs ? data : true);
+        },
+
+          },
+        ]
+      : [
+          {
+            text: texts[msg.submit],
+            cssClass: 'alert-button-bg-white',
+            handler: (data) => {
+          resolve(msg.inputs ? data : true);
+        },
+            
+          },
+          {
+            text: texts[msg.cancel],
+            role: 'cancel',
+            cssClass: 'alert-button-red',
+            handler: () => resolve(false),
+          },
+        ];
       const alert = await this.alert.create({
         cssClass: 'custom-alert-with-close',
         header: texts[msg.header],
         message: texts[msg.message],
         inputs: msg.inputs || [],
-        buttons: [
-      {
-        text: texts[msg.submit],
-        cssClass: 'alert-button-bg-white',
-        handler: (data) => {
-          resolve(msg.inputs ? data : true);
-        },
-      },
-      {
-        text: texts[msg.cancel],
-        role: 'cancel',
-        cssClass: 'alert-button-red',
-        handler: () => {
-          resolve(false);
-        },
-      },
-    ],
+        buttons: buttons
       });
       const headerEl = document.querySelector('.custom-alert-with-close .alert-head');
       if (headerEl) {
