@@ -603,4 +603,364 @@ describe('ProfilePage', () => {
       expect(component.formData.controls.length).toBeGreaterThan(0);
     });
   });
+
+  describe('Error Handling', () => {
+  it('should handle localStorage.getLocalData failure', async () => {
+    mockLocalStorageService.getLocalData.and.returnValue(Promise.reject('Storage error'));
+    
+    await expectAsync(component.ionViewWillEnter()).toBeRejected();
+  });
+
+  it('should handle profileService.getUserRole failure', async () => {
+    mockLocalStorageService.getLocalData.and.returnValues(
+      Promise.resolve(mockUser),
+      Promise.resolve(['mentee'])
+    );
+    mockProfileService.getUserRole.and.returnValue(Promise.reject('API error'));
+    
+    await expectAsync(component.ionViewWillEnter()).toBeRejected();
+  });
+
+  it('should handle getProfileDetailsFromAPI failure', async () => {
+    mockFormService.getForm.and.returnValue(Promise.resolve(mockFormResponse));
+    mockProfileService.getProfileDetailsFromAPI.and.returnValue(Promise.reject('API error'));
+    component.user = mockUser;
+    
+    await expectAsync(component.profileDetailsApi()).toBeRejected();
+  });
+
+  it('should handle getForm failure in profileDetailsApi', async () => {
+    mockFormService.getForm.and.returnValue(Promise.reject('Form error'));
+    component.user = mockUser;
+    
+    await expectAsync(component.profileDetailsApi()).toBeRejected();
+  });
+});
+
+describe('Additional ionViewWillEnter scenarios', () => {
+  it('should handle user with undefined email', async () => {
+    const userWithoutEmail = { ...mockUser, email: undefined };
+    mockLocalStorageService.getLocalData.and.returnValues(
+      Promise.resolve(userWithoutEmail),
+      Promise.resolve(['mentee'])
+    );
+    mockProfileService.getUserRole.and.returnValue(Promise.resolve());
+    mockFormService.getForm.and.returnValue(Promise.resolve(mockFormResponse));
+    mockProfileService.getProfileDetailsFromAPI.and.returnValue(Promise.resolve(userWithoutEmail));
+    
+    await component.ionViewWillEnter();
+    
+    expect(component.formData.data.emailId).toBeUndefined();
+  });
+
+  it('should not call getUserRole when user is null', async () => {
+    mockLocalStorageService.getLocalData.and.returnValues(
+      Promise.resolve(null),
+      Promise.resolve(['mentee'])
+    );
+    
+    try {
+      await component.ionViewWillEnter();
+    } catch (e) {}
+    
+    expect(mockProfileService.getUserRole).not.toHaveBeenCalled();
+  });
+
+  it('should handle roles as null', async () => {
+    mockLocalStorageService.getLocalData.and.returnValues(
+      Promise.resolve(mockUser),
+      Promise.resolve(null)
+    );
+    mockProfileService.getUserRole.and.returnValue(Promise.resolve());
+    mockFormService.getForm.and.returnValue(Promise.resolve(mockFormResponse));
+    mockProfileService.getProfileDetailsFromAPI.and.returnValue(Promise.resolve(mockUser));
+    
+    // This will throw error when trying to call includes on null
+    await expectAsync(component.ionViewWillEnter()).toBeRejected();
+  });
+
+  it('should navigate to edit profile when about is empty string', async () => {
+    const userWithEmptyAbout = { ...mockUser, about: '' };
+    mockLocalStorageService.getLocalData.and.returnValues(
+      Promise.resolve(userWithEmptyAbout),
+      Promise.resolve(['mentee'])
+    );
+    mockProfileService.getProfileDetailsFromAPI.and.returnValue(Promise.resolve(userWithEmptyAbout));
+    
+    await component.ionViewWillEnter();
+    
+    expect(mockRouter.navigate).toHaveBeenCalledWith([CommonRoutes.EDIT_PROFILE], { replaceUrl: true });
+  });
+});
+
+describe('profileDetailsApi additional tests', () => {
+  it('should handle result without email field', async () => {
+    const resultWithoutEmail = { ...mockUser };
+    delete resultWithoutEmail.email;
+    
+    mockFormService.getForm.and.returnValue(Promise.resolve(mockFormResponse));
+    mockProfileService.getProfileDetailsFromAPI.and.returnValue(Promise.resolve(resultWithoutEmail));
+    component.user = mockUser;
+    
+    await component.profileDetailsApi();
+    
+    expect(component.formData.data.emailId).toBeUndefined();
+  });
+
+  it('should handle form response with null controls', async () => {
+    mockFormService.getForm.and.returnValue(Promise.resolve({
+      data: {
+        fields: {
+          controls: null
+        }
+      }
+    }));
+    mockProfileService.getProfileDetailsFromAPI.and.returnValue(Promise.resolve(mockUser));
+    component.user = mockUser;
+    
+    await expectAsync(component.profileDetailsApi()).toBeRejected();
+  });
+
+  it('should add all location fields when none exist', async () => {
+    component.formData.controls = [
+      { title: 'Sessions attended', key: 'sessions_attended' }
+    ];
+    
+    mockFormService.getForm.and.returnValue(Promise.resolve(mockFormResponse));
+    mockProfileService.getProfileDetailsFromAPI.and.returnValue(Promise.resolve(mockUser));
+    component.user = mockUser;
+    
+    await component.profileDetailsApi();
+    
+    expect(component.formData.controls.length).toBe(6); // 1 initial + 5 location fields
+  });
+
+  it('should not update formData when result is undefined', async () => {
+    mockFormService.getForm.and.returnValue(Promise.resolve(mockFormResponse));
+    mockProfileService.getProfileDetailsFromAPI.and.returnValue(Promise.resolve(undefined));
+    component.user = mockUser;
+    component.formData.data = { existing: 'data' };
+    
+    await expectAsync(component.profileDetailsApi()).toBeRejected();
+  });
+});
+
+describe('upDateProfilePopup additional tests', () => {
+  it('should use provided message object', async () => {
+    const customMsg = {
+      header: 'Test',
+      message: 'Test message',
+      cancel: 'No',
+      submit: 'Yes'
+    };
+    mockUtilService.alertPopup.and.returnValue(Promise.resolve(true));
+    
+    await component.upDateProfilePopup(customMsg);
+    
+    expect(mockUtilService.alertPopup).toHaveBeenCalledWith(customMsg);
+  });
+});
+
+describe('Component state tests', () => {
+  it('should maintain isMentorButtonPushed state across multiple calls', async () => {
+    mockLocalStorageService.getLocalData.and.returnValues(
+      Promise.resolve(mockUser),
+      Promise.resolve(['mentee']),
+      Promise.resolve(false),
+      Promise.resolve(mockUser),
+      Promise.resolve(['mentee']),
+      Promise.resolve(false)
+    );
+    mockProfileService.getUserRole.and.returnValue(Promise.resolve());
+    mockFormService.getForm.and.returnValue(Promise.resolve(mockFormResponse));
+    mockProfileService.getProfileDetailsFromAPI.and.returnValue(Promise.resolve(mockUser));
+    
+    await component.ionViewWillEnter();
+    const firstButtonCount = component.buttonConfig.buttons.length;
+    
+    await component.ionViewWillEnter();
+    const secondButtonCount = component.buttonConfig.buttons.length;
+    
+    expect(firstButtonCount).toBe(secondButtonCount);
+  });
+});describe('Error Handling', () => {
+  it('should handle localStorage.getLocalData failure', async () => {
+    mockLocalStorageService.getLocalData.and.returnValue(Promise.reject('Storage error'));
+    
+    await expectAsync(component.ionViewWillEnter()).toBeRejected();
+  });
+
+  it('should handle profileService.getUserRole failure', async () => {
+    mockLocalStorageService.getLocalData.and.returnValues(
+      Promise.resolve(mockUser),
+      Promise.resolve(['mentee'])
+    );
+    mockProfileService.getUserRole.and.returnValue(Promise.reject('API error'));
+    
+    await expectAsync(component.ionViewWillEnter()).toBeRejected();
+  });
+
+  it('should handle getProfileDetailsFromAPI failure', async () => {
+    mockFormService.getForm.and.returnValue(Promise.resolve(mockFormResponse));
+    mockProfileService.getProfileDetailsFromAPI.and.returnValue(Promise.reject('API error'));
+    component.user = mockUser;
+    
+    await expectAsync(component.profileDetailsApi()).toBeRejected();
+  });
+
+  it('should handle getForm failure in profileDetailsApi', async () => {
+    mockFormService.getForm.and.returnValue(Promise.reject('Form error'));
+    component.user = mockUser;
+    
+    await expectAsync(component.profileDetailsApi()).toBeRejected();
+  });
+});
+
+describe('Additional ionViewWillEnter scenarios', () => {
+  it('should handle user with undefined email', async () => {
+    const userWithoutEmail = { ...mockUser, email: undefined };
+    mockLocalStorageService.getLocalData.and.returnValues(
+      Promise.resolve(userWithoutEmail),
+      Promise.resolve(['mentee'])
+    );
+    mockProfileService.getUserRole.and.returnValue(Promise.resolve());
+    mockFormService.getForm.and.returnValue(Promise.resolve(mockFormResponse));
+    mockProfileService.getProfileDetailsFromAPI.and.returnValue(Promise.resolve(userWithoutEmail));
+    
+    await component.ionViewWillEnter();
+    
+    expect(component.formData.data.emailId).toBeUndefined();
+  });
+
+  it('should not call getUserRole when user is null', async () => {
+    mockLocalStorageService.getLocalData.and.returnValues(
+      Promise.resolve(null),
+      Promise.resolve(['mentee'])
+    );
+    
+    try {
+      await component.ionViewWillEnter();
+    } catch (e) {}
+    
+    expect(mockProfileService.getUserRole).not.toHaveBeenCalled();
+  });
+
+  it('should handle roles as null', async () => {
+    mockLocalStorageService.getLocalData.and.returnValues(
+      Promise.resolve(mockUser),
+      Promise.resolve(null)
+    );
+    mockProfileService.getUserRole.and.returnValue(Promise.resolve());
+    mockFormService.getForm.and.returnValue(Promise.resolve(mockFormResponse));
+    mockProfileService.getProfileDetailsFromAPI.and.returnValue(Promise.resolve(mockUser));
+    
+    // This will throw error when trying to call includes on null
+    await expectAsync(component.ionViewWillEnter()).toBeRejected();
+  });
+
+  it('should navigate to edit profile when about is empty string', async () => {
+    const userWithEmptyAbout = { ...mockUser, about: '' };
+    mockLocalStorageService.getLocalData.and.returnValues(
+      Promise.resolve(userWithEmptyAbout),
+      Promise.resolve(['mentee'])
+    );
+    mockProfileService.getProfileDetailsFromAPI.and.returnValue(Promise.resolve(userWithEmptyAbout));
+    
+    await component.ionViewWillEnter();
+    
+    expect(mockRouter.navigate).toHaveBeenCalledWith([CommonRoutes.EDIT_PROFILE], { replaceUrl: true });
+  });
+});
+
+describe('profileDetailsApi additional tests', () => {
+  it('should handle result without email field', async () => {
+    const resultWithoutEmail = { ...mockUser };
+    delete resultWithoutEmail.email;
+    
+    mockFormService.getForm.and.returnValue(Promise.resolve(mockFormResponse));
+    mockProfileService.getProfileDetailsFromAPI.and.returnValue(Promise.resolve(resultWithoutEmail));
+    component.user = mockUser;
+    
+    await component.profileDetailsApi();
+    
+    expect(component.formData.data.emailId).toBeUndefined();
+  });
+
+  it('should handle form response with null controls', async () => {
+    mockFormService.getForm.and.returnValue(Promise.resolve({
+      data: {
+        fields: {
+          controls: null
+        }
+      }
+    }));
+    mockProfileService.getProfileDetailsFromAPI.and.returnValue(Promise.resolve(mockUser));
+    component.user = mockUser;
+    
+    await expectAsync(component.profileDetailsApi()).toBeRejected();
+  });
+
+  it('should add all location fields when none exist', async () => {
+    component.formData.controls = [
+      { title: 'Sessions attended', key: 'sessions_attended' }
+    ];
+    
+    mockFormService.getForm.and.returnValue(Promise.resolve(mockFormResponse));
+    mockProfileService.getProfileDetailsFromAPI.and.returnValue(Promise.resolve(mockUser));
+    component.user = mockUser;
+    
+    await component.profileDetailsApi();
+    
+    expect(component.formData.controls.length).toBe(6); // 1 initial + 5 location fields
+  });
+
+  it('should not update formData when result is undefined', async () => {
+    mockFormService.getForm.and.returnValue(Promise.resolve(mockFormResponse));
+    mockProfileService.getProfileDetailsFromAPI.and.returnValue(Promise.resolve(undefined));
+    component.user = mockUser;
+    component.formData.data = { existing: 'data' };
+    
+    await expectAsync(component.profileDetailsApi()).toBeRejected();
+  });
+});
+
+describe('upDateProfilePopup additional tests', () => {
+  it('should use provided message object', async () => {
+    const customMsg = {
+      header: 'Test',
+      message: 'Test message',
+      cancel: 'No',
+      submit: 'Yes'
+    };
+    mockUtilService.alertPopup.and.returnValue(Promise.resolve(true));
+    
+    await component.upDateProfilePopup(customMsg);
+    
+    expect(mockUtilService.alertPopup).toHaveBeenCalledWith(customMsg);
+  });
+});
+
+describe('Component state tests', () => {
+  it('should maintain isMentorButtonPushed state across multiple calls', async () => {
+    mockLocalStorageService.getLocalData.and.returnValues(
+      Promise.resolve(mockUser),
+      Promise.resolve(['mentee']),
+      Promise.resolve(false),
+      Promise.resolve(mockUser),
+      Promise.resolve(['mentee']),
+      Promise.resolve(false)
+    );
+    mockProfileService.getUserRole.and.returnValue(Promise.resolve());
+    mockFormService.getForm.and.returnValue(Promise.resolve(mockFormResponse));
+    mockProfileService.getProfileDetailsFromAPI.and.returnValue(Promise.resolve(mockUser));
+    
+    await component.ionViewWillEnter();
+    const firstButtonCount = component.buttonConfig.buttons.length;
+    
+    await component.ionViewWillEnter();
+    const secondButtonCount = component.buttonConfig.buttons.length;
+    
+    expect(firstButtonCount).toBe(secondButtonCount);
+  });
+});
 });
