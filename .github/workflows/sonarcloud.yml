@@ -4,7 +4,7 @@ on:
   # Only scan main branch for full analysis
   push:
     branches:
-      - master  # Change to 'master' or 'develop' if that's your default branch
+      - main  # Change to 'master' or 'develop' if that's your default branch
   
   # Scan PRs - this will analyze only changed files
   pull_request:
@@ -28,7 +28,48 @@ jobs:
       - name: Install dependencies
         run: npm ci --legacy-peer-deps
 
-      - name: Run tests and generate coverage
+      - name: Get changed files (PR only)
+        if: github.event_name == 'pull_request'
+        id: changed-files
+        run: |
+          CHANGED_TS_FILES=$(git diff --name-only --diff-filter=ACMRT origin/${{ github.base_ref }}...HEAD | grep -E '\.ts 
+
+      - name: SonarCloud Scan
+        uses: SonarSource/sonarcloud-github-action@v3  # Updated to v3
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}  # CRITICAL: Required for PR analysis
+          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+        with:
+          projectBaseDir: . | grep -v '\.spec\.ts 
+
+      - name: SonarCloud Scan
+        uses: SonarSource/sonarcloud-github-action@v3  # Updated to v3
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}  # CRITICAL: Required for PR analysis
+          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+        with:
+          projectBaseDir: . | tr '\n' ',' || echo "")
+          echo "files=${CHANGED_TS_FILES}" >> $GITHUB_OUTPUT
+          echo "Changed files: ${CHANGED_TS_FILES}"
+
+      - name: Run tests for changed files (PR)
+        if: github.event_name == 'pull_request' && steps.changed-files.outputs.files != ''
+        run: |
+          # Create a test pattern for changed files
+          FILES="${{ steps.changed-files.outputs.files }}"
+          FILES_PATTERN=$(echo "$FILES" | sed 's/\.ts/.spec.ts/g' | sed 's/,/|/g')
+          
+          if [ -n "$FILES_PATTERN" ]; then
+            echo "Running tests matching pattern: $FILES_PATTERN"
+            npx ng test --watch=false --code-coverage --include="$FILES_PATTERN" || true
+          else
+            echo "No test files to run"
+            npx ng test --watch=false --code-coverage
+          fi
+        continue-on-error: true
+
+      - name: Run all tests (main branch)
+        if: github.event_name == 'push'
         run: npx ng test --watch=false --code-coverage
         continue-on-error: true 
 
