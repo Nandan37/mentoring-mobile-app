@@ -1,19 +1,41 @@
-name: Build
+name: SonarCloud Scan
+
 on:
+  # Only scan main branch for full analysis
   push:
     branches:
-      - master
+      - master  # Change to 'master' or 'develop' if that's your default branch
+  
+  # Scan PRs - this will analyze only changed files
   pull_request:
     types: [opened, synchronize, reopened]
+
 jobs:
-  sonarqube:
-    name: SonarQube
+  build:
     runs-on: ubuntu-latest
+
     steps:
-      - uses: actions/checkout@v4
+      - name: Checkout repository
+        uses: actions/checkout@v4
         with:
-          fetch-depth: 0  # Shallow clones should be disabled for a better relevancy of analysis
-      - name: SonarQube Scan
-        uses: SonarSource/sonarqube-scan-action@v6
+          fetch-depth: 0  # Required for PR analysis
+
+      - name: Setup Node (latest LTS)
+        uses: actions/setup-node@v4
+        with:
+          node-version: "lts/*"
+
+      - name: Install dependencies
+        run: npm ci --legacy-peer-deps
+
+      - name: Run tests and generate coverage
+        run: npx ng test --watch=false --code-coverage
+        continue-on-error: true 
+
+      - name: SonarCloud Scan
+        uses: SonarSource/sonarcloud-github-action@v3  # Updated to v3
         env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}  # CRITICAL: Required for PR analysis
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+        with:
+          projectBaseDir: .
