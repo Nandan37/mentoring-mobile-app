@@ -4,7 +4,7 @@ on:
   # Only scan main branch for full analysis
   push:
     branches:
-      - main  # Change to 'master' or 'develop' if that's your default branch
+      - master  # Change to 'master' or 'develop' if that's your default branch
   
   # Scan PRs - this will analyze only changed files
   pull_request:
