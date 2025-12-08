@@ -1,9 +1,12 @@
 name: SonarCloud Scan
 
 on:
+  # Only scan main branch for full analysis
   push:
     branches:
-      - "**"
+      - main  # Change to 'master' or 'develop' if that's your default branch
+  
+  # Scan PRs - this will analyze only changed files
   pull_request:
     types: [opened, synchronize, reopened]
 
@@ -15,7 +18,7 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
         with:
-          fetch-depth: 0
+          fetch-depth: 0  # Required for PR analysis
 
       - name: Setup Node (latest LTS)
         uses: actions/setup-node@v4
@@ -30,8 +33,9 @@ jobs:
         continue-on-error: true 
 
       - name: SonarCloud Scan
-        uses: SonarSource/sonarcloud-github-action@v2
+        uses: SonarSource/sonarcloud-github-action@v3  # Updated to v3
         env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}  # CRITICAL: Required for PR analysis
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
         with:
           projectBaseDir: .
