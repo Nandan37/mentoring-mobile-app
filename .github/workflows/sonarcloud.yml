@@ -1,26 +1,20 @@
-name: SonarCloud Scan
-
+name: Build & Sonar
 on:
-  # Only scan main branch for full analysis
   push:
-    branches:
-      - master  # Change to 'master' or 'develop' if that's your default branch
-  
-  # Scan PRs - this will analyze only changed files
+    branches: [ master ]
   pull_request:
     types: [opened, synchronize, reopened]
 
 jobs:
-  build:
+  test-and-sonar:
     runs-on: ubuntu-latest
-
     steps:
-      - name: Checkout repository
+      - name: Checkout
         uses: actions/checkout@v4
         with:
-          fetch-depth: 0  # Required for PR analysis
+          fetch-depth: 0
 
-      - name: Setup Node (latest LTS)
+      - name: Setup Node
         uses: actions/setup-node@v4
         with:
           node-version: "lts/*"
@@ -28,14 +22,13 @@ jobs:
       - name: Install dependencies
         run: npm ci --legacy-peer-deps
 
-      - name: Run tests and generate coverage
-        run: npx ng test --watch=false --code-coverage
-        continue-on-error: true 
+      - name: Run tests & produce coverage
+        run: |
+          npx ng test --watch=false --code-coverage --browsers=ChromeHeadless || true
 
-      - name: SonarCloud Scan
-        uses: SonarSource/sonarcloud-github-action@v3  # Updated to v3
+      - name: SonarQube Scan
+        uses: SonarSource/sonarqube-scan-action@v6
         env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}  # CRITICAL: Required for PR analysis
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
-        with:
-          projectBaseDir: .
+          # optionally pass extra sonar-scanner properties:
+          # SONAR_SCANNER_OPTS: -Dsonar.javascript.lcov.reportPaths=coverage/lcov.info
