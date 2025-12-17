@@ -24,7 +24,8 @@ export class HttpService {
   baseUrl;
   isFeedbackTriggered = false;
   isAlertOpen: any = false;
-  extraHeaders
+  extraHeaders;
+  private httpClient = CapacitorHttp;
 
   constructor(
     private userService: UserService,
@@ -81,7 +82,7 @@ export class HttpService {
       headers: headers,
       data: body,
     };
-    return CapacitorHttp.post(options)
+    return this.httpClient.post(options)
       .then((data: any) => {
         let result: any = data.data;
         if (result.responseCode === "OK") {
@@ -102,7 +103,7 @@ export class HttpService {
       headers: headers,
       params: {},
     };
-    return CapacitorHttp.get(options)
+    return this.httpClient.get(options)
       .then((data: any) => {
         let result: any = data.data;
         if(result?.meta?.data?.length && !this.isFeedbackTriggered){
@@ -128,7 +129,7 @@ export class HttpService {
       headers: headers,
       data: '',
     };
-    return CapacitorHttp.delete(options)
+    return this.httpClient.delete(options)
       .then((data: any) => {
         let result: any = data.data;
         if (result.responseCode === "OK") {
@@ -150,7 +151,7 @@ export class HttpService {
       headers: headers,
       data: body,
     };
-    return CapacitorHttp.patch(options)
+    return this.httpClient.patch(options)
       .then((data: any) => {
         let result: any = data.data;
         if (result.responseCode === "OK") {
@@ -207,7 +208,7 @@ async getToken() {
         refresh_token: _.get(this.userService.token, 'refresh_token')
       },
     };
-    return CapacitorHttp.post(options)
+    return this.httpClient.post(options)
       .then((data: any) => {
         let result: any = data.data;
         if (result.responseCode === "OK") {
@@ -240,7 +241,7 @@ async getToken() {
         } else {
           localStorage.clear();
           auth.clearLocalData();
-          location.href = window.location.origin;
+          this.router.navigateByUrl('/');
         }
         break;
       default:
@@ -293,12 +294,11 @@ async getToken() {
       await alert.present();
       let data = await alert.onDidDismiss();
       if (data.role == 'cancel') {
+        let auth = this.injector.get(AuthService);
         if(environment.isAuthBypassed) {
-          let auth = this.injector.get(AuthService);
           auth.clearLocalData();
-          location.href = window.location.origin
+          this.router.navigateByUrl('/');
         } else {
-          let auth = this.injector.get(AuthService);
           auth.logoutAccount(true);
         }
       }
@@ -316,7 +316,7 @@ async getToken() {
       headers: headers,
       params: {},
     };
-    return CapacitorHttp.get(options)
+    return this.httpClient.get(options)
       .then((data: any) => {
         if (data.status == 200) {
           return data;
