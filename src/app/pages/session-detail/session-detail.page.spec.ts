@@ -547,7 +547,7 @@ describe('SessionDetailPage', () => {
  describe('onJoin', () => {
    it('should call joinSession with sessionDatas', fakeAsync(() => {
      component.sessionDatas = { ...baseSessionResult };
-     mockSessionService.joinSession.and.returnValue(Promise.resolve());
+     mockSessionService.joinSession.and.returnValue(Promise.resolve(null));
     
      component.onJoin();
      tick();
