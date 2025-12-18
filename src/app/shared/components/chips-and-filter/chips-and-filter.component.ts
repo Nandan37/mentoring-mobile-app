@@ -13,7 +13,17 @@ export class ChipsAndFilterComponent implements OnInit {
   @Output() removeFilterChip = new EventEmitter();
   @Input() selectedFilters:  any;
   @Output() sendChildValue = new EventEmitter();
+  @Output() onSelectAllChange =new EventEmitter<boolean>();
+  @Output() onSelectAllXChange =new EventEmitter<boolean>()
   @Input() isFilterEnable: any;
+  @Input () selectedCount
+  @Input() totalCount
+  @Input() tableData;
+  @Input() maxCount
+  @Input() showSelectAll
+    
+  selectAllXActive : boolean;
+  disableCheckbox : boolean;
 
   constructor(private router: Router) { }
  
@@ -46,5 +56,34 @@ export class ChipsAndFilterComponent implements OnInit {
   private resetSearch() {
     this.searchAndCriteriaData = '';
   }
+  
+  onSelectAllChangeClick(event: any){
+    this.onSelectAllChange.emit(event.detail.checked)
+  }
 
+    isAllSelected(): boolean {
+  if (!this.tableData || this.tableData.length === 0) {
+    return false;
+  }
+  
+  for (const item of this.tableData) {
+    
+    if (item.enrolled_type === 'ENROLLED') {
+      continue;
+    }
+    
+    if (item.action?.[0]?.action !== 'REMOVE') {
+      return false;
+    }
+    if(this.selectedCount == this.maxCount){
+      return true;
+    }
+  }
+  return true;
+}
+
+ onToggleClick(){
+    this.selectAllXActive = !this.selectAllXActive
+    this.onSelectAllXChange.emit(this.selectAllXActive)
+  }
 }

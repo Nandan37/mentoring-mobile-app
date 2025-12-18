@@ -57,6 +57,10 @@ export class SearchPopoverComponent implements OnInit {
   disableInfiniteScroll = false; 
   disableNavigation= true;
   showPaginator: boolean= true;
+  disabledCheckboxId: string | null = null;
+  showSelectAll : boolean = true;
+  showCheckbox : boolean= true;
+  isSelectAllActive: boolean= false;
 
   constructor(private platform: Platform, private modalController: ModalController, private toast: ToastService,private translate: TranslateService, private localStorage: LocalStorageService, private util: UtilService, private httpService: HttpService, private form: FormService) { 
     this.platform.backButton.subscribeWithPriority(10, () => {
@@ -145,7 +149,7 @@ export class SearchPopoverComponent implements OnInit {
     if(this.data.control.id){
       queryString = queryString + '&session_id=' + this.data.control.id
     }
-    const sorting = `&order=${this.sortingData?.order || ''}&sort_by=${this.sortingData?.sort_by || ''}&mentorId=${this.data?.mentorId ? this.data?.mentorId :  this.user.id}`;
+    const sorting = `&order=${this.sortingData?.order || ''}&sort_by=${this.sortingData?.sort_by || 'name'}&mentorId=${this.data?.mentorId ? this.data?.mentorId :  this.user.id}`;
     queryString = queryString + sorting
     const config = {
       url: urlConstants.API_URLS[this.data.control.meta.url] + this.page + '&limit=' + this.limit + '&search=' + btoa(this.searchText) + queryString,
@@ -153,7 +157,9 @@ export class SearchPopoverComponent implements OnInit {
     };
     try {
       const data: any = await this.httpService.get(config);
-      this.count = data.result.count
+      if (this.page === 1 || !this.count) {
+        this.count = data.result.count;
+      }
       this.noDataMessage = this.searchText ? "SEARCH_RESULT_NOT_FOUND" : "THIS_SPACE_LOOKS_EMPTY"
       let selectedIds =  _.map(this.selectedList, 'id');
       data.result.data.forEach((ele) => {
@@ -192,10 +198,6 @@ export class SearchPopoverComponent implements OnInit {
   }
 
   onButtonCLick(data: any) {
-    if (this.selectedList.length) {
-      const sessionManager = this.selectedList.some(element => this.user.id === element.id);
-      this.countSelectedList = sessionManager ? this.selectedList.length - 1 : this.selectedList.length;
-    }
     switch(data?.action || data?.type){
       case 'ADD':
         this.countSelectedList = (this.user.id == data.element.id) ?this.countSelectedList : this.countSelectedList+1
@@ -207,7 +209,10 @@ export class SearchPopoverComponent implements OnInit {
             this.tableData[index].action = this.actionButtons.REMOVE;
             let addedData = data.element
             this.selectedList.push(addedData)
+            this.selectedList = [...this.selectedList]; 
+            this.disabledCheckboxId = null;
           } else {
+              this.disabledCheckboxId = data.element.id;
               this.toast.showToast('SESSION_MENTEE_LIMIT', 'danger');
           }
         }
@@ -225,6 +230,10 @@ export class SearchPopoverComponent implements OnInit {
       default:
         
     }
+    if (this.selectedList.length) {
+      const sessionManager = this.selectedList.some(element => this.user.id === element.id);
+      this.countSelectedList = sessionManager ? this.selectedList.length - 1 : this.selectedList.length;
+    }
   }
 
   async onPaginatorChange(data:any) {
@@ -239,10 +248,12 @@ export class SearchPopoverComponent implements OnInit {
 
       let data = await this.getMenteelist();
         if(data.length === 0) {
-          this.disableInfiniteScroll = true;
-          return ;
+          this.disableInfiniteScroll = true; 
       }
     this.tableData = this.tableData.concat(data)
+    if(this.isSelectAllActive){
+      this.onSelectAll(this.isSelectAllActive);
+    }
     event.target.complete();
   }
 
@@ -318,4 +329,140 @@ export class SearchPopoverComponent implements OnInit {
     });
     modal.present()
   }
+
+  onSelectAll(isChecked : boolean){
+    this.isSelectAllActive= isChecked
+    switch(isChecked) {
+
+     case true:
+  let currentCount = this.countSelectedList;
+
+  for (const element of this.tableData) {
+      
+      const alreadySelected = this.selectedList.some(item => item.id === element.id);
+      if (alreadySelected) continue;
+
+      if (element.enrolled_type === 'ENROLLED') continue; 
+
+      const proposedCount = (this.user.id === element.id) 
+          ? currentCount 
+          : currentCount + 1; 
+
+      if (this.maxCount && proposedCount > this.maxCount) {
+          this.toast.showToast('SESSION_MENTEE_LIMIT', 'danger');
+          break; 
+      }
+      const index = this.tableData.findIndex(item => item.id === element.id);
+      if (index !== -1) {
+          this.tableData[index].action = this.actionButtons.REMOVE;
+      }
+      this.selectedList.push(element);
+      currentCount = proposedCount;
+  }
+
+  this.countSelectedList = currentCount;
+  this.tableData = [...this.tableData]; 
+
+  break;
+    
+     case false:
+    
+    for (const element of this.tableData) {
+        
+        const selectedIndex = this.selectedList.findIndex(item => item.id === element.id);
+        
+        if (selectedIndex !== -1) {
+            const tableIndex = this.tableData.findIndex(item => item.id === element.id);
+
+            if (tableIndex !== -1) {
+                
+                this.tableData[tableIndex].action = this.actionButtons.ADD;
+            }
+            this.selectedList.splice(selectedIndex, 1);
+            if (this.user.id !== element.id) {
+                this.countSelectedList = this.countSelectedList - 1;
+            }
+        }
+    }
+    this.tableData = [...this.tableData];
+    break;
+  }
+}
+
+  async onSelectAllX(isChecked: boolean) {
+  
+  switch(isChecked) {
+    case true:
+      
+      const sessionManagerInList = this.selectedList.some(item => item.id === this.user.id);
+      let currentCount = sessionManagerInList ? this.selectedList.length - 1 : this.selectedList.length;
+      const originalPage = this.page;
+      const originalLimit = this.limit;
+      this.page = 1;
+      this.limit = this.count; 
+      
+      const allMentees = await this.getMenteelist();
+      let limitReached = false;
+      
+      for (const element of allMentees) {
+        const alreadySelected = this.selectedList.some(item => item.id === element.id);
+        if (alreadySelected) {
+          continue;
+        }
+        if (element.enrolled_type === 'ENROLLED') {
+          continue;
+        }  
+        const proposedCount = (this.user.id === element.id) 
+          ? currentCount 
+          : currentCount + 1;
+  
+        if (this.maxCount && proposedCount > this.maxCount) {
+          limitReached = true;
+          break;
+        }
+        this.selectedList.push(element);
+        currentCount = proposedCount;
+      }
+      
+      
+      if (this.data.isMobile) {
+        this.disableInfiniteScroll = false; 
+        const firstPageData = await this.getMenteelist();
+        this.tableData = firstPageData.map(item => {
+          const isSelected = this.selectedList.some(selected => selected.id === item.id);
+          if (isSelected) {
+            item.action = item.enrolled_type === 'ENROLLED' ? 
+              [{ label: 'REMOVE', action: 'REMOVE', color: 'primary', name: 'REMOVE', cssColor: 'primary-color', isDisabled: true }] :
+              this.actionButtons.REMOVE;
+          }
+          return item;
+        });
+      } else {
+        
+        this.page = originalPage;
+        this.limit = originalLimit;
+        this.setPaginatorToFirstpage = true;
+        
+        const currentPageData = await this.getMenteelist();
+        this.tableData = currentPageData;
+      }
+      const finalSessionManager = this.selectedList.some(item => item.id === this.user.id);
+      this.countSelectedList = finalSessionManager ? this.selectedList.length - 1 : this.selectedList.length;
+      
+      if (limitReached) {
+        this.toast.showToast('SESSION_MENTEE_LIMIT', 'danger');
+      } 
+      break;
+      
+    case false:
+      
+      this.selectedList = [];
+      this.countSelectedList = 0;
+      this.page = 1;
+      this.setPaginatorToFirstpage = true;
+      this.tableData = await this.getMenteelist();
+      break;
+      
+  }
+}
 }
