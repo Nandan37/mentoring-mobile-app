@@ -1,4 +1,4 @@
-import {  Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
+import {  Component, EventEmitter, Input, OnInit, Output, SimpleChanges } from '@angular/core';
 import { NavigationEnd, Router } from '@angular/router';
 import { filter } from 'rxjs';
 
@@ -33,7 +33,13 @@ export class ChipsAndFilterComponent implements OnInit {
       .subscribe(() => {
         this.resetSearch();
       });
-  }
+  }  
+  
+  ngOnChanges(changes: SimpleChanges) {
+      if(this.selectedCount< this.maxCount){
+        this.selectAllXActive = false;
+      }
+    } 
 
   closeCriteriaChip(){
     this.sendChildValue.emit('');
@@ -72,9 +78,10 @@ export class ChipsAndFilterComponent implements OnInit {
       continue;
     }
     
-    if (item.action?.[0]?.action !== 'REMOVE') {
+    const hasRemoveAction = item.action?.some(a => a.action === 'REMOVE') ?? false;
+    if (!hasRemoveAction) {
       return false;
-    }
+    } 
     if(this.selectedCount == this.maxCount){
       return true;
     }
@@ -82,7 +89,7 @@ export class ChipsAndFilterComponent implements OnInit {
   return true;
 }
 
- onToggleClick(){
+ onToggleSelectAllX(){
     this.selectAllXActive = !this.selectAllXActive
     this.onSelectAllXChange.emit(this.selectAllXActive)
   }

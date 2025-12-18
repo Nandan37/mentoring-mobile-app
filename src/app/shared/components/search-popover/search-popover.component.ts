@@ -231,8 +231,8 @@ export class SearchPopoverComponent implements OnInit {
         
     }
     if (this.selectedList.length) {
-      const sessionManager = this.selectedList.some(element => this.user.id === element.id);
-      this.countSelectedList = sessionManager ? this.selectedList.length - 1 : this.selectedList.length;
+      const isSessionManager = this.selectedList.some(element => this.user.id === element.id);
+      this.countSelectedList = isSessionManager ? this.selectedList.length - 1 : this.selectedList.length;
     }
   }
 
@@ -389,80 +389,61 @@ export class SearchPopoverComponent implements OnInit {
   }
 }
 
-  async onSelectAllX(isChecked: boolean) {
+async onSelectAllX(isChecked: boolean) {
+  if (!isChecked) {
+    this.selectedList = [];
+    this.countSelectedList = 0;
+    this.page = 1;
+    this.setPaginatorToFirstpage = true;
+    this.disableInfiniteScroll = false;
+    this.tableData = await this.getMenteelist();
+    return;
+  }
   
-  switch(isChecked) {
-    case true:
-      
-      const sessionManagerInList = this.selectedList.some(item => item.id === this.user.id);
-      let currentCount = sessionManagerInList ? this.selectedList.length - 1 : this.selectedList.length;
-      const originalPage = this.page;
-      const originalLimit = this.limit;
-      this.page = 1;
-      this.limit = this.count; 
-      
-      const allMentees = await this.getMenteelist();
-      let limitReached = false;
-      
-      for (const element of allMentees) {
-        const alreadySelected = this.selectedList.some(item => item.id === element.id);
-        if (alreadySelected) {
-          continue;
-        }
-        if (element.enrolled_type === 'ENROLLED') {
-          continue;
-        }  
-        const proposedCount = (this.user.id === element.id) 
-          ? currentCount 
-          : currentCount + 1;
+  const originalPage = this.page;
+  const originalLimit = this.limit;
+  this.page = 1;
+  this.limit = this.count;
+  const allMentees = await this.getMenteelist();
   
-        if (this.maxCount && proposedCount > this.maxCount) {
-          limitReached = true;
-          break;
-        }
-        this.selectedList.push(element);
-        currentCount = proposedCount;
-      }
-      
-      
-      if (this.data.isMobile) {
-        this.disableInfiniteScroll = false; 
-        const firstPageData = await this.getMenteelist();
-        this.tableData = firstPageData.map(item => {
-          const isSelected = this.selectedList.some(selected => selected.id === item.id);
-          if (isSelected) {
-            item.action = item.enrolled_type === 'ENROLLED' ? 
-              [{ label: 'REMOVE', action: 'REMOVE', color: 'primary', name: 'REMOVE', cssColor: 'primary-color', isDisabled: true }] :
-              this.actionButtons.REMOVE;
-          }
-          return item;
-        });
-      } else {
-        
-        this.page = originalPage;
-        this.limit = originalLimit;
-        this.setPaginatorToFirstpage = true;
-        
-        const currentPageData = await this.getMenteelist();
-        this.tableData = currentPageData;
-      }
-      const finalSessionManager = this.selectedList.some(item => item.id === this.user.id);
-      this.countSelectedList = finalSessionManager ? this.selectedList.length - 1 : this.selectedList.length;
-      
-      if (limitReached) {
-        this.toast.showToast('SESSION_MENTEE_LIMIT', 'danger');
-      } 
+  const hasSessionManager = this.selectedList.some(item => item.id === this.user.id);
+  let currentCount = hasSessionManager ? this.selectedList.length - 1 : this.selectedList.length;
+  let limitReached = false;
+  
+  for (const mentee of allMentees) {
+    if (this.selectedList.some(item => item.id === mentee.id) || mentee.enrolled_type === 'ENROLLED') continue;
+    
+    const newCount = mentee.id === this.user.id ? currentCount : currentCount + 1;
+    if (this.maxCount && newCount > this.maxCount) {
+      limitReached = true;
       break;
-      
-    case false:
-      
-      this.selectedList = [];
-      this.countSelectedList = 0;
-      this.page = 1;
-      this.setPaginatorToFirstpage = true;
-      this.tableData = await this.getMenteelist();
-      break;
-      
+    }
+    this.selectedList.push(mentee);
+    currentCount = newCount;
+  }
+  
+  if (this.data.isMobile) {
+    this.disableInfiniteScroll = true;
+    this.tableData = allMentees.map(item => {
+      const isSelected = this.selectedList.some(selected => selected.id === item.id);
+      if (isSelected) {
+        item.action = item.enrolled_type === 'ENROLLED' 
+          ? [{ label: 'REMOVE', action: 'REMOVE', color: 'primary', name: 'REMOVE', cssColor: 'primary-color', isDisabled: true }]
+          : this.actionButtons.REMOVE;
+      }
+      return item;
+    });
+  } else {
+    this.page = originalPage;
+    this.limit = originalLimit;
+    this.setPaginatorToFirstpage = true;
+    this.tableData = await this.getMenteelist();
+  }
+  
+  this.countSelectedList = currentCount;
+  
+  if (limitReached) {
+    this.toast.showToast('SESSION_MENTEE_LIMIT', 'danger');
   }
 }
 }

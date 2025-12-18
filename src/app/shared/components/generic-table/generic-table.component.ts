@@ -96,8 +96,10 @@ disableCheckbox : boolean;
     if (item.enrolled_type === 'ENROLLED') {
       continue;
     }
-    
-    if (item.action?.[0]?.action !== 'REMOVE') {
+    const hasRemoveAction =
+      item.action?.some(a => a.action === 'REMOVE') ?? false;
+
+    if (!hasRemoveAction) {
       return false;
     }
     if(this.selectedCount == this.maxCount){
@@ -108,7 +110,7 @@ disableCheckbox : boolean;
 }
 
  isRowInRemoveState(element: any): boolean {
-  return element.action &&  element.action[0].action === 'REMOVE';
+  return element.action?.some(a => a.action === 'REMOVE') ?? false;
          
 }
 
@@ -120,7 +122,7 @@ onCheckboxAction(row: any, event: any) {
   this.isAllSelected()
 }
 
-  onToggleClick(){
+  onToggleSelectAllX(){
     this.selectAllXActive = !this.selectAllXActive
     this.onSelectAllXChange.emit(this.selectAllXActive)
   }
