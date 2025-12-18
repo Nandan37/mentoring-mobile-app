@@ -23,6 +23,7 @@ export class GenericCardComponent implements OnInit {
   @Input () selectedList
   @Input () maxCount
   @Input () showCheckbox
+  @Input () showSelectAll
   
 
   constructor(private router: Router, private localStorage: LocalStorageService) {}
