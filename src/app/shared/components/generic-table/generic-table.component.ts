@@ -22,6 +22,12 @@ export class GenericTableComponent implements OnInit {
   @Output() onClickEvent = new EventEmitter();
   @Output() paginatorChanged = new EventEmitter();
   @Output() onSorting = new EventEmitter();
+  @Output() onSelectAllChange =new EventEmitter<boolean>();
+  @Output() onSelectAllXChange =new EventEmitter<boolean>()
+  @Input () maxCount;
+  @Input () selectedCount
+  @Input() disabledCheckboxId: string | null = null;
+  @Input () selectedList
   pageSize = paginatorConstants.defaultPageSize;
   pageSizeOptions = paginatorConstants.pageSizeOptions;
   
@@ -29,8 +35,15 @@ export class GenericTableComponent implements OnInit {
   displayedColumns:any;
   constructor(public popoverController: PopoverController) { }
 
+  actionButtons = {
+     REMOVE: 'REMOVE', 
+     ADD: 'ADD'    
+            };
+selectAllXActive : boolean;
+disableCheckbox : boolean;
+
   ngOnInit() {
-    this.displayedColumns = this.columnData.map(column => column.name);
+    this.displayedColumns = ['select', ...this.columnData.map(column => column.name)];
     this.dataSource = new MatTableDataSource(this.tableData);
   }
   ngOnChanges(changes: SimpleChanges) {
@@ -39,9 +52,12 @@ export class GenericTableComponent implements OnInit {
     }
     if (changes['tableData']) {
       this.dataSource = new MatTableDataSource(this.tableData);
+      this.disableCheckbox = this.tableData.action?.[0]?.isDisabled;
     }
-  }
-
+    if(this.selectedCount< this.maxCount){
+      this.selectAllXActive = false;
+    }
+  } 
   onCellClick(action: any, columnName?: any, element?: any) {
     let value = {
       action:action,
@@ -62,6 +78,68 @@ export class GenericTableComponent implements OnInit {
       pageSize: this.paginator.pageSize
     }
     this.paginatorChanged.emit(data);
+     this.isAllSelected()
+     this.disableCheckbox = this.tableData.action?.[0]?.isDisabled;
   }
 
+  onSelectAllChangeClick(event: any){
+    this.onSelectAllChange.emit(event.detail.checked)
+  }
+
+    isAllSelected(): boolean {
+  if (!this.tableData || this.tableData.length === 0) {
+    return false;
+  }
+  
+  for (const item of this.tableData) {
+    
+    if (item.enrolled_type === 'ENROLLED') {
+      continue;
+    }
+    const hasRemoveAction =
+      item.action?.some(a => a.action === 'REMOVE') ?? false;
+
+    if (!hasRemoveAction) {
+      return false;
+    }
+    if(this.selectedCount == this.maxCount){
+      return true;
+    }
+  }
+  return true;
+}
+
+ isRowInRemoveState(element: any): boolean {
+  return element.action?.some(a => a.action === 'REMOVE') ?? false;
+         
+}
+
+onCheckboxAction(row: any, event: any) {
+  const isChecked = event.detail.checked;
+  
+  const action = isChecked ? 'ADD' : 'REMOVE';
+  this.onCellClick(action, null, row);
+  this.isAllSelected()
+}
+
+  onToggleSelectAllX(){
+    this.selectAllXActive = !this.selectAllXActive
+    this.onSelectAllXChange.emit(this.selectAllXActive)
+  }
+
+  isCheckboxDisabled(element: any): boolean {
+  if (this.disabledCheckboxId === element.id) {
+    return true;
+  }
+  const isSelected = this.selectedList.some(item => item.id === element.id);
+  if (isSelected) {
+    return false;
+  }
+  const selectedCount = this.selectedList.length;
+  const maxCountReached = this.maxCount && selectedCount >= this.maxCount;
+  if (maxCountReached) {
+    return true;
+  }
+  return false;
+}
 }

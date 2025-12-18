@@ -19,6 +19,11 @@ export class GenericCardComponent implements OnInit {
   @Input() disableButton: boolean;
   @Input() showTag: any;
   @Input() disableNavigation: boolean= false;
+  @Input() disabledCheckboxId: string | null = null;
+  @Input () selectedList
+  @Input () maxCount
+  @Input () showCheckbox
+  
 
   constructor(private router: Router, private localStorage: LocalStorageService) {}
 
@@ -55,4 +60,37 @@ export class GenericCardComponent implements OnInit {
       return false;
     }
   }
+
+  onCheckboxAction(data: any, event: any) {
+  const isChecked = event.detail.checked;
+  const action = isChecked ? 'ADD' : 'REMOVE';
+  let value = {
+      data: data.id || data.user_id,
+      type: action,
+      rid: data?.connection_meta?.room_id,
+      element: data
+    }; 
+  this.onClickEvent.emit(value);
+}
+
+ isRowInRemoveState(data: any): boolean {
+  return data.action &&  data.action[0].action === 'REMOVE';
+}
+
+isCheckboxDisabled(element: any): boolean {
+  if (this.disabledCheckboxId === element.id) {
+    return true;
+  }
+  const isSelected = this.selectedList.some(item => item.id === element.id);
+  if (isSelected) {
+    return false;
+  }
+  const selectedCount = this.selectedList.length;
+  const maxCountReached = this.maxCount && selectedCount >= this.maxCount;
+  if (maxCountReached) {
+    return true;
+  }
+  return false;
+}
+
 }
