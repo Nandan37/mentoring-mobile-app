@@ -2,8 +2,8 @@
   <div class="header-container">
   <div class="header">{{ headingText | translate}}</div>
   <div class="sorting-icon">
-  <ion-checkbox *ngIf="tableData?.length" labelPlacement="end" class="header" [checked]="isAllSelected()"  (ionChange)="onSelectAllChangeClick($event)">{{ isAllSelected() ? ('DESELECT_ALL' | translate) + ' - ' + ('SELECTED' | translate) + ' : ' + selectedCount : ('SELECT_ALL' | translate)}}</ion-checkbox>
-  <div *ngIf="selectedCount > 0" (click)="onToggleSelectAllX()" style="font-weight:700;color: #3a85e9f3; cursor: pointer;">{{ selectAllXActive ? ('| ' + ('CLEAR_ALL' | translate) + ' [' + totalCount + ']') : ('| ' + ('SELECT_ALL' | translate) + ' [' + totalCount + ']') }}</div> 
+  <ion-checkbox *ngIf="tableData?.length && showCheckbox" labelPlacement="end" class="header" [checked]="isAllSelected()"  (ionChange)="onSelectAllChangeClick($event)">{{ isAllSelected() ? ('DESELECT_ALL' | translate) + ' - ' + ('SELECTED' | translate) + ' : ' + selectedCount : ('SELECT_ALL' | translate)}}</ion-checkbox>
+  <div *ngIf="selectedCount > 0 && showSelectAll" (click)="onToggleSelectAllX()" style="font-weight:700;color: #3a85e9f3; cursor: pointer;">{{ selectAllXActive ? ('| ' + ('CLEAR_ALL' | translate) + ' [' + totalCount + ']') : ('| ' + ('SELECT_ALL' | translate) + ' [' + totalCount + ']') }}</div> 
   </div>
   </div>
   <div *ngIf="pageSize && pageSizeOptions" class="d-flex flex-justify-space-between ion-padding">
@@ -20,6 +20,7 @@
     </th>
     <td mat-cell *matCellDef="let element">
         <ion-checkbox 
+        *ngIf="showCheckbox"
          (ionChange)="onCheckboxAction(element, $event)"
          [checked]="isRowInRemoveState(element)"
          [disabled]="isCheckboxDisabled(element)" 
