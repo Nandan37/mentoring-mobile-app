@@ -75,7 +75,7 @@ export class GenericCardComponent implements OnInit {
 }
 
  isRowInRemoveState(data: any): boolean {
-  return data.action?.some(a => a.action === 'REMOVE') ?? false;
+  return data?.action?.some(a => a.action === 'REMOVE') ?? false;
 }
 
 isCheckboxDisabled(element: any): boolean {

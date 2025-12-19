@@ -115,7 +115,7 @@ disableCheckbox : boolean;
 }
 
  isRowInRemoveState(element: any): boolean {
-  return element.action?.some(a => a.action === 'REMOVE') ?? false;
+  return element?.action?.some(a => a.action === 'REMOVE') ?? false;
          
 }
 
