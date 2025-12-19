@@ -378,6 +378,186 @@ describe('HttpService', () => {
       expect(mockAlert.present).toHaveBeenCalled();
     });
   });
+
+
+describe('extra headers', () => {
+
+  it('setHeaders merges extra headers from localStorage', async () => {
+    (Storage.prototype.getItem as jasmine.Spy).and.returnValue(
+      JSON.stringify({ 'x-test': '123' })
+    );
+
+    const headers = await service.setHeaders();
+    expect(headers!['x-test']).toBe('123');
+  });
+
+  it('post calls handleError when responseCode is not OK', async () => {
+    spyOn(service, 'handleError').and.throwError('err');
+
+    (service as any).httpClient.post.and.returnValue(
+      Promise.resolve({
+        data: { responseCode: 'FAIL' },
+      })
+    );
+
+    await expectAsync(
+      service.post({ url: '/fail', payload: {} } as any)
+    ).toBeRejected();
+  });
+
+  it('get calls handleError when responseCode is not OK', async () => {
+    spyOn(service, 'handleError').and.throwError('err');
+
+    (service as any).httpClient.get.and.returnValue(
+      Promise.resolve({
+        data: { responseCode: 'FAIL' },
+      })
+    );
+
+    await expectAsync(
+      service.get({ url: '/fail' } as any)
+    ).toBeRejected();
+  });
+
+  it('delete calls handleError when responseCode is not OK', async () => {
+    spyOn(service, 'handleError').and.throwError('err');
+
+    (service as any).httpClient.delete.and.returnValue(
+      Promise.resolve({
+        data: { responseCode: 'FAIL' },
+      })
+    );
+
+    await expectAsync(
+      service.delete({ url: '/fail' } as any)
+    ).toBeRejected();
+  });
+
+  it('patch calls handleError when responseCode is not OK', async () => {
+    spyOn(service, 'handleError').and.throwError('err');
+
+    (service as any).httpClient.patch.and.returnValue(
+      Promise.resolve({
+        data: { responseCode: 'FAIL' },
+      })
+    );
+
+    await expectAsync(
+      service.patch({ url: '/fail', payload: {} } as any)
+    ).toBeRejected();
+  });
+
+  it('getAccessToken calls handleError on failure', async () => {
+    spyOn(service, 'handleError').and.throwError('err');
+
+    (service as any).httpClient.post.and.returnValue(
+      Promise.resolve({
+        data: { responseCode: 'FAIL' },
+      })
+    );
+
+    await expectAsync(service.getAccessToken()).toBeRejected();
+  });
+
+  it('handleError returns early for GET_CHAT_TOKEN', () => {
+    service.handleError({
+      status: 400,
+      url: urlConstants.API_URLS.GET_CHAT_TOKEN,
+      data: {},
+    });
+  });
+
+  it('handleError throws immediately for profile API', () => {
+    expect(() =>
+      service.handleError({
+        status: 400,
+        url: 'interface/v1/profile/get',
+        data: {},
+      })
+    ).toThrow();
+  });
+
+  it('handleError default case executes', () => {
+    expect(() =>
+      service.handleError({
+        status: 500,
+        url: '/unknown',
+        data: {},
+      })
+    ).toThrow();
+
+    expect(toast.showToast).toHaveBeenCalled();
+  });
+
+  it('triggerLogoutConfirmationAlert returns true when alert already open', async () => {
+    service.isAlertOpen = true;
+
+    const res = await service.triggerLogoutConfirmationAlert({
+      data: { message: 'msg' },
+    } as any);
+
+    expect(res).toBeTrue();
+  });
+
+  it('getFile calls handleError when status is not 200', async () => {
+    spyOn(service, 'handleError').and.throwError('err');
+
+    (service as any).httpClient.get.and.returnValue(
+      Promise.resolve({ status: 500 })
+    );
+
+    await expectAsync(
+      service.getFile({ url: '/file' } as any)
+    ).toBeRejected();
+  });
+
+});
+
+describe('header setting', () => {
+
+  it('setHeaders merges extraHeaders into headers object', async () => {
+    (Storage.prototype.getItem as jasmine.Spy).and.returnValue(
+      JSON.stringify({ 'x-extra-header': 'abc' })
+    );
+
+    const headers = await service.setHeaders();
+
+    expect(headers!['x-extra-header']).toBe('abc');
+    expect(headers!['X-auth-token']).toBe(token);
+  });
+
+  it('post uses requestParam.headers when provided', async () => {
+    (service as any).httpClient.post.and.returnValue(
+      Promise.resolve({
+        data: { responseCode: 'OK' },
+      })
+    );
+
+    await service.post({
+      url: '/custom-header',
+      headers: { custom: 'yes' },
+      payload: {},
+    } as any);
+
+    const call = (service as any).httpClient.post.calls.mostRecent().args[0];
+
+    expect(call.headers.custom).toBe('yes');
+  });
+
+  it('handleError covers 404 status branch', () => {
+    expect(() =>
+      service.handleError({
+        status: 404,
+        url: '/not-found',
+        data: { message: 'Not found' },
+      })
+    ).toThrow();
+
+    expect(toast.showToast).toHaveBeenCalledWith('Not found', 'danger');
+  });
+
+});
+
 });
 
 
