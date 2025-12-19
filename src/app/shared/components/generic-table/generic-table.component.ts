@@ -136,19 +136,15 @@ onCheckboxAction(row: any, event: any) {
   if (this.disabledCheckboxId === element.id) {
     return true;
   }
-
-  const hasRemoveAction =
-    element.action?.some(a => a.action === 'REMOVE') ?? false;
-
-  if (!hasRemoveAction) {
-    return true;
-  }
-
   const isSelected = this.selectedList.some(item => item.id === element.id);
   if (isSelected) {
-    return false;
+    return false; 
   }
-
-  return this.maxCount && this.selectedList.length >= this.maxCount;
+  const selectedCount = this.selectedList.length;
+  const maxCountReached = this.maxCount && selectedCount >= this.maxCount;
+  if (maxCountReached) {
+    return true;
+  }
+  return false;
 }
 }
