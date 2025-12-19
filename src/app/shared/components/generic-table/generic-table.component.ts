@@ -28,6 +28,9 @@ export class GenericTableComponent implements OnInit {
   @Input () selectedCount
   @Input() disabledCheckboxId: string | null = null;
   @Input () selectedList
+  @Input () showSelectAll
+  @Input () showCheckbox
+
   pageSize = paginatorConstants.defaultPageSize;
   pageSizeOptions = paginatorConstants.pageSizeOptions;
   
@@ -52,7 +55,9 @@ disableCheckbox : boolean;
     }
     if (changes['tableData']) {
       this.dataSource = new MatTableDataSource(this.tableData);
-      this.disableCheckbox = this.tableData.action?.[0]?.isDisabled;
+      this.disableCheckbox = this.tableData?.some(
+           item => item.action?.some(a => a.isDisabled)
+             ) ?? false;
     }
     if(this.selectedCount< this.maxCount){
       this.selectAllXActive = false;
@@ -131,15 +136,19 @@ onCheckboxAction(row: any, event: any) {
   if (this.disabledCheckboxId === element.id) {
     return true;
   }
+
+  const hasRemoveAction =
+    element.action?.some(a => a.action === 'REMOVE') ?? false;
+
+  if (!hasRemoveAction) {
+    return true;
+  }
+
   const isSelected = this.selectedList.some(item => item.id === element.id);
   if (isSelected) {
     return false;
   }
-  const selectedCount = this.selectedList.length;
-  const maxCountReached = this.maxCount && selectedCount >= this.maxCount;
-  if (maxCountReached) {
-    return true;
-  }
-  return false;
+
+  return this.maxCount && this.selectedList.length >= this.maxCount;
 }
 }
