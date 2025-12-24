@@ -86,10 +86,13 @@ selectAllXActive : boolean;
   }
 
   onSelectAllChangeClick(event: any){
+    if(event.detail.checked){
     if(this.selectedCount >= this.maxCount){
-       event.target.checked = false;
+      
        this.toast.showToast('SESSION_MENTEE_LIMIT', 'danger');
+        event.target.checked = false;
     }
+  }
      this.onSelectAllChange.emit(event.detail.checked)
      if(!this.isAllSelected()){
       event.target.checked = false;
