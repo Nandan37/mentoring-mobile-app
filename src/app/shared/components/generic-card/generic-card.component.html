@@ -43,7 +43,6 @@
     <ion-checkbox *ngIf="showCheckbox" mode="md" class="square-checkbox"
         (ionChange)="onCheckboxAction(data, $event)"
          [checked]="isRowInRemoveState(data)"
-         [disabled]="isCheckboxDisabled(data)" 
         ></ion-checkbox>
         </div>
     @if(cardConfig.header.image) {

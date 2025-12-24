@@ -9,6 +9,7 @@ import { urlConstants } from 'src/app/core/constants/urlConstants';
 import { HttpService, LocalStorageService, ToastService, UtilService } from 'src/app/core/services';
 import { FormService } from 'src/app/core/services/form/form.service';
 import { FilterPopupComponent } from '../filter-popup/filter-popup.component';
+import { ActivatedRoute } from '@angular/router';
 
 @Component({
   selector: 'app-search-popover',
@@ -58,11 +59,12 @@ export class SearchPopoverComponent implements OnInit {
   disableNavigation= true;
   showPaginator: boolean= true;
   disabledCheckboxId: string | null = null;
-  showSelectAll : boolean = true;
-  showCheckbox : boolean= true;
+  showSelectAll : boolean = false;
+  showCheckbox : boolean= false;
   isSelectAllActive: boolean= false;
-
-  constructor(private platform: Platform, private modalController: ModalController, private toast: ToastService,private translate: TranslateService, private localStorage: LocalStorageService, private util: UtilService, private httpService: HttpService, private form: FormService) { 
+  source: any;
+  sorting : any;
+  constructor(private platform: Platform, private modalController: ModalController, private toast: ToastService,private translate: TranslateService, private localStorage: LocalStorageService, private util: UtilService, private httpService: HttpService, private form: FormService, private route: ActivatedRoute) { 
     this.platform.backButton.subscribeWithPriority(10, () => {
       this.handleBackButton();
     });
@@ -79,9 +81,14 @@ export class SearchPopoverComponent implements OnInit {
   }
 
   async ngOnInit() {
+    this.source = this.route.snapshot.queryParamMap.get('source');
     let isMobile = this.util.isMobile();
     if(isMobile)
       this.limit = 25;
+      if(this.data.control.name ==="mentees"){
+      this.showCheckbox = true;
+      this.showSelectAll = true; 
+    }
     this.maxCount = await this.localStorage.getLocalData(localKeys[this.data.control.meta.maxCount])
     this.user = await this.localStorage.getLocalData(localKeys.USER_DETAILS)
     this.roles = await this.localStorage.getLocalData(localKeys.USER_ROLES);
@@ -89,6 +96,7 @@ export class SearchPopoverComponent implements OnInit {
     this.mentorForm = _.get(result, 'data.fields.controls');
     this.headerConfig.label = this.data?.control?.name === "mentees" ? "MENTEE_LIST" : "MENTOR_LIST";
     this.selectedList = this.data.selectedData ? this.data.selectedData : this.selectedList
+    this.countSelectedList = this.selectedList.length
     if (this.data.viewListMode) {
       this.selectedList.forEach((ele) => {
         ele.organization = (typeof ele.organization === 'object' && ele.organization !== null) ? ele.organization.name : ele.organization;
@@ -149,8 +157,13 @@ export class SearchPopoverComponent implements OnInit {
     if(this.data.control.id){
       queryString = queryString + '&session_id=' + this.data.control.id
     }
-    const sorting = `&order=${this.sortingData?.order || ''}&sort_by=${this.sortingData?.sort_by || 'name'}&mentorId=${this.data?.mentorId ? this.data?.mentorId :  this.user.id}`;
-    queryString = queryString + sorting
+    if( this.source == "home") {
+       this.sorting = `&order=${this.sortingData?.order || ''}&sort_by=${this.sortingData?.sort_by || 'name'}&mentorId=${this.data?.mentorId ? this.data?.mentorId :  this.user.id}`;
+    }
+    else{
+     this.sorting = `&order=${this.sortingData?.order || ''}&sort_by=${this.sortingData?.sort_by || ''}&mentorId=${this.data?.mentorId ? this.data?.mentorId :  this.user.id}`;
+    }
+    queryString = queryString + this.sorting
     const config = {
       url: urlConstants.API_URLS[this.data.control.meta.url] + this.page + '&limit=' + this.limit + '&search=' + btoa(this.searchText) + queryString,
       payload: {}
@@ -212,7 +225,6 @@ export class SearchPopoverComponent implements OnInit {
             this.selectedList = [...this.selectedList]; 
             this.disabledCheckboxId = null;
           } else {
-              this.disabledCheckboxId = data.element.id;
               this.toast.showToast('SESSION_MENTEE_LIMIT', 'danger');
           }
         }
@@ -412,7 +424,7 @@ async onSelectAllX(isChecked: boolean) {
   
   for (const mentee of allMentees) {
     if (this.selectedList.some(item => item.id === mentee.id) || mentee.enrolled_type === 'ENROLLED') continue;
-    
+   
     const newCount = mentee.id === this.user.id ? currentCount : currentCount + 1;
     if (this.maxCount && newCount > this.maxCount) {
       limitReached = true;
@@ -441,7 +453,7 @@ async onSelectAllX(isChecked: boolean) {
   }
   
   this.countSelectedList = currentCount;
-  
+
   if (limitReached) {
     this.toast.showToast('SESSION_MENTEE_LIMIT', 'danger');
   }

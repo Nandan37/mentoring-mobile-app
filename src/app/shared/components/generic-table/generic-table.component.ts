@@ -3,6 +3,7 @@ import { MatPaginator } from '@angular/material/paginator';
 import { MatTableDataSource } from '@angular/material/table';
 import { PopoverController } from '@ionic/angular';
 import { paginatorConstants } from 'src/app/core/constants/paginatorConstants';
+import { ToastService } from 'src/app/core/services';
 
 @Component({
   selector: 'app-generic-table',
@@ -36,14 +37,15 @@ export class GenericTableComponent implements OnInit {
   
   dataSource: MatTableDataSource<any>;
   displayedColumns:any;
-  constructor(public popoverController: PopoverController) { }
+  constructor(public popoverController: PopoverController,
+              private toast: ToastService
+  ) { }
 
   actionButtons = {
      REMOVE: 'REMOVE', 
      ADD: 'ADD'    
             };
 selectAllXActive : boolean;
-disableCheckbox : boolean;
 
   ngOnInit() {
     this.displayedColumns = ['select', ...this.columnData.map(column => column.name)];
@@ -55,9 +57,6 @@ disableCheckbox : boolean;
     }
     if (changes['tableData']) {
       this.dataSource = new MatTableDataSource(this.tableData);
-      this.disableCheckbox = this.tableData?.some(
-           item => item.action?.some(a => a.isDisabled)
-             ) ?? false;
     }
     if(this.selectedCount< this.maxCount){
       this.selectAllXActive = false;
@@ -84,11 +83,22 @@ disableCheckbox : boolean;
     }
     this.paginatorChanged.emit(data);
      this.isAllSelected()
-     this.disableCheckbox = this.tableData.action?.[0]?.isDisabled;
   }
 
   onSelectAllChangeClick(event: any){
-    this.onSelectAllChange.emit(event.detail.checked)
+    if(event.detail.checked){
+    if(this.selectedCount >= this.maxCount){
+      
+       this.toast.showToast('SESSION_MENTEE_LIMIT', 'danger');
+        event.target.checked = false;
+    }
+  }
+     this.onSelectAllChange.emit(event.detail.checked)
+     if(!this.isAllSelected()){
+      event.target.checked = false;
+     }
+    this.isAllSelected()
+    
   }
 
     isAllSelected(): boolean {
@@ -107,7 +117,7 @@ disableCheckbox : boolean;
     if (!hasRemoveAction) {
       return false;
     }
-    if(this.selectedCount == this.maxCount){
+    if( this.tableData.length > this.maxCount  && this.selectedCount == this.maxCount){
       return true;
     }
   }
@@ -121,10 +131,15 @@ disableCheckbox : boolean;
 
 onCheckboxAction(row: any, event: any) {
   const isChecked = event.detail.checked;
+  if (isChecked && this.selectedCount >= this.maxCount) {
+    event.target.checked = false;
+    this.toast.showToast('SESSION_MENTEE_LIMIT', 'danger');
+    return;
+  }
   
   const action = isChecked ? 'ADD' : 'REMOVE';
   this.onCellClick(action, null, row);
-  this.isAllSelected()
+  this.isAllSelected();
 }
 
   onToggleSelectAllX(){

@@ -3,6 +3,7 @@ import { Router } from '@angular/router';
 import { localKeys } from 'src/app/core/constants/localStorage.keys';
 import { LocalStorageService } from 'src/app/core/services';
 import { CommonRoutes } from 'src/global.routes';
+import { ToastService } from 'src/app/core/services';
 
 @Component({
   selector: 'app-generic-card',
@@ -24,9 +25,11 @@ export class GenericCardComponent implements OnInit {
   @Input () maxCount
   @Input () showCheckbox
   @Input () showSelectAll
+  @Input () selectedCount
   
 
-  constructor(private router: Router, private localStorage: LocalStorageService) {}
+  constructor(private router: Router, private localStorage: LocalStorageService, private toast : ToastService
+  ) {}
 
   async ngOnInit() {
     this.chatConfig = await this.localStorage.getLocalData(localKeys['CHAT_CONFIG'])
@@ -64,6 +67,11 @@ export class GenericCardComponent implements OnInit {
 
   onCheckboxAction(data: any, event: any) {
   const isChecked = event.detail.checked;
+  if (isChecked && this.selectedCount >= this.maxCount) {
+    event.target.checked = false;
+    this.toast.showToast('SESSION_MENTEE_LIMIT', 'danger');
+    return;
+  }
   const action = isChecked ? 'ADD' : 'REMOVE';
   let value = {
       data: data.id || data.user_id,
@@ -76,22 +84,6 @@ export class GenericCardComponent implements OnInit {
 
  isRowInRemoveState(data: any): boolean {
   return data?.action?.some(a => a.action === 'REMOVE') ?? false;
-}
-
-isCheckboxDisabled(element: any): boolean {
-  if (this.disabledCheckboxId === element.id) {
-    return true;
-  }
-  const isSelected = this.selectedList.some(item => item.id === element.id);
-  if (isSelected) {
-    return false;
-  }
-  const selectedCount = this.selectedList.length;
-  const maxCountReached = this.maxCount && selectedCount >= this.maxCount;
-  if (maxCountReached) {
-    return true;
-  }
-  return false;
 }
 
 }
