@@ -272,7 +272,7 @@ describe('MentorDetailsPage', () => {
 
     it('should join session and refresh upcoming sessions on joinAction', fakeAsync(() => {
       const event = { type: 'joinAction', data: { id: '456' } };
-      sessionService.joinSession.and.returnValue(Promise.resolve());
+      sessionService.joinSession.and.returnValue(Promise.resolve(null));
       spyOn(component, 'getUpcomingSessions');
 
       component.onAction(event);
