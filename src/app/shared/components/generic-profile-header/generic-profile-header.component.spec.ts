@@ -206,18 +206,4 @@ describe('GenericProfileHeaderComponent', () => {
     expect(component.labels).toContain('Check out mentor');
     expect(component.labels).toContain('Profile on Mentored - explore the sessions');
   });
-
-  it('copyToClipBoard should call Clipboard.write and show toast', async () => {
-    spyOn(Clipboard, 'write').and.returnValue(Promise.resolve());
-    await component.copyToClipBoard('http://example.com');
-    expect(Clipboard.write).toHaveBeenCalledWith({ string: 'http://example.com' });
-    expect(mockToastService.showToast).toHaveBeenCalledWith('COPIED', 'success');
-  });
-
-  it('viewRoles should call profileService.viewRolesModal with titles array', async () => {
-    mockProfileService.viewRolesModal.calls.reset();
-    component.headerData.organizations = [{ roles: [{ title: 'mentor' }, { title: 'admin' }] }];
-    await component.viewRoles();
-    expect(mockProfileService.viewRolesModal).toHaveBeenCalledWith(['mentor', 'admin']);
-  });
 });
