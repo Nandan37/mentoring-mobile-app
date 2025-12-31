@@ -467,7 +467,7 @@ describe('HomeSearchPage', () => {
 
     it('should join session on joinAction', async () => {
       mockLocalStorage.getLocalData.and.returnValue(Promise.resolve({ about: 'test user' }));
-      mockSessionService.joinSession.and.returnValue(Promise.resolve());
+      mockSessionService.joinSession.and.returnValue(Promise.resolve(null));
       spyOn(component, 'fetchSessionList');
       const event = { type: 'joinAction', data: { id: '123' } };
 

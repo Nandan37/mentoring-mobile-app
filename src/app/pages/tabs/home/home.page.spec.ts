@@ -388,7 +388,7 @@ const mockSessions = {
     describe('eventAction', () => {
           beforeEach(() => {
       component.user = mockUser;
-      mockSessionService.joinSession.and.returnValue(Promise.resolve());
+      mockSessionService.joinSession.and.returnValue(Promise.resolve(null));
       mockSessionService.enrollSession.and.returnValue(
         Promise.resolve({ result: true, message: 'Success' })
       );

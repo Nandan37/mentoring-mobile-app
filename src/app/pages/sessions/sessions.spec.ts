@@ -356,7 +356,7 @@ describe('SessionsPage', () => {
     it('should call joinSession with event data', async () => {
       const sessionData = { _id: '123', name: 'Test Session' };
       const event = { data: sessionData };
-      mockSessionService.joinSession.and.returnValue(Promise.resolve());
+      mockSessionService.joinSession.and.returnValue(Promise.resolve(null));
       
       await component.onJoin(event);
       
@@ -365,7 +365,7 @@ describe('SessionsPage', () => {
 
     it('should handle joinSession call', async () => {
       const event = { data: { _id: '456' } };
-      mockSessionService.joinSession.and.returnValue(Promise.resolve());
+      mockSessionService.joinSession.and.returnValue(Promise.resolve(null));
       
       await component.onJoin(event);
       
