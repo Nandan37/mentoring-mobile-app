@@ -5,7 +5,7 @@ import { AlertController, ModalController } from '@ionic/angular';
 import { TranslateService } from '@ngx-translate/core';
 import { of } from 'rxjs';
 
-import { HttpService } from 'src/app/core/services/http/http.service'; 
+import { HttpService } from 'src/app/core/services/http/http.service';
 import { UserService } from '../user/user.service';
 import { NetworkService } from '../network.service';
 import { ToastService } from '../toast.service';
@@ -227,7 +227,7 @@ describe('HttpService', () => {
     const req = { url: '/test', payload: { a: 1 } };
 
     it('should throw when network unavailable', async () => {
-      network.isNetworkAvailable = false;
+      Object.defineProperty(network, 'isNetworkAvailable', { value: false, configurable: true });
       await expectAsync(service.post(req as any)).toBeRejected();
     });
 
@@ -316,7 +316,7 @@ describe('HttpService', () => {
     const req = { url: '/test-get' };
 
     it('should throw when network unavailable', async () => {
-      network.isNetworkAvailable = false;
+      Object.defineProperty(network, 'isNetworkAvailable', { value: false, configurable: true });
       await expectAsync(service.get(req as any)).toBeRejected();
     });
 
@@ -423,7 +423,7 @@ describe('HttpService', () => {
     const req = { url: '/test-delete' };
 
     it('should throw when network unavailable', async () => {
-      network.isNetworkAvailable = false;
+      Object.defineProperty(network, 'isNetworkAvailable', { value: false, configurable: true });
       await expectAsync(service.delete(req as any)).toBeRejected();
     });
 
@@ -472,7 +472,7 @@ describe('HttpService', () => {
     const req = { url: '/test-patch', payload: { x: 1 } };
 
     it('should throw when network unavailable', async () => {
-      network.isNetworkAvailable = false;
+      Object.defineProperty(network, 'isNetworkAvailable', { value: false, configurable: true });
       await expectAsync(service.patch(req as any)).toBeRejected();
     });
 
@@ -587,7 +587,7 @@ describe('HttpService', () => {
     });
 
     it('should throw when network unavailable', async () => {
-      network.isNetworkAvailable = false;
+      Object.defineProperty(network, 'isNetworkAvailable', { value: false, configurable: true });
       await expectAsync(service.getAccessToken()).toBeRejected();
     });
 
@@ -1117,7 +1117,7 @@ describe('HttpService', () => {
     });
 
     it('should handle network check failure in multiple methods', async () => {
-      network.isNetworkAvailable = false;
+      Object.defineProperty(network, 'isNetworkAvailable', { value: false, configurable: true });
 
       await expectAsync(service.post({ url: '/test' } as any)).toBeRejected();
       await expectAsync(service.get({ url: '/test' } as any)).toBeRejected();
@@ -1194,5 +1194,28 @@ describe('HttpService', () => {
     });
   });
 
+
+
+  describe('redirectToOrigin', () => {
+    it('should redirect to window origin', () => {
+      const mockWindow = {
+        location: {
+          origin: 'http://localhost:8100',
+          href: ''
+        }
+      };
+      (service as any)._window = mockWindow;
+
+      // We need to call the real method, so if it was stubbed in beforeEach, we might need to be careful.
+      // In beforeEach: spyOn<any>(service, 'redirectToOrigin').and.stub();
+      // We need to undo that or callThrough, but better: 
+      // check if we can override the spy?
+      (service as any).redirectToOrigin.and.callThrough();
+
+      (service as any).redirectToOrigin();
+
+      expect(mockWindow.location.href).toBe('http://localhost:8100');
+    });
+  });
 
 });
