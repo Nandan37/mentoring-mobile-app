@@ -69,7 +69,7 @@ describe('MentorDetailsPage', () => {
         },
         {
           provide: UtilService,
-          useValue: jasmine.createSpyObj('UtilService', ['isMobile', 'getDeepLink', 'shareLink']),
+          useValue: jasmine.createSpyObj('UtilService', ['isMobile', 'getDeepLink', 'shareLink', 'alertPopup']),
         },
         {
           provide: Location,
@@ -340,6 +340,94 @@ describe('MentorDetailsPage', () => {
       expect(component.page).toBe(2);
       expect(component.getUpcomingSessions).toHaveBeenCalledWith(true);
       expect(event.target.complete).toHaveBeenCalled();
+    }));
+  });
+
+  describe('block', () => {
+    it('should show alert and block user if confirmed', fakeAsync(() => {
+      utilService.alertPopup.and.returnValue(Promise.resolve(true));
+      component.mentorName = 'Mentor Name';
+      component.mentorId = '123';
+
+      component.block('123');
+      tick();
+
+      expect(utilService.alertPopup).toHaveBeenCalled();
+      expect(toast.showToast).toHaveBeenCalledWith("BLOCK_TOAST_MESSAGE", "success", 5000, [], undefined, { name: 'Mentor Name' });
+      expect(component.isdisabled).toBe(true);
+    }));
+
+    it('should show alert and NOT block user if cancelled', fakeAsync(() => {
+      utilService.alertPopup.and.returnValue(Promise.resolve(false));
+      component.mentorName = 'Mentor Name';
+
+      component.block('123');
+      tick();
+
+      expect(utilService.alertPopup).toHaveBeenCalled();
+      expect(toast.showToast).not.toHaveBeenCalled();
+      expect(component.isdisabled).toBeUndefined();
+    }));
+  });
+
+  describe('unblock', () => {
+    it('should unblock user', () => {
+      component.isdisabled = true;
+      component.unblock();
+      expect(component.isdisabled).toBe(false);
+    });
+  });
+
+  describe('action', () => {
+    it('should call block method when action is "block"', () => {
+      spyOn(component, 'block');
+      component.action('block');
+      expect(component.block).toHaveBeenCalledWith(component.mentorId);
+    });
+  });
+
+  describe('share (mobile)', () => {
+    it('should share link using utilService on mobile', fakeAsync(() => {
+      component.isMobile = true;
+      component.buttonConfig.meta.id = '123';
+      utilService.getDeepLink.and.returnValue('deep-link');
+      // Mocking navigator.share
+      const originalShare = navigator.share;
+      (navigator as any).share = jasmine.createSpy('share').and.returnValue(Promise.resolve());
+
+      component.share();
+      tick();
+
+      expect(utilService.getDeepLink).toHaveBeenCalled();
+      expect(utilService.shareLink).toHaveBeenCalled();
+
+      // Restore navigator.share
+      if (originalShare) {
+        (navigator as any).share = originalShare;
+      } else {
+        delete (navigator as any).share;
+      }
+    }));
+  });
+
+  describe('ionViewWillEnter edge case', () => {
+    it('should not do anything if isLoading is true', fakeAsync(() => {
+      component.isLoading = true;
+      component.ionViewWillEnter();
+      tick();
+      expect(localStorage.getLocalData).not.toHaveBeenCalled();
+    }));
+    it('should call getUpcomingSessiosn if is_mentor is true', fakeAsync(() => {
+      const user = { id: '456' };
+      localStorage.getLocalData.and.returnValue(Promise.resolve(user));
+      spyOn(component, 'getMentor');
+      spyOn(component, 'getUpcomingSessions');
+      component.mentorProfileData = { result: { is_mentor: true } };
+
+      component.ionViewWillEnter();
+      tick();
+
+      expect(component.getUpcomingSessions).toHaveBeenCalled();
     }));
   });
 });

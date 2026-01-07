@@ -39,7 +39,7 @@ export class HttpService {
     private alert: AlertController,
     private router : Router,
     private toast: ToastService
-  ) {  
+  ) {
     this.baseUrl = environment['baseUrl'];
   }
 
@@ -47,7 +47,7 @@ export class HttpService {
     let token = await this.getToken();
     if(!token) {
       return null;
-    } 
+    }
     const timezone = Intl.DateTimeFormat().resolvedOptions().timeZone;
     const acceptLanguage = await this.localStorage.getLocalData(localKeys.SELECTED_LANGUAGE);
     const headers = {
@@ -67,16 +67,16 @@ export class HttpService {
 
   async post(requestParam: RequestParams) {
     if (!(await this.checkNetworkAvailability())) {
-      
-  throw Error(null);
-}
+
+      throw Error(null);
+    }
 
     let defaultHeaders = await this.setHeaders();
     const headers = requestParam.headers ?  { ...requestParam.headers, ...defaultHeaders } : defaultHeaders;
     let body = requestParam.payload ? requestParam.payload : {};
     if (body?.time_zone) {
-    headers.timeZone = body.time_zone;        
-  }
+      headers.timeZone = body.time_zone;
+    }
     const options = {
       url: this.baseUrl + requestParam.url,
       headers: headers,
@@ -95,8 +95,8 @@ export class HttpService {
 
   async get(requestParam: RequestParams) {
     if (!(await this.checkNetworkAvailability())) {
-  throw Error(null);
-}
+      throw Error(null);
+    }
     const headers = requestParam.headers ? requestParam.headers : await this.setHeaders();
     const options = {
       url: this.baseUrl + requestParam.url,
@@ -121,8 +121,8 @@ export class HttpService {
 
   async delete(requestParam: RequestParams) {
     if (!(await this.checkNetworkAvailability())) {
-  throw Error(null);
-}
+      throw Error(null);
+    }
     const headers = requestParam.headers ? requestParam.headers : await this.setHeaders();
     const options = {
       url: this.baseUrl + requestParam.url,
@@ -142,8 +142,8 @@ export class HttpService {
 
   async patch(requestParam: RequestParams) {
     if (!(await this.checkNetworkAvailability())) {
-  throw Error(null);
-}
+      throw Error(null);
+    }
     let body = requestParam.payload ? requestParam.payload : {};
     const headers = requestParam.headers ? requestParam.headers : await this.setHeaders();
     const options = {
@@ -169,12 +169,12 @@ export class HttpService {
       this.toastService.showToast('MSG_PLEASE_NETWORK', 'danger')
       return false;
     } else {
-    return true;
+      return true;
     }
   }
 
 
-async getToken() {
+  async getToken() {
     const token = await this.userService.getUserValue();
     //need to verify token validity
     if (!token) {
@@ -197,8 +197,8 @@ async getToken() {
 
   async getAccessToken() {
     if (!(await this.checkNetworkAvailability())) {
-  throw Error(null);
-}
+      throw Error(null);
+    }
     const options = {
       url: this.baseUrl + urlConstants.API_URLS.REFRESH_TOKEN,
       headers: {
@@ -263,7 +263,7 @@ async getToken() {
   }
 
   async triggerLogoutConfirmationAlert(result) {
-    this.toast.setDisableToast(true); 
+    this.toast.setDisableToast(true);
     if(await this.modalController.getTop()) {
       await this.modalController.dismiss()
     }
@@ -275,7 +275,7 @@ async getToken() {
         .subscribe((text) => {
           texts = text;
         });
-        this.isAlertOpen = true;
+      this.isAlertOpen = true;
       const alert = await this.alert.create({
         message: msg,
         buttons: [
@@ -285,7 +285,7 @@ async getToken() {
             cssClass: 'alert-button-red',
             handler: () => {
               this.isAlertOpen = false;
-              this.toast.setDisableToast(false); 
+              this.toast.setDisableToast(false);
             },
           },
         ],
@@ -308,8 +308,8 @@ async getToken() {
     }
   }
 
- async getFile(requestParam: RequestParams){
-    
+  async getFile(requestParam: RequestParams){
+
     const headers = requestParam.headers ? requestParam.headers : await this.setHeaders();
     const options = {
       url: this.baseUrl + requestParam.url,
@@ -327,7 +327,9 @@ async getToken() {
       });
   }
 
-    private redirectToOrigin(): void {
-    location.href = window.location.origin;
+  _window = window;
+
+  private redirectToOrigin(): void {
+    this._window.location.href = this._window.location.origin;
   }
 }
