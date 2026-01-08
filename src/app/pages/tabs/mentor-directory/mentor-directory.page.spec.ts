@@ -1,13 +1,19 @@
 import 'zone.js';          
 import 'zone.js/testing';  
 
+import 'zone.js';
+import 'zone.js/testing';
+
 /* mentor-directory.page.spec.ts */
 import { ComponentFixture, TestBed, waitForAsync } from '@angular/core/testing';
 import { MentorDirectoryPage } from './mentor-directory.page';
 import { Router } from '@angular/router';
 import { ActivatedRoute } from '@angular/router';
-import { of } from 'rxjs';
+import { of, throwError } from 'rxjs'; 
 import { NO_ERRORS_SCHEMA } from '@angular/core';
+// Import dependencies needed for the component file (even if not used in test)
+import * as _ from 'lodash'; 
+import { IonContent } from '@ionic/angular';
 
 // import service tokens exactly as used in your component
 import { HttpService, LoaderService, ToastService } from 'src/app/core/services';
@@ -15,6 +21,11 @@ import { FormService } from 'src/app/core/services/form/form.service';
 import { LocalStorageService } from 'src/app/core/services';
 import { CommonRoutes } from 'src/global.routes';
 import { TranslateModule } from '@ngx-translate/core';
+
+// Mock values used in the component file (assuming these constants/keys exist)
+const localKeys = { USER_DETAILS: 'user_details' };
+const MENTOR_DIR_CARD_FORM = 'mentor_dir_card_form';
+const urlConstants = { API_URLS: { MENTORS_DIRECTORY_LIST: 'api/mentors/' } };
 
 jasmine.DEFAULT_TIMEOUT_INTERVAL = 10000;
 
@@ -51,6 +62,7 @@ class MockFormService {
 
 class MockLocalStorageService {
   getLocalData = jasmine.createSpy('getLocalData').and.callFake((key) => {
+    // return a user object
     return Promise.resolve({ id: 42, name: 'current-user' });
   });
 }
@@ -109,6 +121,7 @@ describe('MentorDirectoryPage', () => {
     component.searchText = '';
     component.mentorForm = {};
     component.mentors = [];
+    component.loading = false; // Reset loading state
 
     fixture.detectChanges();
     await fixture.whenStable();
@@ -125,16 +138,30 @@ describe('MentorDirectoryPage', () => {
     expect(Array.isArray(component.buttonConfig)).toBeTrue();
     expect(component.buttonConfig.length).toBeGreaterThan(0);
   });
-
-  it('ionViewWillEnter should fetch user, form, initialize and call getMentors and gotToTop', async () => {
+  
+  // --- BRANCH COVERAGE: ionViewWillEnter 'this.loading' check ---
+  it('ionViewWillEnter should skip initialization and only scroll if this.loading is true', async () => {
     spyOn(component, 'getMentors').and.returnValue(Promise.resolve());
-    // ensure content spy exists
+    component.loading = true; // Set state to hit the branch
     (component as any).content = { scrollToTop: jasmine.createSpy('scrollToTop') } as any;
 
     await component.ionViewWillEnter();
 
-    expect(localStorage.getLocalData).toHaveBeenCalled();
-    expect(formService.getForm).toHaveBeenCalledWith(jasmine.anything());
+    expect((component as any).content.scrollToTop).toHaveBeenCalled();
+    expect(localStorage.getLocalData).not.toHaveBeenCalled();
+    expect(component.getMentors).not.toHaveBeenCalled();
+  });
+
+  it('ionViewWillEnter should fetch user, form, initialize and call getMentors and gotToTop (Success Path)', async () => {
+    spyOn(component, 'getMentors').and.returnValue(Promise.resolve());
+    (component as any).content = { scrollToTop: jasmine.createSpy('scrollToTop') } as any;
+    component.loading = false; // Ensure it proceeds
+
+    await component.ionViewWillEnter();
+
+    expect(component.loading).toBeTrue(); // Should set loading = true at start
+    expect(localStorage.getLocalData).toHaveBeenCalledWith(localKeys.USER_DETAILS);
+    expect(formService.getForm).toHaveBeenCalledWith(MENTOR_DIR_CARD_FORM);
     expect(component.currentUserId).toBe(42);
     expect(component.page).toBe(1);
     expect(component.mentors).toEqual([]);
@@ -143,99 +170,215 @@ describe('MentorDirectoryPage', () => {
     expect((component as any).content.scrollToTop).toHaveBeenCalled();
   });
 
-  it('getMentors should populate mentors, mentorsCount, map buttonConfig and disable infinite when total values >= count', async () => {
-    // Create mock data shaped as groups with values arrays
+  it('ionViewWillEnter should handle localStorage error gracefully', async () => {
+    (localStorage.getLocalData as jasmine.Spy).and.returnValue(Promise.reject(new Error('User Fetch Fail')));
+    spyOn(component, 'getMentors').and.returnValue(Promise.resolve());
+    component.loading = false;
+
+    await component.ionViewWillEnter();
+
+    expect(localStorage.getLocalData).toHaveBeenCalled();
+    // currentUserId will be undefined/null, but execution continues
+    expect(component.getMentors).toHaveBeenCalled();
+  });
+  
+  // --- BRANCH COVERAGE: getMentors when showLoader is FALSE ---
+  it('getMentors should NOT call startLoader/stopLoader when showLoader is false', async () => {
+    const mockData = { result: { data: [{ values: [{ id: 1 }] }], count: 1 } };
+    (httpService.get as jasmine.Spy).and.returnValue(Promise.resolve(mockData));
+
+    await component.getMentors(false, false); // showLoader=false
+
+    expect(loaderService.startLoader).not.toHaveBeenCalled();
+    expect(loaderService.stopLoader).not.toHaveBeenCalled();
+    expect(component.isLoaded).toBeTrue();
+  });
+  
+  // --- BRANCH COVERAGE: getMentors when isLoadMore is FALSE (Initial Load / Refresh) ---
+  it('getMentors should REPLACE mentors and set mentorsCount when isLoadMore is false', async () => {
+    component.mentors = [{ values: [{ id: 99 }] }]; // existing data
+    const mockData = { result: { data: [{ values: [{ id: 1 }] }], count: 5 } };
+    (httpService.get as jasmine.Spy).and.returnValue(Promise.resolve(mockData));
+
+    await component.getMentors(false, false); // isLoadMore=false
+
+    expect(component.mentors.length).toBe(1); // Replaced, not appended
+    expect(component.mentorsCount).toBe(5); // Should set the count
+    expect(component.isInfiniteScrollDisabled).toBeFalse(); // 1 < 5
+  });
+
+  // --- BRANCH COVERAGE: getMentors when total values < count (Infinite Scroll NOT Disabled) ---
+  it('getMentors should NOT disable infinite scroll when total values < count', async () => {
+    // totalValues = 2, count = 5 -> isInfiniteScrollDisabled false
     const mockData = {
       result: {
-        data: [
-          { values: [{ id: 1 }, { id: 2 }] },
-          { values: [{ id: 3 }] }
-        ],
-        count: 3
+        data: [{ values: [{ id: 1 }, { id: 2 }] }],
+        count: 5 
       }
     };
     (httpService.get as jasmine.Spy).and.returnValue(Promise.resolve(mockData));
 
-    // ensure current user id is one of mentors to test hide logic
-    component.currentUserId = 2;
-    component.buttonConfig = [{ id: 'a', label: 'A' }];
+    await component.getMentors(true, false);
+
+    expect(component.isInfiniteScrollDisabled).toBeFalse();
+  });
+  
+  // --- BRANCH COVERAGE: getMentors when total values == count (Infinite Scroll Disabled) ---
+  it('getMentors should disable infinite scroll when total values == count', async () => {
+    // totalValues = 2, count = 2 -> isInfiniteScrollDisabled true
+    const mockData = {
+      result: {
+        data: [{ values: [{ id: 1 }, { id: 2 }] }],
+        count: 2
+      }
+    };
+    (httpService.get as jasmine.Spy).and.returnValue(Promise.resolve(mockData));
 
     await component.getMentors(true, false);
 
-    expect(httpService.get).toHaveBeenCalled();
-    expect(component.data).toBeDefined();
-    expect(Array.isArray(component.mentors)).toBeTrue();
-    expect(component.mentors.length).toBe(2); // two groups returned
-    expect(component.mentorsCount).toBe(3);
-    // totalValues = 2 + 1 = 3 -> isInfiniteScrollDisabled true
     expect(component.isInfiniteScrollDisabled).toBeTrue();
-
-    // Check that each mentor in values has buttonConfig and that id==currentUserId has isHide true
-    const flattened = component.mentors.reduce((acc: any[], g: any) => acc.concat(g.values || []), []);
-
-    expect(flattened.every((m: any) => Array.isArray(m.buttonConfig))).toBeTrue();
-    const mentorWithId2 = flattened.find((m: any) => m.id === 2);
-    expect(mentorWithId2).toBeDefined();
-    // find a mapped button and check for isHide flag on that mentor
-    expect(mentorWithId2.buttonConfig.some((b: any) => b.isHide === true)).toBeTrue();
   });
 
+  // --- BRANCH COVERAGE: getMentors when data array is empty (Infinite Scroll Disabled) ---
+  it('getMentors should disable infinite scroll when returned data array is empty', async () => {
+    // data.result.data.length === 0 -> isInfiniteScrollDisabled true
+    const mockData = {
+      result: {
+        data: [], 
+        count: 10
+      }
+    };
+    (httpService.get as jasmine.Spy).and.returnValue(Promise.resolve(mockData));
+    
+    await component.getMentors(true, false);
+
+    expect(component.isInfiniteScrollDisabled).toBeTrue();
+    expect(component.mentors.length).toBe(0);
+  });
+  
+  // --- BRANCH COVERAGE: getMentors buttonConfig mapping for currentUserId ---
+  it('getMentors should hide buttons for current user and show for others', async () => {
+    const mockData = {
+      result: {
+        data: [{ values: [{ id: 42, name: 'Current User' }, { id: 99, name: 'Other User' }] }],
+        count: 2
+      }
+    };
+    (httpService.get as jasmine.Spy).and.returnValue(Promise.resolve(mockData));
+    component.currentUserId = 42;
+    component.buttonConfig = [{ id: 'btn', label: 'Test' }];
+
+    await component.getMentors(false, false);
+
+    const currentUser = component.mentors[0].values.find(m => m.id === 42);
+    const otherUser = component.mentors[0].values.find(m => m.id === 99);
+
+    // Current User: button should have isHide: true
+    expect(currentUser.buttonConfig.some(b => b.isHide)).toBeTrue();
+    
+    // Other User: button should NOT have isHide: true (default behavior)
+    expect(otherUser.buttonConfig.every(b => b.isHide !== true)).toBeTrue();
+  });
+
+
   it('getMentors should append mentors on load more', async () => {
-    // first call returns 1 group
     const first = { result: { data: [{ values: [{ id: 1 }] }], count: 2 } };
     const second = { result: { data: [{ values: [{ id: 2 }] }], count: 2 } };
     (httpService.get as jasmine.Spy).and.returnValues(Promise.resolve(first), Promise.resolve(second));
 
-    component.buttonConfig = [{ id:'x', label:'X' }];
-    component.currentUserId = 999; // no hiding
-
-    // initial fetch (not load more)
-    await component.getMentors(true, false);
+    // initial fetch
+    await component.getMentors(false, false);
     expect(component.mentors.length).toBe(1);
 
-    // now simulate load more (isLoadMore true); mentors should append
+    // load more (isLoadMore true)
     await component.getMentors(false, true);
     expect(component.mentors.length).toBe(2);
+    expect(component.mentors.some(g => g.values.some(m => m.id === 2))).toBeTrue();
   });
 
-  it('getMentors should handle error and stop loader', async () => {
+  // --- BRANCH COVERAGE: getMentors Error Handling ---
+  it('getMentors should handle error, set isLoaded and disable scroll', async () => {
     (httpService.get as jasmine.Spy).and.returnValue(Promise.reject(new Error('boom')));
-    // removed duplicate spyOn because loaderService methods are already spies in MockLoaderService
-
+    
+    // Initial load error (showLoader=true)
     await component.getMentors(true, false);
 
-    // assert existing spies were called
     expect(loaderService.startLoader).toHaveBeenCalled();
     expect(loaderService.stopLoader).toHaveBeenCalled();
     expect(component.isLoaded).toBeTrue();
     expect(component.isInfiniteScrollDisabled).toBeTrue();
+    
+    // Load more error (showLoader=false)
+    (httpService.get as jasmine.Spy).and.returnValue(Promise.reject(new Error('boom')));
+    component.isLoaded = false;
+    component.isInfiniteScrollDisabled = false;
+    await component.getMentors(false, true);
+    
+    expect(loaderService.startLoader.calls.count()).toBe(1); // Only called once in the first block
+    expect(component.isLoaded).toBeTrue();
+    expect(component.isInfiniteScrollDisabled).toBeTrue();
   });
 
-  it('eventAction should navigate for cardSelect, chat, and requestSession', () => {
+
+  it('eventAction should navigate for cardSelect', () => {
     component.eventAction({ type: 'cardSelect', data: { id: 11 } } as any);
     expect(router.navigate).toHaveBeenCalledWith([CommonRoutes.MENTOR_DETAILS, 11]);
+  });
 
+  it('eventAction should navigate for chat', () => {
     component.eventAction({ type: 'chat', data: { id: 22 } } as any);
     expect(router.navigate).toHaveBeenCalledWith([CommonRoutes.CHAT_REQ, { id: 22 }], { queryParams: { id: 22 } });
+  });
 
+  it('eventAction should navigate for requestSession', () => {
     component.eventAction({ type: 'requestSession', data: 33 } as any);
     expect(router.navigate).toHaveBeenCalledWith([CommonRoutes.SESSION_REQUEST], { queryParams: { data: 33 } });
   });
 
-  it('loadMore should increment page, call getMentors and complete event', async () => {
+  // --- BRANCH COVERAGE: eventAction default case (unmatched type) ---
+  it('eventAction should do nothing for an unknown type (default case)', () => {
+    const initialCalls = router.navigate.calls.count();
+    component.eventAction({ type: 'unknownAction', data: {} } as any);
+    expect(router.navigate.calls.count()).toBe(initialCalls); 
+  });
+
+  it('loadMore should increment page, call getMentors and complete event when not disabled', async () => {
     const mockEvent: any = { target: { complete: jasmine.createSpy('complete') } };
     spyOn(component, 'getMentors').and.returnValue(Promise.resolve());
 
-    component.data = { result: { data: [{ values: [] }] } }; // simulate data present
+    component.data = { result: { data: [{ values: [] }] } }; // ensures this.data is true
     component.isInfiniteScrollDisabled = false;
     component.page = 1;
 
     await component.loadMore(mockEvent);
 
     expect(component.page).toBe(2);
-    expect(component.getMentors).toHaveBeenCalled();
+    expect(component.getMentors).toHaveBeenCalledWith(false, true); 
     expect(mockEvent.target.complete).toHaveBeenCalled();
   });
+
+  // --- BRANCH COVERAGE: loadMore when disabled ---
+  it('loadMore should NOT increment page or call getMentors if data is missing or infinite scroll is disabled', async () => {
+    const mockEvent: any = { target: { complete: jasmine.createSpy('complete') } };
+    spyOn(component, 'getMentors').and.returnValue(Promise.resolve());
+
+    // Case 1: Infinite Scroll Disabled
+    component.isInfiniteScrollDisabled = true;
+    component.data = {};
+    component.page = 1;
+    await component.loadMore(mockEvent);
+    expect(component.page).toBe(1);
+
+    // Case 2: Data is missing (component.data is falsy)
+    component.isInfiniteScrollDisabled = false;
+    component.data = undefined;
+    await component.loadMore(mockEvent);
+    expect(component.page).toBe(1);
+    
+    expect(component.getMentors).not.toHaveBeenCalled();
+    expect(mockEvent.target.complete).toHaveBeenCalledTimes(2); // Should complete event in both cases
+  });
+
 
   it('onSearch should navigate to mentor search directory with query param', () => {
     component.searchText = 'hello';

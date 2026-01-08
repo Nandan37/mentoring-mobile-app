@@ -16,24 +16,24 @@ export class PageHeaderComponent implements OnInit {
   @Output() actionEvent = new EventEmitter();
   hasBadge: boolean;
 
-  constructor(private location:NavController,
-    private router : Router,
+  constructor(private location: NavController,
+    private router: Router,
     private utilService: UtilService
-  ) {}
+  ) { }
 
-  routes =[
-     { title: 'MENTORS', action: "mentor-directory", icon: 'people', class:"hide-on-small-screen", url: CommonRoutes.TABS+'/'+CommonRoutes.MENTOR_DIRECTORY, pageId: PAGE_IDS.mentorDirectory},
-     { title: 'DASHBOARD', action: "dashboard", icon: 'stats-chart', class:"hide-on-small-screen", url: CommonRoutes.TABS+'/'+CommonRoutes.DASHBOARD, pageId: PAGE_IDS.dashboard },
-     { title: 'HELP', action: "help", icon: 'help-circle', url: CommonRoutes.HELP, pageId: PAGE_IDS.help},
-     { title: 'FAQ', action: "faq", icon: 'alert-circle', url: CommonRoutes.FAQ, pageId: PAGE_IDS.faq},
-     { title: 'HELP_VIDEOS', action: "help videos", icon: 'videocam',url: CommonRoutes.HELP_VIDEOS, pageId: PAGE_IDS.helpVideos },
-     { title: 'LANGUAGE', action: "selectLanguage", icon: 'language', url: CommonRoutes.LANGUAGE, pageId: PAGE_IDS.language },
-     { title: 'CHANGE_PASSWORD', action: 'change-password', icon: 'key', url: CommonRoutes.CHANGE_PASSWORD, pageId: PAGE_IDS.changePassword},
-     { title: 'LOGIN_ACTIVITY', action: 'login-activity', icon: 'time', url: CommonRoutes.LOGIN_ACTIVITY, pageId: PAGE_IDS.loginActivity},
-     {title: 'ADMIN_WORKSPACE', action: "admin", icon: 'briefcase' ,class:'', url: CommonRoutes.ADMIN+'/'+CommonRoutes.ADMIN_DASHBOARD, pageId: PAGE_IDS.adminWorkspace}
-   ];
+  routes = [
+    { title: 'MENTORS', action: "mentor-directory", icon: 'people', class: "hide-on-small-screen", url: CommonRoutes.TABS + '/' + CommonRoutes.MENTOR_DIRECTORY, pageId: PAGE_IDS.mentorDirectory },
+    { title: 'DASHBOARD', action: "dashboard", icon: 'stats-chart', class: "hide-on-small-screen", url: CommonRoutes.TABS + '/' + CommonRoutes.DASHBOARD, pageId: PAGE_IDS.dashboard },
+    { title: 'HELP', action: "help", icon: 'help-circle', url: CommonRoutes.HELP, pageId: PAGE_IDS.help },
+    { title: 'FAQ', action: "faq", icon: 'alert-circle', url: CommonRoutes.FAQ, pageId: PAGE_IDS.faq },
+    { title: 'HELP_VIDEOS', action: "help videos", icon: 'videocam', url: CommonRoutes.HELP_VIDEOS, pageId: PAGE_IDS.helpVideos },
+    { title: 'LANGUAGE', action: "selectLanguage", icon: 'language', url: CommonRoutes.LANGUAGE, pageId: PAGE_IDS.language },
+    { title: 'CHANGE_PASSWORD', action: 'change-password', icon: 'key', url: CommonRoutes.CHANGE_PASSWORD, pageId: PAGE_IDS.changePassword },
+    { title: 'LOGIN_ACTIVITY', action: 'login-activity', icon: 'time', url: CommonRoutes.LOGIN_ACTIVITY, pageId: PAGE_IDS.loginActivity },
+    { title: 'ADMIN_WORKSPACE', action: "admin", icon: 'briefcase', class: '', url: CommonRoutes.ADMIN + '/' + CommonRoutes.ADMIN_DASHBOARD, pageId: PAGE_IDS.adminWorkspace }
+  ];
   ngOnInit() {
-      this.utilService.hasBadge$.subscribe((flag) => {
+    this.utilService.hasBadge$.subscribe((flag) => {
       this.hasBadge = flag;
     });
   }
@@ -44,10 +44,13 @@ export class PageHeaderComponent implements OnInit {
   onBack() {
     const currentUrl = this.router.url;
     if (currentUrl === `/${CommonRoutes.TABS}/${CommonRoutes.HOME}`) {
-      const baseUrl = window.location.origin;
-      window.location.href = `${baseUrl}/home`;
+      this.redirectToHome();
     } else {
       this.location.pop();
     }
+  }
+  redirectToHome() {
+    const baseUrl = window.location.origin;
+    window.location.href = `${baseUrl}/home`;
   }
 }
