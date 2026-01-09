@@ -37,6 +37,7 @@ export class GenericCardComponent implements OnInit {
   handleButtonClick(action: string, data) {
     let value = {
       data: data.id || data.user_id,
+      name : data.name,
       type: action,
       rid: data?.connection_meta?.room_id,
       element: data

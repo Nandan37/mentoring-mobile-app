@@ -16,6 +16,7 @@ import { SessionService } from 'src/app/core/services/session/session.service';
 import { CommonRoutes } from 'src/global.routes';
 import { Location } from '@angular/common';
 import * as _ from 'lodash';
+import { TitleCasePipe } from '@angular/common';
 
 @Component({
   selector: 'app-mentor-details',
@@ -23,15 +24,20 @@ import * as _ from 'lodash';
   styleUrls: ['./mentor-details.page.scss'],
 })
 export class MentorDetailsPage implements OnInit {
+  mentorName;
   mentorId;
   page = 1;
   limit = 100;
   totalCount = 0;
+  isdisabled:boolean;
+  connected;
   public isMobile: any;
   currentUserId: any;
   public headerConfig: any = {
     backButton: false,
-    headerColor: "primary"
+    headerColor: "primary",
+    popOver: true,
+    actions : []
   };
   disableInfiniteScroll: boolean = false;
 
@@ -112,7 +118,15 @@ export class MentorDetailsPage implements OnInit {
     this.detailData.data = this.mentorProfileData?.result;
     this.detailData.data.organizationName =
       this.mentorProfileData?.result?.organization?.name || '';
-    this.headerConfig.share = this.detailData.data?.is_mentor;
+    // this.headerConfig.share = this.detailData.data?.is_mentor;
+     this.mentorName = new TitleCasePipe().transform(this.mentorProfileData.result.username);
+    this.headerConfig.actions = []; 
+
+    if (this.mentorProfileData.result.is_connected) {
+        this.headerConfig.actions.push("block", "share");
+    } else {
+        this.headerConfig.actions.push("share");
+           }
   }
 
   async getUpcomingSessions(isLoadMore: boolean = false) {
@@ -193,13 +207,17 @@ export class MentorDetailsPage implements OnInit {
       case 'share':
         this.share();
         break;
+
+      case 'block':
+        this.block(this.mentorId);
+        break;
     }
   }
   
   async share() {
     if(this.isMobile && navigator.share){
           let url = `/mentoring/${CommonRoutes.MENTOR_DETAILS}/${this.buttonConfig.meta.id}`;
-          let link = await this.utilService.getDeepLink(url);
+          let link = this.utilService.getDeepLink(url);
           let params = {
             link: link,
             subject: "Profile Share",
@@ -209,8 +227,32 @@ export class MentorDetailsPage implements OnInit {
         } else {
           await this.copyToClipBoard(window.location.href);
           this.toast.showToast('PROFILE_LINK_COPIED', 'success');
-        }
+        }     
   }
+   async block(mentorId) {
+    const userId = mentorId;
+
+    const result = await this.utilService.alertPopup({
+    header: "CONFIRM_BLOCK_HEADER",   
+    message: "CONFIRM_BLOCK_MESSAGE", 
+    submit: "BLOCK",
+    cancel: "CANCEL",
+    swapButtons: true
+  },
+   {name: this.mentorName}
+  );
+
+  if (result) {
+    // const payload = {
+    //       url:urlConstants.block,
+    //       payload: {user_id: userId},
+    //       };
+    //     this.httpService.post(payload)
+    
+        this.toast.showToast("BLOCK_TOAST_MESSAGE","success", 5000,[],undefined, {name:this.mentorName})
+        this.isdisabled=true;
+             }           
+}  
   
   copyToClipBoard = async (copyData: any) => {
     await Clipboard.write({
@@ -247,7 +289,7 @@ export class MentorDetailsPage implements OnInit {
     }
   }
   
-  private updateButtonConfig() {
+   updateButtonConfig() {
     this.buttonConfig.buttons = !this.mentorProfileData?.result?.is_mentor
       ? [
           {
@@ -273,6 +315,11 @@ export class MentorDetailsPage implements OnInit {
                    ...btn,isHide: true
             }));
            }
+  }
+
+  unblock(){
+    this.isdisabled=false;
+    // implement the api function
   }
 
   async loadMore(event) {
