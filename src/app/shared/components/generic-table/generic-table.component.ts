@@ -3,6 +3,7 @@ import { MatPaginator } from '@angular/material/paginator';
 import { MatTableDataSource } from '@angular/material/table';
 import { PopoverController } from '@ionic/angular';
 import { paginatorConstants } from 'src/app/core/constants/paginatorConstants';
+import { ToastService } from 'src/app/core/services';
 
 @Component({
   selector: 'app-generic-table',
@@ -17,21 +18,41 @@ export class GenericTableComponent implements OnInit {
   @Input() headingText;
   @Input() totalCount;
   @Input() noDataMessage;
-  @Input() showPaginator
+  @Input() showPaginator 
   @Input() setPaginatorToFirstpage
+  @Input() maxCount;
+  @Input() selectedCount;
+  @Input() disabledCheckboxId: string | null = null;
+  @Input() selectedList;
+  @Input() showSelectAll;
+  @Input() showCheckbox;
   @Output() onClickEvent = new EventEmitter();
   @Output() paginatorChanged = new EventEmitter();
   @Output() onSorting = new EventEmitter();
+  @Output() onSelectAllChange = new EventEmitter<boolean>();
+  @Output() onSelectAllXChange = new EventEmitter<boolean>();
   pageSize = paginatorConstants.defaultPageSize;
   pageSizeOptions = paginatorConstants.pageSizeOptions;
+  private programmaticUpdate = new Set<any>();
+  private isSelectAllInProgress = false;
+   temporaryRow : any;
+
   
   dataSource: MatTableDataSource<any>;
   displayedColumns:any;
-  constructor(public popoverController: PopoverController) { }
+  constructor(public popoverController: PopoverController, private toast: ToastService) { }
+   
+  actionButtons = {
+  REMOVE: 'REMOVE',
+  ADD: 'ADD'
+};
+
+selectAllXActive: boolean;
 
   ngOnInit() {
-    this.displayedColumns = this.columnData.map(column => column.name);
+    this.displayedColumns = ['select', ...this.columnData.map(column => column.name)];
     this.dataSource = new MatTableDataSource(this.tableData);
+    console.log(this.showPaginator, "gen paginator 55")
   }
   ngOnChanges(changes: SimpleChanges) {
     if(this.setPaginatorToFirstpage){
@@ -40,15 +61,26 @@ export class GenericTableComponent implements OnInit {
     if (changes['tableData']) {
       this.dataSource = new MatTableDataSource(this.tableData);
     }
+    if(this.selectedCount === this.totalCount || this.selectedCount >= this.maxCount){
+  this.selectAllXActive = true;
+} else {
+  this.selectAllXActive = false;
+}
+console.log(this.selectedList, "selected list in on changes 65");
   }
 
   onCellClick(action: any, columnName?: any, element?: any) {
+    console.log("67")
     let value = {
       action:action,
       columnName: columnName,
       element: element
     }
+     this.programmaticUpdate.add(element);
     this.onClickEvent.emit(value)
+    setTimeout(() => {
+    this.programmaticUpdate.delete(element);
+  }, 0);
   }
 
   async onClickSorting(event: any,data: any) {
@@ -62,6 +94,113 @@ export class GenericTableComponent implements OnInit {
       pageSize: this.paginator.pageSize
     }
     this.paginatorChanged.emit(data);
+    this.isAllSelected();
   }
+  onSelectAllChangeClick(event: any){
+     console.log(event.detail.checked, "onSelectAllChangeClick - 89");
+    if (this.programmaticUpdate.has(this.temporaryRow) ) {
+    console.log("Ignoring programmatic checkbox update");
+    return;
+  }
+    this.isSelectAllInProgress = true;
+    if(event.detail.checked){
+    // if(this.selectedCount >= this.maxCount){
+      
+    //    this.toast.showToast('SESSION_MENTEE_LIMIT', 'danger');
+    //    console.log(" onSelectAllChangeClick - 93");
+    //     event.target.checked = false;
+    // }
+  }
+     this.onSelectAllChange.emit(event.detail.checked)   
+     if(!this.isAllSelected()){
+      event.target.checked = false;
+     }
+    this.isAllSelected()
+     setTimeout(() => {
+    this.isSelectAllInProgress = false;
+  }, 0);
+    
+  }
+
+    isAllSelected(): boolean {
+      
+      console.log(this.tableData, "table data in is all selected 106");
+  if (!this.tableData || this.tableData.length === 0) {
+    return false;
+  }
+  
+  for (const item of this.tableData) {
+    
+    if (item.enrolled_type === 'ENROLLED') {
+      continue;
+    }
+    const hasRemoveAction =
+      item.action?.some(a => a.name == 'REMOVE') ?? false;
+
+    if (!hasRemoveAction) {
+      return false;
+    }
+    
+    if( this.tableData.length > this.maxCount  && this.selectedCount == this.maxCount){
+
+      return true;
+    }
+  }
+  return true;
+}
+
+ isRowInRemoveState(element: any): boolean {
+  console.log(element, "element in isRowInRemoveState 139");
+  return element?.action?.some(a => a.name === 'REMOVE') ?? false;
+  
+         
+}
+
+onCheckboxAction(row: any, event: any) {
+  this.temporaryRow = row
+  console.log(event, "onCheckboxAction triggered 152");
+  
+   if (this.programmaticUpdate.has(row)  || this.isSelectAllInProgress) {
+    console.log("Ignoring programmatic checkbox update");
+    return;
+  }
+  console.log(row, event, "onCheckboxAction - 145");
+  const isChecked = event.detail.checked;
+  if ( isChecked && this.selectedCount >= this.maxCount) {
+    event.target.checked = false;
+    this.toast.showToast('SESSION_MENTEE_LIMIT', 'danger');
+    console.log("onCheckboxAction - 147");
+    return;
+  }
+  
+  const action = isChecked ? 'ADD' : 'REMOVE';
+  console.log("onCheckboxAction - 151", isChecked,action);
+
+  this.onCellClick(action, null, row);
+  console.log("onCheckboxAction - on cell click triggered 157");
+  this.isAllSelected();
+}    
+
+
+  onToggleSelectAllX(){
+    this.selectAllXActive = !this.selectAllXActive
+    this.onSelectAllXChange.emit(this.selectAllXActive)
+  }
+
+  isCheckboxDisabled(element: any): boolean {
+  if (this.disabledCheckboxId === element.id) {
+    return true;
+  }
+  const isSelected = this.selectedList.some(item => item.id === element.id);
+  if (isSelected) {
+    return false; 
+  }
+  const selectedCount = this.selectedList.length;
+  const maxCountReached = this.maxCount && selectedCount >= this.maxCount;
+  if (maxCountReached) {
+    return true;
+  }
+  return false;
+}
 
 }
