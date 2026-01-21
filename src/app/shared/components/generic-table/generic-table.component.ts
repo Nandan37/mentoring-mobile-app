@@ -52,7 +52,6 @@ selectAllXActive: boolean;
   ngOnInit() {
     this.displayedColumns = ['select', ...this.columnData.map(column => column.name)];
     this.dataSource = new MatTableDataSource(this.tableData);
-    console.log(this.showPaginator, "gen paginator 55")
   }
   ngOnChanges(changes: SimpleChanges) {
     if(this.setPaginatorToFirstpage){
@@ -66,11 +65,9 @@ selectAllXActive: boolean;
 } else {
   this.selectAllXActive = false;
 }
-console.log(this.selectedList, "selected list in on changes 65");
   }
 
   onCellClick(action: any, columnName?: any, element?: any) {
-    console.log("67")
     let value = {
       action:action,
       columnName: columnName,
@@ -97,19 +94,12 @@ console.log(this.selectedList, "selected list in on changes 65");
     this.isAllSelected();
   }
   onSelectAllChangeClick(event: any){
-     console.log(event.detail.checked, "onSelectAllChangeClick - 89");
     if (this.programmaticUpdate.has(this.temporaryRow) ) {
-    console.log("Ignoring programmatic checkbox update");
     return;
   }
     this.isSelectAllInProgress = true;
     if(event.detail.checked){
-    // if(this.selectedCount >= this.maxCount){
-      
-    //    this.toast.showToast('SESSION_MENTEE_LIMIT', 'danger');
-    //    console.log(" onSelectAllChangeClick - 93");
-    //     event.target.checked = false;
-    // }
+    
   }
      this.onSelectAllChange.emit(event.detail.checked)   
      if(!this.isAllSelected()){
@@ -124,7 +114,6 @@ console.log(this.selectedList, "selected list in on changes 65");
 
     isAllSelected(): boolean {
       
-      console.log(this.tableData, "table data in is all selected 106");
   if (!this.tableData || this.tableData.length === 0) {
     return false;
   }
@@ -150,7 +139,6 @@ console.log(this.selectedList, "selected list in on changes 65");
 }
 
  isRowInRemoveState(element: any): boolean {
-  console.log(element, "element in isRowInRemoveState 139");
   return element?.action?.some(a => a.name === 'REMOVE') ?? false;
   
          
@@ -158,26 +146,20 @@ console.log(this.selectedList, "selected list in on changes 65");
 
 onCheckboxAction(row: any, event: any) {
   this.temporaryRow = row
-  console.log(event, "onCheckboxAction triggered 152");
   
    if (this.programmaticUpdate.has(row)  || this.isSelectAllInProgress) {
-    console.log("Ignoring programmatic checkbox update");
     return;
   }
-  console.log(row, event, "onCheckboxAction - 145");
   const isChecked = event.detail.checked;
   if ( isChecked && this.selectedCount >= this.maxCount) {
     event.target.checked = false;
     this.toast.showToast('SESSION_MENTEE_LIMIT', 'danger');
-    console.log("onCheckboxAction - 147");
     return;
   }
   
   const action = isChecked ? 'ADD' : 'REMOVE';
-  console.log("onCheckboxAction - 151", isChecked,action);
 
   this.onCellClick(action, null, row);
-  console.log("onCheckboxAction - on cell click triggered 157");
   this.isAllSelected();
 }    
 
